@@ -55,16 +55,16 @@ if { ![util::is_nil id] } {
       template::multirow foreach items { 
           switch $item_type {
               content_template { 
-                  set url "../templates/properties?id=item_id"
+                  set url "../templates/properties?id=$item_id"
               }
               party {
                   set url "../$id/index?id="
               }
               user {
-                  set url "../$id/one-user?id=item_id"
+                  set url "../$id/one-user?id=$item_id"
               }
               default {
-                  set url "../$id/index?id=item_id"
+                  set url "../$id/index?id=$item_id"
               }
           }
           # this is for all items in the sitemap that need to be listed under the
