@@ -38,25 +38,8 @@ ad_proc -public content_add::content_method_html { content_type item_id } {
 
     set target "revision-add-2?item_id=$item_id"
 
-    template::query count_text_mime_types has_text_mime_type onevalue "
-      select
-        count(*)
-      from
-        cr_content_mime_type_map
-      where
-        mime_type like ('%text/%')
-      and
-        content_type = :content_type
-    "
-
-    template::query count_mime_types mime_type_count onevalue "
-      select
-        count(*)
-      from
-        cr_content_mime_type_map
-      where
-        content_type = :content_type
-    " 
+    set has_text_mime_type [db_string count_text_mime_types ""]
+    set mime_type_count [db_string count_mime_types ""]
 
     if { $mime_type_count > 0 } {
 

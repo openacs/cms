@@ -38,15 +38,7 @@ ad_proc content_method::get_content_methods { content_type args } {
     set text_entry_filter [text_entry_filter_sql $content_type]
 
     # get default content method (if any)
-    template::query get_default_method default_method onevalue "
-      select 
-        content_method 
-      from
-        cm_content_methods m
-      where
-        content_method = content_method.get_method (:content_type )
-      $text_entry_filter
-    " -cache "content_method_types_default $content_type"
+    set default_method [db_string get_default_method ""]
     
     # if the default exists, return it
     if { ![template::util::is_nil default_method] } {
@@ -54,30 +46,13 @@ ad_proc content_method::get_content_methods { content_type args } {
     } else {
 	# otherwise look up all content method mappings
 
-	template::query get_methods_1 methods onelist "
-	  select
-	    map.content_method
-	  from
-	    cm_content_type_method_map map, cm_content_methods m
-	  where
-	    map.content_method = m.content_method
-	  and
-	    map.content_type = :content_type
-	  $text_entry_filter
-	" -cache "content_method_types $content_type"
+        set methods [db_list get_methods_1 ""]
     }
 
     # if there are no mappings, return all methods
     if { [template::util::is_nil methods] } {
 
-	template::query get_methods_2 methods onelist "
-	  select
-	    content_method
-	  from
-	    cm_content_methods m
-	  where 1 = 1
-	  $text_entry_filter
-	" -cache "content_method_types"
+        set methods [db_list get_methods_2 ""]
     }
 
     return $methods
@@ -102,48 +77,19 @@ ad_proc content_method::get_content_method_options { content_type } {
     
     set text_entry_filter [text_entry_filter_sql $content_type]
 
-    template::query get_content_default_method default_method onerow "
-      select
-        label, map.content_method
-      from
-        cm_content_type_method_map map, cm_content_methods m
-      where
-        map.content_method = m.content_method
-      and
-        map.content_method = content_method.get_method( :content_type )
-      $text_entry_filter
-    " -cache "content_method_types_n_labels_default $content_type"
-
-    template::util::array_to_vars default_method
+    db_1row get_content_default_method ""
 
     if { ![template::util::is_nil content_method] } {
 	set methods [list [list $label $content_method]]
     } else {
 	# otherwise look up all content methods mappings
-	template::query get_methods_1 methods multilist "
-	  select
-	    label, map.content_method
-	  from
-	    cm_content_methods m, cm_content_type_method_map map
-	  where
-            m.content_method = map.content_method
-	  and
-	    map.content_type = :content_type
-	  $text_entry_filter
-	" -cache "content_method_types_n_labels $content_type"
+        set methods [db_list_of_lists get_methods_1 ""]
     }
 
     # if there are no mappings, return all methods
     if { [template::util::is_nil methods] } {
 
-	template::query get_methods_2 methods multilist "
-	  select
-	    label, content_method
-	  from
-	    cm_content_methods m
-	  where 1 = 1
-	  $text_entry_filter
-	" -cache "content_method_types_n_labels"
+        set methods [db_list_of_lists get_methods_2 ""]
     }
 
     return $methods

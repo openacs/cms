@@ -44,29 +44,11 @@ ad_proc cms_folder::get_registered_types {
   folder_id {datasource multilist} {name registered_types}
 } {
 
-  set code [list \
-    template::query get_name_type $name $datasource "
-    select
-      o.pretty_name,
-      m.content_type
-    from
-      acs_object_types o, cr_folder_type_map m
-    where
-      m.folder_id = :folder_id
-    and
-      m.content_type = o.object_type
-    and
-      content_item.is_subclass(o.object_type, 'content_revision') = 't'
-    order by
-      decode(o.object_type, 'content_revision', '----', o.pretty_name)" \
-    -cache "folder_registered_types $folder_id $datasource" -persistent \
-    -timeout 3600]
-
   if { [string equal $datasource "multirow"] } {
-    lappend code "-uplevel"
+      return [uplevel 1 "db_multirow $name get_name_type {}"]
+  } else {
+      return [db_list_of_lists get_name_type ""]
   }
-
-  eval $code
 }
 
 # @public flush_registered_types
