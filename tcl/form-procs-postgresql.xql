@@ -304,26 +304,6 @@
 	</querytext>
 </partialquery>
 
-<fullquery name="content::get_content_value.gcv_get_revision_id">
-	<querytext>
-
-        select 1
-
-	</querytext>
-</fullquery>
-
-<fullquery name="content::get_content_value.gcv_get_previous_content">      
-      <querytext>
-      
-    select 
-      content
-    from 
-      cr_revisions
-    where 
-      revision_id = :revision_id
-  
-      </querytext>
-</fullquery>
 
 <fullquery name="content::get_attributes.ga_get_attributes">
 	<querytext>

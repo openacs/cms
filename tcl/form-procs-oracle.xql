@@ -257,16 +257,6 @@
 	</querytext>
 </partialquery>
 
-<fullquery name="content::get_content_value.gcv_get_revision_id">
-	<querytext>
-
-	  begin
-	    content_revision.to_temporary_clob(:revision_id);
-	  end;
-
-	</querytext>
-</fullquery>
-
 <fullquery name="content::get_attributes.ga_get_attributes">
 	<querytext>
 

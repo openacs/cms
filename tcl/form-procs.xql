@@ -201,18 +201,6 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="content::get_content_value.gcv_get_previous_content">
-	<querytext>
-
-    select 
-      content
-    from 
-      cr_content_text
-    where 
-      revision_id = :revision_id
-
-	</querytext>
-</fullquery>
 
 <fullquery name="content::copy_content.cc_get_mime_type">
 	<querytext>

@@ -1813,30 +1813,6 @@ ad_proc -public content::get_object_id {} {
   return [db_string nextval "select acs_object_id_seq.nextval from dual"]
 }
 
-ad_proc -public content::get_content_value { revision_id } {
-
-  db_transaction {
-      db_exec_plsql gcv_get_revision_id {
-	  begin
-	    content_revision.to_temporary_clob(:revision_id);
-	  end;
-      }
-
-      # Query for values from a previous revision
-
-      template::query gcv_get_previous_content content onevalue "
-      select 
-        content
-      from 
-        cr_content_text
-      where 
-        revision_id = :revision_id"
-
-  }
-
-  return $content
-}
-
 
 ad_proc -private content::get_attributes { content_type args } {
 
