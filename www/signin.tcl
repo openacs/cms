@@ -1,5 +1,3 @@
-
-
 form create sign_in_user 
 
 element create sign_in_user screen_name \
@@ -13,7 +11,6 @@ element create sign_in_user password \
 	-widget password \
 	-html { size 20 } \
 	-label "Password"
-
 
 
 
