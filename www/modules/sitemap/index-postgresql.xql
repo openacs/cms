@@ -13,7 +13,7 @@
          else coalesce(v.title, i.name) end as title,
     case when r.item_id = :index_page_id then 't' 
                                          else 'f' end as is_index_page,
-    coalesce(round(v.content_length::float8 / 1000.0, 2)::float8::text, '-') as file_size
+    coalesce(round(v.content_length::numeric / 1000.0, 2)::float8::text, '-') as file_size
   from 
     cr_items i 
         LEFT OUTER JOIN 
@@ -53,7 +53,7 @@
     o.object_type, t.pretty_name as content_type,
     to_char(o.last_modified, 'MM/DD/YYYY HH24:MI') as last_modified_date,
     case when r.item_id = :index_page_id then 't' else 'f' end as is_index_page,
-    coalesce(round(v.content_length::float8 / 1000.0, 2)::float8::text, '-') as file_size
+    coalesce(round(v.content_length::numeric / 1000.0, 2)::float8::text, '-') as file_size
   from 
     cr_items i
         LEFT OUTER JOIN
