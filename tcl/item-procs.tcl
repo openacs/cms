@@ -53,7 +53,7 @@ ad_proc -public item::get_item_from_revision { revision_id } {
   @see proc item::get_best_revision
 
 } {
-    set item_id [db_string gifr_get_one_revision ""}
+    set item_id [db_string gifr_get_one_revision ""]
     return $item_id
 }
 
