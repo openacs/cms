@@ -1216,7 +1216,7 @@ declare
   p_transition_key                 alias for $2;  
   p_user_id                        alias for $3;  
 begin
-    select
+    return
       count(task_id) > 0
     from
       wf_tasks t
