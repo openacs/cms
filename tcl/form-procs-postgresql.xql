@@ -252,8 +252,8 @@ null
     from
       acs_attributes,
       (
-	select 
-	  o2.object_type, tree_level(o2.tree_sortkey) as type_order
+ 	select 
+	  o2.object_type as ancestor, tree_level(o2.tree_sortkey) as type_order
 	from
 	  (
 	    SELECT *
