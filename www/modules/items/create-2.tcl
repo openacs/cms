@@ -81,6 +81,13 @@ content::new_item_form -form_name create_item \
 	-content_type $content_type \
 	-content_method $content_method
 
+# added to support content storage selection (OpenACS - DanW)
+element create create_item storage_type \
+	-datatype keyword \
+	-widget radio \
+	-label "Content Storage Type" \
+        -options { {{Lob Storage} lob } {{File Storage} file} {{Text Storage} text}} \
+	-values [list "file"]
 
 if { [wizard exists] } {
   set is_wizard t
@@ -100,9 +107,9 @@ if { [form is_valid create_item] } {
 	return
     }
 
-    form get_values create_item return_url item_id
+    form get_values create_item return_url item_id storage_type
     
-    set item_id [content::new_item create_item]
+    set item_id [content::new_item create_item $storage_type]
 
     # do wizard forward or forward to return_url
     if { ![wizard exists] } { 

@@ -89,6 +89,9 @@ template::util::array_to_vars preview_info
 if { [string equal $physical_path "../"] } {
     set display_path "/"
 } else {
+    if {[string equal [string index $physical_path 0] "/"]} {
+        set physical_path [string range $physical_path 1 end]
+    }
     set display_path "/$physical_path"
 }
 

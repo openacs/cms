@@ -7,7 +7,7 @@
       <querytext>
 
   select
-    r.content, i.storage_type 
+    '[cr_fs_path]' || r.content as content, i.storage_type 
   from 
     cr_revisions r, cr_items i
   where
