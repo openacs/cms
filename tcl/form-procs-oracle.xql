@@ -284,6 +284,14 @@
 	</querytext>
 </fullquery>
 
+<fullquery name="content::get_latest_revision.glr_get_latest_revision">
+	<querytext>
+
+    select content_item.get_latest_revision(:item_id) from dual
+
+	</querytext>
+</fullquery>
+
 <fullquery name="content::get_attribute_enum_values.gaev_get_enum_values">
 	<querytext>
 
@@ -297,16 +305,9 @@
 	   order by
 	     sort_order
 
-	</querytex>
-</fullquery>
-
-<fullquery name="content::get_latest_revision.glr_get_latest_revision">
-	<querytext>
-
-    select content_item.get_latest_revision(:item_id) from dual
-
 	</querytext>
 </fullquery>
+
 
 <fullquery name="content::add_basic_revision.basic_get_revision_id">      
       <querytext>
