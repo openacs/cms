@@ -343,7 +343,7 @@ null
 	</querytext>
 </partialquery>
 
-<partialquery name="content::add_basic_revision.abr_new_revision_publish_date_ne"
+<partialquery name="content::add_basic_revision.abr_new_revision_publish_date_ne">
 	<querytext>
          , now()
 	</querytext>

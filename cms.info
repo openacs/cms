@@ -71,9 +71,7 @@
             <file type="data_model" db_type="postgresql" path="sql/postgresql/cms-update.sql"/>
             <file type="data_model" db_type="postgresql" path="sql/postgresql/cms-widgets.sql"/>
             <file type="data_model" db_type="postgresql" path="sql/postgresql/cms-workflow.sql"/>
-            <file path="sql/postgresql/err.txt"/>
             <file type="data_model" db_type="postgresql" path="sql/postgresql/rel-test.sql"/>
-            <file path="sql/tmp.txt"/>
             <file type="tcl_init" path="tcl/browser-init.tcl"/>
             <file type="tcl_procs" path="tcl/browser-procs.tcl"/>
             <file type="tcl_procs" path="tcl/clipboard-procs.tcl"/>
@@ -83,8 +81,6 @@
             <file type="tcl_procs" path="tcl/cms-folder-procs.tcl"/>
             <file type="tcl_procs" path="tcl/content-add-procs.tcl"/>
             <file type="query_file" path="tcl/content-add-procs.xql"/>
-            <file type="query_file" db_type="oracle" path="tcl/content-method-procs-oracle.xql"/>
-            <file type="query_file" db_type="postgresql" path="tcl/content-method-procs-postgresql.xql"/>
             <file type="tcl_procs" path="tcl/content-method-procs.tcl"/>
             <file type="query_file" path="tcl/content-method-procs.xql"/>
             <file type="query_file" db_type="oracle" path="tcl/form-procs-oracle.xql"/>
@@ -99,6 +95,8 @@
             <file type="query_file" db_type="postgresql" path="tcl/module-procs-postgresql.xql"/>
             <file type="tcl_procs" path="tcl/module-procs.tcl"/>
             <file type="query_file" path="tcl/module-procs.xql"/>
+            <file type="query_file" db_type="oracle" path="tcl/pagination-procs-oracle.xql"/>
+            <file type="query_file" db_type="postgresql" path="tcl/pagination-procs-postgresql.xql"/>
             <file type="tcl_procs" path="tcl/pagination-procs.tcl"/>
             <file type="query_file" path="tcl/pagination-procs.xql"/>
             <file type="query_file" db_type="oracle" path="tcl/perm-procs-oracle.xql"/>
@@ -115,14 +113,15 @@
             <file type="query_file" db_type="oracle" path="tcl/user-procs-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="tcl/user-procs-postgresql.xql"/>
             <file type="tcl_procs" path="tcl/user-procs.tcl"/>
+            <file type="query_file" path="tcl/user-procs.xql"/>
             <file type="query_file" db_type="oracle" path="tcl/widget-procs-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="tcl/widget-procs-postgresql.xql"/>
             <file type="tcl_procs" path="tcl/widget-procs.tcl"/>
             <file type="query_file" db_type="oracle" path="tcl/workflow-procs-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="tcl/workflow-procs-postgresql.xql"/>
             <file type="tcl_procs" path="tcl/workflow-procs.tcl"/>
-            <file type="content_page" path="www/bookmark.adp"/>
-            <file type="content_page" path="www/bookmark.tcl"/>
+            <file path="www/bookmark.adp"/>
+            <file type="tcl_util" path="www/bookmark.tcl"/>
             <file type="documentation" path="www/doc/acs-admin-guide.html"/>
             <file type="documentation" path="www/doc/ad-doc.css"/>
             <file type="documentation" path="www/doc/child_example.html"/>
@@ -196,297 +195,299 @@
             <file type="documentation" path="www/doc/xml/uplevels-namespaces.xml"/>
             <file type="documentation" path="www/doc/xml/user-guide.xml"/>
             <file type="documentation" path="www/doc/xml/user-permissions.xml"/>
-            <file type="content_page" path="www/error.adp"/>
-            <file type="content_page" path="www/error.tcl"/>
-            <file type="content_page" path="www/head.adp"/>
-            <file type="content_page" path="www/head.tcl"/>
+            <file path="www/error.adp"/>
+            <file type="tcl_util" path="www/error.tcl"/>
+            <file path="www/head.adp"/>
+            <file type="tcl_util" path="www/head.tcl"/>
             <file type="query_file" path="www/head.xql"/>
-            <file type="content_page" path="www/index.adp"/>
-            <file type="content_page" path="www/index.tcl"/>
-            <file type="content_page" path="www/index.vuh"/>
+            <file type="query_file" db_type="oracle" path="www/index-oracle.xql"/>
+            <file type="query_file" db_type="postgresql" path="www/index-postgresql.xql"/>
+            <file path="www/index.adp"/>
+            <file type="tcl_util" path="www/index.tcl"/>
+            <file path="www/index.vuh"/>
             <file type="query_file" path="www/index.xql"/>
-            <file type="content_page" path="www/item/children.tcl"/>
+            <file type="tcl_util" path="www/item/children.tcl"/>
             <file type="query_file" db_type="oracle" path="www/item/create-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/item/create-postgresql.xql"/>
-            <file type="content_page" path="www/item/create.adp"/>
-            <file type="content_page" path="www/item/create.tcl"/>
+            <file path="www/item/create.adp"/>
+            <file type="tcl_util" path="www/item/create.tcl"/>
             <file type="query_file" path="www/item/create.xql"/>
-            <file type="content_page" path="www/item/permissions.tcl"/>
-            <file type="content_page" path="www/item/revision-add.tcl"/>
-            <file type="content_page" path="www/item/revision.tcl"/>
-            <file type="content_page" path="www/item/revisions.tcl"/>
-            <file type="content_page" path="www/item/templates.tcl"/>
-            <file type="content_page" path="www/item/workflow-status.tcl"/>
-            <file type="content_page" path="www/loading.html"/>
-            <file type="content_page" path="www/master.adp"/>
-            <file type="content_page" path="www/master.tcl"/>
+            <file type="tcl_util" path="www/item/permissions.tcl"/>
+            <file type="tcl_util" path="www/item/revision-add.tcl"/>
+            <file type="tcl_util" path="www/item/revision.tcl"/>
+            <file type="tcl_util" path="www/item/revisions.tcl"/>
+            <file type="tcl_util" path="www/item/templates.tcl"/>
+            <file type="tcl_util" path="www/item/workflow-status.tcl"/>
+            <file path="www/loading.html"/>
+            <file path="www/master.adp"/>
+            <file type="tcl_util" path="www/master.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/categories/create-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/categories/create-postgresql.xql"/>
-            <file type="content_page" path="www/modules/categories/create.adp"/>
-            <file type="content_page" path="www/modules/categories/create.tcl"/>
+            <file path="www/modules/categories/create.adp"/>
+            <file type="tcl_util" path="www/modules/categories/create.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/categories/delete-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/categories/delete-postgresql.xql"/>
-            <file type="content_page" path="www/modules/categories/delete.tcl"/>
+            <file type="tcl_util" path="www/modules/categories/delete.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/categories/edit-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/categories/edit-postgresql.xql"/>
-            <file type="content_page" path="www/modules/categories/edit.adp"/>
-            <file type="content_page" path="www/modules/categories/edit.tcl"/>
+            <file path="www/modules/categories/edit.adp"/>
+            <file type="tcl_util" path="www/modules/categories/edit.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/categories/index-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/categories/index-postgresql.xql"/>
-            <file type="content_page" path="www/modules/categories/index.adp"/>
-            <file type="content_page" path="www/modules/categories/index.tcl"/>
+            <file path="www/modules/categories/index.adp"/>
+            <file type="tcl_util" path="www/modules/categories/index.tcl"/>
             <file type="query_file" path="www/modules/categories/index.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/categories/keyword-assign-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/categories/keyword-assign-postgresql.xql"/>
-            <file type="content_page" path="www/modules/categories/keyword-assign.tcl"/>
+            <file type="tcl_util" path="www/modules/categories/keyword-assign.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/categories/keyword-unassign-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/categories/keyword-unassign-postgresql.xql"/>
-            <file type="content_page" path="www/modules/categories/keyword-unassign.tcl"/>
-            <file type="content_page" path="www/modules/categories/move.tcl"/>
+            <file type="tcl_util" path="www/modules/categories/keyword-unassign.tcl"/>
+            <file type="tcl_util" path="www/modules/categories/move.tcl"/>
             <file type="query_file" path="www/modules/categories/move.xql"/>
-            <file type="content_page" path="www/modules/categories/refresh-tree.adp"/>
-            <file type="content_page" path="www/modules/categories/refresh-tree.tcl"/>
-            <file type="content_page" path="www/modules/clipboard/add.tcl"/>
-            <file type="content_page" path="www/modules/clipboard/clear-clipboard.adp"/>
-            <file type="content_page" path="www/modules/clipboard/clear-clipboard.tcl"/>
-            <file type="content_page" path="www/modules/clipboard/clipboard-ui.adp"/>
-            <file type="content_page" path="www/modules/clipboard/clipboard-ui.tcl"/>
-            <file type="content_page" path="www/modules/clipboard/clipboard.js"/>
-            <file type="content_page" path="www/modules/clipboard/index.adp"/>
-            <file type="content_page" path="www/modules/clipboard/index.tcl"/>
-            <file type="content_page" path="www/modules/clipboard/list.tcl"/>
-            <file type="content_page" path="www/modules/clipboard/remove.tcl"/>
+            <file path="www/modules/categories/refresh-tree.adp"/>
+            <file type="tcl_util" path="www/modules/categories/refresh-tree.tcl"/>
+            <file type="tcl_util" path="www/modules/clipboard/add.tcl"/>
+            <file path="www/modules/clipboard/clear-clipboard.adp"/>
+            <file type="tcl_util" path="www/modules/clipboard/clear-clipboard.tcl"/>
+            <file path="www/modules/clipboard/clipboard-ui.adp"/>
+            <file type="tcl_util" path="www/modules/clipboard/clipboard-ui.tcl"/>
+            <file path="www/modules/clipboard/clipboard.js"/>
+            <file path="www/modules/clipboard/index.adp"/>
+            <file type="tcl_util" path="www/modules/clipboard/index.tcl"/>
+            <file type="tcl_util" path="www/modules/clipboard/list.tcl"/>
+            <file type="tcl_util" path="www/modules/clipboard/remove.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/assign-keywords-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/assign-keywords-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/assign-keywords.tcl"/>
+            <file type="tcl_util" path="www/modules/items/assign-keywords.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/attributes-edit-oracle.xql"/>
-            <file type="content_page" path="www/modules/items/attributes-edit.adp"/>
-            <file type="content_page" path="www/modules/items/attributes-edit.tcl"/>
+            <file path="www/modules/items/attributes-edit.adp"/>
+            <file type="tcl_util" path="www/modules/items/attributes-edit.tcl"/>
             <file type="query_file" path="www/modules/items/attributes-edit.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/attributes-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/attributes-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/attributes.adp"/>
-            <file type="content_page" path="www/modules/items/attributes.tcl"/>
+            <file path="www/modules/items/attributes.adp"/>
+            <file type="tcl_util" path="www/modules/items/attributes.tcl"/>
             <file type="query_file" path="www/modules/items/attributes.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/children-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/children-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/children.adp"/>
-            <file type="content_page" path="www/modules/items/children.tcl"/>
+            <file path="www/modules/items/children.adp"/>
+            <file type="tcl_util" path="www/modules/items/children.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/comment-add-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/comment-add-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/comment-add.adp"/>
-            <file type="content_page" path="www/modules/items/comment-add.tcl"/>
+            <file path="www/modules/items/comment-add.adp"/>
+            <file type="tcl_util" path="www/modules/items/comment-add.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/comments-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/comments-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/comments.adp"/>
-            <file type="content_page" path="www/modules/items/comments.tcl"/>
-            <file type="content_page" path="www/modules/items/content-add-1.adp"/>
-            <file type="content_page" path="www/modules/items/content-add-1.tcl"/>
+            <file path="www/modules/items/comments.adp"/>
+            <file type="tcl_util" path="www/modules/items/comments.tcl"/>
+            <file path="www/modules/items/content-add-1.adp"/>
+            <file type="tcl_util" path="www/modules/items/content-add-1.tcl"/>
             <file type="query_file" path="www/modules/items/content-add-1.xql"/>
-            <file type="content_page" path="www/modules/items/content-add-2.adp"/>
-            <file type="content_page" path="www/modules/items/content-add-2.tcl"/>
+            <file path="www/modules/items/content-add-2.adp"/>
+            <file type="tcl_util" path="www/modules/items/content-add-2.tcl"/>
             <file type="query_file" path="www/modules/items/content-add-2.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/content-download-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/content-download-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/content-download.tcl"/>
+            <file type="tcl_util" path="www/modules/items/content-download.tcl"/>
             <file type="query_file" path="www/modules/items/content-download.xql"/>
-            <file type="content_page" path="www/modules/items/content-method-links.adp"/>
-            <file type="content_page" path="www/modules/items/content-method-links.tcl"/>
-            <file type="content_page" path="www/modules/items/create-1.adp"/>
-            <file type="content_page" path="www/modules/items/create-1.tcl"/>
+            <file path="www/modules/items/content-method-links.adp"/>
+            <file type="tcl_util" path="www/modules/items/content-method-links.tcl"/>
+            <file path="www/modules/items/create-1.adp"/>
+            <file type="tcl_util" path="www/modules/items/create-1.tcl"/>
             <file type="query_file" path="www/modules/items/create-1.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/create-2-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/create-2-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/create-2.adp"/>
-            <file type="content_page" path="www/modules/items/create-2.tcl"/>
-            <file type="content_page" path="www/modules/items/custom/cr_demo_article_image/create-1.adp"/>
-            <file type="content_page" path="www/modules/items/custom/cr_demo_article_image/create-1.tcl"/>
+            <file path="www/modules/items/create-2.adp"/>
+            <file type="tcl_util" path="www/modules/items/create-2.tcl"/>
+            <file path="www/modules/items/custom/cr_demo_article_image/create-1.adp"/>
+            <file type="tcl_util" path="www/modules/items/custom/cr_demo_article_image/create-1.tcl"/>
             <file type="query_file" path="www/modules/items/custom/cr_demo_article_image/create-1.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/custom/cr_demo_article_image/create-2-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/custom/cr_demo_article_image/create-2-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/custom/cr_demo_article_image/create-2.adp"/>
-            <file type="content_page" path="www/modules/items/custom/cr_demo_article_image/create-2.tcl"/>
+            <file path="www/modules/items/custom/cr_demo_article_image/create-2.adp"/>
+            <file type="tcl_util" path="www/modules/items/custom/cr_demo_article_image/create-2.tcl"/>
             <file type="query_file" path="www/modules/items/custom/cr_demo_article_image/create-2.xql"/>
-            <file type="content_page" path="www/modules/items/custom/image/attributes-edit.adp"/>
-            <file type="content_page" path="www/modules/items/custom/image/attributes-edit.tcl"/>
+            <file path="www/modules/items/custom/image/attributes-edit.adp"/>
+            <file type="tcl_util" path="www/modules/items/custom/image/attributes-edit.tcl"/>
             <file type="query_file" path="www/modules/items/custom/image/attributes-edit.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/custom/image/content-add-1-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/custom/image/content-add-1-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/custom/image/content-add-1.adp"/>
-            <file type="content_page" path="www/modules/items/custom/image/content-add-1.tcl"/>
+            <file path="www/modules/items/custom/image/content-add-1.adp"/>
+            <file type="tcl_util" path="www/modules/items/custom/image/content-add-1.tcl"/>
             <file type="query_file" path="www/modules/items/custom/image/content-add-1.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/custom/image/create-1-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/custom/image/create-1-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/custom/image/create-1.adp"/>
-            <file type="content_page" path="www/modules/items/custom/image/create-1.tcl"/>
+            <file path="www/modules/items/custom/image/create-1.adp"/>
+            <file type="tcl_util" path="www/modules/items/custom/image/create-1.tcl"/>
             <file type="query_file" path="www/modules/items/custom/image/create-1.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/custom/image/revision-add-1-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/custom/image/revision-add-1-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/custom/image/revision-add-1.adp"/>
-            <file type="content_page" path="www/modules/items/custom/image/revision-add-1.tcl"/>
+            <file path="www/modules/items/custom/image/revision-add-1.adp"/>
+            <file type="tcl_util" path="www/modules/items/custom/image/revision-add-1.tcl"/>
             <file type="query_file" path="www/modules/items/custom/image/revision-add-1.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/delete-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/delete-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/delete.tcl"/>
+            <file type="tcl_util" path="www/modules/items/delete.tcl"/>
             <file type="query_file" path="www/modules/items/delete.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/export-xml-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/export-xml-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/export-xml.tcl"/>
+            <file type="tcl_util" path="www/modules/items/export-xml.tcl"/>
             <file type="query_file" path="www/modules/items/export-xml.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/index-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/index-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/index.adp"/>
-            <file type="content_page" path="www/modules/items/index.tcl"/>
+            <file path="www/modules/items/index.adp"/>
+            <file type="tcl_util" path="www/modules/items/index.tcl"/>
             <file type="query_file" path="www/modules/items/index.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/keywords-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/keywords-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/keywords.adp"/>
-            <file type="content_page" path="www/modules/items/keywords.tcl"/>
+            <file path="www/modules/items/keywords.adp"/>
+            <file type="tcl_util" path="www/modules/items/keywords.tcl"/>
             <file type="query_file" path="www/modules/items/keywords.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/publish-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/publish-postgresql.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/publish-status-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/publish-status-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/publish-status.adp"/>
-            <file type="content_page" path="www/modules/items/publish-status.tcl"/>
-            <file type="content_page" path="www/modules/items/publish.tcl"/>
+            <file path="www/modules/items/publish-status.adp"/>
+            <file type="tcl_util" path="www/modules/items/publish-status.tcl"/>
+            <file type="tcl_util" path="www/modules/items/publish.tcl"/>
             <file type="query_file" path="www/modules/items/publish.xql"/>
-            <file type="content_page" path="www/modules/items/relate-child-order.tcl"/>
+            <file type="tcl_util" path="www/modules/items/relate-child-order.tcl"/>
             <file type="query_file" path="www/modules/items/relate-child-order.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/relate-items-2-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/relate-items-2-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/relate-items-2.adp"/>
-            <file type="content_page" path="www/modules/items/relate-items-2.tcl"/>
+            <file path="www/modules/items/relate-items-2.adp"/>
+            <file type="tcl_util" path="www/modules/items/relate-items-2.tcl"/>
             <file type="query_file" path="www/modules/items/relate-items-2.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/relate-items-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/relate-items-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/relate-items.adp"/>
-            <file type="content_page" path="www/modules/items/relate-items.tcl"/>
-            <file type="content_page" path="www/modules/items/relate-order.tcl"/>
+            <file path="www/modules/items/relate-items.adp"/>
+            <file type="tcl_util" path="www/modules/items/relate-items.tcl"/>
+            <file type="tcl_util" path="www/modules/items/relate-order.tcl"/>
             <file type="query_file" path="www/modules/items/relate-order.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/related-items-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/related-items-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/related-items.adp"/>
-            <file type="content_page" path="www/modules/items/related-items.tcl"/>
+            <file path="www/modules/items/related-items.adp"/>
+            <file type="tcl_util" path="www/modules/items/related-items.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/relationship-view-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/relationship-view-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/relationship-view.adp"/>
-            <file type="content_page" path="www/modules/items/relationship-view.tcl"/>
+            <file path="www/modules/items/relationship-view.adp"/>
+            <file type="tcl_util" path="www/modules/items/relationship-view.tcl"/>
             <file type="query_file" path="www/modules/items/relationship-view.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/rename-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/rename-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/rename.adp"/>
-            <file type="content_page" path="www/modules/items/rename.tcl"/>
+            <file path="www/modules/items/rename.adp"/>
+            <file type="tcl_util" path="www/modules/items/rename.tcl"/>
             <file type="query_file" path="www/modules/items/rename.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/revision-add-1-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/revision-add-1-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/revision-add-1.adp"/>
-            <file type="content_page" path="www/modules/items/revision-add-1.tcl"/>
+            <file path="www/modules/items/revision-add-1.adp"/>
+            <file type="tcl_util" path="www/modules/items/revision-add-1.tcl"/>
             <file type="query_file" path="www/modules/items/revision-add-1.xql"/>
-            <file type="content_page" path="www/modules/items/revision-add-2.adp"/>
-            <file type="content_page" path="www/modules/items/revision-add-2.tcl"/>
+            <file path="www/modules/items/revision-add-2.adp"/>
+            <file type="tcl_util" path="www/modules/items/revision-add-2.tcl"/>
             <file type="query_file" path="www/modules/items/revision-add-2.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/revision-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/revision-postgresql.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/revision-upload-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/revision-upload-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/revision-upload.adp"/>
-            <file type="content_page" path="www/modules/items/revision-upload.tcl"/>
-            <file type="content_page" path="www/modules/items/revision.adp"/>
-            <file type="content_page" path="www/modules/items/revision.tcl"/>
+            <file path="www/modules/items/revision-upload.adp"/>
+            <file type="tcl_util" path="www/modules/items/revision-upload.tcl"/>
+            <file path="www/modules/items/revision.adp"/>
+            <file type="tcl_util" path="www/modules/items/revision.tcl"/>
             <file type="query_file" path="www/modules/items/revision.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/revisions-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/revisions-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/revisions.adp"/>
-            <file type="content_page" path="www/modules/items/revisions.tcl"/>
+            <file path="www/modules/items/revisions.adp"/>
+            <file type="tcl_util" path="www/modules/items/revisions.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/status-edit-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/status-edit-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/status-edit.adp"/>
-            <file type="content_page" path="www/modules/items/status-edit.tcl"/>
+            <file path="www/modules/items/status-edit.adp"/>
+            <file type="tcl_util" path="www/modules/items/status-edit.tcl"/>
             <file type="query_file" path="www/modules/items/status-edit.xql"/>
-            <file type="content_page" path="www/modules/items/symlink.tcl"/>
-            <file type="content_page" path="www/modules/items/template-register.tcl"/>
+            <file type="tcl_util" path="www/modules/items/symlink.tcl"/>
+            <file type="tcl_util" path="www/modules/items/template-register.tcl"/>
             <file type="query_file" path="www/modules/items/template-register.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/template-unregister-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/template-unregister-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/template-unregister.tcl"/>
+            <file type="tcl_util" path="www/modules/items/template-unregister.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/templates-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/templates-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/templates.adp"/>
-            <file type="content_page" path="www/modules/items/templates.tcl"/>
+            <file path="www/modules/items/templates.adp"/>
+            <file type="tcl_util" path="www/modules/items/templates.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/unpublish-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/unpublish-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/unpublish.tcl"/>
+            <file type="tcl_util" path="www/modules/items/unpublish.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/unrelate-item-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/unrelate-item-postgresql.xql"/>
-            <file type="content_page" path="www/modules/items/unrelate-item.tcl"/>
+            <file type="tcl_util" path="www/modules/items/unrelate-item.tcl"/>
             <file type="query_file" path="www/modules/items/unrelate-item.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/permissions/index-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/permissions/index-postgresql.xql"/>
-            <file type="content_page" path="www/modules/permissions/index.adp"/>
-            <file type="content_page" path="www/modules/permissions/index.tcl"/>
+            <file path="www/modules/permissions/index.adp"/>
+            <file type="tcl_util" path="www/modules/permissions/index.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/permissions/permission-alter-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/permissions/permission-alter-postgresql.xql"/>
-            <file type="content_page" path="www/modules/permissions/permission-alter.adp"/>
-            <file type="content_page" path="www/modules/permissions/permission-alter.tcl"/>
-            <file type="content_page" path="www/modules/permissions/permission-grant.tcl"/>
-            <file type="content_page" path="www/modules/search/index.adp"/>
-            <file type="content_page" path="www/modules/search/index.tcl"/>
+            <file path="www/modules/permissions/permission-alter.adp"/>
+            <file type="tcl_util" path="www/modules/permissions/permission-alter.tcl"/>
+            <file type="tcl_util" path="www/modules/permissions/permission-grant.tcl"/>
+            <file path="www/modules/search/index.adp"/>
+            <file type="tcl_util" path="www/modules/search/index.tcl"/>
             <file type="query_file" path="www/modules/search/index.xql"/>
-            <file type="content_page" path="www/modules/search/search-results.adp"/>
-            <file type="content_page" path="www/modules/search/search-results.tcl"/>
+            <file path="www/modules/search/search-results.adp"/>
+            <file type="tcl_util" path="www/modules/search/search-results.tcl"/>
             <file type="query_file" path="www/modules/search/search-results.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/sitemap/ancestors-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/sitemap/ancestors-postgresql.xql"/>
-            <file type="content_page" path="www/modules/sitemap/ancestors.adp"/>
-            <file type="content_page" path="www/modules/sitemap/ancestors.tcl"/>
+            <file path="www/modules/sitemap/ancestors.adp"/>
+            <file type="tcl_util" path="www/modules/sitemap/ancestors.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/sitemap/attributes-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/sitemap/attributes-postgresql.xql"/>
-            <file type="content_page" path="www/modules/sitemap/attributes.adp"/>
-            <file type="content_page" path="www/modules/sitemap/attributes.tcl"/>
+            <file path="www/modules/sitemap/attributes.adp"/>
+            <file type="tcl_util" path="www/modules/sitemap/attributes.tcl"/>
             <file type="query_file" path="www/modules/sitemap/attributes.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/sitemap/copy-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/sitemap/copy-postgresql.xql"/>
-            <file type="content_page" path="www/modules/sitemap/copy.adp"/>
-            <file type="content_page" path="www/modules/sitemap/copy.tcl"/>
+            <file path="www/modules/sitemap/copy.adp"/>
+            <file type="tcl_util" path="www/modules/sitemap/copy.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/sitemap/create-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/sitemap/create-postgresql.xql"/>
-            <file type="content_page" path="www/modules/sitemap/create.adp"/>
-            <file type="content_page" path="www/modules/sitemap/create.tcl"/>
+            <file path="www/modules/sitemap/create.adp"/>
+            <file type="tcl_util" path="www/modules/sitemap/create.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/sitemap/delete-items-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/sitemap/delete-items-postgresql.xql"/>
-            <file type="content_page" path="www/modules/sitemap/delete-items.adp"/>
-            <file type="content_page" path="www/modules/sitemap/delete-items.tcl"/>
+            <file path="www/modules/sitemap/delete-items.adp"/>
+            <file type="tcl_util" path="www/modules/sitemap/delete-items.tcl"/>
             <file type="query_file" path="www/modules/sitemap/delete-items.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/sitemap/delete-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/sitemap/delete-postgresql.xql"/>
-            <file type="content_page" path="www/modules/sitemap/delete.tcl"/>
+            <file type="tcl_util" path="www/modules/sitemap/delete.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/sitemap/index-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/sitemap/index-postgresql.xql"/>
-            <file type="content_page" path="www/modules/sitemap/index.adp"/>
-            <file type="content_page" path="www/modules/sitemap/index.tcl"/>
+            <file path="www/modules/sitemap/index.adp"/>
+            <file type="tcl_util" path="www/modules/sitemap/index.tcl"/>
             <file type="query_file" path="www/modules/sitemap/index.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/sitemap/move-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/sitemap/move-postgresql.xql"/>
-            <file type="content_page" path="www/modules/sitemap/move.adp"/>
-            <file type="content_page" path="www/modules/sitemap/move.tcl"/>
-            <file type="content_page" path="www/modules/sitemap/refresh-tree.adp"/>
-            <file type="content_page" path="www/modules/sitemap/refresh-tree.tcl"/>
+            <file path="www/modules/sitemap/move.adp"/>
+            <file type="tcl_util" path="www/modules/sitemap/move.tcl"/>
+            <file path="www/modules/sitemap/refresh-tree.adp"/>
+            <file type="tcl_util" path="www/modules/sitemap/refresh-tree.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/sitemap/rename-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/sitemap/rename-postgresql.xql"/>
-            <file type="content_page" path="www/modules/sitemap/rename.adp"/>
-            <file type="content_page" path="www/modules/sitemap/rename.tcl"/>
+            <file path="www/modules/sitemap/rename.adp"/>
+            <file type="tcl_util" path="www/modules/sitemap/rename.tcl"/>
             <file type="query_file" path="www/modules/sitemap/rename.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/sitemap/symlink-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/sitemap/symlink-postgresql.xql"/>
-            <file type="content_page" path="www/modules/sitemap/symlink.adp"/>
-            <file type="content_page" path="www/modules/sitemap/symlink.tcl"/>
+            <file path="www/modules/sitemap/symlink.adp"/>
+            <file type="tcl_util" path="www/modules/sitemap/symlink.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/sitemap/type-register-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/sitemap/type-register-postgresql.xql"/>
-            <file type="content_page" path="www/modules/sitemap/type-register.tcl"/>
+            <file type="tcl_util" path="www/modules/sitemap/type-register.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/sitemap/type-unregister-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/sitemap/type-unregister-postgresql.xql"/>
-            <file type="content_page" path="www/modules/sitemap/type-unregister.tcl"/>
+            <file type="tcl_util" path="www/modules/sitemap/type-unregister.tcl"/>
             <file type="template" path="www/modules/templates/assets.adp"/>
             <file type="template" path="www/modules/templates/assets.tcl"/>
             <file type="query_file" path="www/modules/templates/assets.xql"/>
@@ -607,233 +608,233 @@
             <file type="query_file" db_type="postgresql" path="www/modules/types/content-method-postgresql.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/types/content-method-set-default-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/types/content-method-set-default-postgresql.xql"/>
-            <file type="content_page" path="www/modules/types/content-method-set-default.tcl"/>
+            <file type="tcl_util" path="www/modules/types/content-method-set-default.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/types/content-method-unregister-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/types/content-method-unregister-postgresql.xql"/>
-            <file type="content_page" path="www/modules/types/content-method-unregister.tcl"/>
+            <file type="tcl_util" path="www/modules/types/content-method-unregister.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/types/content-method-unset-default-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/types/content-method-unset-default-postgresql.xql"/>
-            <file type="content_page" path="www/modules/types/content-method-unset-default.tcl"/>
-            <file type="content_page" path="www/modules/types/content-method.adp"/>
-            <file type="content_page" path="www/modules/types/content-method.tcl"/>
+            <file type="tcl_util" path="www/modules/types/content-method-unset-default.tcl"/>
+            <file path="www/modules/types/content-method.adp"/>
+            <file type="tcl_util" path="www/modules/types/content-method.tcl"/>
             <file type="query_file" path="www/modules/types/content-method.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/types/content_symlink/delete-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/types/content_symlink/delete-postgresql.xql"/>
-            <file type="content_page" path="www/modules/types/content_symlink/delete.tcl"/>
+            <file type="tcl_util" path="www/modules/types/content_symlink/delete.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/types/index-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/types/index-postgresql.xql"/>
-            <file type="content_page" path="www/modules/types/index.adp"/>
-            <file type="content_page" path="www/modules/types/index.tcl"/>
+            <file path="www/modules/types/index.adp"/>
+            <file type="tcl_util" path="www/modules/types/index.tcl"/>
             <file type="query_file" path="www/modules/types/index.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/types/mime-types-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/types/mime-types-postgresql.xql"/>
-            <file type="content_page" path="www/modules/types/mime-types.adp"/>
-            <file type="content_page" path="www/modules/types/mime-types.tcl"/>
+            <file path="www/modules/types/mime-types.adp"/>
+            <file type="tcl_util" path="www/modules/types/mime-types.tcl"/>
             <file type="query_file" path="www/modules/types/mime-types.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/types/register-templates-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/types/register-templates-postgresql.xql"/>
-            <file type="content_page" path="www/modules/types/register-templates.adp"/>
-            <file type="content_page" path="www/modules/types/register-templates.tcl"/>
+            <file path="www/modules/types/register-templates.adp"/>
+            <file type="tcl_util" path="www/modules/types/register-templates.tcl"/>
             <file type="query_file" path="www/modules/types/register-templates.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/types/relation-register-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/types/relation-register-postgresql.xql"/>
-            <file type="content_page" path="www/modules/types/relation-register.adp"/>
-            <file type="content_page" path="www/modules/types/relation-register.tcl"/>
+            <file path="www/modules/types/relation-register.adp"/>
+            <file type="tcl_util" path="www/modules/types/relation-register.tcl"/>
             <file type="query_file" path="www/modules/types/relation-register.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/types/relation-unregister-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/types/relation-unregister-postgresql.xql"/>
-            <file type="content_page" path="www/modules/types/relation-unregister.tcl"/>
+            <file type="tcl_util" path="www/modules/types/relation-unregister.tcl"/>
             <file type="query_file" path="www/modules/types/relation-unregister.xql"/>
-            <file type="content_page" path="www/modules/types/relations.adp"/>
-            <file type="content_page" path="www/modules/types/relations.tcl"/>
+            <file path="www/modules/types/relations.adp"/>
+            <file type="tcl_util" path="www/modules/types/relations.tcl"/>
             <file type="query_file" path="www/modules/types/relations.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/types/set-default-template-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/types/set-default-template-postgresql.xql"/>
-            <file type="content_page" path="www/modules/types/set-default-template.tcl"/>
+            <file type="tcl_util" path="www/modules/types/set-default-template.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/types/unregister-mime-type-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/types/unregister-mime-type-postgresql.xql"/>
-            <file type="content_page" path="www/modules/types/unregister-mime-type.tcl"/>
+            <file type="tcl_util" path="www/modules/types/unregister-mime-type.tcl"/>
             <file type="query_file" path="www/modules/types/unregister-mime-type.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/types/unregister-template-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/types/unregister-template-postgresql.xql"/>
-            <file type="content_page" path="www/modules/types/unregister-template.tcl"/>
+            <file type="tcl_util" path="www/modules/types/unregister-template.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/types/widget-register-1-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/types/widget-register-1-postgresql.xql"/>
-            <file type="content_page" path="www/modules/types/widget-register-1.adp"/>
-            <file type="content_page" path="www/modules/types/widget-register-1.tcl"/>
+            <file path="www/modules/types/widget-register-1.adp"/>
+            <file type="tcl_util" path="www/modules/types/widget-register-1.tcl"/>
             <file type="query_file" path="www/modules/types/widget-register-1.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/types/widget-register-2-oracle.xql"/>
-            <file type="content_page" path="www/modules/types/widget-register-2.adp"/>
-            <file type="content_page" path="www/modules/types/widget-register-2.tcl"/>
+            <file path="www/modules/types/widget-register-2.adp"/>
+            <file type="tcl_util" path="www/modules/types/widget-register-2.tcl"/>
             <file type="query_file" path="www/modules/types/widget-register-2.xql"/>
-            <file type="content_page" path="www/modules/types/widget-register-3.adp"/>
-            <file type="content_page" path="www/modules/types/widget-register-3.tcl"/>
+            <file path="www/modules/types/widget-register-3.adp"/>
+            <file type="tcl_util" path="www/modules/types/widget-register-3.tcl"/>
             <file type="query_file" path="www/modules/types/widget-register-3.xql"/>
-            <file type="content_page" path="www/modules/types/widget-register.adp"/>
-            <file type="content_page" path="www/modules/types/widget-register.tcl"/>
+            <file path="www/modules/types/widget-register.adp"/>
+            <file type="tcl_util" path="www/modules/types/widget-register.tcl"/>
             <file type="query_file" path="www/modules/types/widget-register.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/types/widget-unregister-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/types/widget-unregister-postgresql.xql"/>
-            <file type="content_page" path="www/modules/types/widget-unregister.tcl"/>
+            <file type="tcl_util" path="www/modules/types/widget-unregister.tcl"/>
             <file type="query_file" path="www/modules/types/widget-unregister.xql"/>
-            <file type="content_page" path="www/modules/users/access.tcl"/>
-            <file type="content_page" path="www/modules/users/change-user-state.tcl"/>
+            <file type="tcl_util" path="www/modules/users/access.tcl"/>
+            <file type="tcl_util" path="www/modules/users/change-user-state.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/users/create-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/users/create-postgresql.xql"/>
-            <file type="content_page" path="www/modules/users/create.adp"/>
-            <file type="content_page" path="www/modules/users/create.tcl"/>
+            <file path="www/modules/users/create.adp"/>
+            <file type="tcl_util" path="www/modules/users/create.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/users/delete-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/users/delete-postgresql.xql"/>
-            <file type="content_page" path="www/modules/users/delete.tcl"/>
-            <file type="content_page" path="www/modules/users/edit-user.adp"/>
-            <file type="content_page" path="www/modules/users/edit-user.tcl"/>
+            <file type="tcl_util" path="www/modules/users/delete.tcl"/>
+            <file path="www/modules/users/edit-user.adp"/>
+            <file type="tcl_util" path="www/modules/users/edit-user.tcl"/>
             <file type="query_file" path="www/modules/users/edit-user.xql"/>
-            <file type="content_page" path="www/modules/users/edit.adp"/>
-            <file type="content_page" path="www/modules/users/edit.tcl"/>
+            <file path="www/modules/users/edit.adp"/>
+            <file type="tcl_util" path="www/modules/users/edit.tcl"/>
             <file type="query_file" path="www/modules/users/edit.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/users/index-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/users/index-postgresql.xql"/>
-            <file type="content_page" path="www/modules/users/index.adp"/>
-            <file type="content_page" path="www/modules/users/index.tcl"/>
+            <file path="www/modules/users/index.adp"/>
+            <file type="tcl_util" path="www/modules/users/index.tcl"/>
             <file type="query_file" path="www/modules/users/index.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/users/make-admin-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/users/make-admin-postgresql.xql"/>
-            <file type="content_page" path="www/modules/users/make-admin.tcl"/>
+            <file type="tcl_util" path="www/modules/users/make-admin.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/users/one-user-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/users/one-user-postgresql.xql"/>
-            <file type="content_page" path="www/modules/users/one-user.adp"/>
-            <file type="content_page" path="www/modules/users/one-user.tcl"/>
+            <file path="www/modules/users/one-user.adp"/>
+            <file type="tcl_util" path="www/modules/users/one-user.tcl"/>
             <file type="query_file" path="www/modules/users/one-user.xql"/>
-            <file type="content_page" path="www/modules/users/permission-add.tcl"/>
-            <file type="content_page" path="www/modules/users/permission-remove.tcl"/>
-            <file type="content_page" path="www/modules/users/refresh-tree.adp"/>
-            <file type="content_page" path="www/modules/users/refresh-tree.tcl"/>
-            <file type="content_page" path="www/modules/users/search-results.adp"/>
+            <file type="tcl_util" path="www/modules/users/permission-add.tcl"/>
+            <file type="tcl_util" path="www/modules/users/permission-remove.tcl"/>
+            <file path="www/modules/users/refresh-tree.adp"/>
+            <file type="tcl_util" path="www/modules/users/refresh-tree.tcl"/>
+            <file path="www/modules/users/search-results.adp"/>
             <file type="query_file" db_type="oracle" path="www/modules/users/user-assoc-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/users/user-assoc-postgresql.xql"/>
-            <file type="content_page" path="www/modules/users/user-assoc.tcl"/>
+            <file type="tcl_util" path="www/modules/users/user-assoc.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/users/user-search-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/users/user-search-postgresql.xql"/>
-            <file type="content_page" path="www/modules/users/user-search.adp"/>
-            <file type="content_page" path="www/modules/users/user-search.tcl"/>
+            <file path="www/modules/users/user-search.adp"/>
+            <file type="tcl_util" path="www/modules/users/user-search.tcl"/>
             <file type="query_file" path="www/modules/users/user-search.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/workflow/case-create-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/workflow/case-create-postgresql.xql"/>
-            <file type="content_page" path="www/modules/workflow/case-create.adp"/>
-            <file type="content_page" path="www/modules/workflow/case-create.tcl"/>
+            <file path="www/modules/workflow/case-create.adp"/>
+            <file type="tcl_util" path="www/modules/workflow/case-create.tcl"/>
             <file type="query_file" path="www/modules/workflow/case-create.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/workflow/case-status-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/workflow/case-status-postgresql.xql"/>
-            <file type="content_page" path="www/modules/workflow/case-status.adp"/>
-            <file type="content_page" path="www/modules/workflow/case-status.tcl"/>
+            <file path="www/modules/workflow/case-status.adp"/>
+            <file type="tcl_util" path="www/modules/workflow/case-status.tcl"/>
             <file type="query_file" path="www/modules/workflow/case-status.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/workflow/index-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/workflow/index-postgresql.xql"/>
-            <file type="content_page" path="www/modules/workflow/index.adp"/>
-            <file type="content_page" path="www/modules/workflow/index.tcl"/>
+            <file path="www/modules/workflow/index.adp"/>
+            <file type="tcl_util" path="www/modules/workflow/index.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/workflow/overdue-items-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/workflow/overdue-items-postgresql.xql"/>
-            <file type="content_page" path="www/modules/workflow/overdue-items.adp"/>
-            <file type="content_page" path="www/modules/workflow/overdue-items.tcl"/>
+            <file path="www/modules/workflow/overdue-items.adp"/>
+            <file type="tcl_util" path="www/modules/workflow/overdue-items.tcl"/>
             <file type="query_file" path="www/modules/workflow/overdue-items.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/workflow/task-checkin-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/workflow/task-checkin-postgresql.xql"/>
-            <file type="content_page" path="www/modules/workflow/task-checkin.adp"/>
-            <file type="content_page" path="www/modules/workflow/task-checkin.tcl"/>
+            <file path="www/modules/workflow/task-checkin.adp"/>
+            <file type="tcl_util" path="www/modules/workflow/task-checkin.tcl"/>
             <file type="query_file" path="www/modules/workflow/task-checkin.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/workflow/task-finish-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/workflow/task-finish-postgresql.xql"/>
-            <file type="content_page" path="www/modules/workflow/task-finish.adp"/>
-            <file type="content_page" path="www/modules/workflow/task-finish.tcl"/>
+            <file path="www/modules/workflow/task-finish.adp"/>
+            <file type="tcl_util" path="www/modules/workflow/task-finish.tcl"/>
             <file type="query_file" path="www/modules/workflow/task-finish.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/workflow/task-reject-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/workflow/task-reject-postgresql.xql"/>
-            <file type="content_page" path="www/modules/workflow/task-reject.adp"/>
-            <file type="content_page" path="www/modules/workflow/task-reject.tcl"/>
+            <file path="www/modules/workflow/task-reject.adp"/>
+            <file type="tcl_util" path="www/modules/workflow/task-reject.tcl"/>
             <file type="query_file" path="www/modules/workflow/task-reject.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/workflow/task-start-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/workflow/task-start-postgresql.xql"/>
-            <file type="content_page" path="www/modules/workflow/task-start.adp"/>
-            <file type="content_page" path="www/modules/workflow/task-start.tcl"/>
+            <file path="www/modules/workflow/task-start.adp"/>
+            <file type="tcl_util" path="www/modules/workflow/task-start.tcl"/>
             <file type="query_file" path="www/modules/workflow/task-start.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/workflow/user-tasks-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/workflow/user-tasks-postgresql.xql"/>
-            <file type="content_page" path="www/modules/workflow/user-tasks.adp"/>
-            <file type="content_page" path="www/modules/workflow/user-tasks.tcl"/>
+            <file path="www/modules/workflow/user-tasks.adp"/>
+            <file type="tcl_util" path="www/modules/workflow/user-tasks.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/workflow/workflow-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/workflow/workflow-postgresql.xql"/>
-            <file type="content_page" path="www/modules/workflow/workflow.adp"/>
-            <file type="content_page" path="www/modules/workflow/workflow.tcl"/>
+            <file path="www/modules/workflow/workflow.adp"/>
+            <file type="tcl_util" path="www/modules/workflow/workflow.tcl"/>
             <file type="query_file" path="www/modules/workflow/workflow.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/workspace/assignments-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/workspace/assignments-postgresql.xql"/>
-            <file type="content_page" path="www/modules/workspace/assignments.adp"/>
-            <file type="content_page" path="www/modules/workspace/assignments.tcl"/>
+            <file path="www/modules/workspace/assignments.adp"/>
+            <file type="tcl_util" path="www/modules/workspace/assignments.tcl"/>
             <file type="query_file" db_type="oracle" path="www/modules/workspace/index-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/workspace/index-postgresql.xql"/>
-            <file type="content_page" path="www/modules/workspace/index.adp"/>
-            <file type="content_page" path="www/modules/workspace/index.tcl"/>
-            <file type="content_page" path="www/modules/workspace/preferences.tcl"/>
-            <file type="content_page" path="www/package-doc.adp"/>
-            <file type="content_page" path="www/package-doc.tcl"/>
+            <file path="www/modules/workspace/index.adp"/>
+            <file type="tcl_util" path="www/modules/workspace/index.tcl"/>
+            <file type="tcl_util" path="www/modules/workspace/preferences.tcl"/>
+            <file path="www/package-doc.adp"/>
+            <file type="tcl_util" path="www/package-doc.tcl"/>
             <file type="query_file" db_type="oracle" path="www/register-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/register-postgresql.xql"/>
-            <file type="content_page" path="www/register.adp"/>
-            <file type="content_page" path="www/register.tcl"/>
+            <file path="www/register.adp"/>
+            <file type="tcl_util" path="www/register.tcl"/>
             <file type="query_file" path="www/register.xql"/>
-            <file type="content_page" path="www/resources/Add24.gif"/>
-            <file type="content_page" path="www/resources/Bookmarked24.gif"/>
-            <file type="content_page" path="www/resources/Bookmarks16.gif"/>
-            <file type="content_page" path="www/resources/Bookmarks24.gif"/>
-            <file type="content_page" path="www/resources/Copy24.gif"/>
-            <file type="content_page" path="www/resources/Delete16.gif"/>
-            <file type="content_page" path="www/resources/Delete24.gif"/>
-            <file type="content_page" path="www/resources/Edit16.gif"/>
-            <file type="content_page" path="www/resources/Edit24.gif"/>
-            <file type="content_page" path="www/resources/Import24.gif"/>
-            <file type="content_page" path="www/resources/Open24.gif"/>
-            <file type="content_page" path="www/resources/Page24.gif"/>
-            <file type="content_page" path="www/resources/Refresh16.gif"/>
-            <file type="content_page" path="www/resources/Refresh24.gif"/>
-            <file type="content_page" path="www/resources/Search24.gif"/>
-            <file type="content_page" path="www/resources/Shortcut24.gif"/>
-            <file type="content_page" path="www/resources/Stop24.gif"/>
-            <file type="content_page" path="www/resources/blank.gif"/>
-            <file type="content_page" path="www/resources/blue-box.gif"/>
-            <file type="content_page" path="www/resources/checked.gif"/>
-            <file type="content_page" path="www/resources/collapse.gif"/>
-            <file type="content_page" path="www/resources/corners/lower-left.gif"/>
-            <file type="content_page" path="www/resources/corners/lower-right.gif"/>
-            <file type="content_page" path="www/resources/corners/upper-left.gif"/>
-            <file type="content_page" path="www/resources/corners/upper-right.gif"/>
-            <file type="content_page" path="www/resources/expand.gif"/>
-            <file type="content_page" path="www/resources/folder.gif"/>
-            <file type="content_page" path="www/resources/generic-item.gif"/>
-            <file type="content_page" path="www/resources/generic-item16.gif"/>
-            <file type="content_page" path="www/resources/mark.gif"/>
-            <file type="content_page" path="www/resources/open-folder.gif"/>
-            <file type="content_page" path="www/resources/open-shortcut.gif"/>
-            <file type="content_page" path="www/resources/shortcut.gif"/>
-            <file type="content_page" path="www/resources/treeBlank.gif"/>
-            <file type="content_page" path="www/resources/treeSelect.gif"/>
-            <file type="content_page" path="www/resources/triangle-dn.gif"/>
-            <file type="content_page" path="www/resources/triangle-up.gif"/>
-            <file type="content_page" path="www/resources/unchecked.gif"/>
-            <file type="content_page" path="www/signin.adp"/>
-            <file type="content_page" path="www/signin.tcl"/>
-            <file type="content_page" path="www/signout.tcl"/>
-            <file type="content_page" path="www/table-footer.adp"/>
-            <file type="content_page" path="www/table-footer.tcl"/>
-            <file type="content_page" path="www/table-header.adp"/>
-            <file type="content_page" path="www/table-header.tcl"/>
-            <file type="content_page" path="www/tree.tcl"/>
+            <file path="www/resources/Add24.gif"/>
+            <file path="www/resources/Bookmarked24.gif"/>
+            <file path="www/resources/Bookmarks16.gif"/>
+            <file path="www/resources/Bookmarks24.gif"/>
+            <file path="www/resources/Copy24.gif"/>
+            <file path="www/resources/Delete16.gif"/>
+            <file path="www/resources/Delete24.gif"/>
+            <file path="www/resources/Edit16.gif"/>
+            <file path="www/resources/Edit24.gif"/>
+            <file path="www/resources/Import24.gif"/>
+            <file path="www/resources/Open24.gif"/>
+            <file path="www/resources/Page24.gif"/>
+            <file path="www/resources/Refresh16.gif"/>
+            <file path="www/resources/Refresh24.gif"/>
+            <file path="www/resources/Search24.gif"/>
+            <file path="www/resources/Shortcut24.gif"/>
+            <file path="www/resources/Stop24.gif"/>
+            <file path="www/resources/blank.gif"/>
+            <file path="www/resources/blue-box.gif"/>
+            <file path="www/resources/checked.gif"/>
+            <file path="www/resources/collapse.gif"/>
+            <file path="www/resources/corners/lower-left.gif"/>
+            <file path="www/resources/corners/lower-right.gif"/>
+            <file path="www/resources/corners/upper-left.gif"/>
+            <file path="www/resources/corners/upper-right.gif"/>
+            <file path="www/resources/expand.gif"/>
+            <file path="www/resources/folder.gif"/>
+            <file path="www/resources/generic-item.gif"/>
+            <file path="www/resources/generic-item16.gif"/>
+            <file path="www/resources/mark.gif"/>
+            <file path="www/resources/open-folder.gif"/>
+            <file path="www/resources/open-shortcut.gif"/>
+            <file path="www/resources/shortcut.gif"/>
+            <file path="www/resources/treeBlank.gif"/>
+            <file path="www/resources/treeSelect.gif"/>
+            <file path="www/resources/triangle-dn.gif"/>
+            <file path="www/resources/triangle-up.gif"/>
+            <file path="www/resources/unchecked.gif"/>
+            <file path="www/signin.adp"/>
+            <file type="tcl_util" path="www/signin.tcl"/>
+            <file type="tcl_util" path="www/signout.tcl"/>
+            <file path="www/table-footer.adp"/>
+            <file type="tcl_util" path="www/table-footer.tcl"/>
+            <file path="www/table-header.adp"/>
+            <file type="tcl_util" path="www/table-header.tcl"/>
+            <file type="tcl_util" path="www/tree.tcl"/>
         </files>
         <parameters>
-            <parameter datatype="number"  min_n_values="1"  max_n_values="1"  name="ClipboardFloatsP"  default="1" description="Determine whether the clipboard should be in its own floating window."/>
-            <parameter datatype="number"  min_n_values="1"  max_n_values="1"  name="StatusSweepInterval"  default="3600" description="The interval, in seconds, between the sweeps of all items. Sweeping discovers items whose publication status (live/ready/expired) has changed and takes appropriate action.  Lower values increase the precision of the publishing/expiration dates but decrease performance. Changes to this parameter are effective only after a server restart." section_name="publishing"/>
-            <parameter datatype="string"  min_n_values="1"  max_n_values="1"  name="PageRoot"  default="./" description="All items will be published to the filesystem with their URLs relative to this root. Relative paths are relative to [ns_info pageroot]." section_name="publishing"/>
-            <parameter datatype="string"  min_n_values="1"  max_n_values="1"  name="PublishRoots"  default="./" description="The directories to which content is published as a space separated list. Relative paths are relative to parameter PageRoot. " section_name="publishing"/>
             <parameter datatype="string"  min_n_values="1"  max_n_values="1"  name="TemplateRoot"  default="templates" description="The directory to which templates are published. See the TemplateRoot parameter in the acs-content-repository." section_name="templates"/>
+            <parameter datatype="string"  min_n_values="1"  max_n_values="1"  name="PublishRoots"  default="./" description="The directories to which content is published as a space separated list. Relative paths are relative to parameter PageRoot. " section_name="publishing"/>
+            <parameter datatype="string"  min_n_values="1"  max_n_values="1"  name="PageRoot"  default="./" description="All items will be published to the filesystem with their URLs relative to this root. Relative paths are relative to [ns_info pageroot]." section_name="publishing"/>
+            <parameter datatype="number"  min_n_values="1"  max_n_values="1"  name="StatusSweepInterval"  default="3600" description="The interval, in seconds, between the sweeps of all items. Sweeping discovers items whose publication status (live/ready/expired) has changed and takes appropriate action.  Lower values increase the precision of the publishing/expiration dates but decrease performance. Changes to this parameter are effective only after a server restart." section_name="publishing"/>
+            <parameter datatype="number"  min_n_values="1"  max_n_values="1"  name="ClipboardFloatsP"  default="1" description="Determine whether the clipboard should be in its own floating window."/>
         </parameters>
 
     </version>
