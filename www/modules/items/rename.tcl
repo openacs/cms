@@ -44,7 +44,7 @@ if { [form is_valid rename_item] } {
   db_transaction {
       db_exec_plsql rename_item "
     begin 
-    content_item.rename (
+    content_item.edit_name (
         item_id => :item_id, 
         name    => :name 
     ); 

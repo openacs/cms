@@ -7,7 +7,7 @@
       <querytext>
       
     begin 
-    content_item.rename (
+    content_item.edit_name (
         item_id => :item_id, 
         name    => :name 
     ); 
