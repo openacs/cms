@@ -19,7 +19,6 @@ set original_id $id
 set user_id [User::getID]
 set root_id [cm::modules::${mount_point}::getRootFolderID]
 
-set db [template::get_db_handle]
 
 # Get the folder label/description
 #   If :id does not exist, then use :root_id
@@ -27,7 +26,7 @@ if { [template::util::is_nil id] } {
 
   set parent_var :root_id
 
-  template::query module_name onevalue "
+  template::query get_module_name module_name onevalue "
     select name from cm_modules where key = :mount_point
   " 
 
@@ -38,7 +37,7 @@ if { [template::util::is_nil id] } {
 
   # get all the content types registered to this folder
   # check whether this folder allows subfolders, symlinks, and templates
-  template::query registered_types onelist "
+  template::query get_reg_types registered_types onelist "
     select
       content_type
     from
@@ -67,7 +66,7 @@ if { [template::util::is_nil id] } {
   set parent_var :id
 
   # Resolve the symlink, if any
-  template::query resolved_id onevalue "
+  template::query get_resolved_id resolved_id onevalue "
     select content_symlink.resolve( :id ) from dual
   "
 
@@ -80,7 +79,7 @@ if { [template::util::is_nil id] } {
     set what "Folder"
   }
 
-  template::query info onerow "
+  template::query get_info info onerow "
     select
       parent_id, NVL(label, name) label, description
     from
@@ -100,7 +99,7 @@ if { [template::util::is_nil id] } {
 
   # get all the content types registered to this folder
   # check whether this folder allows subfolders, symlinks, and templates
-  template::query registered_types onelist "
+  template::query get_types registered_types onelist "
     select
       content_type
     from
@@ -156,7 +155,7 @@ if { [string equal $user_permissions(cm_new) f] } {
 
 # Get the index page ID
 
-template::query index_page_id onevalue "
+template::query get_index_page_id index_page_id onevalue "
   select content_folder.get_index_page($parent_var) from dual
 "
 
@@ -254,7 +253,6 @@ set display_sql "
     is_index_page desc $orderby_clause"
 
 
-template::release_db_handle
 
 # paginator
 set p_name "folder_contents_${mount_point}_$id"
@@ -268,8 +266,6 @@ set group [paginator get_group $p_name $page]
 paginator get_context $p_name pages [paginator get_pages $p_name $group]
 paginator get_context $p_name groups [paginator get_groups $p_name $group 10]
 
-
-set db [template::get_db_handle]
 
 # determine whether item is marked (on clipboard), its link and icon
 for { set i 1 } { $i <= [multirow size items] } { incr i } { 
@@ -313,7 +309,7 @@ for { set i 1 } { $i <= [multirow size items] } { incr i } {
 
 
 # symlinks to this folder/item
-template::query symlinks multirow "
+template::query get_symlinks symlinks multirow "
   select
     i.item_id id,
     content_item.get_path(i.item_id) path
@@ -324,8 +320,6 @@ template::query symlinks multirow "
   and
     i.item_id = :original_id
 "
-
-template::release_db_handle
 
 
 form create add_item

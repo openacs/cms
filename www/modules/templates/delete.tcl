@@ -12,13 +12,12 @@ if { ! [string equal $submit {}] } {
 
   if { $submit == "Delete" } {
 
-    set db [begin_db_transaction]
+      db_transaction {
 
-    foreach template_id [ns_querygetall template_id] {
-      ns_ora dml $db "begin content_template.delete(:template_id); end;"
-    }
-
-    end_db_transaction
+          foreach template_id [ns_querygetall template_id] {
+              db_exec_plsql delete "begin content_template.delete(:template_id); end;"
+          }
+      }
   }
 
   template::forward [ns_queryget return_url]

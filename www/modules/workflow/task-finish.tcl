@@ -9,7 +9,6 @@ request set_param return_url -datatype text -value "../workspace/index"
 
 
 set user_id [User::getID]
-set db [template::get_db_handle]
 
 # check that the task is still valid
 template::query get_status is_valid_task onevalue "
@@ -17,7 +16,6 @@ template::query get_status is_valid_task onevalue "
 " 
 
 if { [string equal $is_valid_task f] } {
-    template::release_db_handle
     template::forward $return_url
 }
 
@@ -44,7 +42,6 @@ template::query get_task_info task_info onerow "
     content_workflow.can_approve( tk.task_id, :user_id ) = 't'
 " 
 
-template::release_db_handle
 
 
 form create task_finish -elements {

@@ -4,8 +4,6 @@
 request create
 request set_param item_id -datatype integer
 
-set db [ns_db gethandle]
-
 # permissions check - need cm_write on item_id to add a revision
 content::check_access $item_id cm_write -user_id [User::getID] -db $db
 
@@ -14,7 +12,7 @@ form create image -html { enctype "multipart/form-data" } -elements {
     revision_id  -datatype integer -widget hidden
 }
 
-query item_info onerow "
+template::query get_item_info item_info onerow "
   select 
     i.name, i.latest_revision, r.title 
   from 
@@ -28,8 +26,6 @@ query item_info onerow "
 " -db $db
 
 template::util::array_to_vars item_info
-
-ns_db releasehandle $db
 
 
 content::add_attribute_elements image image $latest_revision
@@ -54,75 +50,68 @@ if { [form is_valid image] } {
     set user_id [User::getID]
     set ip_address [ns_conn peeraddr]
 
-    set db [ns_db gethandle]
-    ns_ora dml $db "begin transaction"
-
-    query latest_revision onevalue "
+    db_transaction {
+        template::query get_latest latest_revision onevalue "
       select
         latest_revision
       from
         cr_items
       where
         item_id = :item_id
-    " -db $db
+    " 
 
-    set sql "
+        # create the revision
+        if { [catch {db_exec_plsql "
       begin
-      :revision_id := content_revision.copy(
+      :1 := content_revision.copy(
           target_item_id => :item_id,
           copy_id        => :revision_id,
           revision_id    => :latest_revision,
           creation_user  => :user_id,
           creation_ip    => :ip_address 
       );
-      end;"
+      end;"  } revision_id] } {
 
-    # create the revision
-    if { [catch {ns_ora exec_plsql_bind $db $sql revision_id} errmsg] } {
-
-	# check for dupe submit
-	query clicks onevalue "
+            # check for dupe submit
+            template::query get_clicks clicks onevalue "
 	  select
 	    count(1)
 	  from
 	    cr_revisions
 	  where
 	    revision_id = :revision_id
-	" -db $db
+	" 
 
-	ns_ora dml $db "abort transaction"
-	ns_db releasehandle $db
+            db_dml abort "abort transaction"
 
-	if { $clicks > 0 } {
-	    # double click error - forward to view the item
-	    template::forward \
+            if { $clicks > 0 } {
+                # double click error - forward to view the item
+                template::forward \
 		    "../../index?item_id=$item_id"
-	    return
-	} else {
-	    template::request::error new_revision_error \
+                return
+            } else {
+                template::request::error new_revision_error \
 		    "custom/image/attributes-edit.tcl -
 	               while creation new revision for item $item_id - $errmsg"
-	    return
-	}
-    }
+                return
+            }
+        }
 
-    # update the new title and description
-    ns_ora dml $db "
+        # update the new title and description
+        db_dml update_revisions "
       update cr_revisions
         set title = :title,
         description = :description
         where revision_id = :revision_id"
 
 
-    # update image dimensions
-    ns_ora dml $db "
+        # update image dimensions
+        db_dml update_images "
       update images
         set width = :width,
         height = :height
         where image_id = :revision_id"
-
-    ns_ora dml $db "end transaction"
-    ns_db releasehandle $db
+    }
 
     template::forward "../../index?item_id=$item_id"
 }

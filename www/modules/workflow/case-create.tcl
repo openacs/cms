@@ -12,7 +12,6 @@ form create case_create -elements {
 set user_id [User::getID]
 set is_edit [element get_value case_create is_edit]
 
-set db [template::get_db_handle]
 
 # check if this user has permission to create a workflow
 set item_id [element get_value case_create item_id]
@@ -23,7 +22,7 @@ content::check_access $item_id cm_item_workflow \
 	-request_error
 
 # get a list of users (this should be context-specific)
-query users multilist "
+template::query get_users users multilist "
   select 
     person.name(user_id) name, user_id 
   from 
@@ -35,7 +34,9 @@ query users multilist "
 " 
 
 # Prepare the form elements
-set query "
+
+set transition_list [list]
+template::query get_name_key iterate "
   select 
     transition_name, transition_key 
   from 
@@ -43,10 +44,7 @@ set query "
   where 
     workflow_key = 'publishing_wf' 
   order by 
-    sort_order"
-
-set transition_list [list]
-query::iterate $db $query {
+    sort_order" {
 
     form section case_create $row(transition_name)
 
@@ -94,7 +92,8 @@ if { [form is_request case_create] } {
 
 	# Get existing case assignments
 	set case_id [element get_value case_create case_id]
-	set sql_query "
+ 
+	template::query get_key_id iterate "
 	  select 
             transition_key, party_id
 	  from 
@@ -102,9 +101,7 @@ if { [form is_request case_create] } {
 	  where 
             workflow_key = 'publishing_wf'
 	  and
-            case_id = :case_id"
- 
-	query::iterate $db $sql_query {
+            case_id = :case_id" {
 	    lappend case_values($row(transition_key)) $row(party_id)
 	}
 
@@ -118,7 +115,8 @@ if { [form is_request case_create] } {
 	}
 
 	# Get existing deadlines
-	set sql_query "
+
+	template::query get_key_deadline iterate "
 	  select 
             transition_key, 
             to_char(deadline, 'YYYY MM DD HH24 MI SS') as deadline
@@ -127,16 +125,14 @@ if { [form is_request case_create] } {
           where 
             workflow_key = 'publishing_wf'
           and 
-            case_id = :case_id"
-
-	query::iterate $db $sql_query { 
+            case_id = :case_id" { 
 	    element set_properties case_create \
 		    "${row(transition_key)}_deadline" \
 		    -value [util::date acquire sql_date $row(deadline)]
 	}
 
     } else {
-	query case_id onevalue "
+	template::query get_case_id case_id onevalue "
           select acs_object_id_seq.nextval from dual
 	"
 
@@ -144,20 +140,19 @@ if { [form is_request case_create] } {
     }
 }
 
-template::release_db_handle
-
 if { [form is_valid case_create] } {
 
     form get_values case_create item_id case_id is_edit transitions msg
     set creation_ip [ns_conn peeraddr]
 
     set db [template::begin_db_transaction]
+    db_transaction {
 
-    if { ![string equal $is_edit t] } {
+        if { ![string equal $is_edit t] } {
 
 
-	# create the workflow
-	ns_ora exec_plsql_bind $db "begin :1 := workflow_case.new(
+            # create the workflow
+            set case_id [db_exec_plsql new_case "begin :1 := workflow_case.new(
 	    workflow_key  => 'publishing_wf', 
 	    context_key   => NULL,
 	    object_id     => :item_id,
@@ -165,14 +160,14 @@ if { [form is_valid case_create] } {
 	    creation_ip   => :creation_ip,
 	    case_id       => :case_id
         ); 
-        end;" [list 1] case_id
+        end;"]
 
-	# make assignments for each transition
-	foreach transition $transitions {
-	    foreach value [element get_values case_create \
-		    ${transition}_assign] {
+            # make assignments for each transition
+            foreach transition $transitions {
+                foreach value [element get_values case_create \
+                                   ${transition}_assign] {
 
-		ns_ora dml $db "
+                    db_exec_plsql add_assignment "
 		  begin
 		  workflow_case.add_manual_assignment(
 		      case_id        => :case_id,
@@ -181,32 +176,32 @@ if { [form is_valid case_create] } {
 		  );
 		  end;
 		"
-	    }
+                }
 
-	    set deadline [element get_value case_create \
-		    ${transition}_deadline]
-	    set dead_sql [util::date get_property sql_date $deadline]
+                set deadline [element get_value case_create \
+                                  ${transition}_deadline]
+                set dead_sql [util::date get_property sql_date $deadline]
 
-	    ns_ora dml $db "
+                db_dml insert_deadlines "
 	      insert into wf_case_deadlines (
 	        case_id, workflow_key, transition_key, deadline
 	      ) values (
 	        :case_id, 'publishing_wf', :transition, $dead_sql
 	      )"
-	}
-    } else {
+            }
+        } else {
 
-	# Modify the workflow
-	foreach transition $transitions {
-	    set new_values \
+            # Modify the workflow
+            foreach transition $transitions {
+                set new_values \
 		    [element get_values case_create ${transition}_assign]
-	    set old_values \
+                set old_values \
 		    [element get_value case_create ${transition}_assign_old]
 
-	    # Remove cleared values
-	    if { [llength $old_values] > 0 } {
-  
-		set query "
+                # Remove cleared values
+                if { [llength $old_values] > 0 } {
+                    
+                    set query "
 		  delete from 
 		    wf_case_assignments 
                   where 
@@ -218,17 +213,17 @@ if { [form is_valid case_create] } {
                   and 
 	            party_id in ([join $old_values ,])"
 
-		if { [llength $new_values] > 0 } { 
-		    append query " and party_id not in ([join $new_values ,])"
-		}
-		ns_ora dml $db $query
-	    }
-                        
-	    # Update existing deadlines
-	    set new_deadline \
+                    if { [llength $new_values] > 0 } { 
+                        append query " and party_id not in ([join $new_values ,])"
+                    }
+                    db_dml delete_assignments $query
+                }
+                
+                # Update existing deadlines
+                set new_deadline \
 		    [element get_value case_create ${transition}_deadline] 
-	    set new_dead_sql [util::date get_property sql_date $new_deadline]
-	    ns_ora dml $db "
+                set new_dead_sql [util::date get_property sql_date $new_deadline]
+                db_dml update_deadlines "
 	      update 
 	        wf_case_deadlines 
 	      set
@@ -240,11 +235,11 @@ if { [form is_valid case_create] } {
 	      and 
 	        case_id = :case_id"   
 
-	    # Insert new values
-	    foreach new_value $new_values {
-		if { [lsearch $old_values $new_value] == -1 } {
+                # Insert new values
+                foreach new_value $new_values {
+                    if { [lsearch $old_values $new_value] == -1 } {
 
-		    ns_ora dml $db "
+                        db_exec_plsql add_new_assignment "
 		      begin
 	    	      workflow_case.add_manual_assignment(
 		          case_id         => :case_id,
@@ -253,13 +248,13 @@ if { [form is_valid case_create] } {
 		      );
 		      end;
 		    "
-		}         
-	    }
-	}
-    }
+                    }         
+                }
+            }
+        }
 
-    # enable the transitions (insert tasks for each transition)
-    ns_ora dml $db "
+        # enable the transitions (insert tasks for each transition)
+        db_exec_plsql start_case "
       begin
       workflow_case.start_case(
           case_id       => :case_id,
@@ -270,12 +265,10 @@ if { [form is_valid case_create] } {
       end;
     "
 
-    # email notifications of task assignments
-    workflow::notify_of_assignments $db $case_id $user_id
+        # email notifications of task assignments
+        workflow::notify_of_assignments $db $case_id $user_id
 
-
-    template::end_db_transaction
-    template::release_db_handle
+    }
 
     # Flush the access cache in order to clear permissions
     content::flush_access_cache $item_id

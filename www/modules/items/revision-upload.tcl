@@ -87,41 +87,40 @@ if { [form is_valid upload] } {
 
   form get_values upload revision_id create_p
 
-  set db [template::begin_db_transaction]
+  db_transaction {
 
-  # create the new item first, if necessary
-  # otherwise read item_id from the form
-  if { [string equal $create_p "t"] } {
-    
-    form get_values upload name parent_id content_type
+      # create the new item first, if necessary
+      # otherwise read item_id from the form
+      if { [string equal $create_p "t"] } {
+          
+          form get_values upload name parent_id content_type
 
-    ns_log Notice "revision-upload.tcl - Creating content item... $name"
-    ns_ora exec_plsql_bind $db "begin 
+          ns_log Notice "revision-upload.tcl - Creating content item... $name"
+          set item_id [db_exec_plsql new_content "begin 
       :item_id := content_item.new(
           name          => :name, 
           parent_id     => :parent_id, 
           content_type  => :content_type,
           creation_user => [User::getID],
           creation_ip   => '[ns_conn peeraddr]' ); 
-      end;" item_id
-  } else {
-    form get_values upload item_id
-  }
+      end;"]
+      } else {
+          form get_values upload item_id
+      }
 
-  ns_log Notice "XML [ns_queryget xml_file.tmpfile]"
-  set tmp_filename [ns_queryget xml_file.tmpfile]
-  set doc [template::util::read_file $tmp_filename]
+      ns_log Notice "XML [ns_queryget xml_file.tmpfile]"
+      set tmp_filename [ns_queryget xml_file.tmpfile]
+      set doc [template::util::read_file $tmp_filename]
 
-  ns_ora clob_dml $db "insert into cr_xml_docs 
+      db_clob_dml insert_content "insert into cr_xml_docs 
   values ($revision_id, empty_clob()) returning doc into :1" $doc
 
-  ns_ora exec_plsql_bind $db "begin
+      set revision_id [db_exec_plsql import_xml "begin
     :revision_id := content_revision.import_xml(
       :item_id, :revision_id, :revision_id);
-  end;" revision_id
+  end;"]
 
-  template::end_db_transaction
-  template::release_db_handle
+  }
 
   template::forward index?item_id=$item_id
 }

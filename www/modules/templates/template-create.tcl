@@ -47,10 +47,9 @@ if { [form is_valid create_template] } {
       set parent_id [cm::modules::templates::getRootFolderID]
     }
  
+    db_transaction {
 
-    set db [template::begin_db_transaction]
-
-    ns_ora exec_plsql_bind $db "begin 
+        db_exec_plsql new_template "begin 
         :ret_val := content_template.new(
             template_id   => :template_id,
             name          => :name,
@@ -59,9 +58,7 @@ if { [form is_valid create_template] } {
             creation_ip   => :ip_address
         );
         end;" ret_val
-
-    template::end_db_transaction
-    template::release_db_handle
+    }
 
     template::forward ../templates/template?template_id=$template_id
 }

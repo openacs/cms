@@ -119,15 +119,13 @@ if { [form is_valid captioned_image] } {
     set user_id [User::getID]
     set ip_address [ns_conn peeraddr]
 
+    db_transaction {
+        
+        # create a new cr_demo_article_image item
 
-
-    set db [ns_db gethandle]
-    ns_ora dml $db "begin transaction"
-    
-    # create a new cr_demo_article_image item
-    set sql "
+        if { [catch {db_exec_plsql new_content"
       begin 
-      :item_id := content_item.new(
+      :1 := content_item.new(
           name          => :name, 
           item_id       => :item_id,
           parent_id     => :parent_id, 
@@ -135,41 +133,38 @@ if { [form is_valid captioned_image] } {
           creation_user => :user_id,
           creation_ip   => :ip_address
       ); 
-      end;"
-
-    if { [catch {ns_ora exec_plsql_bind $db $sql item_id} errmsg] } {
-	ns_log notice "custom/cr_demo_article_image/create-1.tcl caught error 
+      end;" } item_id] } {
+            ns_log notice "custom/cr_demo_article_image/create-1.tcl caught error 
 	  - $errmsg"
 
-	# check for double click
-	query clicks onevalue "
+            # check for double click
+            template::query get_clicks clicks onevalue "
 	  select
 	    count(1)
 	  from
 	    cr_items
 	  where
 	    item_id = :item_id
-	" -db $db
+	" 
 
-	ns_ora dml $db "abort transaction"
-	ns_db releasehandle $db
+            db_dml abort "abort transaction"
 
-	if { $clicks > 0 } {
-	    # double click error - do nothing, forward to view the item
-	    template::forward \
+            if { $clicks > 0 } {
+                # double click error - do nothing, forward to view the item
+                template::forward \
 		    "../../index?item_id=$item_id"
-	} else {
-	    template::request::error new_item_error \
+            } else {
+                template::request::error new_item_error \
 		    "custom/cr_demo_article_image/create-1.tcl - 
 	               while creating new $content_type item - $errmsg"
-	    return
-	}
-    }
+                return
+            }
+        }
 
-    # create the revision
-    ns_ora exec_plsql_bind $db "
+        # create the revision
+        set revision_id [db_exec_plsql new_revision "
       begin
-      :revision_id := content_revision.new (
+      :1 := content_revision.new (
         item_id       => :item_id,
         title         => :title,
         description   => :description,
@@ -178,34 +173,33 @@ if { [form is_valid captioned_image] } {
         creation_ip   => :ip_address
       );
       end;
-    " revision_id
+    "]
 
-    # insert the extended attributes
-    ns_ora dml $db "
+        # insert the extended attributes
+        db_dml insert_image "
       insert into images (
         image_id, width, height
       ) values (
         :revision_id, :width, :height
       )"
 
-    ns_ora dml $db "
+        db_dml insert_art_image "
       insert into cr_demo_article_images (
         article_image_id, caption
       ) values (
         :revision_id, :caption
       )"
 
-    if { [string equal $content_method "file_upload"] } {
-	# upload the image
-        ns_ora blob_dml_file $db "
+        if { [string equal $content_method "file_upload"] } {
+            # upload the image
+            db_dml update_content "
           update cr_revisions
             set content = empty_blob()
             where revision_id = $revision_id
-            returning content into :1" $tmp_filename
+            returning content into :1" -blob_files $tmp_filename
+        }
     }
 
-    ns_ora dml $db "end transaction"
-    ns_db releasehandle $db
 
     # flush the paginator cache
     cms_folder::flush sitemap $parent_id

@@ -9,7 +9,6 @@ if { [template::util::is_nil folder_id] } {
     set folder_id [cm::modules::${mount_point}::getRootFolderID]
 }
 
-set db [template::get_db_handle]
 
 # permissions check - user must have cm_examine on this folder
 content::check_access $folder_id cm_examine -user_id [User::getID] -db $db
@@ -20,7 +19,7 @@ content::check_access $folder_id cm_examine -user_id [User::getID] -db $db
 cms_folder::get_registered_types $folder_id multirow content_types
 
 # Get other misc values
-query folder_name onevalue "
+template::query get_folder_name folder_name onevalue "
   select label from cr_folders where folder_id = :folder_id
 " 
 
@@ -39,7 +38,7 @@ set passthrough [content::assemble_passthrough \
 
 
 # Determine registered types
-query folder_options onerow "
+template::query get_options folder_options onerow "
   select
     content_folder.is_registered(:folder_id,'content_folder') allow_subfolders,
     content_folder.is_registered(:folder_id,'content_symlink') allow_symlinks,
@@ -47,7 +46,6 @@ query folder_options onerow "
   from dual
 " 
 
-template::release_db_handle
 
 
 # Create the form for registering special types to the folder
@@ -95,33 +93,32 @@ if { [form is_valid register_types] } {
     form get_values register_types \
 	    allow_subfolders allow_symlinks folder_resolved_id mount_point
 
-    set db [template::begin_db_transaction]
+    db_transaction {
 
-    # permissions check - must have cm_write on folder to modify its options
-    content::check_access $folder_resolved_id cm_write \
+        # permissions check - must have cm_write on folder to modify its options
+        content::check_access $folder_resolved_id cm_write \
 	    -user_id [User::getID] -db $db
 
 
-    if { [string equal $allow_subfolders "t"] } {
-	set subfolder_sql "content_folder.register_content_type(:folder_resolved_id,'content_folder');"
-    } else {
-	set subfolder_sql "content_folder.unregister_content_type(:folder_resolved_id,'content_folder');"
-    }
+        if { [string equal $allow_subfolders "t"] } {
+            set subfolder_sql "content_folder.register_content_type(:folder_resolved_id,'content_folder');"
+        } else {
+            set subfolder_sql "content_folder.unregister_content_type(:folder_resolved_id,'content_folder');"
+        }
 
-    if { [string equal $allow_symlinks "t"] } {
-	set symlink_sql "content_folder.register_content_type(:folder_resolved_id,'content_symlink');"
-    } else {
-	set symlink_sql "content_folder.unregister_content_type(:folder_resolved_id,'content_symlink');"
-    }
+        if { [string equal $allow_symlinks "t"] } {
+            set symlink_sql "content_folder.register_content_type(:folder_resolved_id,'content_symlink');"
+        } else {
+            set symlink_sql "content_folder.unregister_content_type(:folder_resolved_id,'content_symlink');"
+        }
 
-    set sql "begin
+        set sql 
+
+        db_exec_plsql content "begin
              $subfolder_sql
              $symlink_sql
              end;"
-
-    ns_ora dml $db $sql
-    template::end_db_transaction 
-    template::release_db_handle
+    }
 
     forward "attributes?folder_id=$folder_id&mount_point=$mount_point"
 }

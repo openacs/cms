@@ -92,15 +92,15 @@ if { [form is_valid copy] } {
     form get_values copy id mount_point
     set copied_items [element get_values copy copied_items]
 
-    set db [template::begin_db_transaction]
+    db_transaction {
 
-    set folder_flush_list [list]
-    foreach cp_item_id $copied_items {
-	set parent_id [element get_values copy "parent_id_$cp_item_id"]
+        set folder_flush_list [list]
+        foreach cp_item_id $copied_items {
+            set parent_id [element get_values copy "parent_id_$cp_item_id"]
 
-	set sql 
+            set sql 
 
-	if { [catch {db_exec_plsql copy_item "
+            if { [catch {db_exec_plsql copy_item "
 	    begin
             content_item.copy(
                 item_id          => :cp_item_id,
@@ -109,20 +109,18 @@ if { [form is_valid copy] } {
 	        creation_ip      => :ip
             ); 
             end;"} errmsg] } {
-	    # possibly a duplicate name
-	    ns_log notice "ERROR: copy.tcl - while copying $errmsg"
-	}
+                # possibly a duplicate name
+                ns_log notice "ERROR: copy.tcl - while copying $errmsg"
+            }
 
-	# flush the cache
-	if { [lsearch -exact $folder_flush_list $parent_id] == -1 } {
-	    lappend folder_flush_list $parent_id
-	    cms_folder::flush $mount_point $parent_id
-	}
+            # flush the cache
+            if { [lsearch -exact $folder_flush_list $parent_id] == -1 } {
+                lappend folder_flush_list $parent_id
+                cms_folder::flush $mount_point $parent_id
+            }
 
+        }
     }
-
-    template::end_db_transaction
-    template::release_db_handle
 
     # flush cache for destination folder
     if { $folder_id == [cm::modules::${mount_point}::getRootFolderID] } {

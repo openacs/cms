@@ -46,21 +46,20 @@ if { [form is_valid new_template] } {
   set creation_user [User::getID]
 
   set db [template::begin_db_transaction]
+  db_transaction {
 
-  set sql "begin :template_id := content_template.new(
+
+      set template_id [db_exec_plsql new_template "begin :1 := content_template.new(
          template_id => :template_id,
          name => :name,
          parent_id => :folder_id,
          creation_ip   => :creation_ip,
          creation_user => :creation_user
-  ); end;"
+  ); end;"]
 
-  ns_ora exec_plsql_bind $db $sql template_id
-
-  content::add_basic_revision $template_id "" "Template" \
-      -text "<html></html>" -mime_type $mime_type
-
-  template::end_db_transaction
+      content::add_basic_revision $template_id "" "Template" \
+          -text "<html></html>" -mime_type $mime_type
+  }
 
   template::forward $return_url
 }

@@ -3,13 +3,12 @@ request set_param id -datatype keyword -optional
 request set_param mount_point -datatype keyword -optional -value search
 request set_param parent_id -datatype keyword -optional
 
-set db [template::get_db_handle]
 
 # Get the tabulated list of content types
 set content_types [cm::modules::types::getTypesTree]
 
 # Get a list of mime-types
-query mime_types multilist "
+template::query get_mime_types mime_types multilist "
   select
     label, mime_type as value
   from 
@@ -146,7 +145,7 @@ if { [form is_valid search] } {
   ns_log notice $sql_query
 
   # Perform the query and get the total results
-  template::query total_results onevalue "
+  template::query get_results total_results onevalue "
     select count(*) from ($sql_query)
   " 
 

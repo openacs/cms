@@ -34,7 +34,6 @@ if { [form is_request create_item] } {
 
 if { [form is_valid create_item] } {
 
-  set db [ns_db gethandle]
 
   # set the date value from the form
   form get_values create_item name context_id item_id title description \
@@ -42,18 +41,16 @@ if { [form is_valid create_item] } {
 
   set publish_date [util::date::get_property sql_date $publish_date]
 
-  ns_ora exec_plsql_bind $db "begin 
-    :retval := content_item.new(:name, :context_id, :item_id, sysdate, NULL,
+  set retval [db_exec_plsql new_content_item "begin 
+    :1 := content_item.new(:name, :context_id, :item_id, sysdate, NULL,
                            '[ns_conn peeraddr]', 'content_item'); 
-  end;" retval
+  end;"]
 
-  ns_ora exec_plsql_bind $db "begin 
-    :retval := content_revision.new(:title, :description, $publish_date, 
+  set retval [db_exec_plsql new_revision "begin 
+    :1 := content_revision.new(:title, :description, $publish_date, 
                                :mime_type, NULL, :text, 'content_revision', 
                                :item_id, :revision_id);
-  end;" retval
-
-  ns_db releasehandle $db
+  end;"]
 
   template::forward item?item_id=$item_id
 }

@@ -39,9 +39,9 @@ if { [form is_valid new_folder] } {
   set creation_ip [ns_conn peeraddr]
   set creation_user [User::getID]
 
-  set db [template::begin_db_transaction]
+  db_transaction {
 
-  set sql "begin :folder_id := content_folder.new(
+      set folder_id [db_exec_plsql "begin :folder_id := content_folder.new(
          folder_id => :folder_id,
          name => :name,
          label => :label,
@@ -49,14 +49,11 @@ if { [form is_valid new_folder] } {
          parent_id => :parent_id,
          creation_ip   => :creation_ip,
          creation_user => :creation_user
-  ); end;"
+  ); end;"]
 
-  ns_ora exec_plsql_bind $db $sql folder_id
-
-  content::add_basic_revision $folder_id "" "Template" \
-      -text "<html></html>"
-
-  template::end_db_transaction
+      content::add_basic_revision $folder_id "" "Template" \
+          -text "<html></html>"
+  }
 
   template::forward $return_url
 }

@@ -231,8 +231,6 @@ if { ![string equal $attr_columns ""] } {
   set revision_attr_html ""
 }
 
-template::release_db_handle
-
 set page_title \
 	"$title : Revision $revision_number of $revision_count for $name"
 

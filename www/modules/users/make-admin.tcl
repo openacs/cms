@@ -10,14 +10,14 @@ request set_param return_url -datatype text -optional \
 # to do this
 set user_id [User::getID]
 
-set db [template::begin_db_transaction]
+db_transaction {
 
-content::check_access [cm::modules::sitemap::getRootFolderID] "cm_admin" \
-  -mount_point $mount_point -parent_id $parent_id -db $db
+    content::check_access [cm::modules::sitemap::getRootFolderID] "cm_admin" \
+        -mount_point $mount_point -parent_id $parent_id -db $db
 
-# Grant cm_admin on sitemap, templates, users
+    # Grant cm_admin on sitemap, templates, users
 
-ns_ora dml $db "
+    db_exec_plsql grant_permission "
   declare
     cursor c_module_cur is
       select module_id from cm_modules;
@@ -41,7 +41,6 @@ ns_ora dml $db "
       content_template.get_root_folder, :user_id, 'cm_admin', :target_user_id, 't'
     );
   end;"
-
-template::end_db_transaction
+}
 
 template::forward $return_url

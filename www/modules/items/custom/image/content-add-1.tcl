@@ -61,25 +61,23 @@ if { [form is_valid image] } {
     set height [lindex $image_size 1]
 
 
-    set db [ns_db gethandle]
-    ns_ora dml $db "begin transaction"
-    
-    # insert the extended attributes
-    ns_ora dml $db "
+    db_transaction {
+        
+        # insert the extended attributes
+        db_dml update_images "
       update images
         set width = :width,
         height = :height
         where image_id = :revision_id"
 
-    # upload the image
-    ns_ora blob_dml_file $db "
+        # upload the image
+        db_dml update_revisions "
       update cr_revisions
         set content = empty_blob()
         where revision_id = $revision_id
-        returning content into :1" $tmp_filename
+        returning content into :1" -blob_files $tmp_filename
 
-    ns_ora dml $db "end transaction"
-    ns_db releasehandle $db
+    }
 
 
     template::forward "../../index?item_id=$item_id"

@@ -7,17 +7,14 @@ template::request set_param parent_id -datatype keyword -optional
 request set_param mount_point -datatype keyword -optional -value sitemap
 
 
-set db [template::get_db_handle]
 
 # permission check - user must have cm_write on this folder to delete it
-content::check_access $id cm_write -user_id [User::getID] -db $db
+content::check_access $id cm_write -user_id [User::getID]
 
 # Determine if the folder is empty
-template::query is_empty onevalue "
+template::query check_empty is_empty onevalue "
   select content_folder.is_empty(:id) from dual
 " 
-
-template::release_db_handle
 
 # If nonempty, show error
 if { [string equal $is_empty "f"] } {
@@ -30,10 +27,9 @@ if { [string equal $is_empty "f"] } {
 } else {
 
   # Otherwise, delete the folder
-  set db [template::begin_db_transaction]
-  template::query delete_folder dml "begin content_folder.delete(:id); end;"
-  template::end_db_transaction
-  template::release_db_handle
+  db_transaction {
+      db_exec_plsql delete_folder "begin content_folder.delete(:id); end;"
+  }
 
   # Remove it from the clipboard, if it exists
   set clip [clipboard::parse_cookie]

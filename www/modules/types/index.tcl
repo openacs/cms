@@ -17,19 +17,17 @@ set content_type $id
 set user_id [User::getID]
 set root_id [cm::modules::templates::getRootFolderID]
 
-set db [template::get_db_handle]
-
-query module_id onevalue "
+template::query get_module_id module_id onevalue "
   select module_id from cm_modules where key = 'types'
 " 
 
-content::check_access $module_id cm_examine -user_id $user_id -db $db
+content::check_access $module_id cm_examine -user_id $user_id
 
 set can_edit_widgets $user_permissions(cm_write)
 
 
 # get the content type pretty name
-query object_type_pretty onevalue "
+template::query get_object_type object_type_pretty onevalue "
   select 
     pretty_name
   from
@@ -41,13 +39,12 @@ query object_type_pretty onevalue "
 
 if { [string equal $object_type_pretty ""] } {
     # error - invalid content_type
-    template::release_db_handle
     template::forward index
 }
 
 
 # get all the content types that this content type inherits from
-query content_type_tree multirow "
+template::query get_content_type content_type_tree multirow "
   select 
     decode (supertype, 'acs_object', '', supertype) as parent_type,   
     decode (object_type, 'content_revision', '', object_type) as object_type,
@@ -65,7 +62,7 @@ query content_type_tree multirow "
 " 
 
 # get all the attribute properties for this object_type
-query attribute_types multirow "
+template::query get_attr_types attribute_types multirow "
   select 
     attr.attribute_id, attr.attribute_name, attr.object_type,
     attr.pretty_name as attribute_name_pretty,
@@ -97,7 +94,7 @@ query attribute_types multirow "
 " 
 
 # get template information
-query type_templates multirow "
+template::query get_type_templates type_templates multirow "
   select 
     template_id, ttmap.content_type, use_context, is_default, name, 
     content_item.get_path(
@@ -114,8 +111,6 @@ query type_templates multirow "
   order by 
     upper(name)
 " 
-
-template::release_db_handle
 
 set page_title "Content Type - $object_type_pretty"
 

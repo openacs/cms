@@ -45,28 +45,29 @@ if { [form is_valid register_user] } {
 	    password screen_name
 
     set db [template::begin_db_transaction]
-    
-    set user_id [ad_user_new $email $first_name $last_name $password \
-	    "" "" "" "" "" $user_id]
+    db_transaction {
+        
+        set user_id [ad_user_new $email $first_name $last_name $password \
+                         "" "" "" "" "" $user_id]
 
-    ns_ora dml $db "
+        db_dml update_users "
       update users
         set screen_name = :screen_name
         where user_id = :user_id"
 
-    # if there are no users with the 'cm_admin' privilege 
-    #   (the CMS has never been used), then this user will be the admin
-    set cms_admin_exists [User::cms_admin_exists $db]
-    if { $cms_admin_exists == 0 } {
-	set is_admin t
-    } else {
-	set is_admin f
-    }
+        # if there are no users with the 'cm_admin' privilege 
+        #   (the CMS has never been used), then this user will be the admin
+        set cms_admin_exists [User::cms_admin_exists $db]
+        if { $cms_admin_exists == 0 } {
+            set is_admin t
+        } else {
+            set is_admin f
+        }
 
-    # make admin - grant 'cm_admin' privileges for all content items
-    #   and for content modules
-    if { [string equal $is_admin t] } {
-	ns_ora dml $db "
+        # make admin - grant 'cm_admin' privileges for all content items
+        #   and for content modules
+        if { [string equal $is_admin t] } {
+            db_dml grant_permissions "
 	declare
 	  cursor c_item_cur is
 	    select item_id from cr_items
@@ -96,11 +97,10 @@ if { [form is_valid register_user] } {
 
 	end;
 	"
+        }
+
+        User::login $db $user_id
     }
-
-    User::login $db $user_id
-
-    template::end_db_transaction
 
     template::forward index
 }

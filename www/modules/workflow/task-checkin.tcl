@@ -9,12 +9,11 @@ request set_param return_url -datatype text    -value "../workspace/index"
 set user_id [User::getID]
 
 # check that the task is still valid
-query is_valid_task onevalue "
+template::query check_valid is_valid_task onevalue "
   select content_workflow.can_approve( :task_id, :user_id ) from dual
 " 
 
 if { [string equal $is_valid_task f] } {
-  template::release_db_handle
   template::forward $return_url
 }
 
@@ -99,21 +98,20 @@ if { [form is_valid task_start] } {
     set ip_address [ns_conn peeraddr]    
     set user_id [User::getID]
 
-    set db [template::begin_db_transaction]
-
-    # check that the task is still valid
-    template::query get_task_status is_valid_task onevalue "
+    db_transaction {
+        # check that the task is still valid
+        template::query get_task_status is_valid_task onevalue "
       select content_workflow.can_approve( :task_id, :user_id ) from dual
     " 
 
-    if { [string equal $is_valid_task f] } {
-	db_dml abort "abort transaction"
-	template::request::error invalid_task \
+        if { [string equal $is_valid_task f] } {
+            db_dml abort "abort transaction"
+            template::request::error invalid_task \
 		"task-checkin.tcl - invalid task - $task_id"
-	return
-    }
+            return
+        }
 
-    db_exec_plsql workflow_checkin "
+        db_exec_plsql workflow_checkin "
       begin
       content_workflow.checkin(
           task_id      => :task_id,             
@@ -123,5 +121,6 @@ if { [form is_valid task_start] } {
       );
       end;
     "    
+    }
     template::forward $return_url
 }

@@ -98,10 +98,9 @@ if { [form is_valid widget_register] } {
     form get_values widget_register \
 	    widget is_required attribute_name content_type
 
-    set db [ns_db gethandle]
-    ns_ora dml $db "begin transaction"
+    db_transaction {
 
-    query already_registered  onevalue "
+        template::query check_registered already_registered  onevalue "
       select 1
       from
         cm_attribute_widgets
@@ -109,21 +108,21 @@ if { [form is_valid widget_register] } {
         attribute_id = :attribute_id
       and
         widget = :widget
-    " -db $db
+    " 
 
-    # just update the is_required column if this widget is already registered
-    #   this way we don't overwrite the existing attribute widget params
-    if { ![template::util::is_nil already_registered] && \
-	    $already_registered } {
-	ns_ora dml $db "
+        # just update the is_required column if this widget is already registered
+        #   this way we don't overwrite the existing attribute widget params
+        if { ![template::util::is_nil already_registered] && \
+                 $already_registered } {
+            db_dml update_widgets "
 	  update cm_attribute_widgets
             set is_required = decode(is_required,'t','f','t')
             where attribute_id = :attribute_id
             and widget = :widget"
-    } else {
+        } else {
 
-	# (re)register a widget to an attribute
-	ns_ora dml $db "
+            # (re)register a widget to an attribute
+            db_exec_plsql register_widget "
 	  begin
 	  cm_form_widget.register_attribute_widget(
               content_type   => :content_type,
@@ -132,9 +131,8 @@ if { [form is_valid widget_register] } {
               is_required    => :is_required
           );
 	  end;"
+        }
     }
-    ns_ora dml $db "end transaction"
-    ns_db releasehandle $db
     
     wizard set_param widget $widget
     wizard forward

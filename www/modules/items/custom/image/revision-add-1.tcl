@@ -46,12 +46,12 @@ element create image upload \
 	-widget file \
 	-label "Upload Image"
 
-
-if { [form is_request image] } {
+# a noop ?
+# if { [form is_request image] } {
   
-    set db [template::get_db_handle]
-    ns_db releasehandle $db
-}
+#     set db [template::get_db_handle]
+#     ns_db releasehandle $db
+# }
 
 
 
@@ -102,13 +102,12 @@ if { [form is_valid image] } {
     set user_id [User::getID]
     set ip_address [ns_conn peeraddr]
 
-    set db [ns_db gethandle]
-    ns_ora dml $db "begin transaction"
+    db_transaction {
 
-    # create the revision
-    ns_ora exec_plsql_bind $db "
+        # create the revision
+        set revision_id [db_exec_plsql new_revision "
       begin
-      :revision_id := content_revision.new (
+      :1 := content_revision.new (
         item_id       => :item_id,
         title         => :title,
         description   => :description,
@@ -117,28 +116,26 @@ if { [form is_valid image] } {
         creation_ip   => :ip_address
       );
       end;
-    " revision_id
+    "]
 
-    # insert the extended attributes
-    ns_ora dml $db "
+        # insert the extended attributes
+        db_dml insert_images "
       insert into images (
         image_id, width, height
       ) values (
         :revision_id, :width, :height
       )"
 
-    # upload the image
-    ns_ora blob_dml_file $db "
+        # upload the image
+        db_dml update_revisions "
       update cr_revisions
         set content = empty_blob()
         where revision_id = $revision_id
-        returning content into :1" $tmp_filename
+        returning content into :1" -blob_files $tmp_filename
 
 
 
-
-    ns_ora dml $db "end transaction"
-    ns_db releasehandle $db
+    }
 
     template::forward "../../index?item_id=$item_id"
 
