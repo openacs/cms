@@ -404,6 +404,18 @@ begin
     return 0; 
 end;' language 'plpgsql';
 
+create function cm_form_widget__set_attribute_param_value (varchar,varchar,varchar,integer,varchar,varchar)
+returns integer as '
+begin
+    return cm_form_widget__set_attribute_param_value($1, $2, $3, cast ($4 as varchar), $5, $6); 
+end;' language 'plpgsql';
+
+create function cm_form_widget__set_attribute_param_value (varchar,varchar,varchar,integer,varchar,varchar)
+returns integer as '
+begin
+    return cm_form_widget__set_attribute_param_value($1, $2, $3, cast ($4 as varchar), $5, $6); 
+end;' language 'plpgsql';
+
 -- show errors
 
 
