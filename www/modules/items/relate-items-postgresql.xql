@@ -22,8 +22,8 @@
       <querytext>
 
     select 
-      lpad(' ', tree_level(tree_sortkey), '-') || pretty_name as pretty_name, 
-      object_type
+      lpad(' ', tree_level(ot1.tree_sortkey), '-') || ot1.pretty_name as pretty_name, 
+      ot1.object_type
     from
       acs_object_types ot1, acs_object_types ot2
     where ot2.object_type = 'cr_item_rel'

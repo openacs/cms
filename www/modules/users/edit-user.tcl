@@ -48,7 +48,7 @@ element create edit_user password2 \
   } 
 
 if { [form is_request edit_user] } {
-
+    ns_log Notice "REQUEST"
   # Find basic user params
     db_1row get_user_info "" -column_array info
 
@@ -56,7 +56,7 @@ if { [form is_request edit_user] } {
 }
 
 if { [form is_valid edit_user] } {
-
+    ns_log Notice "VALID"
   form get_values edit_user first_names last_name screen_name item_id \
     user_id parent_id mount_point email url password no_alerts_until
 
@@ -89,6 +89,8 @@ if { [form is_valid edit_user] } {
 
   template::forward "one-user?id=$item_id&parent_id=$parent_id&mount_point=$mount_point"
 
+} else {
+    ns_log Notice "FORM NOT VALID"
 }
 
 
