@@ -189,7 +189,7 @@ null
 	<querytext>
 
       update cr_revisions 
-      set content = empty_blob() where revision_id = :revision_id
+      set content = empty_lob() where revision_id = :revision_id
 
 	</querytext>
 <fullquery>
@@ -231,6 +231,75 @@ null
 	<querytext>
 
 	to_char($attr, 'YYYY MM DD HH24 MI SS') as $attr
+
+	</querytext>
+</partialquery>
+
+<fullquery name="gcv_get_revision_id">
+	<querytext>
+
+	    select content_revision__to_temporary_clob(:revision_id) as revision_id;
+
+	</querytext>
+</fullquery>
+
+<fullquery name="ga_get_attributes">
+	<querytext>
+
+    select
+      [join $args ","]
+    from
+      acs_attributes RIGHT OUTER JOIN
+      (
+	select 
+	  o2.object_type, tree_level(o2.tree_sortkey) as type_order
+	from
+	  (
+	    SELECT *
+	    FROM acs_object_types
+	    WHERE object_type = :content_type
+	  ) o1, acs_object_types o2
+	where
+	  o2.tree_sortkey <= o1.tree_sortkey
+	AND
+	  o1.tree_sortkey like (o2.tree_sortkey || '%')
+
+      ) types USING (object_type)
+    where
+      attribute_name <> 'ldap dn'
+    order by type_order desc, sort_order
+
+	</querytext>
+</fullquery>
+
+<fullquery name="gaev_get_enum_values">
+	<querytext>
+
+           select
+	     coalesce(pretty_name,enum_value), 
+	     enum_value
+	   from
+	     acs_enum_values
+	   where
+	     attribute_id = :attribute_id
+	   order by
+	     sort_order
+
+	</querytext>
+</fullquery>
+
+<fullquery name="glr_get_latest_revision">
+	<querytext>
+
+    select content_item__get_latest_revision(:item_id)
+
+	</querytext>
+</fullquery>
+
+<partialquery name="abr_new_revision_title">
+	<querytext>
+
+   select content_revision__new(:title
 
 	</querytext>
 </partialquery>

@@ -27,10 +27,10 @@
 
 <fullquery name="insert_revision_form">
 	<querytext>
-              insert into $last_table (
-                [join $columns ", "]
+              insert into $__last_table (
+                [join $__columns ", "]
               ) values (
-                [join $values ", "]
+                [join $__values ", "]
               )"
 	</querytext>
 </fullquery>
@@ -54,10 +54,10 @@
 
 <fullquery name="process_insert_statement">
 	<querytext>
-              insert into $last_table (
-                [join $columns ", "]
+              insert into $__last_table (
+                [join $__columns ", "]
               ) values (
-                [join $values ", "]
+                [join $__values ", "]
               )"
 	</querytext>
 </fullquery>
@@ -189,6 +189,19 @@
         acs_object_types 
       where 
         object_type = :object_type
+
+	</querytext>
+</fullquery>
+
+<fullquery name="gcv_get_previous_content">
+	<querytext>
+
+    select 
+      content
+    from 
+      cr_content_text
+    where 
+      revision_id = :revision_id
 
 	</querytext>
 </fullquery>

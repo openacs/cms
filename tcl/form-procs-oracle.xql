@@ -239,4 +239,114 @@
 	</querytext>
 </partialquery>
 
+<fullquery name="gcv_get_revision_id">
+	<querytext>
+
+	  begin
+	    content_revision.to_temporary_clob(:revision_id);
+	  end;
+
+	</querytext>
+</fullquery>
+
+<fullquery name="ga_get_attributes">
+	<querytext>
+
+    select
+      [join $args ","]
+    from
+      acs_attributes,
+      (
+	select 
+	  object_type ancestor, level as type_order
+	from 
+	  acs_object_types
+	connect by 
+	  prior supertype = object_type
+	start with 
+          object_type = :content_type
+      ) types
+    where
+      object_type = ancestor
+    and
+      attribute_name <> 'ldap dn'
+    order by type_order desc, sort_order
+
+	</querytext>
+</fullquery>
+
+<fullquery name="gaev_get_enum_values">
+	<querytext>
+
+           select
+	     nvl(pretty_name,enum_value), 
+	     enum_value
+	   from
+	     acs_enum_values
+	   where
+	     attribute_id = :attribute_id
+	   order by
+	     sort_order
+
+	</querytex>
+</fullquery>
+
+<fullquery name="glr_get_latest_revision">
+	<querytext>
+
+    select content_item.get_latest_revision(:item_id) from dual
+
+	</querytext>
+</fullquery>
+
+<partialquery name="abr_new_revision_title">
+	<querytext>
+
+begin :revision_id := content_revision.new(
+         title         => :title
+
+	</querytext>
+</partialquery>
+
+<partialquery name="abr_new_revision_description">
+	<querytext>
+
+         , description         => :description
+
+	</querytext>
+</partialquery>
+
+<partialquery name="abr_new_revision_publish_date">
+	<querytext>
+
+         , publish_date         => :publish_date
+
+	</querytext>
+</partialquery>
+
+<partialquery name="abr_new_revision_mime_type">
+	<querytext>
+
+         , mime_type         => :mime_type
+
+	</querytext>
+</partialquery>
+
+<partialquery name="abr_new_revision_nls_language">
+	<querytext>
+
+         , nls_language         => :nls_language
+
+	</querytext>
+</partialquery>
+
+<partialquery name="abr_new_revision_text">
+	<querytext>
+
+         , text         => :text
+
+	</querytext>
+</partialquery>
+
+
 </queryset>

@@ -17,8 +17,9 @@ ad_proc content::query_form_metadata {
   #   the 3 nvl subqueries are necessary because we cannot outer join
   #   to more than one table without doing multiple subqueries (which is
   #   even less efficient than this way)
-    
-  set attributes_query [db_map attributes_query_1] 
+
+  upvar __query query
+  set query [db_map attributes_query_1] 
  
   if { ![template::util::is_nil extra_where] } {      
     append query "\n   and\n      $extra_where"
@@ -34,7 +35,7 @@ ad_proc content::query_form_metadata {
   }  
 
   uplevel "
-    template::query get_form_metadata $datasource_name $datasource_type \{$query\}
+    template::query get_form_metadata $datasource_name $datasource_type \{$__query\}
   "
 
 }
@@ -307,6 +308,9 @@ ad_proc content::get_element_default_params {} {
 #     param_source, param_type, value
 # POST: adds params to the 'element create' command
 ad_proc content::get_revision_create_element {} {
+    upvar __sql sql
+    set sql [db_map get_enum_1]
+    
     uplevel {
         if { ![string equal $attribute_name {}] } {
             
@@ -317,10 +321,8 @@ ad_proc content::get_revision_create_element {} {
                 # if datatype is enumeration, then query acs_enum_values table to
                 # build the option list
                 if { [string equal $datatype "enumeration"] } {
-                    
-                    set sql [db_map get_enum_1]
-            
-                    template::query get_enum_values options multilist $sql
+
+                    template::query get_enum_values options multilist $__sql
                     lappend code_params -options $options
                 }
                 
@@ -349,7 +351,6 @@ ad_proc content::process_revision_form { form_name content_type item_id {db{}} }
 
     template::form get_values $form_name title description mime_type
 
-    # FIX ME: check -postgresql version
     # create the basic revision
     db_exec_plsql new_content_revision {
              begin
@@ -440,18 +441,19 @@ ad_proc content::process_revision_form { form_name content_type item_id {db{}} }
 #      columns, values, last_table
 ad_proc content::process_revision_form_dml {} {
 
+    upvar last_table __last_table
+    upvar columns __columns
+    upvar values __values
+    upvar __sql sql
+    set sql [db_map insert_revision_form]
+    
     uplevel {
 
         if { ! [string equal $last_table {}] } {
             lappend columns $last_id_column
             lappend values ":revision_id"
 
-            db_dml insert_revision_form "
-              insert into $last_table (
-                [join $columns ", "]
-              ) values (
-                [join $values ", "]
-              )"
+            db_dml insert_revision_form $__sql
         }
     }
 }
@@ -530,19 +532,19 @@ ad_proc content::insert_element_data {
 # PRE: the following variables must be set in the uplevel scope:
 #      columns, values, last_table, id_value_ref
 ad_proc content::process_insert_statement {} {
-
+    upvar last_table __last_table
+    upvar columns __columns
+    upvar values __values
+    upvar __sql sql
+    set sql [db_map process_insert_statement]
+    
     uplevel {
 
         if { ! [string equal $last_table {}] } {
             lappend columns $last_id_column
             lappend values ":$id_value_ref"
 
-	    db_dml process_insert_statement "
-              insert into $last_table (
-                [join $columns ", "]
-              ) values (
-                [join $values ", "]
-              )"
+	    db_dml process_insert_statement $__sql
         }
     }
 }
@@ -1702,23 +1704,24 @@ ad_proc content::get_object_id {} {
 
 ad_proc content::get_content_value { revision_id } {
 
-  set db [template::begin_db_transaction]
+  db_transaction {
+      db_exec_plsql gcv_get_revision_id {
+	  begin
+	    content_revision.to_temporary_clob(:revision_id);
+	  end;
+      }
 
-  ns_ora dml $db "begin content_revision.to_temporary_clob(:revision_id); end;"
+      # Query for values from a previous revision
 
-  # Query for values from a previous revision
-  set sql "
-    select 
-      content
-    from 
-      cr_content_text
-    where 
-      revision_id = :revision_id
-  "
+      template::query gcv_get_previous_content content onevalue "
+      select 
+        content
+      from 
+        cr_content_text
+      where 
+        revision_id = :revision_id"
 
-  template::query content onevalue $sql -db $db
-
-  template::end_db_transaction
+  }
 
   return $content
 }
@@ -1733,38 +1736,19 @@ ad_proc content::get_content_value { revision_id } {
 # @param args Names of columns to query.  If no columns are specified,
 # returns a simple list of attribute names.
 
-proc content::get_attributes { content_type args } {
+ad_proc content::get_attributes { content_type args } {
 
   if { [llength $args] == 0 } {
     set args [list attribute_name]
   }
 
+  ### RBM: FIX ME (aD left this note. Probably should be fixed).
   ### HACK ! What the hell is "ldap dn" ?
-  set query "
-    select
-      [join $args ","]
-    from
-      acs_attributes,
-      (
-	select 
-	  object_type ancestor, level as type_order
-	from 
-	  acs_object_types
-	connect by 
-	  prior supertype = object_type
-	start with 
-          object_type = :content_type
-      ) types
-    where
-      object_type = ancestor
-    and
-      attribute_name <> 'ldap dn'
-    order by type_order desc, sort_order"
 
   if { [llength $args] == 1 } {
-    template::query attributes onelist $query
+    template::query ga_get_attributes attributes onelist ""
   } else {
-    template::query attributes multilist $query
+    template::query attributes multilist ""
   }
 
   return $attributes
@@ -1778,9 +1762,10 @@ proc content::get_attributes { content_type args } {
 # @param attribute_id   The primary key of the attribute as in the
 #                       attribute_id column of the acs_attributes table.
 
-proc content::get_attribute_enum_values { attribute_id } {
+ad_proc content::get_attribute_enum_values { attribute_id } {
 
-  set sql "select
+  template::query gaev_get_enum_values enum multilist "
+           select
 	     nvl(pretty_name,enum_value), 
 	     enum_value
 	   from
@@ -1790,7 +1775,6 @@ proc content::get_attribute_enum_values { attribute_id } {
 	   order by
 	     sort_order"
 
-  template::query enum multilist $sql
 
   return $enum
 }
@@ -1801,9 +1785,9 @@ proc content::get_attribute_enum_values { attribute_id } {
 
 # @param item_id  The ID of the content item.
 
-proc content::get_latest_revision { item_id } {
+ad_proc content::get_latest_revision { item_id } {
 
-  template::query latest_revision onevalue "
+  template::query glr_get_latest_revision latest_revision onevalue "
     select content_item.get_latest_revision(:item_id) from dual"
 
   return $latest_revision
@@ -1823,26 +1807,28 @@ proc content::get_latest_revision { item_id } {
 # @option text
 # @option tmpfile
 
-proc content::add_basic_revision { item_id revision_id title args } {
+ad_proc content::add_basic_revision { item_id revision_id title args } {
 
   template::util::get_opts $args
 
   set creation_ip [ns_conn peeraddr]
   set creation_user [User::getID]
 
-  set sql "begin :revision_id := content_revision.new(
-               item_id       => content_symlink.resolve(:item_id),
-               revision_id   => :revision_id,
-               title         => :title,
-               creation_ip   => :creation_ip,
-               creation_user => :creation_user"
+  set sql [db_map abr_new_revision_title]
+             item_id       => content_symlink.resolve(:item_id),
+         revision_id   => :revision_id,
+         creation_date  => sysdate,
+         creation_ip   => :creation_ip,
+         creation_user => :creation_user
 
-  foreach param { description mime_type text } {
+  foreach param { description publish_date mime_type nls_language text } {
 
     if { [info exists opts($param)] } {
       set $param $opts($param)
-      append sql ", $param => :$param"
-    }
+	append sql [db_map abr_new_revision_$param]", $param => :$param"
+    } else {
+	switch $param {
+	    "description" 
   }
 
   append sql "); end;"
