@@ -19,7 +19,7 @@ namespace eval content_add {}
 # @param content_type The content type of the item
 # @param item_id The item id
 
-proc content_add::content_method_html { db content_type item_id } {
+ad_proc content_add::content_method_html { content_type item_id } {
     
     set content_method_html ""
 
@@ -34,7 +34,7 @@ proc content_add::content_method_html { db content_type item_id } {
         mime_type like ('%text/%')
       and
         content_type = :content_type
-    " -db $db
+    "
 
     template::query mime_type_count onevalue "
       select
@@ -43,7 +43,7 @@ proc content_add::content_method_html { db content_type item_id } {
         cr_content_mime_type_map
       where
         content_type = :content_type
-    " -db $db
+    " 
 
     if { $mime_type_count > 0 } {
 
