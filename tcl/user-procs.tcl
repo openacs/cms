@@ -5,7 +5,7 @@ namespace eval User {
   proc checkRegistration { url } {
     
     if { [getID] == 0 } { 
-      ns_returnredirect $url
+      ad_returnredirect $url
     }
   }
 
