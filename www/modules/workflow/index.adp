@@ -8,25 +8,25 @@
   <p>
 
 
-  <table cellspacing=0 cellpadding=4 border=0 width=95%>
+  <table cellspacing=0 cellpadding=4 border=0 width="95%">
   <tr bgcolor="#FFFFFF"><td>
     <b>Workflow Items by Task</b>
   </td></tr>
 
   <tr bgcolor="#6699CC"><td>
 
-  <table cellspacing=0 cellpadding=5 border=0 width=100%>
+  <table cellspacing=0 cellpadding=5 border=0 width="100%">
     <tr bgcolor="99CCFF">
       <if @transitions:rowcount@ eq 0>
         <td><em>There are no publishing workflows.</em></td>
       </if>
       <else>
 
-      <th width=40%>Workflow State</th>
-      <th width=15%>Workflow Items</th>
-      <th width=15%>Active Items</th>
-      <th width=15%>Checked Out Items</th>
-      <th width=15%>Overdue Items</th>
+      <th width="40%">Workflow State</th>
+      <th width="15%">Workflow Items</th>
+      <th width="15%">Active Items</th>
+      <th width="15%">Checked Out Items</th>
+      <th width="15%">Overdue Items</th>
 
     </tr>
 
@@ -75,25 +75,25 @@
 
 
   <p>
-  <table cellspacing=0 cellpadding=4 border=0 width=95%>
+  <table cellspacing=0 cellpadding=4 border=0 width="95%">
     <tr bgcolor="#FFFFFF"><td>
       <b>Workflow Items by Assigned Parties</b>
     </td></tr>
 
     <tr bgcolor="#6699CC"><td>
 
-    <table cellspacing=0 cellpadding=4 border=0 width=100%>
+    <table cellspacing=0 cellpadding=4 border=0 width="100%">
       <tr bgcolor="#99CCFF">
 	<if @user_tasks:rowcount@ eq 0>
           <td><em>There are no publishing workflows.</em></td></tr>
         </if>
         <else>
 
-        <th width=40%>Assigned Party</th>
-        <th width=15%>Workflow Items</th>
-	<th width=15%>Active Items</th>
-	<th width=15%>Checked Out Items</th>
-	<th width=15%>Overdue Items</th>
+        <th width="40%">Assigned Party</th>
+        <th width="15%">Workflow Items</th>
+	<th width="15%">Active Items</th>
+	<th width="15%">Checked Out Items</th>
+	<th width="15%">Overdue Items</th>
       </tr>
 
       <multiple name=user_tasks>

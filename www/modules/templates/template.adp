@@ -1,7 +1,7 @@
 <master src="../../master">
 <property name="title">Content Template</property>
 
-<table border=0 width=95%>
+<table border=0 width="95%">
 <tr>
 
 <td align=left><b>
@@ -24,13 +24,13 @@
 </if>
 <else>
 
-  <table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width=95%>
+  <table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width="95%">
   <tr>
     <th align=left>Registered Content Items</th>
   </tr>
   <tr><td>
 
-  <table border=0 cellspacing=0 width=100%>
+  <table border=0 cellspacing=0 width="100%">
   <tr bgcolor="#99ccff">
     <th>Title</th>
     <th>Context</th>
@@ -62,13 +62,13 @@
 </if>
 <else>
 
-  <table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width=95%>
+  <table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width="95%">
   <tr>
     <th align=left>Registered Content Types</th>
   </tr>
   <tr><td>
 
-  <table border=0 cellspacing=0 width=100%>
+  <table border=0 cellspacing=0 width="100%">
   <tr bgcolor="#99ccff">
     <th>Content Type</th>
     <th>Context</th>

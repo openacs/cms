@@ -9,7 +9,7 @@
 
 <h2>@page_title@</h2>
 
-<table border=0 cellpadding=4 cellspacing=0 width=95%>
+<table border=0 cellpadding=4 cellspacing=0 width="95%">
 <tr>
   <td nowrap align=left>
     <font size=-1>
@@ -44,10 +44,10 @@
 <p>
 
 
-<table cellpadding=1 cellspacing=0 border=0 width=100%>
+<table cellpadding=1 cellspacing=0 border=0 width="100%">
 <tr bgcolor=#000000><td>
 
-<table cellpadding=0 cellspacing=0 border=0 width=100%>
+<table cellpadding=0 cellspacing=0 border=0 width="100%">
 <tr bgcolor=#eeeeee><td>
 
 <!-- Tabs begin -->
@@ -61,7 +61,7 @@
 <!-- Tabs end -->
 
 <br>
-<table cellspacing=0 cellpadding=0 border=0 width=95%>
+<table cellspacing=0 cellpadding=0 border=0 width="95%">
 
 <if @type_props.tab@ eq attributes>
   
@@ -70,7 +70,7 @@
 
     <!-- ATTRIBUTES TABLE -->
     <include src="../../table-header" title="Attributes">
-    <table cellspacing=0 cellpadding=4 border=0 width=100%>
+    <table cellspacing=0 cellpadding=4 border=0 width="100%">
     <if @attribute_types:rowcount@ eq 0>
       <tr bgcolor="#99CCFF">
 	<td><em>This content type has no attributes.</em></td>
@@ -137,7 +137,7 @@
 <if @type_props.tab@ eq templates>
   <tr><td>
     <include src="../../table-header" title="Registered Templates">
-    <table cellspacing=0 cellpadding=4 border=0 width=100%>
+    <table cellspacing=0 cellpadding=4 border=0 width="100%">
 
     <if @type_templates:rowcount@ eq 0>
       <tr bgcolor="#99CCFF">

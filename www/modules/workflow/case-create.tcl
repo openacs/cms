@@ -49,7 +49,7 @@ template::query::iterate get_name_key  "
 
     element create case_create ${row(transition_key)}_assign \
 	    -datatype integer \
-	    -widget multiselect \
+	    -widget select \
 	    -options $users \
 	    -label "Assignment"
  

@@ -1,6 +1,6 @@
 <a name="templates">
 
-<table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width=95%>
+<table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width="95%">
 
 <tr bgcolor="#FFFFFF">
   <td align=left><b>Registered Templates</b></td>
@@ -8,7 +8,7 @@
 </tr>
 
 <tr><td colspan=2>
-<table bgcolor=#6699CC cellspacing=0 cellpadding=2 border=0 width=100%>
+<table bgcolor=#6699CC cellspacing=0 cellpadding=2 border=0 width="100%">
 
   <tr><th align=left colspan=6>
     Templates Registered to @iteminfo.name@
@@ -21,9 +21,9 @@
   </if>
   <else>
     <th width=25% align=left nowrap>Name</th>
-    <td width=5%>&nbsp;&nbsp;&nbsp;</td>
-    <th width=20%align=left nowrap>Context</th>
-    <td width=5%>&nbsp;&nbsp;&nbsp;</td>
+    <td width="5%">&nbsp;&nbsp;&nbsp;</td>
+    <th width=20% align=left nowrap>Context</th>
+    <td width="5%">&nbsp;&nbsp;&nbsp;</td>
     <th width=10% align=left nowrap>&nbsp;</th>
     <th width=35% align=left nowrap>&nbsp;</th>
   </else>
@@ -52,7 +52,7 @@
 </td></tr>
 
 <tr><td colspan=2>
-<table bgcolor=#6699CC cellspacing=0 cellpadding=2 border=0 width=100%>
+<table bgcolor=#6699CC cellspacing=0 cellpadding=2 border=0 width="100%">
 
   <tr><th align=left colspan=6>
       Templates Registered to @iteminfo.pretty_name@
@@ -65,12 +65,12 @@
   </if>
   <else>
 
-    <th width=25%>Name</th>
-    <td width=5%>&nbsp;&nbsp;&nbsp;</td>
-    <th width=20%>Context</th>
-    <td width=5%>&nbsp;&nbsp;&nbsp;</td>
-    <th width=10%>&nbsp</th>
-    <th width=35%>&nbsp</th>
+    <th width="25%">Name</th>
+    <td width="5%">&nbsp;&nbsp;&nbsp;</td>
+    <th width="20%">Context</th>
+    <td width="5%">&nbsp;&nbsp;&nbsp;</td>
+    <th width="10%">&nbsp</th>
+    <th width="35%">&nbsp</th>
   </else>
   </tr>
   

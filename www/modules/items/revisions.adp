@@ -1,4 +1,4 @@
-<table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width=95%>
+<table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width="95%">
 <tr bgcolor="#FFFFFF">
   <td align=left><b>Revisions</b></td>
   <td align=right>
@@ -16,7 +16,7 @@
 <tr>
 <td colspan=2>
 
-<table bgcolor=#99CCFF cellspacing=0 cellpadding=2 border=0 width=100%>
+<table bgcolor=#99CCFF cellspacing=0 cellpadding=2 border=0 width="100%">
   <tr bgcolor="#99CCFF">
     <if @revisions:rowcount@ eq 0>
       <td colspan=3><em>No revisions.</em></td></if>

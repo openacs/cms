@@ -33,9 +33,9 @@
 <if @items:rowcount@ gt 0> 
 
 <!-- pagination context bar -->
-<table cellpadding=4 cellspacing=0 border=0 width=95%>
+<table cellpadding=4 cellspacing=0 border=0 width="95%">
 <tr>
-  <td align=left width=5%>
+  <td align=left width="5%">
     <if @info.previous_group@ not nil>
       <a href="index?id=@id@&@passthrough@&orderby=@orderby@&page=@info.previous_group@">
         &lt;&lt;</a>
@@ -59,7 +59,7 @@
   </multiple>
   </td>
 
-  <td align=right width=5%>
+  <td align=right width="5%">
     <if @page@ lt @info.page_count@>
       <a href="index?id=@id@&@passthrough@&orderby=@orderby@&page=@info.next_page@">&gt;</a>
     </if>
@@ -74,9 +74,9 @@
 </tr>
 </table>
 
-<table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width=95%>
+<table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width="95%">
 <tr><td>
-<table bgcolor=#99CCFF cellspacing=0 cellpadding=2 border=0 width=100%>
+<table bgcolor=#99CCFF cellspacing=0 cellpadding=2 border=0 width="100%">
 
   <tr bgcolor="#99ccff"><td colspan=2>&nbsp</td>
       <th>

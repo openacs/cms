@@ -30,12 +30,12 @@
 
 <body>
 
-<table cellpadding=2 cellspacing=0 border=1 width=100%>
+<table cellpadding=2 cellspacing=0 border=1 width="100%">
 
 <tr bgcolor=#6699CC>
 <td>
 
-<table cellpadding=0 cellspacing=0 border=0 width=100%>
+<table cellpadding=0 cellspacing=0 border=0 width="100%">
 
 <tr><td nowrap height=1 bgcolor="#999999"><img src="assets/gray-dot.gif" height=1 width=1></td></tr>
 <tr><td nowrap height=1 bgcolor="#FFFFFF"><img src="assets/white-dot.gif" height=1 width=1></td></tr>
@@ -67,7 +67,7 @@
 <tr><td bgcolor=#FFFFFF>
 <!-- begin tabs -->
 
-<table cellpadding=0 cellspacing=0 border=0 bgcolor=#FFFFFF width=100%>
+<table cellpadding=0 cellspacing=0 border=0 bgcolor=#FFFFFF width="100%">
 <tr>
 <td bgcolor=#FFFFFF>&nbsp;&nbsp;</td>
 <td>
@@ -97,7 +97,7 @@
 
 </table>
 
-<table cellpadding=0 cellspacing=0 border=0 bgcolor=#999999 width=100%>
+<table cellpadding=0 cellspacing=0 border=0 bgcolor=#999999 width="100%">
 <tr>
 <td height=1 bgcolor=#999999><img src="assets/gray-dot.gif" 
   height=1 width=1></td>

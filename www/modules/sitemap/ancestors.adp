@@ -1,6 +1,6 @@
 
 
-<table border=0 cellpadding=0 cellspacing=0 width=95%>
+<table border=0 cellpadding=0 cellspacing=0 width="95%">
 <tr>
   <!-- display the ancestor tree -->
   <td align=left nowrap>

@@ -8,13 +8,13 @@
 
 
         select  workflow_case__new(
+	    :case_id,
 	    'publishing_wf', 
 	    NULL,
 	    :item_id,
             now(),
 	    :user_id, 
-	    :creation_ip,
-	    :case_id
+	    :creation_ip
         ); 
        
       </querytext>

@@ -5,10 +5,10 @@
 
 <p>
 
-<table cellpadding=1 cellspacing=0 border=0 width=100%>
+<table cellpadding=1 cellspacing=0 border=0 width="100%">
 <tr bgcolor=#000000><td>
 
-<table cellpadding=0 cellspacing=0 border=0 width=100%>
+<table cellpadding=0 cellspacing=0 border=0 width="100%">
 <tr bgcolor=#eeeeee><td>
 
 <!-- Tabs begin -->
@@ -22,7 +22,7 @@
 <!-- Tabs end -->
 
 <br>
-<table cellspacing=0 cellpadding=0 border=0 width=95%>
+<table cellspacing=0 cellpadding=0 border=0 width="95%">
 
 
 <if @item_props.tab@ eq editing>

@@ -1,11 +1,11 @@
 <!-- Display relation types -->
 
-<table cellspacing=0 cellpadding=4 border=0 width=95%>
+<table cellspacing=0 cellpadding=4 border=0 width="95%">
 <tr>
   <th align=left>Registered Item Relation Types</th>
 </tr>
 <tr bgcolor="#6699CC"><td>
-<table cellspacing=0 cellpadding=4 border=0 width=100%>
+<table cellspacing=0 cellpadding=4 border=0 width="100%">
 
 <if @rel_types:rowcount@ eq 0>
   <tr bgcolor="#99CCFF">
@@ -67,12 +67,12 @@
 
 <!-- display child relation types -->
 
-<table cellspacing=0 cellpadding=4 border=0 width=95%>
+<table cellspacing=0 cellpadding=4 border=0 width="95%">
 <tr>
   <th align=left>Registered Child Relation Types</th>
 </tr>
 <tr bgcolor="#6699CC"><td>
-<table cellspacing=0 cellpadding=4 border=0 width=100%>
+<table cellspacing=0 cellpadding=4 border=0 width="100%">
 
 <if @child_types:rowcount@ eq 0>
   <tr bgcolor="#99CCFF">

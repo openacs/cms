@@ -9,7 +9,7 @@
 
 <if @results:rowcount@ gt 0>
 
-<table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width=100%>
+<table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width="100%">
 <tr bgcolor="#FFFFFF">
   <td align=left><b>Search Results</b></td>
 </tr>
@@ -18,7 +18,7 @@
 <tr>
 <td>
 
-  <table bgcolor=#99CCFF cellspacing=0 cellpadding=5 border=0 width=100%>
+  <table bgcolor=#99CCFF cellspacing=0 cellpadding=5 border=0 width="100%">
 
   <tr bgcolor="#99CCFF">
     <th>#</th>

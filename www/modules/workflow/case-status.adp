@@ -1,4 +1,4 @@
-<table border=0 cellpadding=1 cellspacing=0 bgcolor=#FFFFFF width=95%>
+<table border=0 cellpadding=1 cellspacing=0 bgcolor=#FFFFFF width="95%">
 <tr bgcolor=#DDDDDD><td>
 
 <if @caseinfo@ not nil>

@@ -12,7 +12,7 @@
 
 <tr bgcolor="#BBBBBB">
 <td colspan=2>
-  <table cellspacing=0 cellpadding=4 border=2 width=100%>
+  <table cellspacing=0 cellpadding=4 border=2 width="100%">
   <tr bgcolor="#DDDDDD">
     <th align=left>@message@</th>
   </tr>

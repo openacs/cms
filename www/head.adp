@@ -12,8 +12,8 @@
      }
   </style>
 <body>
-<table border=0 cellpadding=4 cellspacing=0 width=100%>
-<tr><td><table border=0 width=100%>
+<table border=0 cellpadding=4 cellspacing=0 width="100%">
+<tr><td><table border=0 width="100%">
 <tr>
   <th valign=top align=left nowrap>My Workspace: @name@</th>
   <td align=right nowrap>

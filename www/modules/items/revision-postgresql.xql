@@ -16,7 +16,7 @@
        cr_mime_types 
      where 
        mime_type = cr_revisions.mime_type
-    ) mime_type_pretty,
+    ) as mime_type_pretty,
     to_char(publish_date,'Month DD, YYYY') as publish_date_pretty,
     content_length as content_size
   from 
@@ -93,6 +93,19 @@
   order by
     attr.object_type, attr.sort_order
 
+      </querytext>
+</fullquery>
+
+<fullquery name="get_content">      
+      <querytext>
+
+      select 
+        content
+      from
+        cr_revisions
+      where
+        revision_id = :revision_id
+    
       </querytext>
 </fullquery>
 

@@ -96,4 +96,18 @@
 </fullquery>
 
  
+<fullquery name="get_content">      
+      <querytext>
+
+      select 
+        blob_to_string(content)
+      from
+        cr_revisions
+      where
+        revision_id = :revision_id
+    
+      </querytext>
+</fullquery>
+
+ 
 </queryset>

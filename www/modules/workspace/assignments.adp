@@ -1,4 +1,4 @@
-<table cellspacing=0 cellpadding=4 border=0 width=95%>
+<table cellspacing=0 cellpadding=4 border=0 width="95%">
 <tr bgcolor="#FFFFFF">
   <td>
     <b>Tasks Checked Out By Other Users</b>
@@ -6,7 +6,7 @@
 </tr>
 
 <tr bgcolor="#6699CC"><td>
-<table cellspacing=0 cellpadding=4 border=0 width=100%>
+<table cellspacing=0 cellpadding=4 border=0 width="100%">
 
 <if @locked_tasks:rowcount@ eq 0>
   <tr bgcolor="#99CCFF">
@@ -18,13 +18,13 @@
 <else>
 
 <tr bgcolor="#99CCFF">
-  <th width=15%>Type</th>
-  <th width=30%>Title</th>
-  <th width=20%>My Tasks</th>
-  <th width=15%>Deadline</th>
-  <th width=8%>Checked out by</th>
-  <th width=7%>Checked out until</th>
-  <th width=5%>&nbsp</th>
+  <th width="15%">Type</th>
+  <th width="30%">Title</th>
+  <th width="20%">My Tasks</th>
+  <th width="15%">Deadline</th>
+  <th width="8%">Checked out by</th>
+  <th width="7%">Checked out until</th>
+  <th width="5%">&nbsp</th>
 </tr>
 
 <multiple name=locked_tasks>

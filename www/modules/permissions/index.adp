@@ -7,7 +7,7 @@
   header="@header@">
 
 
-<table bgcolor=#99CCFF cellspacing=0 cellpadding=2 border=0 width=100%>
+<table bgcolor=#99CCFF cellspacing=0 cellpadding=2 border=0 width="100%">
   <tr bgcolor="#99CCFF">
     <if @permissions:rowcount@ eq 0>
       <td colspan=3><em>No permissions.</em></td></if>

@@ -42,6 +42,7 @@ set user_id [User::getID]
 if { ![util::is_nil id] } {
   
   set item_id_list [clipboard::get_items $clip $id]
+  ns_log Notice "item_id_list = [join $item_id_list ","]"
 
   # First, attempt to ask the module for the list of item paths in sorted order
   # Could fail because of some SQL error or because the procedure does not exist
@@ -74,7 +75,7 @@ if { ![util::is_nil id] } {
   } errmsg ] } {
     # Process the list manually. Path information will not be shown, but at least
     # the names will be
-    ns_log notice "CLIPBOARD ERROR"
+    ns_log notice "CLIPBOARD ERROR: $errmsg"
     set items:rowcount 0
     foreach item_id $item_id_list {
       incr items:rowcount

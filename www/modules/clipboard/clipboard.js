@@ -62,6 +62,8 @@ function mark(root_url, mnt, id, floatclipboard_p) {
 function markx(root_url, mnt, id, checked, unchecked, floatclipboard_p) {
 
   var marks = getCookie("content_marks");
+  var str = "";
+  var ck = "";
   
   // info for each mount point is delimited by "|"
   mountList = marks.split("|");
@@ -100,6 +102,7 @@ function markx(root_url, mnt, id, checked, unchecked, floatclipboard_p) {
     }
   }
 
+  str = joinArray(mountList, "|");
   setCookie("content_marks", joinArray(mountList, "|"));
 
   if (document.images["mark" + id]) {
@@ -113,6 +116,7 @@ function markx(root_url, mnt, id, checked, unchecked, floatclipboard_p) {
   if (floatclipboard_p) {
     // this last call open or refresh the floating clipboard
     var clipboardWin=window.open(root_url + 'modules/clipboard/index?id=' + mnt + '&mount_point=clipboard','clipboardFrame', 'toolbar=no,dependent=yes,innerWidth=500,innerHeight=300,scrollbars=yes');
+
   }
 
 }
@@ -151,9 +155,11 @@ function set_marks(mnt, checked) {
 }
 
 function setCookie(name, value, expire) {
-   document.cookie = name + "=" + escape(value) + "; path=/ ; domain=" +
-   window.location.hostname +
-   ((expire == null) ? "" : ("; expires=" + expire.toGMTString()));
+   var today = new Date()
+   var exp = new Date()
+   exp.setTime(today.getTime() + 60*60*24*365)
+   var ck = name + "=" + escape(value) + "; path=/" + ((expire == null) ? "" : ("; expires=" + expire.toGMTString()));
+   document.cookie = ck
 }
 
 function getCookie(Name) {

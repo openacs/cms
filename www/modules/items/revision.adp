@@ -22,7 +22,7 @@
 
 <include src="../../table-header">
 
-<table bgcolor="#6699CC" cellspacing=0 cellpadding=4 border=0 width=100%>
+<table bgcolor="#6699CC" cellspacing=0 cellpadding=4 border=0 width="100%">
   <tr bgcolor="#99ccff">
     <th>Attribute</th>
     <th>Revision Type</th>
@@ -63,7 +63,7 @@
 
 
 <include src="../../table-header">
-<table bgcolor="#6699CC" cellspacing=0 cellpadding=4 border=0 width=100%>
+<table bgcolor="#6699CC" cellspacing=0 cellpadding=4 border=0 width="100%">
     
   <tr bgcolor="#99CCFF">
     <th align=left>Content</th>

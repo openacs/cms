@@ -1,4 +1,4 @@
-<table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width=95%>
+<table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width="95%">
 
 <tr bgcolor="#FFFFFF">
 
@@ -21,7 +21,7 @@
 
 <td colspan=3>
 
-<table bgcolor=#6699CC cellspacing=0 cellpadding=2 border=0 width=100%>
+<table bgcolor=#6699CC cellspacing=0 cellpadding=2 border=0 width="100%">
 
   <multiple name=attributes>
 

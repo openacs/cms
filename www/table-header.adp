@@ -1,5 +1,5 @@
 
-<table cellspacing=0 cellpadding=4 border=0 width=95%>
+<table cellspacing=0 cellpadding=4 border=0 width="95%">
 
 <if @title@ not nil>
   <tr bgcolor="#FFFFFF">

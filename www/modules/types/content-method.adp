@@ -1,12 +1,12 @@
 <include src="../../table-header" 
   title="Registered Content Insertion Methods">
-<table cellspacing=0 cellpadding=0 border=0 width=100%>
+<table cellspacing=0 cellpadding=0 border=0 width="100%">
 
 
 <if @user_permissions.cm_write@ eq t and @unregistered_method_count@ gt 0>
   <tr>
     <td><formtemplate id="register">
-      <table cellspacing=0 cellpadding=4 border=0 width=100%>
+      <table cellspacing=0 cellpadding=4 border=0 width="100%">
       <tr bgcolor="#EEEEEE"><td>
 	<b>Register Content Insertion Method:</b>&nbsp;&nbsp;
 	<formwidget id="content_type">
@@ -25,7 +25,7 @@
 <td>
 
 
-<table cellspacing=0 cellpadding=4 border=0 width=100%>
+<table cellspacing=0 cellpadding=4 border=0 width="100%">
 
 <if @content_methods:rowcount@ eq 0>
   <tr bgcolor="#99CCFF">

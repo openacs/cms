@@ -36,7 +36,7 @@
       <if @datasources.structure@ in multirow multilist form>
         <if  @datasources.column_name@ ne "-">
 	  <br>
-	  <table cellpadding=3 cellspacing=0 border=0 width=95%>
+	  <table cellpadding=3 cellspacing=0 border=0 width="95%">
 
 	    <if @datasources.structure@ in multirow multilist>
 	      <tr>

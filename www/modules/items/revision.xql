@@ -10,21 +10,6 @@
 </fullquery>
 
  
-<fullquery name="get_content">      
-      <querytext>
-
---FIXME:      
-      select 
-        content
-      from
-        cr_revisions
-      where
-        revision_id = :revision_id
-    
-      </querytext>
-</fullquery>
-
- 
 <fullquery name="get_attr_values">      
       <querytext>
       

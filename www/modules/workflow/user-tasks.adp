@@ -4,7 +4,7 @@
 <p>
 
 
-<table cellspacing=0 cellpadding=4 border=0 width=95%>
+<table cellspacing=0 cellpadding=4 border=0 width="95%">
 <tr>
   <td bgcolor="#FFFFFF">
     <b>Active Tasks</b>
@@ -12,7 +12,7 @@
 </tr>
 
 <tr bgcolor="#6699CC"><td>
-<table cellspacing=0 cellpadding=4 border=0 width=100%>
+<table cellspacing=0 cellpadding=4 border=0 width="100%">
 <if @active_tasks:rowcount@ eq 0>
   <tr bgcolor="#99CCFF">
     <td><em>There are no active tasks.</em></td>
@@ -82,7 +82,7 @@
 
 <if @awaiting_tasks:rowcount@ gt 0>
 
-<table cellspacing=0 cellpadding=4 border=0 width=95%>
+<table cellspacing=0 cellpadding=4 border=0 width="95%">
 <tr bgcolor="#FFFFFF">
   <td>
     <b>Awaiting Tasks</b>
@@ -90,7 +90,7 @@
 </tr>
 
 <tr bgcolor="#6699CC"><td>
-<table cellspacing=0 cellpadding=4 border=0 width=100%>
+<table cellspacing=0 cellpadding=4 border=0 width="100%">
 
   <tr bgcolor="#99CCFF">
     <th>Task</th>

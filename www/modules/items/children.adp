@@ -1,7 +1,7 @@
 <master src="../../master">
 <property name="title">Child Items</property>
 
-<table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width=95%>
+<table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width="95%">
 <tr bgcolor="#FFFFFF">
   <th align=left valign=bottom>Child Items</th>
 
@@ -24,7 +24,7 @@
 <tr>
 <td colspan=2>
 
-<table bgcolor=#99CCFF cellspacing=0 cellpadding=2 border=0 width=100%>
+<table bgcolor=#99CCFF cellspacing=0 cellpadding=2 border=0 width="100%">
 
   <tr bgcolor="#99CCFF">
     <if @children:rowcount@ eq 0>
@@ -63,7 +63,7 @@
 
       <td nowrap>
         <if @user_permissions.cm_write@ eq t>
-          <table border=0 cellspacing=2 cellpadding=0 width=100%>
+          <table border=0 cellspacing=2 cellpadding=0 width="100%">
              <tr><td><a href="relate-order?rel_id=@children.rel_id@&order=up&mount_point=@mount_point@&relation_type=child">
                 <img src="../../resources/triangle-up.gif" border=0></a></td></tr>
              <tr><td><a href="relate-order?rel_id=@children.rel_id@&order=down&mount_point=@mount_point@&relation_type=child">

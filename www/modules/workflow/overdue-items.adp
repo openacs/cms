@@ -9,10 +9,10 @@
 <else>
 
 
-<table cellspacing=0 cellpadding=4 border=0 width=95%>
+<table cellspacing=0 cellpadding=4 border=0 width="95%">
 <tr bgcolor="#6699CC"><td>
 
-<table cellspacing=0 cellpadding=4 border=0 width=100%>
+<table cellspacing=0 cellpadding=4 border=0 width="100%">
 <tr bgcolor="99CCFF">
 
   <if @transition@ eq "all">

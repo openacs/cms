@@ -3,7 +3,7 @@
 
 <fullquery name="get_caseinfo">      
       <querytext>
-      select case_id, initcap(state) state
+      select case_id, initcap(state) as state
            from wf_cases where object_id = :item_id
       </querytext>
 </fullquery>

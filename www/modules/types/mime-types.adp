@@ -3,12 +3,12 @@
 
 
 <include src="../../table-header" title="Registered Mime Types">
-<table cellspacing=0 cellpadding=0 border=0 width=100%>
+<table cellspacing=0 cellpadding=0 border=0 width="100%">
 
 <if @user_permissions.cm_write@ eq t and @unregistered_mime_types_count@ gt 0>
   <tr>
     <td><formtemplate id="register">
-      <table cellspacing=0 cellpadding=4 border=0 width=100%>
+      <table cellspacing=0 cellpadding=4 border=0 width="100%">
       <tr bgcolor="#EEEEEE"><td>
 	<b>Register MIME type:</b>&nbsp;&nbsp;
 	<formwidget id="id">
@@ -24,7 +24,7 @@
 
 <tr><td>
 
-  <table class="blue" cellspacing=0 cellpadding=4 border=0 width=100%>
+  <table class="blue" cellspacing=0 cellpadding=4 border=0 width="100%">
   <if @registered_mime_types:rowcount@ eq 0>
     <tr>
       <td>

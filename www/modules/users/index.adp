@@ -27,12 +27,12 @@
 <if @subgroups:rowcount@ gt 0>
 
   <include src="../../table-header" title="Subgroups">
-  <table bgcolor=#99CCFF cellspacing=0 cellpadding=4 border=0 width=100%>
+  <table bgcolor=#99CCFF cellspacing=0 cellpadding=4 border=0 width="100%">
 
   <tr bgcolor="#99CCFF">
-    <th width=5%>&nbsp;</th>
-    <th width=5%>&nbsp;</th>
-    <th width=30%>Name</th>
+    <th width="5%">&nbsp;</th>
+    <th width="5%">&nbsp;</th>
+    <th width="30%">Name</th>
     <th>Email</th>
     <th>Users</th>
     <if @admin_p@ eq t>
@@ -74,12 +74,12 @@
 <if @users:rowcount@ gt 0>
 
   <include src="../../table-header" title="Users">
-  <table bgcolor=#99CCFF cellspacing=0 cellpadding=4 border=0 width=100%>
+  <table bgcolor=#99CCFF cellspacing=0 cellpadding=4 border=0 width="100%">
 
   <tr bgcolor="#99CCFF">
-    <th width=5%>&nbsp;</th>
-    <th width=5%>&nbsp;</th>
-    <th width=30%>Name</th>
+    <th width="5%">&nbsp;</th>
+    <th width="5%">&nbsp;</th>
+    <th width="30%">Name</th>
     <th>Screen Name</th>
     <th>Email</th>
     <if @id@ not nil><th>Membership</th></if>
