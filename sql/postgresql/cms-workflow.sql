@@ -545,7 +545,7 @@ create function content_workflow__checkout (integer,timestamp,integer,varchar,va
 returns integer as '
 declare
   p_task_id                        alias for $1;  
-  p_hold_timeout                   alias for $2;  
+  p_hold_timeout                   alias for $2;  -- default null  
   p_user_id                        alias for $3;  
   p_ip_address                     alias for $4;  
   p_msg                            alias for $5;  
@@ -687,7 +687,7 @@ begin
     else if v_task_state != ''started'' then
       raise EXCEPTION '' -20000:  Cannot chack in this task because it is in an invalid state %'', v_task_state;
     else
-      raise EXCEPTION '' -20000: Cannot check in this task because user_id % is not the holding user'', user_id;
+      raise EXCEPTION '' -20000: Cannot check in this task because user_id % is not the holding user'', p_user_id;
     end if; end if;
 
     return 0; 

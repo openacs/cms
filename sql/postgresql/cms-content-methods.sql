@@ -46,7 +46,7 @@ insert into cm_content_methods (
 );
 
 
-* Map a content type to a content method(s) */
+/* Map a content type to a content method(s) */
 create table cm_content_type_method_map (
   content_type		varchar(100)
 			constraint cm_type_method_map_type_fk
@@ -58,7 +58,7 @@ create table cm_content_type_method_map (
 );
 
 
-* A view of all mapped content methods */
+/* A view of all mapped content methods */
 create view cm_type_methods
 as
   select
@@ -128,9 +128,9 @@ as
 create function content_method__get_method (varchar)
 returns varchar as '
 declare
-  get_method__content_type    alias for $1;  
-  v_method                    cm_content_type_method_map.content_method%TYPE;
-  v_count                     integer;       
+  p_content_type                alias for $1;  
+  v_method                      cm_content_type_method_map.content_method%TYPE;
+  v_count                       integer;       
 begin
 
     -- first, look for the default
@@ -139,7 +139,7 @@ begin
     from
       cm_content_type_method_map
     where
-      content_type = get_method__content_type
+      content_type = p_content_type
     and
       is_default = ''t'';
 
@@ -150,7 +150,7 @@ begin
       from
         cm_content_type_method_map
       where
-        content_type = get_method__content_type;
+        content_type = p_content_type;
 
       if v_count = 1 then
         -- if so, return the only registered method
@@ -159,7 +159,7 @@ begin
 	from
 	  cm_content_type_method_map
 	where
-	  content_type = get_method__content_type;
+	  content_type = p_content_type;
       end if;      
     end if;
 
@@ -176,8 +176,8 @@ end;' language 'plpgsql';
 create function content_method__is_mapped (varchar,varchar)
 returns boolean as '
 declare
-  is_mapped__content_type          alias for $1;  
-  is_mapped__content_method        alias for $2;  
+  p_content_type          alias for $1;  
+  p_content_method        alias for $2;  
 begin
     
     return 
@@ -185,9 +185,9 @@ begin
     from
       cm_content_type_method_map
     where
-      content_type = is_mapped__content_type
+      content_type = p_content_type
     and
-      content_method = is_mapped__content_method;
+      content_method = p_content_method;
    
 end;' language 'plpgsql';
 
@@ -196,10 +196,10 @@ end;' language 'plpgsql';
 create function content_method__add_method (varchar,varchar,char)
 returns integer as '
 declare
-  add_method__content_type         alias for $1;  
-  add_method__content_method       alias for $2;  
-  add_method__is_default           alias for $3;  -- default ''f''
-  v_method_already_mapped          integer;       
+  p_content_type                alias for $1;  
+  p_content_method              alias for $2;  
+  p_is_default                  alias for $3;  -- default ''f''
+  v_method_already_mapped       integer;       
 begin
 
     -- check if there is any existing mapping
@@ -208,24 +208,24 @@ begin
     from
       cm_content_type_method_map
     where
-      content_type = add_method__content_type
+      content_type = p_content_type
     and
-      content_method = add_method__content_method;
+      content_method = p_content_method;
 
     if v_method_already_mapped = 1 then
 
       -- update the content type method mapping
       update cm_content_type_method_map
-        set is_default = add_method__is_default
-	where content_type = add_method__content_type
-	and content_method = add_method__content_method;
+        set is_default = p_is_default
+	where content_type = p_content_type
+	and content_method = p_content_method;
     else
       -- insert the content type method mapping
       insert into cm_content_type_method_map (
         content_type, content_method, is_default
       ) values (
-        add_method__content_type, add_method__content_method, 
-	add_method__is_default
+        p_content_type, p_content_method, 
+	p_is_default
       );
     end if;
 
@@ -237,13 +237,13 @@ end;' language 'plpgsql';
 create function content_method__add_all_methods (varchar)
 returns integer as '
 declare
-  add_all_methods__content_type    alias for $1;  
+  p_content_type    alias for $1;  
 begin
     -- map all unmapped content methods to the content type 
     insert into cm_content_type_method_map (
       content_type, content_method, is_default
     ) select
-      add_all_methods__content_type, content_method, ''f''
+      p_content_type as content_type, content_method, ''f''
     from
       cm_content_methods m
     where
@@ -254,7 +254,7 @@ begin
 	where
 	  content_method = m.content_method
         and
-          content_type = add_all_methods__content_type 
+          content_type = p_content_type 
       );
 
       return 0; 
@@ -265,19 +265,19 @@ end;' language 'plpgsql';
 create function content_method__set_default_method (varchar,varchar)
 returns integer as '
 declare
-  set_default_method__content_type      alias for $1;  
-  set_default_method__content_method    alias for $2;  
+  p_content_type      alias for $1;  
+  p_content_method    alias for $2;  
 begin
 
     -- unset old default
     PERFORM content_method__unset_default_method (
-        set_default_method__content_type
+        p_content_type
     );
     -- set new default
     update cm_content_type_method_map
       set is_default = ''t''
-      where content_type = set_default_method__content_type
-      and content_method = set_default_method__content_method;
+      where content_type = p_content_type
+      and content_method = p_content_method;
 
     return 0; 
 end;' language 'plpgsql';
@@ -287,12 +287,12 @@ end;' language 'plpgsql';
 create function content_method__unset_default_method (varchar)
 returns integer as '
 declare
-  unset_default_method__content_type   alias for $1;  
+  p_content_type   alias for $1;  
 begin
 
     update cm_content_type_method_map
       set is_default = ''f''
-      where content_type = unset_default_method__content_type;
+      where content_type = p_content_type;
 
     return 0; 
 end;' language 'plpgsql';
@@ -302,14 +302,14 @@ end;' language 'plpgsql';
 create function content_method__remove_method (varchar,varchar)
 returns integer as '
 declare
-  remove_method__content_type      alias for $1;  
-  remove_method__content_method    alias for $2;  
+  p_content_type      alias for $1;  
+  p_content_method    alias for $2;  
 begin
 
     -- delete the content type - method mapping    
     delete from cm_content_type_method_map
-      where content_type = remove_method__content_type
-      and content_method = remove_method__content_method;
+      where content_type = p_content_type
+      and content_method = p_content_method;
 
     return 0; 
 end;' language 'plpgsql';

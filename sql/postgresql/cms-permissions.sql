@@ -355,7 +355,7 @@ declare
   p_holder_id                      alias for $2;  
   p_privilege                      alias for $3;  
   p_recepient_id                   alias for $4;  
-  p_is_recursive                   alias for $5;  
+  p_is_recursive                   alias for $5;  -- default ''f''
   v_item_id                        cr_items.item_id%TYPE;
   v_items                          item_array_type;
   v_idx                            integer;       
@@ -441,7 +441,7 @@ declare
   p_holder_id                      alias for $2;  
   p_privilege                      alias for $3;  
   p_revokee_id                     alias for $4;  
-  p_is_recursive                   alias for $5;  
+  p_is_recursive                   alias for $5;  -- default ''f''
   v_items                          item_array_type;
   v_item_id                        cr_items.item_id%TYPE;
   v_idx                            integer;       
@@ -757,7 +757,7 @@ returns integer as '
 declare
   p_parent_object_id               alias for $1;  
   p_child_object_id                alias for $2;  
-  p_child_creator_id               alias for $3;  
+  p_child_creator_id               alias for $3;  -- default null  
 begin
     PERFORM cms_permission__update_permissions(p_child_object_id);
     return 0; 
@@ -799,8 +799,8 @@ declare
   p_holder_id                      alias for $2;  
   p_privilege                      alias for $3;  
   p_recepient_id                   alias for $4;  
-  p_is_recursive                   alias for $5;  
-  p_object_type                    alias for $6;  
+  p_is_recursive                   alias for $5;  -- default ''f''
+  p_object_type                    alias for $6;  -- default ''content_item''
 begin
     PERFORM cms_permission__grant_permission (
       p_object_id, p_holder_id, p_privilege, p_recepient_id, p_is_recursive
@@ -846,8 +846,8 @@ declare
   p_holder_id                      alias for $2;  
   p_privilege                      alias for $3;  
   p_revokee_id                     alias for $4;  
-  p_is_recursive                   alias for $5;  
-  p_object_type                    alias for $6;  
+  p_is_recursive                   alias for $5;  -- default ''f''  
+  p_object_type                    alias for $6;  -- default ''content_item''
 begin
     PERFORM cms_permission__revoke_permission (
       p_object_id, p_holder_id, p_privilege, p_revokee_id, p_is_recursive
