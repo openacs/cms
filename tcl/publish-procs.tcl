@@ -331,7 +331,7 @@ ad_proc -public publish::set_publish_status { item_id new_status {revision_id ""
       # If live revision exists, publish it
       if { ![template::util::is_nil revision_id] && \
               [item::is_publishable $item_id] } {
-        publish_revision $revision_id
+          publish_revision $revision_id -root_path [publish::get_publish_roots]
       } else {
         # Delete the published files
         publish::unpublish_item $item_id
