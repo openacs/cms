@@ -12,7 +12,7 @@
     round(r.content_length / 1000, 2) || ' KB' as file_size,
     decode(NVL(p.person_id, 0),
         0, '-',
-        substr(p.first_names, 1, 1) || substr(p.last_name, 1, 1)) modified_by,
+        p.first_names || ' ' || p.last_name) modified_by,
     nvl(j.msg, '-') msg
   from 
     cr_revisions r, acs_objects o, persons p, journal_entries j

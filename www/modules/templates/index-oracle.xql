@@ -26,7 +26,7 @@
 <fullquery name="get_path">      
       <querytext>
 
-        select content_item.get_path(:id) from dual
+        select content_item.get_path(:item_id) from dual
 
       </querytext>
 </fullquery>
@@ -41,7 +41,7 @@
   from
     cr_templates t, cr_items i, acs_objects o, cr_revisions r
   where
-    i.parent_id = :id
+    i.parent_id = :item_id
   and
     i.item_id = t.template_id
   and

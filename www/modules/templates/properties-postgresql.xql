@@ -23,7 +23,7 @@
 <fullquery name="get_path">      
       <querytext>
 
-      select content_item__get_path(:id, null)
+      select content_item__get_path(:item_id, null)
 
       </querytext>
 </fullquery>

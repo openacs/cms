@@ -7,6 +7,7 @@
       <querytext>
       
   select
+    x.item_id,
     content_item__get_revision_count(x.item_id) as revision_count, 
     content_revision__get_number(:revision_id) as revision_number, 
     content_item__get_live_revision(x.item_id) as live_revision, 

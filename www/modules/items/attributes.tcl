@@ -39,7 +39,25 @@ content::check_access $info(item_id) cm_examine \
 
 set content_type $type_info(object_type)
 
-db_multirow -extend attribute_value attributes get_attributes "" {
+template::list::create \
+    -name attributes \
+    -multirow attributes \
+    -actions [list "Edit item attributes" \
+		  "attributes-edit?item_id=$info(item_id)" \
+		  "Edit item attributes"] \
+    -elements {
+	attribute_label {
+	    label "Attribute"
+	}
+	attribute_value {
+	    label "Value"
+	}
+	object_label {
+	    label "Origin"
+	}
+    }
+
+db_multirow -extend { attribute_value } attributes get_attributes "" {
 
     if { [catch { set value $info($attribute_name) } errmsg] } {
 	# catch - value doesn't exist

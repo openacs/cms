@@ -36,7 +36,7 @@ if { [form is_valid new_folder] } {
   form get_values new_folder parent_id name folder_id label description
 
   set creation_ip [ns_conn peeraddr]
-  set creation_user [User::getID]
+  set creation_user [auth::require_login]
 
   db_transaction {
 

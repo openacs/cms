@@ -11,12 +11,12 @@ request create -params {
 }
 
 set root_id [cm::modules::${mount_point}::getRootFolderID]
+set root_title [item::get_title $root_id]
 
 # special case - when the item_id is null, set it to the root folder
 if { [template::util::is_nil item_id] } {
     set item_id $root_id
 }
-
 
 # Get the cookie; prepare for setting bookmarks
 #set clip [clipboard::parse_cookie]

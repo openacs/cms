@@ -1,141 +1,103 @@
-<html>
+<master src="../../master">
+<property name="title">@page_title@</property>
 
-<head>
+<nobr><p class="h1">
+<include src="../../bookmark" mount_point="@mount_point@" id="@item_id@">
+@page_title;noquote@ 
+</p>
+</nobr>
+<p/>
 
-<title>Template Properties</title>
+&nbsp;&nbsp;&nbsp;
+<if @description@ not nil>@description;noquote@</if>
+<else>No description</else>
 
-<style>
-  body {
-    background-color: white
-  }
-  th { 
-    font-size: 9pt;
-    font-family: sans-serif;
-  }
-  td { 
-    font-size: 9pt;
-    font-family: sans-serif;
-  }
-</style>
+<p/>
 
-<script language=Javascript src="../clipboard/clipboard.js"></script>
+<include src="../sitemap/ancestors" mount_point=@mount_point@ item_id=@item_id@>
 
-<script language=JavaScript>
-  function setSrc(name, src) {
-    document.images[name].src = "assets/" + src;
-  }
-</script>
- 
-</head>
+<p/>
 
-<body>
+<!-- Tabs -->
 
-<table cellpadding=2 cellspacing=0 border=1 width="100%">
+<div id="subnavbar-div">
+  <div id="subnavbar-container">
+    <div id="subnavbar">
 
-<tr bgcolor=#6699CC>
-<td>
+ <if @template_props_tab@ eq general>
+   <div class="tab" id="subnavbar-here">
+     General
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/templates/properties?item_id=@item_id@&mount_point=@mount_point@&template_props_tab=general" title="" class="subnavbar-unselected">General</a>
+   </div>
+ </else>
 
-<table cellpadding=0 cellspacing=0 border=0 width="100%">
+ <if @template_props_tab@ eq revisions>
+   <div class="tab" id="subnavbar-here">
+     Revisions
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/templates/properties?item_id=@item_id@&mount_point=@mount_point@&template_props_tab=revisions" title="" class="subnavbar-unselected">Revisions</a>
+   </div>
+ </else>
 
-<tr><td nowrap height=1 bgcolor="#999999"><img src="assets/gray-dot.gif" height=1 width=1></td></tr>
-<tr><td nowrap height=1 bgcolor="#FFFFFF"><img src="assets/white-dot.gif" height=1 width=1></td></tr>
+ <if @template_props_tab@ eq datasources>
+   <div class="tab" id="subnavbar-here">
+     Datasources
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/templates/properties?item_id=@item_id@&mount_point=@mount_point@&template_props_tab=datasources" title="" class="subnavbar-unselected">Datasources</a>
+   </div>
+ </else>
 
-<!-- begin folder -->
+ <if @template_props_tab@ eq assets>
+   <div class="tab" id="subnavbar-here">
+     Assets
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/templates/properties?item_id=@item_id@&mount_point=@mount_point@&template_props_tab=assets" title="" class="subnavbar-unselected">Assets</a>
+   </div>
+ </else>
 
-<tr bgcolor=#DDDDDD>
-<td>
-<table cellpadding=2 cellspacing=0 border=0>
-<tr>
+ <if @template_props_tab@ eq types>
+   <div class="tab" id="subnavbar-here">
+     Content Types
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/templates/properties?item_id=@item_id@&mount_point=@mount_point@&template_props_tab=types" title="" class="subnavbar-unselected">Content Types</a>
+   </div>
+ </else>
 
-  <th nowrap align=left>&nbsp;Template:</th>
-  <form action="index"><td nowrap><input size=40 name="path" value="@path@"></td></form>
+ <if @template_props_tab@ eq items>
+   <div class="tab" id="subnavbar-here">
+     Content Items
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/templates/properties?item_id=@item_id@&mount_point=@mount_point@&template_props_tab=items" title="" class="subnavbar-unselected">Content Items</a>
+   </div>
+ </else>
 
-</tr>
-</table>
-</td>
-</tr>
+  </div>
+ </div>
+</div>
 
-<!-- end folder -->
+<div id="subnavbar-body">
 
-<tr><td nowrap height=1 bgcolor="#999999"><img src="assets/gray-dot.gif" height=1 width=1></td></tr>
-<tr><td nowrap height=1 bgcolor="#FFFFFF"><img src="assets/white-dot.gif" height=1 width=1></td></tr>
-<tr><td nowrap height=3 bgcolor="#DDDDDD"><img src="assets/light-gray-dot.gif" height=3 width=1></td></tr>
-<tr><td nowrap height=2 bgcolor="#999999"><img src="assets/gray-dot.gif" height=2 width=1></td></tr>
+<div id=section>
+<include src=@template_props_tab@ template_id=@item_id@>
+</div>
 
-<tr><td bgcolor=#FFFFFF>&nbsp;</td></tr>
-
-<tr><td bgcolor=#FFFFFF>
-<!-- begin tabs -->
-
-<table cellpadding=0 cellspacing=0 border=0 bgcolor=#FFFFFF width="100%">
-<tr>
-<td bgcolor=#FFFFFF>&nbsp;&nbsp;</td>
-<td>
-<table cellpadding=0 cellspacing=0 border=0 bgcolor=#DDDDDD>
-
-<tr>
-<td height=1 colspan=@tab_count@ bgcolor=#999999><img src="assets/gray-dot.gif"
-    height=1 width=1></td>
-</tr>
-
-<tr align=center>
-<td><img src="assets/toolbar-separator.gif"></td>
-
-<multiple name=tabs>
-<if @tab@ ne @tabs.name@>
-<td>&nbsp;<a 
-  href="properties?id=@id@&tab=@tabs.name@">@tabs.label@</a>&nbsp;</td>
-</if>
-<else>
-<td bgcolor=#FFFFFF>&nbsp;<b>@tabs.label@</b>&nbsp;</td>
-</else>
-
-<td><img src="assets/toolbar-separator.gif"></td>
-</multiple>
-
-</tr>
-
-</table>
-
-<table cellpadding=0 cellspacing=0 border=0 bgcolor=#999999 width="100%">
-<tr>
-<td height=1 bgcolor=#999999><img src="assets/gray-dot.gif" 
-  height=1 width=1></td>
-</tr>
-</table>
-
-</td>
-<td bgcolor=#FFFFFF>&nbsp;&nbsp;</td>
-</tr>
-
-<tr>
-<td colspan=3 bgcolor=#FFFFFF>&nbsp;&nbsp;</td>
-</tr>
-
-<tr>
-<td bgcolor=#FFFFFF>&nbsp;&nbsp;</td>
-<td bgcolor=#FFFFFF>
-
-  <include src=@tab;noquote@ template_id=@id;noquote@>
-
-</td>
-<td bgcolor=#FFFFFF>&nbsp;&nbsp;</td>
-</tr>
-</table>
-
-<!-- end tabbed pane -->
-
-</td></tr>
-
-<tr><td bgcolor=#FFFFFF>&nbsp;</td></tr>
-
-<tr><td nowrap height=2 bgcolor="#999999"><img src="assets/gray-dot.gif" height=2 width=1></td></tr>
-
-</table>
-
-</td>
-</tr>
-</table>
-
-</body>
-</html>
+</div>

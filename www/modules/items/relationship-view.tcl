@@ -7,7 +7,7 @@ request create -params {
 
 # Get misc info
 
-db_1row get_rel_info ""
+db_1row get_rel_info "" 
 
 # Get extra attributes
 

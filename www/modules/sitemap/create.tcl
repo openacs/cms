@@ -13,7 +13,7 @@ if { [util::is_nil parent_id] } {
 
 
 # permissions check - user must have cm_new on parent
-content::check_access $create_parent_id cm_new -user_id [User::getID] 
+content::check_access $create_parent_id cm_new -user_id [auth::require_login] 
 
 # Get the path
 set path [db_string get_path ""]
@@ -23,7 +23,7 @@ set path [db_string get_path ""]
 form create add_folder
 
 element create add_folder parent_id \
-  -label "Parent ID" -datatype keyword -widget hidden -param -optional
+  -label "Parent ID" -integer keyword -widget hidden -param -optional
 
 element create add_folder mount_point \
   -label "Mount Point" -datatype keyword -widget hidden -param -optional

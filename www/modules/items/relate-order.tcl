@@ -5,11 +5,10 @@ request set_param rel_id -datatype integer
 request set_param order         -datatype keyword 
 request set_param mount_point   -datatype keyword -value "sitemap"
 request set_param return_url    -datatype text    -value "index"
+request set_param item_props_tab -datatype text    -value "children"
 request set_param passthrough   -datatype text \
 	-value [content::assemble_passthrough mount_point]
 request set_param relation_type -datatype keyword -value "relation" 
-
-
 
 # Use hardcoding instead of inheritance, since inheritance is not in the
 # data model for some reason
@@ -88,4 +87,4 @@ db_transaction {
     }
 }
 
-template::forward "$return_url?[content::url_passthrough $passthrough]"
+template::forward "$return_url?item_props_tab=$item_props_tab[content::url_passthrough $passthrough]"

@@ -11,7 +11,7 @@ if { ! [string equal $submit {}] } {
   if { $submit == "Copy" } {
 
       db_transaction {
-          set creation_user [User::getID]
+          set creation_user [auth::require_login]
           set creation_ip [ns_conn peeraddr]
 
           foreach template_id [ns_querygetall template_id] {

@@ -43,4 +43,4 @@ if { [catch {db_exec_plsql unregister "
 	    "Could not unregister relation type - $errmsg"
 }
 
-template::forward "index?id=$content_type"
+template::forward "index?id=$content_type&type_props_tab=relations"

@@ -59,7 +59,7 @@ ad_proc -public content::check_access { object_id privilege args } {
   template::util::get_opts $args 
 
   if { [template::util::is_nil opts(user_id)] } {
-    set user_id [User::getID]
+    set user_id [auth::require_login]
   } else {
     set user_id $opts(user_id)
   }  

@@ -1,22 +1,4 @@
-<html>
-
-<head>
-
-<title>Delete Templates</title>
-
-<style>
-  body {
-    background-color: white
-  }
-  th { 
-    font-size: 9pt;
-    font-family: sans-serif;
-  }
-  td { 
-    font-size: 9pt;
-    font-family: sans-serif;
-  }
-</style>
+<master src="../../master">
 
 <script language=Javascript src="../clipboard/clipboard.js"></script>
 
@@ -26,10 +8,6 @@
   }
 </script>
  
-</head>
-
-<body>
-
 <table cellpadding=2 cellspacing=0 border=1 width="100%">
 
 <tr bgcolor=#6699CC>
@@ -76,9 +54,6 @@
 </td>
 </tr>
 </table>
-
-</body>
-</html>
 
 
 

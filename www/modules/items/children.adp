@@ -1,5 +1,4 @@
-<master src="../../master">
-<property name="title">Child Items</property>
+<div id=section-header>Child Items</div>
 
 <table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width="95%">
 <tr bgcolor="#FFFFFF">

@@ -33,7 +33,7 @@
     from
       cr_folder_type_map
     where
-      folder_id = :id
+      folder_id = :item_id
   
       </querytext>
 </fullquery>

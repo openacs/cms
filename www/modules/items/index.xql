@@ -5,13 +5,23 @@
       <querytext>
       
   select 
-    content_type, latest_revision
+    i.content_type, i.latest_revision, r.description
   from 
-    cr_items 
+    cr_items i, cr_revisions r
   where 
-   item_id = :item_id
+   i.item_id = :item_id
+  and 
+   r.revision_id = content_item__get_best_revision(:item_id)
+
       </querytext>
 </fullquery>
 
+<fullquery name="get_item_title">
+ <querytext>
+
+  select title from cr_revisions where revision_id = :latest_revision
+
+ </querytext>
+</fullquery>
  
 </queryset>

@@ -10,16 +10,16 @@
   <td align=left><b>Attributes</b></td>
 
   <td align=center>Relationship between 
-     <a href="index?item_id=@rel_info.item_id@&mount_point=$mount_point">
-       @rel_info.item_title@
+     <a href="index?item_id=@item_id@&mount_point=@mount_point@">
+       @item_title@
      </a>
      and
-     <if @rel_info.is_item@ eq t>
-       <a href="index?item_id=@rel_info.related_object_id@&mount_point=$mount_point">
-         @rel_info.related_title@
+     <if @is_item@ eq t>
+       <a href="index?item_id=@related_object_id@&mount_point=@mount_point@">
+         @related_title@
        </a>     
      </if>
-     <else>@rel_info.related_title@</else>
+     <else>@related_title@</else>
   </td>
   
   <td align=right><a href="unrelate-item?rel_id=@rel_id@&mount_point=@mount_point@">
@@ -36,13 +36,13 @@
   <tr bgcolor="#FFFFFF">
     <td>Relation Tag</td>
     <td>&nbsp;&nbsp;&nbsp;</td>
-    <td>@rel_info.relation_tag@</td>
+    <td>@relation_tag@</td>
   </tr>
 
   <tr bgcolor="#EEEEEE">
     <td>Sort Order </td>
     <td>&nbsp;&nbsp;&nbsp;</td>
-    <td>@rel_info.order_n@</td>
+    <td>@order_n@</td>
   </tr>
 
   <multiple name=rel_attrs>

@@ -37,7 +37,6 @@
       </querytext>
 </fullquery>
 
-
 <partialquery name="display_data_partial">      
       <querytext>
 
@@ -80,10 +79,45 @@
       </querytext>
 </partialquery>
 
+<fullquery name="get_folder_contents">      
+      <querytext>
+
+  select
+    case when i.content_type = 'content_folder' then 't' else'f' end as is_folder,
+    case when i.content_type = 'content_template' then 't' else 'f' end as is_template,
+    r.item_id, r.item_id as id, v.revision_id, r.resolved_id, r.is_symlink, r.name, i.parent_id,
+    coalesce(trim(
+      case when o.object_type = 'content_symlink' then r.label
+           when o.object_type = 'content_folder' then f.label
+	   else coalesce(v.title, i.name) end),'-') as title,
+    case when i.publish_status = 'live' then to_char(u.publish_date, 'MM/DD/YYYY') else '-' end as publish_date,
+    o.object_type, t.pretty_name as content_type,
+    to_char(o.last_modified, 'MM/DD/YYYY HH24:MI') as last_modified_date,
+    coalesce(round(v.content_length::numeric / 1000.0, 2)::float8::text, '-') as file_size
+  from 
+    cr_items i
+        LEFT OUTER JOIN
+    cr_revisions v ON i.latest_revision = v.revision_id
+        LEFT OUTER JOIN
+    cr_revisions u ON i.live_revision = u.revision_id
+        LEFT OUTER JOIN
+    cr_folders f ON i.item_id = f.folder_id, 
+    cr_resolved_items r, acs_objects o, acs_object_types t
+  where
+    r.parent_id = $parent_var
+  and
+    r.resolved_id = i.item_id
+  and
+    i.item_id = o.object_id
+  and
+    i.content_type = t.object_type
+      </querytext>
+</fullquery>
+
 <fullquery name="get_resolved_id">      
       <querytext>
       
-    select content_symlink__resolve( :id ) 
+    select content_symlink__resolve( :item_id ) 
   
       </querytext>
 </fullquery>
@@ -124,7 +158,7 @@
     where
       i.item_id = f.folder_id
     and
-      f.folder_id = :id
+      f.folder_id = :item_id
   
       </querytext>
 </fullquery>

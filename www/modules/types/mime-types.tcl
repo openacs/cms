@@ -8,7 +8,7 @@ request set_param content_type -datatype keyword -value 'content_revision'
 set module_id [db_string get_module_id ""]
 
 # permissions check - must have cm_examine
-content::check_access $module_id cm_examine -user_id [User::getID]
+content::check_access $module_id cm_examine -user_id [auth::require_login]
 
 set content_type_name [db_string get_name ""]
 
@@ -22,7 +22,23 @@ if { [template::util::is_nil content_type_name] } {
     template::forward "index?id=content_revision"
 }
 
-db_multirow registered_mime_types get_reg_mime_types ""
+template::list::create \
+    -name mime_types \
+    -multirow registered_mime_types \
+    -has_checkboxes \
+    -key mime_types \
+    -elements {
+	label {
+	    label "Mime Type"
+	}
+	unreg {
+	    display_template "<a href=\"@registered_mime_types.unreg_url@\">unregister</a>"
+	}
+    }
+
+db_multirow -extend {unreg unreg_url} registered_mime_types get_reg_mime_types "" {
+    set unreg_url [export_vars -base unregister-mime-type {content_type mime_type}]
+}
   
 set page_title "Register MIME types to $content_type_name"
 

@@ -83,7 +83,7 @@
 <fullquery name="get_resolved_id">      
       <querytext>
       
-    select content_symlink.resolve( :id ) from dual
+    select content_symlink.resolve( :item_id ) from dual
   
       </querytext>
 </fullquery>
@@ -124,7 +124,7 @@
     where
       i.item_id = f.folder_id
     and
-      f.folder_id = :id
+      f.folder_id = :item_id
   
       </querytext>
 </fullquery>

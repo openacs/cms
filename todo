@@ -1,0 +1,37 @@
+basic/cosmetic
+---------
+list-ize child items (or what to do with it? shouldn't we be able to relate items that already exist?)
+templates not showing up on clipboard as templates
+better navigation strategy (i.e., "back" links while visiting attributes, rename, delete pages, etc.)
+new icon for "clipping" items - new listbuilder checkboxes confuse UI a bit
+include description in heading on folder attributes page
+inheritance display should not link to "basic item" on its page and should not include the current type (related to navigation strategy)
+move all item info (clip check, title, path, etc.) into an include and put in /lib (with ancestors and bookmark)
+combine the index pages for templates and items into one and put in /lib? (if they can be made the same)
+use page_title in master (possible?)
+
+fix "clear the clipboard" functionality
+fix [float] link in tabs
+list-ize user browser
+floatclipboard_p working?
+
+plumbing
+--------
+build up actions list for folder using allow_* vars (i.e., links? new folders?) on sitemap browser
+replace [User::getID] with [auth::require_login]
+root folder param?
+content delivery strategy
+remove custom cms permissions system [perm::require]
+remove old workflow/add new workflow
+fix search
+utilize new cr tcl api
+use ad_form where appropriate
+integrate categories package
+ad_page_contract for non-include pages?
+
+questions/ideas
+---------
+create templates from within folders (in old system)?
+generic error page (replace with ad_complain or just pretty up?)
+better model for "clipping" items?
+how do we get extlinks and other types (if any?) which do not sub-class content_revision into the system?

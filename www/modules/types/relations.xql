@@ -20,7 +20,7 @@
   where
     o.object_type = r.target_type
   and
-    r.content_type = :type
+    r.content_type = :content_type
   order by
     pretty_name, relation_tag
 
@@ -38,7 +38,7 @@
   where
     c.child_type = o.object_type
   and
-    c.parent_type = :type
+    c.parent_type = :content_type
   order by
     pretty_name, relation_tag
 

@@ -7,205 +7,159 @@
   </script> 
 </if>
 
-<h2>@page_title@</h2>
+<nobr><p class="h1">
+<include src="../../bookmark" mount_point="@mount_point@" id="@id@">
+@page_title;noquote@ 
+</p>
+</nobr>
+<p/>
 
-<table border=0 cellpadding=4 cellspacing=0 width="95%">
-<tr>
-  <td nowrap align=left>
-    <font size=-1>
-    <b>Inheritance:</b>&nbsp;
-    <if @content_type_tree:rowcount@ eq 0>
-      <a href="index?id=content_revision">Basic Item</a>
-    </if>
-    <else>
-      <multiple name=content_type_tree>
-        <if @content_type_tree.rownum@ ne 1> : </if>
-        <if @content_type_tree.object_type@ eq @content_type@>
-          @content_type_tree.pretty_name@
-        </if>
-        <else>
-          <a href="index?id=@content_type_tree.object_type@&mount_point=types&parent_id=@content_type_tree.parent_type@">
-            @content_type_tree.pretty_name@
-          </a>
-        </else> 
-      </multiple>
-    </else>
-    </font>
-  </td>
-  <td align=right>
-    <include src="../../bookmark" 
-             mount_point="@mount_point;noquote@" 
-            id="@content_type;noquote@">&nbsp;
-    <font size=-1>Add this content type to the clipboard.</font>
-  </td>
-</tr>
-</table>
+<font size=-1>
+ <strong>Inheritance: </strong>&nbsp;
+   <if @content_type_tree:rowcount@ eq 1>
+    Basic item
+   </if>
+   <else>
+    <multiple name=content_type_tree>
+      <if @content_type_tree.object_type@ eq @content_type@>
+        @content_type_tree.pretty_name;noquote@
+      </if>
+          
+      <else>
+        <a href="index?id=@content_type_tree.object_type@&mount_point=types&parent_id=@content_type_tree.parent_type@">
+          @content_type_tree.pretty_name;noquote@
+        </a>
+      </else> 
+      <if @content_type_tree.rownum@ lt @content_type_tree:rowcount@> : </if>
+    </multiple>
+   </else>
 
-<p>
+</font>
 
+<!-- Set up tabs -->
 
-<table cellpadding=1 cellspacing=0 border=0 width="100%">
-<tr bgcolor=#000000><td>
+<div id="subnavbar-div">
+  <div id="subnavbar-container">
+    <div id="subnavbar">
 
-<table cellpadding=0 cellspacing=0 border=0 width="100%">
-<tr bgcolor=#eeeeee><td>
+ <if @type_props_tab@ eq attributes>
+   <div class="tab" id="subnavbar-here">
+     Attributes
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/types/index?id=@id@&mount_point=@mount_point@&parent_id=@parent_id@&type_props_tab=attributes" title="" class="subnavbar-unselected">Attributes</a>
+   </div>
+ </else>
 
-<!-- Tabs begin -->
+ <if @type_props_tab@ eq relations>
+   <div class="tab" id="subnavbar-here">
+     Relations
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/types/index?id=@id@&mount_point=@mount_point@&parent_id=@parent_id@&type_props_tab=relations" title="" class="subnavbar-unselected">Relations</a>
+   </div>
+ </else>
 
-<tabstrip id=type_props></tabstrip>
+ <if @type_props_tab@ eq templates>
+   <div class="tab" id="subnavbar-here">
+     Templates
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/types/index?id=@id@&mount_point=@mount_point@&parent_id=@parent_id@&type_props_tab=templates" title="" class="subnavbar-unselected">Templates</a>
+   </div>
+ </else>
 
-</td></tr>
+ <if @type_props_tab@ eq permissions>
+   <div class="tab" id="subnavbar-here">
+     Permissions
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/types/index?id=@id@&mount_point=@mount_point@&parent_id=@parent_id@&type_props_tab=permissions" title="" class="subnavbar-unselected">Permissions</a>
+   </div>
+ </else>
 
-<tr bgcolor=#FFFFFF><td align=center>
+ <if @type_props_tab@ eq subtypes>
+   <div class="tab" id="subnavbar-here">
+     Subtypes
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/types/index?id=@id@&mount_point=@mount_point@&parent_id=@parent_id@&type_props_tab=subtypes" title="" class="subnavbar-unselected">Subtypes</a>
+   </div>
+ </else>
 
-<!-- Tabs end -->
+  </div>
+ </div>
+</div>
 
-<br>
-<table cellspacing=0 cellpadding=0 border=0 width="95%">
+<div id="subnavbar-body">
 
-<if @type_props.tab@ eq attributes>
-  
-  <tr><td>
+  <if @type_props_tab@ eq attributes>
 
+    <div id=section>
+    <include src="attributes" can_edit_widgets="@can_edit_widgets@" content_type="@content_type@">
+    </div>
+    <p/>
 
-    <!-- ATTRIBUTES TABLE -->
-    <include src="../../table-header" title="Attributes">
-    <table cellspacing=0 cellpadding=4 border=0 width="100%">
-    <if @attribute_types:rowcount@ eq 0>
-      <tr bgcolor="#99CCFF">
-	<td><em>This content type has no attributes.</em></td>
-      </tr>
-    </if>
-    <else>
+    <div id=section>
+    <include src="mime-types" content_type="@content_type@">
+    </div>
+    <p/>
 
-      <tr bgcolor="#99ccff">
-	<th>Attribute Name</th>
-	<!-- <th>Description Key</th> -->
-	<!-- <th>Description</th>     -->
-	<th>Object Type</th>
-	<th>Data Type</th>
-	<th>Widget</th>
-	<th>&nbsp;</th>
-      </tr>
+    <div id=section>
+    <include src="content-method" content_type="@content_type@">
+    </div>
 
-      <multiple name=attribute_types>
-	<if @attribute_types.rownum@ odd><tr bgcolor="#FFFFFF"></if>
-	<else><tr bgcolor=#EEEEEE></else>
-	  <td>@attribute_types.attribute_name_pretty@</td>
-	  <td>@attribute_types.pretty_name@</td>
-	  <td>@attribute_types.datatype@</td>
-	  <td>
-	    <if @attribute_types.widget@ nil>None</if>
-	    <else>@attribute_types.widget@</else>
-	  </td>
-	  <td align=right>
-	    <if @can_edit_widgets@ eq t>
-	      <if @attribute_types.object_type@ eq @content_type@
-		and @attribute_types.object_type@ ne content_revision>
-		<if @attribute_types.widget@ nil>
-		  <a href="widget-register?attribute_id=@attribute_types.attribute_id@&content_type=@content_type@">Register Widget</a>
-		</if>
-		<else>
-		  [ <a href="widget-register?attribute_id=@attribute_types.attribute_id@&content_type=@content_type@&widget=@attribute_types.widget@">Edit Widget</a> | 
-		  <a href="widget-unregister?attribute_id=@attribute_types.attribute_id@&content_type=@content_type@">Unregister Widget</a> ]
-		</else>
-	      </if>
-	      <else>&nbsp;</else>
-	    </if>
-	    <else>&nbsp;</else>
-	  </td>
-	</tr>
-      </multiple>
-    </else>
-    </table>
-    <include src="../../table-footer">
-    <p>
+ </if>
 
-    <include src="mime-types" content_type="@content_type;noquote@">
-    <p>
+ <if @type_props_tab@ eq relations>
 
-    <include src="content-method" content_type="@content_type;noquote@">
-  </td></tr>
+    <include src="relations" content_type=@content_type;noquote@>
+
+ </if>
+
+<if @type_props_tab@ eq templates>
+
+    <div id=section>    
+    <div id=section-header>Registered Templates</div>
+    <p/>
+    <listtemplate name="type_templates"></listtemplate>
+    </div>
+
 </if>
 
-<if @type_props.tab@ eq relations>
-  <tr><td>
-    <include src="relations" type=@content_type;noquote@>
-  </td></tr>
-</if>
+<if @type_props_tab@ eq permissions>
 
-<if @type_props.tab@ eq templates>
-  <tr><td>
-    <include src="../../table-header" title="Registered Templates">
-    <table cellspacing=0 cellpadding=4 border=0 width="100%">
-
-    <if @type_templates:rowcount@ eq 0>
-      <tr bgcolor="#99CCFF">
-	<td>
-	  <em>There are no templates registered to this content type.</em>
-	</td>
-      </tr>
-    </if>
-    <else>
-
-      <tr bgcolor="#99CCFF">
-	<th>Template Name</th>
-	<th>Path</th>
-	<th>Content Type</th>
-	<th>Context</th>
-	<th>&nbsp</th>
-	<th>&nbsp</th>
-      </tr>
-
-      <multiple name=type_templates>
-      <if @type_templates.rownum@ odd><tr bgcolor="#FFFFFF"></if>
-      <else><tr bgcolor="#EEEEEE"></else>
-	<td>@type_templates.name@</td>
-	<td>@type_templates.path@</td>
-	<td>@type_templates.pretty_name@</td>
-	<td>@type_templates.use_context@</td>
-	<td>
-	  <if @type_templates.is_default@ eq t>Default</if>
-	  <else>
-	    <if @user_permissions.cm_write@ eq t>
-	      <a href="set-default-template?template_id=@type_templates.template_id@&context=@type_templates.use_context@&content_type=@content_type@">Make this the default</a>
-	    </if>
-	    <else>&nbsp;</else>
-	  </else>
-	</td>
-
-	<td align=right>
-	  <if @user_permissions.cm_write@ eq t>
-	    <a href="unregister-template?template_id=@type_templates.template_id@&context=@type_templates.use_context@&content_type=@content_type@">Unregister</a>
-	  </if>
-	  <else>&nbsp;</else>
-	</td>
-      </tr>
-      </multiple>
-    </else>
-    </table>
-    <include src="../../table-footer" footer="@footer;noquote@">
-  </td></tr>
-</if>
-
-<if @type_props.tab@ eq permissions>
-  <tr><td>
+    <div id=section>    
     <include src="../permissions/index" 
       object_id=@module_id;noquote@ 
       mount_point="types" 
       return_url="@return_url;noquote@" 
       passthrough="@passthrough;noquote@">
-  </td></tr>
+    </div>
+
 </if>
 
-</table>
+<if @type_props_tab@ eq subtypes>
+    
+    <div id=section>
+    <include src="subtypes" content_type=@content_type;noquote@ object_type_pretty=@object_type_pretty;noquote@>
+    </div>
+
+</if>
 
 <br>
 
-</td></tr>
-</table>
-
-</td></tr></table>
+</div>
 
 <script language=JavaScript>
   set_marks('@mount_point@', '../../resources/checked');

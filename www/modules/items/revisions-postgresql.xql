@@ -36,11 +36,12 @@
     revision_id, 
     trim(title) as title, 
     trim(description) as description,
+    publish_date,
     content_revision__get_number(revision_id) as revision_number
   from 
     cr_revisions r
   where 
-    r.item_id = $item_id
+    r.item_id = :item_id
   order by
     revision_number desc
 

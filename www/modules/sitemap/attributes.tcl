@@ -1,33 +1,56 @@
-# display content-types that are registered to this folder
+ad_page_contract {
+    Display content types that are registered to this folder
 
-request create
-request set_param folder_id   -datatype integer -optional
-request set_param mount_point -datatype keyword -value sitemap
+    @author Michael Steigman
+    @creation-date October 2004
+} {
+    { folder_id:integer,optional }
+    { folder_resolved_id:integer,optional}
+    { mount_point "sitemap" }
+}
 
 # default folder_id is the root folder
 if { [template::util::is_nil folder_id] } {
     set folder_id [cm::modules::${mount_point}::getRootFolderID]
 }
 
+if { [template::util::is_nil folder_resolved_id] } {
+    set folder_resolved_id $folder_id
+}
 
 # permissions check - user must have cm_examine on this folder
 content::check_access $folder_id cm_examine -user_id [User::getID]
 
+# hack - breadcrumbs for path (need to think about this)
+set call_ancestors_p [expr ![expr $folder_id == [cm::modules::${mount_point}::getRootFolderID]]]
 
 # Get the registered types for the folder 
 # (besides symlinks/templates/subfolders)
 cms_folder::get_registered_types $folder_id multirow content_types
 
+#set type-unreg-url 
+template::list::create \
+    -name content_types \
+    -multirow content_types \
+    -key content_type \
+    -bulk_actions [list	"Unregister checked types from this folder" \
+		       "[export_vars -base type-unregister?mount_point=sitemap {folder_id}]" \
+		       "Unregister checked types from this folder"] \
+    -bulk_action_export_vars folder_id \
+    -actions [list "Register content types on clipboard to this folder" \
+		  [export_vars -base type-register?mount_point=sitemap {folder_id}] "Register clipped content types to this folder"] \
+    -elements {
+	pretty_name {
+	    label "Content Type"
+	}
+	
+    }
+
+
 # Get other misc values
 set folder_name [db_string get_folder_name ""]
 
 set page_title "Folder Attributes - $folder_name"
-set register_marked_content_types \
-	"<a href=\"type-register?folder_id=$folder_id\">
-         <img src=\"../../resources/Add24.gif\" 
-           width=24 height=24 border=0 
-           alt=\"Register marked content types.\">
-           Register marked content types to this folder.</a>"
 
 # Set up passthrough for permissions
 set return_url [ns_conn url]
@@ -39,75 +62,43 @@ set passthrough [content::assemble_passthrough \
 db_1row get_options "" -column_array folder_options
 
 # Create the form for registering special types to the folder
-form create register_types
+ad_form -name special_types \
+    -form {
+	{allow_subfolders:boolean(radio)
+	    {label "Allow Subfolders?"}
+	    {options {{Yes t} {No f}}}
+	    {values $folder_options(allow_subfolders)}
+	}
+	{allow_symlinks:boolean(radio)
+	    {label "Allow Symlinks?"}
+	    {options {{Yes t} {No f}}}
+	    {values $folder_options(allow_symlinks)}
+	}
+	{folder_resolved_id:integer(hidden),optional}
+	{mount_point:text(hidden)}
+	{folder_id:integer(hidden)}
+    } \
+    -on_request {}\
+    -on_submit {
 
-element create register_types folder_resolved_id \
-	-datatype integer \
-	-widget hidden \
-	-optional
-
-# PATCH to set a negative number (with a dash in front of it) as the value
-if { [util::is_nil "register_types:folder_resolved_id(value)"] } {
-  set "register_types:folder_resolved_id(value)" $folder_id
-}
-
-element create register_types folder_id \
-	-datatype integer \
-	-widget hidden \
-	-param -optional
-
-element create register_types mount_point \
-	-datatype keyword \
-	-widget hidden \
-	-param -optional
-
-element create register_types allow_subfolders \
-	-datatype keyword \
-	-widget radio \
-	-label "Allow Subfolders?" \
-	-options { {Yes t} {No f} } \
-	-values [list $folder_options(allow_subfolders)]
-
-element create register_types allow_symlinks \
-	-datatype keyword \
-	-widget radio \
-	-label "Allow Symlinks?" \
-	-options { {Yes t} {No f} } \
-	-values [list $folder_options(allow_symlinks)]
-
-
-# Process the form
-
-if { [form is_valid register_types] } {
-
-    form get_values register_types \
-	    allow_subfolders allow_symlinks folder_resolved_id mount_point
-
-    db_transaction {
-
-        # permissions check - must have cm_write on folder to modify its options
         content::check_access $folder_resolved_id cm_write \
-	    -user_id [User::getID]
-
+	    -user_id [auth::require_login]
 
         if { [string equal $allow_subfolders "t"] } {
             set subfolder_method "register_content_type"
         } else {
             set subfolder_method "unregister_content_type"
         }
-
+	
         if { [string equal $allow_symlinks "t"] } {
             set symlink_method "register_content_type"
         } else {
             set symlink_method "unregister_content_type"
         }
-
-        db_exec_plsql content "
-             begin
-               content_folder.${subfolder_method}(:folder_resolved_id,'content_folder','f');
-               content_folder.${symlink_method}(:folder_resolved_id,'content_symlink','f');
-             end;"
+	
+        db_exec_plsql content ""
+    } \
+    -after_submit {
+	ad_returnredirect "attributes?folder_id=$folder_id&mount_point=$mount_point"
+	ad_script_abort
     }
-
-    forward "attributes?folder_id=$folder_id&mount_point=$mount_point"
-}

@@ -34,7 +34,7 @@
   where
     i.item_id = t.parent_id
   order by
-    tree_level desc
+    tree_level asc
 
       </querytext>
 </fullquery>

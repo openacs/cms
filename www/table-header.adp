@@ -3,7 +3,7 @@
 
 <if @title@ not nil>
   <tr bgcolor="#FFFFFF">
-    <th align=left>@title@</th>
+    <th align=left>@title;noquote@</th>
     <td align=right>
       <if @header@ not nil>@header;noquote@</if>
       <else>&nbsp;</else>

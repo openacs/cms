@@ -82,6 +82,24 @@ ad_proc -public clipboard::is_marked { clip mount_point item_id } {
     }
 }
 
+ad_proc -public clipboard::render_bookmark { mount_point id package_url} {
+
+  Compile and eval a chunk of ADP for the bookmark
+
+} {
+    set img_checked "[ad_conn package_url]resources/checked.gif"
+    set img_unchecked "[ad_conn package_url]resources/unchecked.gif"
+    
+    set clipboardfloats_p [clipboard::floats_p]
+
+    set code "<a href=\"javascript:markx('@package_url@', '@mount_point@', '@id@',
+    '@img_checked@', '@img_unchecked@', '@clipboardfloats_p@')\" title=\"Copy this item to the clipboard\">
+    <img src=\"@img_unchecked@\" border=\"0\" name=\"mark@id@\"> </a>"
+
+    set compiled_code [template::adp_compile -string $code]
+    return [template::adp_eval compiled_code]
+}
+
 ad_proc -public clipboard::get_bookmark_icon { clip mount_point item_id {row_ref row} } {
 
   Use this function as part of the multirow query to

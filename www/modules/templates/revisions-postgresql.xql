@@ -12,7 +12,7 @@
     (round(r.content_length::numeric / 1000.0,2)::float8::text || ' KB'::text) as file_size,
     case when coalesce(p.person_id, 0) = 0 
             then '-' 
-            else substr(p.first_names, 1, 1) || substr(p.last_name, 1, 1) end as modified_by,
+            else p.first_names || ' ' || p.last_name end as modified_by,
     coalesce(j.msg, '-') as msg
   from 
     cr_revisions r, 

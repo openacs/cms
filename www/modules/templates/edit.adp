@@ -1,40 +1,10 @@
-<html>
-
-<head>
-
-<title>Edit Template</title>
-
-<style>
-  body {
-    background-color: white
-  }
-  th { 
-    font-size: 9pt;
-    font-family: sans-serif;
-  }
-  td { 
-    font-size: 9pt;
-    font-family: sans-serif;
-  }
-  h1 { 
-    font-size: 12pt;
-    font-family: sans-serif;
-  }
-  textarea { 
-    font-size: 9pt;
-    font-family: monospace;
-  }
-</style>
+<master src="../../master">
 
 <script language=JavaScript>
   function setSrc(name, src) {
     document.images[name].src = "assets/" + src;
   }
 </script>
- 
-</head>
-
-<body>
 
 <table cellpadding=2 cellspacing=0 border=1>
 <tr bgcolor=#6699CC>
@@ -91,7 +61,3 @@
 </td>
 </tr>
 </table>
-
-</body>
-
-</html>

@@ -11,10 +11,45 @@ if { [template::util::is_nil return_url] } {
     set return_url "index?id=$content_type"
 }
 
+template::list::create \
+    -name content_methods \
+    -multirow content_methods \
+    -has_checkboxes \
+    -no_data "There are no content methods registered to this content type. By default, all content methods will be available to this content type." \
+    -elements {
+	content_method {
+	    label "Content Method"
+	}
+	description {
+	    label "Description"
+	}
+	pretty_is_default {
+	    label "Is default?"
+	}
+	unreg_default_links {
+	    display_template "<center>@content_methods.unreg_default_links;noquote@</center>"
+	}
+	
+    }
 
 # fetch the content methods registered to this content type
-db_multirow content_methods get_methods ""
+db_multirow -extend {pretty_is_default unreg_default_links} content_methods get_methods "" {
+    set content_method_unset_default_url [export_vars -base content-method-unset-default {content_type}]
+    set content_method_set_default_url [export_vars -base content-method-set-default {content_type content_method}]
+    set content_method_unregister_url [export_vars -base content-method-unregister {content_type content_method}]
 
+    set unreg_default_links "\[ "
+    if {[string match $is_default "t"]} {
+	set pretty_is_default "Yes"
+	append unreg_default_links "<a href=\"$content_method_unset_default_url\">unset default</a>"
+    } else {
+    	set pretty_is_default "No"
+	append unreg_default_links "<a href=\"$content_method_set_default_url\">set as default</a>"
+    }
+
+    append unreg_default_links " | <a href=\"$content_method_unregister_url\">unregister</a> ]"
+
+}
 
 # text_entry content method filter
 # don't show text entry if a text mime type is not registered to the item

@@ -1,22 +1,17 @@
-# unregister a content type to a folder
+ad_page_contract {
+    Unregister a content type from a folder
 
-request create
-request set_param folder_id -datatype keyword
-request set_param type_key -datatype keyword
+    @author Michael Steigman
+    @creation-date October 2004
+} {
+    { folder_id:integer }
+    { content_type:multiple }
+}
 
-
-
-db_transaction {
-    db_exec_plsql unregister "
-         begin
-           content_folder.unregister_content_type(
-               folder_id        => :folder_id,
-               content_type     => :type_key,
-               include_subtypes => 'f' 
-           );
-         end;"
+foreach type $content_type {
+    db_exec_plsql unregister ""
 }
 
 cms_folder::flush_registered_types $folder_id
 
-forward "attributes?folder_id=$folder_id"
+ns_returnredirect "attributes?folder_id=$folder_id"

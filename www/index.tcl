@@ -1,9 +1,11 @@
-# Get the name for the current user
+ad_page_contract {
 
-set user_id [User::getID]
+    @author Michael Steigman (michael@steigman.net)
+    @creation-date October 2004
+} {
+    {module "modules/workspace/index"}
+}
 
-if { ! $user_id } { template::forward "signin" }
+set user_id [auth::require_login]
 
-set name [db_string get_name ""]
-
-ns_set put [ns_conn outputheaders] Pragma "No-cache"
+ns_returnredirect $module

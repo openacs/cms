@@ -40,7 +40,7 @@ if { [form is_valid new_template] } {
   form get_values new_template template_id name folder_id mime_type
 
   set creation_ip [ns_conn peeraddr]
-  set creation_user [User::getID]
+  set creation_user [auth::require_login]
 
   db_transaction {
 

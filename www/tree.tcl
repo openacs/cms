@@ -108,6 +108,8 @@ if { [template::util::is_nil state] } {
   set state [initFolderTree $user_id]
 }
 
+ns_log Notice "**** state is $state"
+
 # Extract the current folder (it may be overwritten by user_action)
 set current_folder [ns_queryget current_folder]
 
@@ -181,8 +183,11 @@ set current_folder_id   [lindex $current_folder 1]
 set mount_point ""
 set control_count 0
 
+
+ns_log Notice "**** fetchStateFolders = [fetchStateFolders $user_id state]"
 foreach folder [fetchStateFolders $user_id state] {
- 
+
+  ns_log Notice "**** folder is $folder" 
   set mount_point [folderAccess mount_point $folder]
   set name [folderAccess name $folder]
   set folder_id [folderAccess id $folder]

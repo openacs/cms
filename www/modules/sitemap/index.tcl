@@ -1,28 +1,39 @@
-# List contents of a folder
-# List path of this folder
-# List path of any symlinks to this folder
+ad_page_contract {
+    List contents of a folder
+    List path of this folder
+    List path of any symlinks to this folder
 
-request create
-request set_param id -datatype keyword -optional
-request set_param mount_point -datatype keyword -optional -value sitemap
-request set_param parent_id -datatype keyword -optional
-request set_param orderby -datatype keyword -optional -value name
 
+    @author Michael Steigman
+    @creation-date October 2004
+} {
+    { item_id:integer ""}
+    { mount_point "sitemap" }
+    { parent_id:integer ""}
+    { orderby "name" }
+}
+
+# request create
+# request set_param id -datatype keyword -optional
+# request set_param mount_point -datatype keyword -optional -value sitemap
+# request set_param parent_id -datatype keyword -optional
+# request set_param orderby -datatype keyword -optional -value name
 
 # paginator variables
-request set_param page -datatype integer -value 1
+#request set_param page -datatype integer -value 1
 
 # Create all the neccessary URL params for passthrough
 set passthrough "mount_point=$mount_point&parent_id=$parent_id"
 
-set original_id $id
-set user_id [User::getID]
+set original_id $item_id
+set user_id [auth::require_login]
 set root_id [cm::modules::${mount_point}::getRootFolderID]
 
+set package_url [ad_conn package_url]
 
 # Get the folder label/description
 #   If :id does not exist, then use :root_id
-if { [template::util::is_nil id] } {
+if { [template::util::is_nil item_id] } {
 
   set parent_var :root_id
 
@@ -54,14 +65,14 @@ if { [template::util::is_nil id] } {
 
 } else {
 
-  set parent_var :id
+  set parent_var :item_id
 
   # Resolve the symlink, if any
   set resolved_id [db_string get_resolved_id ""]
 
-  if { $resolved_id != $id } {
+  if { $resolved_id != $item_id } {
     set is_symlink t
-    set id $resolved_id
+    set item_id $resolved_id
     set what "Link"
   } else {
     set is_symlink f
@@ -97,19 +108,20 @@ if { [template::util::is_nil id] } {
 
 }
 
+set page_title "Content Folder - $info(label)"
 
 # Make sure the user has the right access to this folder,
 # set up the user_permissions array
-if { [template::util::is_nil id] } {
+if { [template::util::is_nil item_id] } {
   set object_id $root_id
 } else {
-  set object_id $id
+  set object_id $item_id
 }  
 
 content::check_access $object_id "cm_examine" \
   -user_id $user_id -mount_point $mount_point -parent_id $parent_id \
   -return_url "modules/sitemap/index" \
-  -passthrough [list [list id $original_id] [list orderby $orderby]]
+  -passthrough [list [list item_id $original_id] [list orderby $orderby]]
 
 
 # If the user doesn't have the New permission, he can't create any new items
@@ -130,96 +142,80 @@ if { [string equal $user_permissions(cm_new) f] } {
 
 set index_page_id [db_string get_index_page_id ""]
 
-# sort table by columns
-switch -exact -- $orderby {
-  size  {
-    set orderby_clause ", o.object_type, file_size desc"
-  } 
-  publish_date {
-    set orderby_clause ", o.object_type, publish_date desc"
-  } 
-  last_modified {
-    set orderby_clause ", o.object_type, last_modified desc"
-  }
-  object_type {
-    set orderby_clause ", o.object_type, content_type, upper(v.title)"
-  }  
-  default {
-    set orderby_clause ", o.object_type, upper(v.title)"
-  }
-}
-
-# paginator
-set p_name "folder_contents_${mount_point}_$id"
-paginator create create_folder $p_name "" -pagesize 10 -groupsize 10 -contextual
-
-paginator get_data display_data $p_name items "" item_id $page
-
-paginator get_display_info $p_name info $page
-
-set group [paginator get_group $p_name $page]
-
-paginator get_context $p_name pages [paginator get_pages $p_name $group]
-paginator get_context $p_name groups [paginator get_groups $p_name $group 10]
-
-
-# determine whether item is marked (on clipboard), its link and icon
-for { set i 1 } { $i <= [multirow size items] } { incr i } { 
-  multirow get items $i
-
-  # use the appropriate icon depending on whether 
-  # the icon is bookmarked or not
-  #clipboard::get_bookmark_icon $clip $mount_point $items(item_id) items
-
-  # Create a link based on object type
-  if { [string equal $items(is_folder) t] } {
-    if { [string equal $items(is_symlink) t] } {
-      set base_url "index?id=$items(item_id)"
-    } else {
-      set base_url "index?id=$items(resolved_id)"
-    }
-  } else {
-    set base_url \
-	    "../items/index?item_id=$items(resolved_id)"
-  }
-  set items(link) "${base_url}&mount_point=$mount_point&parent_id=$id"
-
-  # Specify an item based on object type
-  if { [string equal $items(is_symlink) t] } {
-    set items(icon) "Shortcut24"
-  } elseif { [string equal $items(is_folder) t] } {
-    set items(icon) "Open24"
-  } elseif { [string equal $items(is_template) t] } {
-    set items(icon) "generic-item"
-  } else {
-    set items(icon) "Page24"
-  }
-
-  # Set the correct name if the object is a template
-  # Change this to actually do the right thing !
-  if { [string equal $items(is_template) t] } {
-    set items(title) $items(name)
-  } 
-}
-
-
+# REMOVED CODE GOES HERE
 
 # symlinks to this folder/item
 db_multirow symlinks get_symlinks ""
 
-form create add_item
+# build folder contents list
 
-if { [template::util::is_nil id] } {
-    set the_id $root_id
+if { [template::util::is_nil item_id] } {
+    set folder_id $root_id
+    set parent_id $root_id
 } else {
-    set the_id $id
+    set folder_id $item_id
+    set parent_id $item_id
+}  
+
+template::list::create \
+    -name folder_items \
+    -multirow folder_contents \
+    -has_checkboxes \
+    -key item_id \
+    -actions [list "Attributes" [export_vars -base attributes?mount_point=sitemap {folder_id}] "Folder Attributes" \
+		  "Delete Folder" [export_vars -base delete?mount_point=sitemap {item_id}] "Delete this folder" \
+		  "Rename Folder" [export_vars -base rename?mount_point=sitemap {item_id}] "Rename this folder" \
+		  "New Folder" [export_vars -base create?mount_point=sitemap {parent_id}] "Create a new folder within this folder" \
+		  "Move Items" [export_vars -base move?mount_point=sitemap {item_id}] "Move marked items to this folder" \
+		  "Copy Items" [export_vars -base copy?mount_point=sitemap {item_id}] "Copy marked items to this folder" \
+		  "Link Items" [export_vars -base symlink?mount_point=sitemap {item_id}] "Link marked items to this folder" \
+		  "Delete Items" [export_vars -base delete-items?mount_point=sitemap {item_id}] "Delete marked items"] \
+    -elements {
+	copy {
+	    label "Clipboard"
+	    display_template "<center>@folder_contents.copy;noquote@</center>"
+	}
+	title {
+	    label "Name"
+	    link_html { title "View this item"}
+	    link_url_col item_url
+	}
+	file_size {
+	    label "Size"
+	}
+	publish_date {
+	    label "Publish Date"
+	}
+	content_type {
+	    label "Type"
+	}
+	last_modified_date {
+	    label "Last Modified"
+	}
+    }
+
+db_multirow -extend { item_url copy } folder_contents get_folder_contents "" {
+    if { $is_folder } {
+	set item_url [export_vars -base index?mount_point=sitemap { item_id parent_id }]
+    } else {
+	set item_url [export_vars -base ../items/index?mount_point=sitemap { item_id revision_id parent_id }]
+    }
+    set copy [clipboard::render_bookmark sitemap $item_id $package_url]
 }
 
-element create add_item id \
-	-datatype keyword -widget hidden -param -optional
+form create add_item
+
+if { [template::util::is_nil original_id] } {
+    set the_id $root_id
+} else {
+    set the_id $original_id
+}
+
+element create add_item item_id \
+	-datatype integer -widget hidden -param -optional
 
 element create add_item mount_point \
-	-datatype keyword -widget hidden -param -optional
+	-datatype string -widget hidden -param -optional
 
 set revision_types [cms_folder::get_registered_types $the_id]
 set num_revision_types [llength $revision_types]
@@ -231,13 +227,13 @@ element create add_item content_type \
 	-options $revision_types
 
 if { [form is_valid add_item] } {
-    form get_values add_item id mount_point content_type
+    form get_values add_item item_id mount_point content_type
 
     # if the folder_id is empty, then it must be the root folder
-    if { [template::util::is_nil id] } {
+    if { [template::util::is_nil item_id] } {
 	set folder_id [cm::modules::${mount_point}::getRootFolderID]
     } else {
-	set folder_id $id
+	set folder_id $item_id
     }
 
     if { [string equal $mount_point "templates"] } {

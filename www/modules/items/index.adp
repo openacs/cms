@@ -1,97 +1,147 @@
 <master src="../../master">
-<property name="title">Content Item</property>
+<property name="title">@page_title@</property>
 
-<include src="../sitemap/ancestors" item_id=@item_id;noquote@>
+<nobr><p class="h1">
+<include src="../../bookmark" mount_point="@mount_point@" id="@item_id@">
+@page_title;noquote@ 
+</p>
+</nobr>
+<p/>
 
-<p>
+&nbsp;&nbsp;&nbsp;
+<if @description@ not nil>@description;noquote@</if>
+<else>No description</else>
 
-<table cellpadding=1 cellspacing=0 border=0 width="100%">
-<tr bgcolor=#000000><td>
+<p/>
 
-<table cellpadding=0 cellspacing=0 border=0 width="100%">
-<tr bgcolor=#eeeeee><td>
+<include src="../sitemap/ancestors" item_id=@item_id@>
 
-<!-- Tabs begin -->
+<p/>
 
-<tabstrip id=item_props></tabstrip>
+<!-- Tabs -->
 
-</td></tr>
+<div id="subnavbar-div">
+  <div id="subnavbar-container">
+    <div id="subnavbar">
 
-<tr bgcolor=#FFFFFF><td align=center>
+ <if @item_props_tab@ eq editing>
+   <div class="tab" id="subnavbar-here">
+     Editing
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/items/index?item_id=@item_id@&mount_point=@mount_point@&item_props_tab=editing" title="" class="subnavbar-unselected">Editing</a>
+   </div>
+ </else>
 
-<!-- Tabs end -->
+ <if @item_props_tab@ eq children>
+   <div class="tab" id="subnavbar-here">
+     Children
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/items/index?item_id=@item_id@&mount_point=@mount_point@&item_props_tab=children" title="" class="subnavbar-unselected">Children</a>
+   </div>
+ </else>
 
-<br>
-<table cellspacing=0 cellpadding=0 border=0 width="95%">
+ <if @item_props_tab@ eq publishing>
+   <div class="tab" id="subnavbar-here">
+     Publishing
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/items/index?item_id=@item_id@&mount_point=@mount_point@&item_props_tab=publishing" title="" class="subnavbar-unselected">Publishing</a>
+   </div>
+ </else>
 
+ <if @item_props_tab@ eq permissions>
+   <div class="tab" id="subnavbar-here">
+     Permissions
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/items/index?item_id=@item_id@&mount_point=@mount_point@&item_props_tab=permissions" title="" class="subnavbar-unselected">Permissions</a>
+   </div>
+ </else>
 
-<if @item_props.tab@ eq editing>
-  <tr><td>
+  </div>
+ </div>
+</div>
+
+<div id="subnavbar-body">
+
+<if @item_props_tab@ eq editing>
+
+  <div id=section>
   <include src="attributes" revision_id="@info.latest_revision;noquote@">
+  </div>
   <p>
 
+  <div id=section>
   <include src="revisions" item_id="@item_id;noquote@" page="@page;noquote@">
+  </div>
   <p>
 
+  <div id=section>
   <include src="keywords" item_id="@item_id;noquote@" mount_point="@mount_point;noquote@">  
-  <p>
-  </td></tr>
+  </div>
+
 </if>
 
-<if @item_props.tab@ eq children>
-  <tr><td>
+<if @item_props_tab@ eq children>
+
+  <div id=section>
   <include src="children" item_id="@item_id;noquote@">
+  </div>
   <p>
 
+  <div id=section>
   <include src="related-items" item_id="@item_id;noquote@">
+  </div>
   <p>
-  </td></tr>
 
-  <tr><td valign=top><br><br>
-  <!-- DELETE MARKED ITEMS LINK -->
-  <img src="../../resources/Delete24.gif" width=24 hieght=24 border=0>
-  <a href="../sitemap/delete-items?id=@item_id@&@passthrough@">Delete</a>
-  marked items.
-  </td></tr>
 </if>
 
-<if @item_props.tab@ eq publishing>
-  <tr><td>
+<if @item_props_tab@ eq publishing>
 
+  <div id=section>
   <include src="publish-status" item_id="@item_id;noquote@">
+  </div>
   <p>
 
-
+  <div id=section>
   <include src="templates" item_id="@item_id;noquote@">
+  </div>
   <p>
+
 
   <if @user_permissions.cm_item_workflow@ eq t>
+    <div id=section>
     <include src="../workflow/case-status" item_id="@item_id;noquote@">
+    </div>
     <p>
   </if>
 
+  <div id=section>
   <include src="comments" item_id="@item_id;noquote@">
+  </div>
   <p>
-  </td></tr>
+
 </if>
 
-<if @item_props.tab@ eq permissions>
-  <tr><td>
+<if @item_props_tab@ eq permissions>
+  
+  <div id=section>
   <include src="../permissions/index" object_id="@item_id;noquote@" 
     mount_point="@mount_point;noquote@" return_url="@return_url;noquote@" passthrough="@passthrough;noquote@">
-  <p>
-  </td></tr>
+  </div>
+  <p/>
+
 </if>
-
-
-</table>
-
-<br>
-
-</td></tr>
-</table>
-
-</td></tr></table>
 
 <!-- Options at the end -->
 
@@ -108,5 +158,6 @@
   <p>
 </if>
 
+</div>
 
 <p>

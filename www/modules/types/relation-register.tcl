@@ -95,5 +95,5 @@ if { [form is_valid relation] } {
         }
     }    
 
-    template::forward "index?id=$content_type"
+    template::forward "index?id=$content_type&type_props_tab=relations"
 }

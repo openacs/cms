@@ -6,7 +6,7 @@ request set_param mount_point -datatype keyword -value sitemap
 
 
 # permissions check - renaming a folder requires cm_write on the folder
-content::check_access $item_id cm_write -user_id [User::getID] 
+content::check_access $item_id cm_write -user_id [auth::require_login] 
 
 
 # Create then form

@@ -24,7 +24,7 @@
 <fullquery name="get_path">      
       <querytext>
 
-      select content_item.get_path(:id) from dual
+      select content_item.get_path(:item_id) from dual
 
       </querytext>
 </fullquery>

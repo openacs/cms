@@ -1,5 +1,4 @@
-<master src="../../master">
-<property name="title">Clipboard</property>
+<link rel="stylesheet" type="text/css" href="/resources/acs-subsite/site-master.css" media="all">
 
 <script language=javascript>
 
@@ -12,6 +11,10 @@
 
 </script> 
 
+<br/>
+<strong>Clipboard</strong> <a href="javascript:window.close()">(close window)</a>
+<br/><br/>
+
 <div id="subnavbar-div">
   <div id="subnavbar-container">
     <div id="subnavbar">
@@ -23,7 +26,7 @@
  </if>
  <else>
    <div class="tab">
-     <a href="@package_url@modules/clipboard/index?mount_point=@mount_point@&clip_tab=main" title="" class="subnavbar-unselected">Main Menu</a>
+     <a href="@package_url@modules/clipboard/floating?mount_point=@mount_point@&clip_tab=main" title="" class="navbar-unselected">Main Menu</a>
    </div>
  </else>
 
@@ -34,7 +37,7 @@
  </if>
  <else>
    <div class="tab">
-     <a href="@package_url@modules/clipboard/index?mount_point=@mount_point@&clip_tab=sitemap" title="" class="subnavbar-unselected">Content</a>
+     <a href="@package_url@modules/clipboard/floating?mount_point=@mount_point@&clip_tab=sitemap" title="" class="navbar-unselected">Content</a>
    </div>
  </else>
 
@@ -45,7 +48,7 @@
  </if>
  <else>
    <div class="tab">
-     <a href="@package_url@modules/clipboard/index?mount_point=@mount_point@&clip_tab=templates" title="" class="subnavbar-unselected">Templates</a>
+     <a href="@package_url@modules/clipboard/floating?mount_point=@mount_point@&clip_tab=templates" title="" class="navbar-unselected">Templates</a>
    </div>
  </else>
 
@@ -56,7 +59,7 @@
  </if>
  <else>
    <div class="tab">
-     <a href="@package_url@modules/clipboard/index?mount_point=@mount_point@&clip_tab=types" title="" class="subnavbar-unselected">Types</a>
+     <a href="@package_url@modules/clipboard/floating?mount_point=@mount_point@&clip_tab=types" title="" class="navbar-unselected">Types</a>
    </div>
  </else>
 
@@ -67,7 +70,7 @@
  </if>
  <else>
    <div class="tab">
-     <a href="@package_url@modules/clipboard/index?mount_point=@mount_point@&clip_tab=search" title="" class="subnavbar-unselected">Search</a>
+     <a href="@package_url@modules/clipboard/floating?mount_point=@mount_point@&clip_tab=search" title="" class="navbar-unselected">Search</a>
    </div>
  </else>
 
@@ -78,7 +81,7 @@
  </if>
  <else>
    <div class="tab">
-     <a href="@package_url@modules/clipboard/index?mount_point=@mount_point@&clip_tab=keywords" title="" class="subnavbar-unselected">Keywords</a>
+     <a href="@package_url@modules/clipboard/floating?mount_point=@mount_point@&clip_tab=keywords" title="" class="navbar-unselected">Keywords</a>
    </div>
  </else>
 
@@ -89,7 +92,7 @@
  </if>
  <else>
    <div class="tab">
-     <a href="@package_url@modules/clipboard/index?mount_point=@mount_point@&clip_tab=users" title="" class="subnavbar-unselected">Users</a>
+     <a href="@package_url@modules/clipboard/floating?mount_point=@mount_point@&clip_tab=users" title="" class="navbar-unselected">Users</a>
    </div>
  </else>
 
@@ -106,13 +109,13 @@
     the mount points on the left to view a list of clipped items for the
     mount point.</p>
 
-    <p><a href="clear-clipboard">Clear the clipboard</a></p>
+    <p><a href="clear-clipboard?float_p=1">Clear the clipboard</a></p>
  
   </if>
   <else>
     There are no items on the clipboard.
   </else>
-
+  
 </if>
 <else>
 

@@ -6,7 +6,7 @@
 <fullquery name="delete_folder">      
       <querytext>
 
-        select content_folder__delete(:id)
+        select content_folder__delete(:item_id)
 
       </querytext>
 </fullquery>
@@ -15,7 +15,7 @@
 <fullquery name="check_empty">      
       <querytext>
       
-  select content_folder__is_empty(:id) 
+  select content_folder__is_empty(:item_id) 
 
       </querytext>
 </fullquery>

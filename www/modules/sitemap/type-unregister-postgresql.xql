@@ -9,7 +9,7 @@
 
         select content_folder__unregister_content_type(
                :folder_id,
-               :type_key,
+               :type,
                'f' 
            );
         

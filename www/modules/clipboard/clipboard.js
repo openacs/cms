@@ -113,11 +113,11 @@ function markx(root_url, mnt, id, checked, unchecked, floatclipboard_p) {
     }
   }
 
-  if (floatclipboard_p) {
+//  if (floatclipboard_p != 1) {
     // this last call open or refresh the floating clipboard
-    var clipboardWin=window.open(root_url + 'modules/clipboard/index?id=' + mnt + '&mount_point=clipboard','clipboardFrame', 'toolbar=no,dependent=yes,innerWidth=500,innerHeight=300,scrollbars=yes');
+//    var clipboardWin=window.open(root_url + 'modules/clipboard/floating?id=' + mnt + '&mount_point=clipboard','clipboardFrame', 'toolbar=no,dependent=yes,innerWidth=500,innerHeight=300,scrollbars=yes');
 
-  }
+//  }
 
 }
 

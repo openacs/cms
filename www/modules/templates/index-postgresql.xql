@@ -24,7 +24,7 @@
 <fullquery name="get_path">      
       <querytext>
 
-        select content_item__get_path(:id, null)
+        select content_item__get_path(:item_id, null)
 
       </querytext>
 </fullquery>
@@ -33,7 +33,7 @@
       <querytext>
 
   select
-    t.template_id, i.name, 
+    t.template_id, t.template_id as item_id, i.name, 
     to_char(o.last_modified, 'MM/DD/YY HH:MI AM') as modified,
     coalesce(round(r.content_length::numeric / 1000,2), 0)::float8::text || ' KB'::text as file_size
   from
@@ -42,7 +42,7 @@
       RIGHT OUTER JOIN 
     cr_items i ON i.latest_revision = r.revision_id
   where
-    i.parent_id = :id
+    i.parent_id = :item_id
   and
     i.item_id = t.template_id
   and
@@ -53,5 +53,19 @@
       </querytext>
 </fullquery>
 
+<fullquery name="get_info">      
+      <querytext>
+      
+    select
+      parent_id, coalesce(label, name) as label, description
+    from
+      cr_items i, cr_folders f
+    where
+      i.item_id = f.folder_id
+    and
+      f.folder_id = :item_id
+  
+      </querytext>
+</fullquery>
 
 </queryset>

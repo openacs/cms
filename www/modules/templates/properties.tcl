@@ -1,14 +1,21 @@
-request create -params {
-  id -datatype integer
-  path -datatype text
-  tab -datatype keyword -value revisions
+ad_page_contract {
+    List the contents of a folder under in the template repository
+    Either a path or a folder ID may be passed to the page.
+
+    @author Michael Steigman
+    @creation-date October 2004
+} {
+    { item_id:integer ""}
+    { path:optional "" }
+    { mount_point "templates"}
+    { template_props_tab:optional "revisions"}
 }
 
 if { ! [string equal $path {}] } {
 
-    set id [db_string get_id ""]
+    set item_id [db_string get_id ""]
 
-    if { [string equal $id {}] } {
+    if { [string equal $item_id {}] } {
 
         set msg "The requested folder <tt>$path</tt> does not exist."
         request error invalid_path $msg
@@ -16,7 +23,7 @@ if { ! [string equal $path {}] } {
 
 } else {
 
-  if { [string equal $id {}] } {
+  if { [string equal $item_id {}] } {
       set id [db_string get_root_id ""]
   }
 
@@ -28,15 +35,15 @@ if { ! [string equal $path {}] } {
 set type [db_string get_type ""]
 
 if { [string equal $type content_folder] } {
-  template::forward index?id=$id
+  template::forward index?id=$item_id
 }
 
-multirow create tabs label name
-multirow append tabs General general
-multirow append tabs History revisions
-multirow append tabs {Data Sources} datasources
-multirow append tabs Assets assets
-multirow append tabs {Content Types} types
-multirow append tabs {Content Items} items
+set package_url [ad_conn package_url]
 
-set tab_count [expr ${tabs:rowcount} * 2]
+# query the content_type of the item ID so we can check for a custom info page
+db_1row get_info "" -column_array info
+template::util::array_to_vars info
+
+set item_title [db_string get_item_title ""]
+set page_title "Content Template - $item_title"
+

@@ -1,33 +1,121 @@
-<html>
-  <style>
+<master>
 
-     .blue { background-color: #99CCFF }
-     .large { font-size: large }
+<style>
+div#section {
+  border: 1px dotted;
+  padding: 10px;
+}
 
-     body { 
-       font-family: Helvetica,sans-serif;
-       background-color: white
-     }
-     td { 
-       font-family: Helvetica,sans-serif;
-     }
-     th { 
-       font-family: Helvetica,sans-serif;
-       text-align: left;
-     }
-
-     A:link, A:visited, A:active { text-decoration: none }
-
-  </style>
-  <head>
-    <META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
-    <title>@title@</title>
-  </head>
-<body>
+div#section-header {
+  background-color: silver;
+  color: white;
+  font: bold;
+}
+</style>
 
 <script language=Javascript src="@clipboard_js@"></script>
 
+<p/>
+
+<div id="subnavbar-div">
+  <div id="subnavbar-container">
+    <div id="subnavbar">
+
+ <if @section@ eq "workspace">
+  <div class="tab" id="subnavbar-here">
+    Workspace
+  </div>
+ </if>
+ <else>
+  <div class="tab">
+    <a href="@package_url@modules/workspace/index" title="">Workspace</a>
+  </div>
+ </else>
+        
+ <if @section@ eq "sitemap">
+  <div class="tab" id="subnavbar-here">
+    Content
+  </div>
+ </if>
+ <else>
+  <div class="tab">
+    <a href="@package_url@modules/sitemap/index" title="">Content</a>
+  </div>
+ </else>
+
+ <if @section@ eq "templates">
+    <div class="tab" id="subnavbar-here">
+    Templates
+  </div>
+ </if>
+ <else>
+  <div class="tab">
+    <a href="@package_url@modules/templates/index" title="">Templates</a>
+  </div>
+ </else>
+
+ <if @section@ eq "types">
+  <div class="tab" id="subnavbar-here">
+    Types
+  </div>
+ </if>
+ <else>
+  <div class="tab">
+    <a href="@package_url@modules/types/index" title="">Types</a>
+  </div>
+ </else>
+
+ <if @section@ eq "search">
+  <div class="tab" id="subnavbar-here">
+    Search
+  </div>
+ </if>
+ <else>
+  <div class="tab">
+    <a href="@package_url@modules/search/index" title="">Search</a>
+  </div>
+ </else>
+
+ <if @section@ eq "workflow">
+  <div class="tab" id="subnavbar-here">
+    Workflow
+  </div>
+ </if>
+ <else>
+  <div class="tab">
+    <a href="@package_url@modules/workflow/index" title="">Workflow</a>
+  </div>
+ </else>
+
+ <if @section@ eq "users">
+  <div class="tab" id="subnavbar-here">
+    Users
+  </div>
+ </if>
+ <else>
+  <div class="tab">
+    <a href="@package_url@modules/users/index" title="">Users</a>
+  </div>
+ </else>
+
+ <if @section@ eq "clipboard">
+  <div class="tab" id="subnavbar-here">
+    Clipboard
+  </div>
+ </if>
+ <else>
+  <div class="tab">
+    <a href="@package_url@modules/clipboard/index" title="">Clipboard</a>
+    [<a href="javascript:open('@package_url@modules/clipboard/floating?mount_point=clipboard','clipboard', 'toolbar=no,innerWidth=500,innerHeight=300,scrollbars=yes')" title="Open floating clipboard">float</a>]
+  </div>
+ </else>
+
+   </div>
+ </div>
+</div>
+
+<div id="subnavbar-body">
+
 <slave>
 
-</body>
-</html>
+</div>

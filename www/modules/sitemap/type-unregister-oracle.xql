@@ -9,7 +9,7 @@
          begin
            content_folder.unregister_content_type(
                folder_id        => :folder_id,
-               content_type     => :type_key,
+               content_type     => :type,
                include_subtypes => 'f' 
            );
          end;

@@ -7,7 +7,7 @@
       <querytext>
 
 
-        select content_item__unrelate (:rel_id )
+        select content_item__unrelate (:rel )
   
       </querytext>
 </fullquery>

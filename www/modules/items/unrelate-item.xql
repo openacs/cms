@@ -11,7 +11,7 @@
 <fullquery name="get_item_id">      
       <querytext>
       
-  select item_id from cr_item_rels where rel_id = :rel_id
+  select item_id from cr_item_rels where rel_id = :rel
       </querytext>
 </fullquery>
 

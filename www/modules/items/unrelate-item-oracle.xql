@@ -8,7 +8,7 @@
       
   begin
   content_item.unrelate ( 
-      rel_id => :rel_id 
+      rel_id => :rel 
   );
   end;
       </querytext>

@@ -6,9 +6,6 @@ template::request create -params {
   mount_point -datatype keyword -optional -value sitemap
 }
 
-# pagination vars
-template::request set_param page -datatype integer -value 1
-
 # Check permissions
 content::check_access $item_id cm_examine \
   -mount_point $mount_point \
@@ -18,27 +15,46 @@ content::check_access $item_id cm_examine \
 # add content html
 set content_type [db_string get_content_type ""]
 
-
 # get item info
 db_1row get_iteminfo ""
 
-# get all revisions
-db_multirow revisions get_revisions [pagination::paginate_query "
-  select 
-    revision_id, 
-    trim(title) as title, 
-    trim(description) as description,
-    content_revision.get_number(revision_id) as revision_number
-  from 
-    cr_revisions r
-  where 
-    r.item_id = :item_id
-  order by
-    revision_number desc" $page]
+template::list::create \
+    -name revisions \
+    -multirow revisions \
+    -actions [list "Add revision via File Upload" \
+		  [export_vars -base revision-add-2?content_method=file_upload {item_id content_type}] \
+		  "Add revision via File Upload" \
+		  "via Text Entry" \
+    		  [export_vars -base revision-add-2?content_method=text_entry {item_id content_type}] \
+		  "Add revision via Text Entry" \
+		  "via No Content" \
+		  [export_vars -base revision-add-2?content_method=no_content {item_id content_type}] \
+		  "Add revision without content" \
+		  "via XML Import" \
+    		  [export_vars -base revision-add-2?content_method=xml_import {item_id content_type}] \
+		  "Add revision via XML Import"] \
+    -elements {
+	revision_number {
+	    label "\#"
+	}
+	title {
+	    label "Title"
+	}
+	description {
+	    label "Description"
+	}
+	pretty_date {
+	    label "Date"
+	}
+	view {
+	    display_template "<a href=\"@revisions.revision_id_url;noquote@\" title=\"View revision\">view</a>"
+	}
+    }    
 
-
-set sql [db_map get_revisions]
-
-set total_pages [pagination::get_total_pages $sql]
-
-set pagination_html [pagination::page_number_links $page $total_pages]
+db_multirow -extend { pretty_date revision_id_url view } revisions get_revisions "" {
+    if {[template::util::is_nil $description]} {
+	set description "-"
+    }
+    set pretty_date [lc_time_fmt $publish_date "%Q %X"]
+    set revision_id_url "revision?revision_id=$revision_id"
+}
