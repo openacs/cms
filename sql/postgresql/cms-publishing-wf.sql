@@ -61,15 +61,22 @@ begin
 
     perform workflow__add_role(
         ''publishing_wf'',
-        ''author'',
-        ''Author'',
+        ''approval'',
+        ''Approval'',
+        2
+    );
+
+    perform workflow__add_role(
+        ''publishing_wf'',
+        ''authoring'',
+        ''Authoring'',
         1
     );
 
     perform workflow__add_role(
         ''publishing_wf'',
-        ''editor'',
-        ''Editor'',
+        ''editing'',
+        ''Editing'',
         2
     );
     /*****
@@ -80,7 +87,7 @@ begin
             ''publishing_wf'',
             ''authoring'',
             ''Authoring'',
-            ''author'',
+            ''authoring'',
             1,
             ''user''
             );
@@ -89,7 +96,7 @@ begin
             ''publishing_wf'',
             ''editing'',
             ''Editing'',
-            ''editor'',
+            ''editing'',
             2,
             ''user''
             );
@@ -98,7 +105,7 @@ begin
             ''publishing_wf'',
             ''approval'',
             ''Approval'',
-            ''editor'',
+            ''approval'',
             3,
             ''user''
             );                                    

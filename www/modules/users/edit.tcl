@@ -31,7 +31,7 @@ element create edit_group url \
 
 if { [form is_request edit_group] } {
 
-    db_1row get_group ""
+    db_1row get_group_info "" -column_array info
 
   element set_properties edit_group group_name -value $info(group_name)
   element set_properties edit_group email -value $info(email)
