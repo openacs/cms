@@ -83,6 +83,8 @@
             <file type="query_file" path="tcl/content-add-procs.xql"/>
             <file type="tcl_procs" path="tcl/content-method-procs.tcl"/>
             <file type="query_file" path="tcl/content-method-procs.xql"/>
+            <file type="query_file" db_type="oracle" path="tcl/content-method-procs-oracle.xql"/>
+            <file type="query_file" db_type="postgresql" path="tcl/content-method-procs-postgresql.xql"/>
             <file type="query_file" db_type="oracle" path="tcl/form-procs-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="tcl/form-procs-postgresql.xql"/>
             <file type="tcl_procs" path="tcl/form-procs.tcl"/>
@@ -405,8 +407,12 @@
             <file type="tcl_util" path="www/modules/items/status-edit.tcl"/>
             <file type="query_file" path="www/modules/items/status-edit.xql"/>
             <file type="tcl_util" path="www/modules/items/symlink.tcl"/>
+            <file type="query_file" db_type="oracle" path="www/modules/items/symlink-oracle.xql"/>
+            <file type="query_file" db_type="postgresql" path="www/modules/items/symlink-postgresql.xql"/>
             <file type="tcl_util" path="www/modules/items/template-register.tcl"/>
             <file type="query_file" path="www/modules/items/template-register.xql"/>
+            <file type="query_file" db_type="oracle" path="www/modules/items/template-register-oracle.xql"/>
+            <file type="query_file" db_type="postgresql" path="www/modules/items/template-register-postgresql.xql"/>
             <file type="query_file" db_type="oracle" path="www/modules/items/template-unregister-oracle.xql"/>
             <file type="query_file" db_type="postgresql" path="www/modules/items/template-unregister-postgresql.xql"/>
             <file type="tcl_util" path="www/modules/items/template-unregister.tcl"/>
@@ -433,6 +439,8 @@
             <file path="www/modules/search/index.adp"/>
             <file type="tcl_util" path="www/modules/search/index.tcl"/>
             <file type="query_file" path="www/modules/search/index.xql"/>
+            <file type="query_file" db_type="oracle" path="www/modules/search/index-oracle.xql"/>
+            <file type="query_file" db_type="postgresql" path="www/modules/search/index-postgresql.xql"/>
             <file path="www/modules/search/search-results.adp"/>
             <file type="tcl_util" path="www/modules/search/search-results.tcl"/>
             <file type="query_file" path="www/modules/search/search-results.xql"/>
