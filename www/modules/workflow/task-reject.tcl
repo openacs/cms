@@ -9,9 +9,7 @@ request set_param return_url -datatype text -value "../workspace/index"
 set user_id [User::getID]
 
 # check that the task is still valid
-template::query get_status is_valid_task onevalue "
-  select content_workflow.can_reject( :task_id, :user_id ) from dual
-" 
+set is_valid_task [db_string get_status ""]
 
 if { [string equal $is_valid_task f] } {
     forward $return_url
@@ -20,53 +18,11 @@ if { [string equal $is_valid_task f] } {
 
 
 # Get the name of the item and of the task
-template::query get_task_info task_info onerow "
-  select
-    c.object_id, content_item.get_title(c.object_id) title, 
-    tr.transition_name
-  from
-    wf_tasks tk, wf_cases c,
-    wf_transitions tr
-  where
-    tk.task_id = :task_id
-  and
-    tk.transition_key = tr.transition_key
-  and
-    tk.workflow_key = tr.workflow_key
-  and
-    tk.workflow_key = 'publishing_wf'
-  and
-    tk.case_id = c.case_id
-  and
-    content_workflow.can_reject( tk.task_id, :user_id ) = 't'
-" 
+db_1row get_task_info "" -column_array task_info
 
 
 # get the places I can reject to
-template::query get_rejects reject_places multilist "
-  select
-    trans.transition_name, trans.transition_key
-  from
-    wf_places src, wf_places dest, wf_tasks t, wf_transitions trans
-  where
-    src.workflow_key = dest.workflow_key
-  and
-    src.workflow_key = 'publishing_wf'
-  and
-    src.workflow_key = trans.workflow_key
-  and
-    src.place_key = content_workflow.get_this_place( t.transition_key )
-  and
-    -- for the publishing_wf, past transitions have a lower sort order
-    dest.sort_order < src.sort_order
-  and
-    -- get the transition associated with that place
-    content_workflow.get_this_place( trans.transition_key ) = dest.place_key
-  and
-    t.task_id = :task_id
-  order by
-    dest.sort_order desc
-" 
+set reject_places [db_list_of_lists get_rejects ""]
 
 # Create the form
 
@@ -123,8 +79,7 @@ if { [template::form is_valid reject] } {
 
     db_transaction {
         # check that the task is still valid
-        template::query is_valid_task onevalue "
-             select content_workflow.can_reject( :task_id, :user_id ) from dual" 
+        set is_valid_task [db_string is_valid_task ""]
 
         if { [string equal $is_valid_task f] } {
             db_abort_transaction

@@ -86,13 +86,6 @@ ns_log Notice "preview_p = $preview_p"
 # an item cannot be previewed if it has no associated template
 if { [string equal $has_index_page t] } {
     set template_id [db_string get_template_id "" -default ""]
-    template::query get_template_id template_id onevalue "
-      select 
-        content_item.get_template( 
-          nvl( content_folder.get_index_page( :item_id ), 0), 'public' )
-      from
-        dual
-    " 
 }
 
 if { [string equal $template_id ""] } { 

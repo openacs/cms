@@ -35,22 +35,22 @@
       </querytext>
 </fullquery>
 
-<fullquery name="get_items">      
+<fullquery name="get_context">      
       <querytext>
 
 select
       t.tree_level, t.context_id, content_item__get_title(t.context_id) as title
     from (
       select 
-        context_id, level as tree_level
+        context_id, tree_level(tree_sortkey) as tree_level
       from 
-        acs_objects
+        acs_objects o1, (select tree_ancestor_keys(select tree_sorkey 
+                                                     from acs_objects 
+                                                     where object_id = :template_id) as tree_sortkey) parents
       where
         context_id <> 0
-      connect by
-        prior context_id = object_id
-      start with
-        object_id = :template_id
+      and 
+        o1.tree_sortkey = parents.tree_sortkey
       ) t, cr_items i
     where
       i.item_id = t.context_id

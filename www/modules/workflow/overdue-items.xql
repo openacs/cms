@@ -2,7 +2,7 @@
 
 <queryset>
 
-<fullquery name="get_transitoin_name">      
+<fullquery name="get_transition_name">      
       <querytext>
       
       select transition_name

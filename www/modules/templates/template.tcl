@@ -33,26 +33,7 @@ if { [string equal $path ""] } {
 
 
 # get the context bar info
-# FIXME: postgresql query needs to be fixed
-template::query get_context context multirow "select
-      t.tree_level, t.context_id, content_item.get_title(t.context_id) as title
-    from (
-      select 
-        context_id, level as tree_level
-      from 
-        acs_objects
-      where
-        context_id <> 0
-      connect by
-        prior context_id = object_id
-      start with
-        object_id = :template_id
-      ) t, cr_items i
-    where
-      i.item_id = t.context_id
-    order by
-      tree_level desc"
-
+db_multirow context get_context ""
 
 # find out which items this template is registered to
 db_multirow items get_items ""

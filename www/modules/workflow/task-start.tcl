@@ -8,9 +8,7 @@ request set_param return_url -datatype text -value "../workspace/index"
 set user_id [User::getID]
 
 # make sure the task hasn't expired yet
-template::query get_status is_valid_task onevalue "
-  select content_workflow.can_start( :task_id, :user_id ) from dual
-" 
+set is_valid_task [db_string get_status ""]
 
 # if the task is no longer valid, go to My Tasks page
 if { [string equal $is_valid_task f] } {
@@ -19,24 +17,7 @@ if { [string equal $is_valid_task f] } {
 
 
 # task info
-template::query get_task_info task_info onerow "
-  select
-    c.object_id, tr.transition_name,
-    content_item.get_title(c.object_id) title,
-    tk.holding_user as holding_user, 
-    to_char(tk.hold_timeout,'Mon. DD, YYYY') hold_timeout,
-    content_workflow.get_holding_user_name(tk.task_id) holding_user_name
-  from
-    wf_tasks tk,
-    wf_transitions tr,
-    wf_cases c
-  where
-    tk.task_id = :task_id
-  and
-    tk.transition_key = tr.transition_key
-  and
-    tk.case_id = c.case_id
-" 
+set task_info [db_1row get_task_info ""]
 
 set holding_user $task_info(holding_user)
 
@@ -114,8 +95,7 @@ if { [form is_valid task_start] } {
 
     db_transaction {
         # check that task has not expired, if it has display error msg
-        template::query get_status is_valid_task onevalue "
-      select content_workflow.can_start( :task_id, :user_id ) from dual" 
+        set is_valid_task [db_string get_status ""]
 
         if { [string equal $is_valid_task f] } {
             db_abort_transaction

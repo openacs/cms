@@ -11,9 +11,7 @@ request set_param return_url -datatype text -value "../workspace/index"
 set user_id [User::getID]
 
 # check that the task is still valid
-template::query get_status is_valid_task onevalue "
-  select content_workflow.can_approve( :task_id, :user_id ) from dual
-" 
+set is_valid_task [db_string get_status ""]
 
 if { [string equal $is_valid_task f] } {
     template::forward $return_url
@@ -21,27 +19,8 @@ if { [string equal $is_valid_task f] } {
 
 
 # Get the name of the item and of the task
-template::query get_task_info task_info onerow "
-  select
-    c.object_id, content_item.get_title(c.object_id) title, 
-    tr.transition_name
-  from
-    wf_tasks tk, wf_cases c,
-    wf_transitions tr
-  where
-    tk.task_id = :task_id
-  and
-    tk.transition_key = tr.transition_key
-  and
-    tk.workflow_key = tr.workflow_key
-  and
-    tk.workflow_key = 'publishing_wf'
-  and
-    c.case_id = tk.case_id
-  and
-    content_workflow.can_approve( tk.task_id, :user_id ) = 't'
-" 
 
+db_1row get_task_info ""
 
 
 form create task_finish -elements {
@@ -87,8 +66,7 @@ if { [template::form is_valid task_finish] } {
     set user_id [User::getID]
 
     db_transaction {
-        template::query get_status is_valid_task onevalue "
-             select content_workflow.can_approve( :task_id, :user_id ) from dual"
+        set is_valid_task [db_string get_status ""]
 
         if { [string equal $is_valid_task f] } {
             db_abort_transaction

@@ -83,5 +83,13 @@
       </querytext>
 </fullquery>
 
+<fullquery name="is_valid_task">      
+      <querytext>
+
+             select content_workflow.can_reject( :task_id, :user_id ) from dual
+
+      </querytext>
+</fullquery>
+
  
 </queryset>

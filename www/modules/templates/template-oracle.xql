@@ -35,7 +35,7 @@
       </querytext>
 </fullquery>
 
-<fullquery name="get_items">      
+<fullquery name="get_context">      
       <querytext>
 
 select

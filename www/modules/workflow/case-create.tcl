@@ -27,19 +27,11 @@ set users [db_list_of_lists get_users ""]
 
 set transition_list [list]
 
-template::query::iterate get_name_key  "
-  select 
-    transition_name, transition_key 
-  from 
-    wf_transitions
-  where 
-    workflow_key = 'publishing_wf' 
-  order by 
-    sort_order" {
+db_foreach get_name_key  "" {
 
-    form section case_create $row(transition_name)
+    form section case_create $transition_name
 
-    element create case_create ${row(transition_key)}_assign \
+    element create case_create ${transition_key}_assign \
 	    -datatype integer \
 	    -widget select \
 	    -options $users \
@@ -47,20 +39,20 @@ template::query::iterate get_name_key  "
  
     # Create an element to hold the old values, for later comparison
     if { [string equal $is_edit t] } {
-	element create case_create ${row(transition_key)}_assign_old \
+	element create case_create ${transition_key}_assign_old \
 		-datatype text \
 		-widget hidden \
 		-optional
     }
 
-    element create case_create ${row(transition_key)}_deadline \
+    element create case_create ${transition_key}_deadline \
 	    -datatype date \
 	    -widget date \
 	    -format "DD/MONTH/YYYY" -year_interval { 2000 2001 1 } \
 	    -label "Deadline" \
 	    -value [util::date today]
  
-    lappend transition_list $row(transition_key)
+    lappend transition_list $transition_key
 }
 
 
@@ -84,16 +76,8 @@ if { [form is_request case_create] } {
 	# Get existing case assignments
 	set case_id [element get_value case_create case_id]
  
-	template::query::iterate get_key_id "
-	  select 
-            transition_key, party_id
-	  from 
-            wf_case_assignments
-	  where 
-            workflow_key = 'publishing_wf'
-	  and
-            case_id = :case_id" {
-	    lappend case_values($row(transition_key)) $row(party_id)
+	db_foreach get_key_id "" {
+	    lappend case_values($transition_key) $party_id
 	}
 
 	foreach {transition_key party_id_list} [array get case_values] {
@@ -107,26 +91,14 @@ if { [form is_request case_create] } {
 
 	# Get existing deadlines
 
-	template::query::iterate get_key_deadline "
-	  select 
-            transition_key, 
-            to_char(deadline, 'YYYY MM DD HH24 MI SS') as deadline
-          from 
-            wf_case_deadlines
-          where 
-            workflow_key = 'publishing_wf'
-          and 
-            case_id = :case_id" { 
+	db_foreach get_key_deadline "" { 
 	    element set_properties case_create \
-		    "${row(transition_key)}_deadline" \
-		    -value [util::date acquire sql_date $row(deadline)]
+		    "${transition_key}_deadline" \
+		    -value [util::date acquire sql_date $deadline]
 	}
 
     } else {
-	template::query get_case_id case_id onevalue "
-          select acs_object_id_seq.nextval from dual
-	"
-
+        set case_id [db_string get_case_id ""]
 	element set_properties case_create case_id -value $case_id
     }
 }
