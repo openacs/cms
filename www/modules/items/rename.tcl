@@ -9,14 +9,7 @@ request set_param mount_point -datatype keyword -value sitemap
 # permissions check - cm_write required to rename an item
 content::check_access $item_id cm_write -user_id [User::getID]
 
-template::query get_item_name item_name onevalue "
-  select 
-    name
-  from 
-    cr_items
-  where 
-    item_id = :item_id
-"
+set item_name [db_string get_item_name ""]
 
 set page_title "Rename $item_name"
 
@@ -57,13 +50,7 @@ if { [form is_valid rename_item] } {
     ); 
     end;"
 
-      template::query get_parent_id parent_id onevalue "
-    select
-      parent_id
-    from
-      cr_items
-    where
-      item_id = :item_id" 
+      set parent_id [db_string get_parent_id ""]
   }
 
   # flush cache

@@ -16,30 +16,14 @@ content::check_access $item_id cm_examine \
   -request_error
 
 # add content html
-template::query get_content_type content_type onevalue "
-  select
-    content_item.get_content_type( :item_id )
-  from
-    dual
-" 
+set content_type [db_string get_content_type ""]
 
 
 # get item info
-
-template::query get_iteminfo iteminfo onerow "
-  select 
-    item_id, name, locale, live_revision, publish_status,
-    content_item.is_publishable(item_id) as is_publishable
-  from 
-    cr_items
-  where 
-    item_id = :item_id"
-template::util::array_to_vars iteminfo
-
+db_1row get_iteminfo ""
 
 # get all revisions
-
-template::query get_revisions revisions multirow [pagination::paginate_query "
+db_multirow revisions get_revisions [pagination::paginate_query "
   select 
     revision_id, 
     trim(title) as title, 

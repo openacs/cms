@@ -8,29 +8,7 @@ request create -params {
 # flag indicating this is the live revision
 set live_revision_p 0
 
-
-template::query get_revision one_revision onerow "
-  select 
-    revision_id, title, description, item_id, mime_type, 
-    content_revision.get_number( revision_id ) revision_number,
-    (
-     select 
-       label 
-     from 
-       cr_mime_types 
-     where 
-       mime_type = cr_revisions.mime_type
-    ) mime_type_pretty,
-    to_char(publish_date,'Month DD, YYYY') as publish_date_pretty,
-    content_length as content_size
-  from 
-    cr_revisions
-  where 
-    revision_id = :revision_id
-"
-
-template::util::array_to_vars one_revision
-
+db_1row get_revision_one "" 
 
 # Check permissions - must have cm_examine on the item
 content::check_access $item_id cm_examine \
@@ -48,15 +26,10 @@ if { [template::util::is_nil item_id] } {
 
 
 # check if the item is publishable (but does not need live revision)
-template::query get_status is_publishable onevalue "
-  select content_item.is_publishable( :item_id ) from dual
-"
-
+set is_publishable [db_string get_status ""]
 
 # get total number of revision for this item
-template::query get_count revision_count onevalue "
-  select count(*) from cr_revisions where item_id = :item_id
-"
+set revision_count [db_string get_count ""]
 
 set valid_revision_p "t"
 
@@ -65,14 +38,7 @@ set is_text_mime_type f
 set is_image_mime_type f
 if { [regexp {text/} $mime_type] } {
     set is_text_mime_type t
-    template::query get_content content onevalue "
-      select 
-        blob_to_string(content)
-      from
-        cr_revisions
-      where
-        revision_id = :revision_id
-    " 
+    set content [db_string get_content ""]
   
     ns_log notice $content
 
@@ -87,25 +53,7 @@ if { [regexp {text/} $mime_type] } {
 
 
 # get item info
-template::query get_one_item one_content_item onerow "
-  select 
-    name, locale, live_revision as live_revision_id,
-    (
-      select 
-        pretty_name
-      from 
-        acs_object_types
-      where 
-        object_type = cr_items.content_type
-    ) content_type,
-    content_item.get_path(item_id) as path
-  from 
-    cr_items
-  where 
-    item_id = :item_id
-" 
-
-template::util::array_to_vars one_content_item
+db_1row get_one_item ""
     
 if { $live_revision_id == $revision_id } {
   set live_revision_p 1
@@ -120,36 +68,7 @@ if { $live_revision_id == $revision_id } {
 # if column_name is null, then use the attribute_name
 # if id_column is null, then use 'attribute_id' and 'acs_attribute_values'
 
-template::query get_meta_attrs meta_attributes multilist "
-  select 
-    attribute_id, pretty_name, 
-    (select pretty_name from acs_object_types
-     where object_type = attr.object_type) object_type,
-    nvl(column_name,attribute_name) attribute_name,  
-    nvl(attr.table_name,o.table_name) table_name,
-    nvl(o.id_column,'object_id') id_column
-  from
-    acs_attributes attr, 
-    (select 
-       object_type, table_name, id_column 
-     from
-       acs_object_types
-     where 
-       object_type not in ('acs_object','content_revision')
-     connect by
-       prior supertype = object_type
-     start with
-       object_type = (select 
-                        object_type 
-                      from 
-                        acs_objects
-                      where
-                        object_id = :revision_id) ) o
-  where
-    o.object_type = attr.object_type
-  order by
-    attr.object_type, attr.sort_order
-" 
+set meta_attributes [db_list_of_lists get_meta_attrs ""]
 
 set attr_columns [list]
 set attr_tables [list]
@@ -193,14 +112,7 @@ foreach meta $meta_attributes {
 
 if { ![string equal $attr_columns ""] } {
 
-    template::query get_attr_values attribute_values multilist "
-      select 
-        [join $attr_columns ", "]
-      from
-        [join $attr_tables ", "]
-      where
-        [join $column_id_cons " and "]"
-
+    set attribute_values [db_list_of_lists get_attr_values ""]
 
     # write the body of the attribute display table to $revision_attr_html
     set revision_attr_html ""

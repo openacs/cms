@@ -26,15 +26,7 @@ if { [template::util::is_nil item_id] } {
 	template::forward "../sitemap/index"
     }
 
-    template::query get_new_item new_item onerow "
-      select 
-        NVL(content_item.get_path(:parent_id), '/') as item_path,
-        pretty_name as content_type_name
-      from
-        acs_object_types
-      where
-        object_type = :content_type
-    " 
+    db_0or1row get_new_item "" -column_array new_item
 
     if { [template::util::is_nil new_item] } {
 	ns_log Notice "revision-upload.tcl - ERROR: BAD PARENT_ID OR CONTENT_TYPE - $parent_id, $content_type"
@@ -76,9 +68,8 @@ element create upload xml_file \
 
 
 if { [form is_request upload] } { 
- 
-  template::query get_revision_id revision_id onevalue "select acs_object_id_seq.nextval from dual"
-  element set_properties upload revision_id -value $revision_id
+    set revision_id [db_string get_revision_id ""]
+    element set_properties upload revision_id -value $revision_id
 }
 
 

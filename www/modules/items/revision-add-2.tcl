@@ -8,16 +8,7 @@ request set_param content_method -datatype keyword -value no_content
 content::check_access $item_id cm_write -user_id [User::getID]
 
 # get content_type and name of item
-template::query get_one_item one_item onerow "
-  select 
-    content_type, name
-  from
-    cr_items
-  where
-   item_id = :item_id
-"
-
-template::util::array_to_vars one_item
+db_0or1row get_one_item ""
 
 # validate item_id
 if { [template::util::is_nil content_type] } {

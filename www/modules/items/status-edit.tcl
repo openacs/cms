@@ -16,16 +16,14 @@ element create publish_status is_live \
 
 if { [form is_request publish_status] } {
 
-  # Determine whether the item has a live revision
-  template::query get_live_rewision live_revision onevalue "
-    select live_revision from cr_items where item_id = :item_id
-  "
+    # Determine whether the item has a live revision
+    set live_revision [db_string get_live_revision ""]
 
-  if { [template::util::is_nil live_revision] } {
-    element set_value publish_status is_live f
-  } else {
-    element set_value publish_status is_live t
-  }
+    if { [template::util::is_nil live_revision] } {
+        element set_value publish_status is_live f
+    } else {
+        element set_value publish_status is_live t
+    }
 }
 
 
@@ -37,8 +35,7 @@ if { [form is_request publish_status] } {
 # always show production
 set options [list [list "Production" production]]
 
-template::query check_status is_publishable onevalue "
-  select content_item.is_publishable( :item_id ) from dual"
+set is_publishable [db_string check_status ""]
 
 set is_live [element get_value publish_status is_live] 
 
@@ -48,8 +45,7 @@ set is_live [element get_value publish_status is_live]
   lappend options [list "Ready" ready] [list "Live (publishes the item)" live]
 #}
 
-template::query check_published is_published onevalue "
-  select content_item.is_published( :item_id ) from dual"
+set is_published [db_string check_published ""]
 
 # show "Expired" only if the item is currently published
 if { [string equal $is_published t] } {
@@ -91,18 +87,7 @@ element create publish_status end_when \
 if { [form is_request publish_status] } {
 
   # Get the current status
-
-  template::query get_info info onerow "
-    select
-      NVL(publish_status, 'production') as publish_status,
-      to_char(NVL(start_when, sysdate), 'YYYY MM DD HH24 MI SS') start_when,
-      to_char(NVL(end_when, sysdate + 365), 'YYYY MM DD HH24 MI SS') end_when
-    from
-      cr_items i, cr_release_periods r
-    where
-      i.item_id = :item_id
-    and
-      i.item_id = r.item_id (+)"
+  db_1row get_info "" -column_array info
 
   form set_values publish_status info
 }

@@ -10,10 +10,7 @@ db_transaction {
 
     # check to make sure that no template is already registered
     #   to this item in this context
-    template::query second_template_p second_template_p onevalue "
-  select count(1) from cr_item_template_map
-    where use_context = :context
-    and item_id = :item_id"
+    set second_template_p [db_string second_template_p ""]
 
     if { $second_template_p == 0 } {
         if { [catch { db_exec_plsql register_template_to_item "begin content_item.register_template(

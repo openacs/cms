@@ -8,10 +8,9 @@ request set_param passthrough -datatype text -value [content::assemble_passthrou
 
 db_transaction {
     # Get the item_id; determine if the relationship exists
-    template::query get_item_id item_id onevalue "
-  select item_id from cr_item_rels where rel_id = :rel_id" 
+    set item_id [db_string get_item_id "" -default ""]
 
-    if { [template::util::is_nil item_id] } {
+    if { [string equal $item_id ""] } {
         db_abort_transaction
         request::error no_such_rel "The relationship $rel_id does not exist."
         return

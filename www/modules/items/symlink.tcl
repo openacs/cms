@@ -1,11 +1,7 @@
 	# if the item is or is linked to a content_folder, then 
 	#   use the sitemap module to browse the folder
-	set sql "select parent_id, 
-                 content_folder.is_folder(item_id) as folder_p
-                 from cr_items
-                 where item_id = :resolved_id"
 
-	query folder_check onerow $sql
+        db_0or1row do_folder_check "" -column_array folder_check
 
 	if { [info exists folder_check] } {
 	    set folder_p $folder_check(folder_p)

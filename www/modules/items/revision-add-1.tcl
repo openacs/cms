@@ -8,13 +8,7 @@ request set_param item_id -datatype integer
 # check permissions
 content::check_access $item_id cm_write -user_id [User::getID]
 
-template::query get_content_type content_type onevalue "
-  select
-    content_item.get_content_type( :item_id )
-  from
-    dual
-" 
-
+set content_type [db_string get_content_type ""]
 
 # flush the sitemap folder listing cache in anticipation 
 # of the new item
@@ -27,15 +21,7 @@ if { [file exists [ns_url2file \
     template::forward "custom/$content_type/revision-add-1?item_id=$item_id"
 }
 
-
-template::query get_name name onevalue "
-  select
-    name
-  from
-    cr_items
-  where
-    item_id = :item_id"
-
+set name [db_string get_name ""]
 
 # if we have an invalid item_id, then throw error
 if { [template::util::is_nil name] } {
