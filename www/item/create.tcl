@@ -1,6 +1,6 @@
 # Create a new item and an initial revision for a content item (generic)
 
-form create create_item {
+form create create_item
 
 element create create_item item_id -datatype integer -widget hidden
 element create create_item revision_id -datatype integer -widget hidden
