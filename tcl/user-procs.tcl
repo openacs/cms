@@ -27,7 +27,7 @@ namespace eval User {
 
   # get the name of the current user.
 
-  proc getName { { which "full" } } {
+  ad_proc getName { { which "full" } } {
 
     switch $which {
 
@@ -37,14 +37,13 @@ namespace eval User {
     }
 
     set user_id [ad_util_get_cookie acs_user]
-    set query "select 
+
+    return [db_string gn_get_name "select 
         $col
       from 
         persons
       where
-        person_id = [getID]"
-
-    return [ad_dbquery onevalue $query]
+        person_id = [getID]"]
   }
 
 
@@ -52,9 +51,9 @@ namespace eval User {
 
   # a cms admin exists if a user has the 'cm_admin' privilege
   #   on the CMS pages root folder
-  proc cms_admin_exists {} {
+  ad_proc cms_admin_exists {} {
   
-    template::query admin_exists onevalue "
+    template::query cae_admin_exists admin_exists onevalue "
       select content_permission.cm_admin_exists from dual"
 
     if { [string equal $admin_exists t] } {

@@ -142,7 +142,6 @@ ad_proc content::perm_form_generate { form_name_in {passthrough "" } } {
   upvar perm_form_name form_name
   set form_name $form_name_in
 
-  # FIX ME
   set sql [db_map pfg_get_permission_boxes]
   upvar __sql sql
   
@@ -154,35 +153,7 @@ ad_proc content::perm_form_generate { form_name_in {passthrough "" } } {
     set permission_options [list]
     set permission_values  [list]
 
-    template::query permission_boxes multirow $__sql "
-      select 
-	t.child_privilege as privilege, 
-	lpad(' ', t.tree_level * 24, '&nbsp;') || 
-          NVL(p.pretty_name, t.child_privilege) as label,
-	cms_permission.permission_p(
-	 :object_id, :grantee_id, t.child_privilege
-	) as permission_p,
-        cms_permission.permission_p (
-	 :object_id, :grantee_id, t.privilege
-	) as parent_permission_p
-      from (
-	select privilege, child_privilege, level as tree_level
-	  from acs_privilege_hierarchy
-	  connect by privilege = prior child_privilege
-	  start with privilege = 'cm_root'
-	) t, acs_privileges p
-      where
-	p.privilege = t.child_privilege
-      and (
-	cms_permission.has_grant_authority (
-	  :object_id, :user_id, t.child_privilege
-	) = 't' 
-	or
-	cms_permission.has_revoke_authority (
-	  :object_id, :user_id, t.child_privilege, :grantee_id
-	) = 't' 
-      )
-    " -eval {
+    template::query pfg_execute_gpb permission_boxes multirow $__sql -eval {
       if { [string equal $row(parent_permission_p) f] } {
         lappend permission_options [list $row(label) $row(privilege)]
         if { [string equal $row(permission_p) t] && $is_request } {
@@ -225,7 +196,7 @@ ad_proc content::perm_form_process { form_name_in } {
 
   upvar perm_form_name form_name
   set form_name $form_name_in
-  # FIX ME
+
   set sql_grant [db_map pfp_grant_permission_1]
   set sql_revoke [db_map pfp_revoke_permission_1]
   upvar __sql_grant sql_grant
@@ -246,27 +217,10 @@ ad_proc content::perm_form_process { form_name_in } {
 	  foreach pair $permission_options {
 	      set privilege [lindex $pair 1]
 	      if { [lsearch $permission_values $privilege] >= 0 } {
-		  template::query pfp_grant_permission grant_permission dml $__sql_grant "
-                     begin 
-	               cms_permission.grant_permission (
-		         item_id => :object_id, 
-		         holder_id => :user_id,
-		         privilege => :privilege, 
-		         recepient_id => :grantee_id,
-                         is_recursive => :pf_is_recursive
-	               );
-	             end;"
+		  template::query pfp_grant_permission grant_permission dml $__sql_grant 
+
 	      } else {
-		  template::query pfp_revoke_permission revoke_permission dml $__sql_revoke"
-                     begin 
-     	               cms_permission.revoke_permission (
-		         item_id => :object_id, 
-		         holder_id => :user_id,
-		         privilege => :privilege, 
-		         revokee_id => :grantee_id,
-                         is_recursive => :pf_is_recursive
-	               );
-	             end;"
+		  template::query pfp_revoke_permission revoke_permission dml $__sql_revoke
 	      }
 	  }
 

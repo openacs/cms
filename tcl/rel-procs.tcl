@@ -16,35 +16,35 @@ namespace eval cms_rel {}
 
 # @param item_id The item for which to resort related items
 
-proc cms_rel::sort_related_item_order { item_id } {
+ad_proc cms_rel::sort_related_item_order { item_id } {
 
-    set db [template::begin_db_transaction]
+    db_transaction {
 
-    # grab all related items ordered by order_n, rel_id
-    template::query related_items onelist "
-      select
-        rel_id
-      from
-        cr_item_rels
-      where
-        item_id = :item_id
-      order by
-        order_n, rel_id
-    " -db $db
+	# grab all related items ordered by order_n, rel_id
+	template::query srio_get_related_items related_items onelist "
+            select
+              rel_id
+            from
+              cr_item_rels
+            where
+              item_id = :item_id
+            order by
+              order_n, rel_id
+        " 
 
-    # assign each related items a new order_n
-    set i 0
-    foreach rel_id $related_items {
+	# assign each related items a new order_n
+	set i 0
+	foreach rel_id $related_items {
 	
-	ns_ora dml $db "
-	  update cr_item_rels
-            set order_n = :i
-            where rel_id = :rel_id"
+	    db_dml "
+  	        update cr_item_rels
+                  set order_n = :i
+                  where rel_id = :rel_id"
 
-	incr i
-    }
+	    incr i
+	}
     
-    template::end_db_transaction
+    }
 }
 
 
@@ -59,33 +59,33 @@ proc cms_rel::sort_related_item_order { item_id } {
 
 # @param item_id The item for which to resort child items
 
-proc cms_rel::sort_child_item_order { item_id } {
+ad_proc cms_rel::sort_child_item_order { item_id } {
 
-    set db [template::begin_db_transaction]
+    db_transaction {
 
-    # grab all related items ordered by order_n, rel_id
-    template::query child_items onelist "
-      select
-        rel_id
-      from
-        cr_child_rels
-      where
-        parent_id = :item_id
-      order by
-        order_n, rel_id
-    " -db $db
+	# grab all related items ordered by order_n, rel_id
+	template::query scio_get_child_order child_items onelist "
+            select
+              rel_id
+            from
+              cr_child_rels
+            where
+              parent_id = :item_id
+            order by
+              order_n, rel_id
+        " 
 
-    # assign each related items a new order_n
-    set i 0
-    foreach rel_id $child_items {
+	# assign each related items a new order_n
+	set i 0
+	foreach rel_id $child_items {
 	
-	ns_ora dml $db "
-	  update cr_child_rels
-            set order_n = :i
-            where rel_id = :rel_id"
+	    db_dml "
+  	        update cr_child_rels
+                  set order_n = :i
+                  where rel_id = :rel_id"
 
-	incr i
-    }
+	    incr i
+	}
     
-    template::end_db_transaction
+    }
 }

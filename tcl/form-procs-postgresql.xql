@@ -167,13 +167,13 @@
 
 </partialquery>
 
-<partialquery name="db_map cont_new_item_def_params">
+<partialquery name="cont_new_item_def_params">
 	<querytext>
 	$defArray($param)
 	</querytext>
 </partialquery>
 
-<partialquery name="db_map cont_new_item_rel_tag">
+<partialquery name="cont_new_item_rel_tag">
 	<querytext>
 null
 	</querytext>
@@ -250,7 +250,7 @@ null
     select
       [join $args ","]
     from
-      acs_attributes RIGHT OUTER JOIN
+      acs_attributes,
       (
 	select 
 	  o2.object_type, tree_level(o2.tree_sortkey) as type_order
@@ -265,8 +265,10 @@ null
 	AND
 	  o1.tree_sortkey like (o2.tree_sortkey || '%')
 
-      ) types USING (object_type)
+      ) types
     where
+      object_type = ancestor
+    and
       attribute_name <> 'ldap dn'
     order by type_order desc, sort_order
 

@@ -10,13 +10,12 @@ namespace eval workflow {}
 
 # @author Michael Pih
 
-# @param db A database handle
 # @param case_id The publishing workflow
 # @param user_id The From: user when sending the email
 
-proc workflow::notify_of_assignments { case_id user_id } {
+ad_proc workflow::notify_of_assignments { case_id user_id } {
 
-    template::query assignments multilist "
+    template::query noa_get_assignments assignments multilist "
       select
         transition_name, party_id, 
         content_item.get_title(i.item_id) title,
@@ -61,7 +60,7 @@ Dear $name,
 This task is due on $deadline_pretty.
 "
 
-	ns_ora exec_plsql_bind $db "
+	db_exec_plsql "
 	  begin
 	  :request_id := nt.post_request(
 	      party_from   => :user_id,
@@ -71,7 +70,7 @@ This task is due on $deadline_pretty.
 	      message      => :message
 	  );
           end;
-        " request_id
+        " -bind request_id
     }
 
 }
@@ -85,13 +84,12 @@ This task is due on $deadline_pretty.
 
 # @author Michael Pih
 
-# @param db A database handle
 # @param case_id The workflow of an item
 # @param transition_key The name of the task
 
-proc workflow::notify_admin_of_new_tasks { db case_id transition_key } {
+ad_proc workflow::notify_admin_of_new_tasks { case_id transition_key } {
 
-    template::query assignments multilist "
+    template::query naont_get_assignments assignments multilist "
       select
         o.creation_user as admin_id, transition_name, party_id, 
         content_item.get_title(i.item_id) title,
@@ -123,7 +121,7 @@ proc workflow::notify_admin_of_new_tasks { db case_id transition_key } {
         c.object_id = i.item_id
       and
         c.case_id = o.object_id
-    " -db $db
+    " 
 
     foreach assignment $assignments {
 	set admin_id        [lindex $assignment 0]
@@ -142,7 +140,7 @@ Dear $admin_name,
 This task is due on $deadline_pretty.
 "
 
-	ns_ora exec_plsql_bind $db "
+	db_exec_plsql "
 	  begin
 	  request_id := nt.post_request(
 	      party_from   => -1,
@@ -152,7 +150,7 @@ This task is due on $deadline_pretty.
 	      message      => :message
 	  );
           end;
-        " request_id
+        " -bind request_id
     }
 
 }
@@ -165,19 +163,18 @@ This task is due on $deadline_pretty.
 
 # @author Michael Pih
 
-# @param db A database handle
 # @param task_id The task
 
-proc workflow::notify_admin_of_finished_task { task_id } {
+ad_proc workflow::notify_admin_of_finished_task { task_id } {
 
     # the user who finished the task
     set user_id [User::getID]
-    template::query name onevalue "
+    template::query naoft_get_name name onevalue "
       select person.name( :user_id ) from dual
     " 
 
     # get the task name, the creation_user, title, and date of the item
-    template::query task_info onerow "
+    template::query naoft_get_task_info task_info onerow "
       select
         transition_name, 
         content_item.get_title(i.item_id) as title,
@@ -210,7 +207,7 @@ proc workflow::notify_admin_of_finished_task { task_id } {
     set message "Dear $admin_name,
     $name has completed the task: $transition_name of $title on $today."
 
-    ns_ora exec_plsql_bind $db "
+    db_exec_plsql $db "
       begin
       :request_id := nt.post_request(
           party_from   => -1,
@@ -220,7 +217,7 @@ proc workflow::notify_admin_of_finished_task { task_id } {
 	  message      => :message
       );
       end;
-    " request_id
+    " -bind request_id
 }
 
 
@@ -232,7 +229,6 @@ proc workflow::notify_admin_of_finished_task { task_id } {
 
 # @author Michael Pih
 
-# @param db A database handle
 # @param item_id The item on which to check permissions
 # @param show_error t Flag indicating whether to display an error message
 #                     or return t
@@ -241,16 +237,16 @@ proc workflow::notify_admin_of_finished_task { task_id } {
 # then returns t if the current user has permission to access the item, f 
 # if not
 
-proc workflow::check_wf_permission { db item_id {show_error t}} {
+ad_proc workflow::check_wf_permission { item_id {show_error t}} {
 
     set user_id [User::getID]
 
-    template::query can_touch onevalue "
+    template::query cwp_touch_info can_touch onevalue "
       select
         content_workflow.can_touch( :item_id, :user_id )
       from
         dual
-    " -db $db
+    "
 
     if { [string equal $can_touch t] } {
 	return t

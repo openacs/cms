@@ -222,12 +222,14 @@ proc widget::create_values_param { form order default is_required param_source} 
 # @param content_type The content type to which the attribute belongs
 # @param attribute_name The name of the attribute
 
-proc widget::process_param { form order content_type attribute_name } {    
+ad_proc widget::process_param { form order content_type attribute_name } {    
     template::form get_values $form \
 	    param_$order param_type_$order \
 	    param_source_$order param_value_$order
  
-    set sql "
+    set sql 
+
+    db_dml pp_proces_param "
       begin
       cm_form_widget.set_attribute_param_value (
           content_type   => :content_type,
@@ -238,8 +240,6 @@ proc widget::process_param { form order content_type attribute_name } {
           value          => :param_value_$order
       );
       end;"
-
-    ns_ora dml $db $sql
 }
 
 

@@ -123,12 +123,12 @@ ad_proc item::get_id { url {root_folder ""}} {
   if { $last > 0 } {
     set url [string range $url 0 [expr $last - 1]]
   }
-  # FIX ME
-  set sql [db_map gi_get_item_id_1] "select content_item.get_id(:url"
+
+  set sql [db_map gi_get_item_id_1] 
   if { ![template::util::is_nil root_folder] } {
-      append sql [db_map gi_get_item_id_2] ", :root_folder"
+      append sql [db_map gi_get_item_id_2] 
   } 
-  append sql [db_map gi_get_item_id_3] ") from dual"
+  append sql [db_map gi_get_item_id_3] 
 
   # Get the path
   template::query gi_get_item_id item_id onevalue $sql -cache "item_id $url $root_folder" 
@@ -438,12 +438,12 @@ ad_proc item::get_revision_content { revision_id args } {
 
   # Get the mime type, decide if we want the text
   get_mime_info $revision_id
-  # FIX ME
+
   if { [string equal \
            [lindex [split $mime_info(mime_type) "/"] 0] "text"] } {
-      set text_sql [db_map grc_get_all_content_1] ",\n    content.blob_to_string(content) as text"
+      set text_sql [db_map grc_get_all_content_1]
   } else {
-    set text_sql ""
+      set text_sql ""
   }
  
   # Get the content type

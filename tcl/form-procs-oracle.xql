@@ -168,13 +168,13 @@
 	</querytext>
 </partialquery>
 
-<partialquery name="db_map cont_new_item_def_params">
+<partialquery name="cont_new_item_def_params">
 	<querytext>
 	$param => $defArray($param)
 	</querytext>
 </partialquery>
 
-<partialquery name="db_map cont_new_item_rel_tag">
+<partialquery name="cont_new_item_rel_tag">
 	<querytext>
 	relation_tag => :relation_tag
 	</querytext>

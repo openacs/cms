@@ -80,7 +80,7 @@ namespace eval cm {
     }
 
     namespace eval workspace {
-     #RBM: FIX ME: This has got to be a hack that was left over in the code!
+
      ad_proc getRootFolderID {} { return 0 } 
 
       ad_proc getChildFolders { id } {
@@ -158,17 +158,8 @@ namespace eval cm {
         set sql_id_list "'"
         append sql_id_list [join $id_list "','"]
         append sql_id_list "'"
-	#FIX ME
+
         set sql_query [db_map gsp_get_sorted_paths]
-	               "select 
-                         item_id, 
-                         content_item.get_path(item_id, :sorted_paths_root_id) as item_path,
-                         content_type as item_type
-                       from 
-                         cr_items
-                       where
-                         item_id in ($sql_id_list)
-                       order by item_path"
 
 	upvar sql_query __sql
         upvar sorted_paths_root_id _root_id
@@ -299,16 +290,8 @@ namespace eval cm {
         set sql_id_list "'"
         append sql_id_list [join $id_list "','"]
         append sql_id_list "'"
-	# FIX ME
-        set sql_query [db_map gsp_get_query] "
-          select 
-            keyword_id as item_id,
-            content_keyword.get_path(keyword_id) as item_path,
-            'content_keyword' as item_type
-          from
-            cr_keywords
-          where 
-            keyword_id in ($sql_id_list)"
+
+        set sql_query [db_map gsp_get_query]
 
 	upvar __sql sql_query
         uplevel "
@@ -362,20 +345,8 @@ namespace eval cm {
         set sql_id_list "'"
         append sql_id_list [join $id_list "','"]
         append sql_id_list "'"
-	# FIX ME
-        set sql_query [db_map gsp_get_sort_paths] "
-          select 
-            o.object_id as item_id,
-            o.object_type || ': ' || acs_object.name(o.object_id) as item_path,
-            o.object_type as item_type
-          from
-            acs_objects o, parties p
-          where
-            o.object_id = p.party_id
-          and
-            o.object_id in ($sql_id_list)
-          order by
-            item_path"
+
+        set sql_query [db_map gsp_get_sort_paths]
 
 	upvar __sql sql_query
         uplevel "template::query $name multirow \{$__sql\} -eval \{$eval_code\}"
