@@ -7,13 +7,7 @@ request set_param ext_passthrough -datatype text -optional -value $passthrough
 
 set user_id [User::getID]
 
-template::query get_info info onerow "
-  select 
-    acs_object.name(:object_id) as object_name, 
-    acs_object.name(:grantee_id) as grantee_name,
-    acs_permission.permission_p(:object_id, :user_id, 'cm_perm') as user_cm_perm
-  from
-    dual"
+db_1row get_info "" -column_array info
 
 if { [string equal $info(user_cm_perm) t] } {
 

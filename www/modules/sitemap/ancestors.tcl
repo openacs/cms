@@ -27,30 +27,7 @@ if { [template::util::is_nil item_id] } {
 
 # get the context bar info
 
-template::query get_context context multirow "
-  select
-    t.tree_level, t.parent_id, 
-    content_folder.is_folder(i.item_id) is_folder,
-    content_item.get_title(t.parent_id) as title
-  from 
-    cr_items i,
-    (
-      select 
-        parent_id, level as tree_level
-      from 
-        cr_items
-      where
-        parent_id ^= 0
-      connect by
-        prior parent_id = item_id
-      start with
-        item_id = :item_id
-    ) t
-  where
-    i.item_id = t.parent_id
-  order by
-    tree_level desc"
-
+db_multirow context get_context ""
 
 # pass in index_page_id to improve efficiency
 if { ![template::util::is_nil index_page_id] } {
@@ -64,24 +41,7 @@ if { ![template::util::is_nil index_page_id] } {
 
 # get the path of the item
 
-template::query get_preview_info preview_info onerow "
-  select
-    $index_page_sql 
-    -- does it have a template
-    content_item.get_template( item_id, 'public' ) template_id,
-    -- symlinks to this folder will have the path of this item
-    content_item.get_virtual_path( item_id, :root_id ) virtual_path,
-    content_item.get_path( 
-      content_symlink.resolve( item_id ), :root_id ) physical_path,
-    content_folder.is_folder( item_id ) is_folder,
-    live_revision
-  from
-    cr_items
-  where 
-    item_id = :item_id" 
-
-template::util::array_to_vars preview_info
-
+db_1row get_preview_info ""
 
 template::util::array_to_vars preview_info
 # physical_path, virtual_path, is_folder, has_index_page
@@ -125,6 +85,7 @@ if { [string equal $mount_point sitemap] } {
 ns_log Notice "preview_p = $preview_p"
 # an item cannot be previewed if it has no associated template
 if { [string equal $has_index_page t] } {
+    set template_id [db_string get_template_id "" -default ""]
     template::query get_template_id template_id onevalue "
       select 
         content_item.get_template( 
@@ -134,7 +95,7 @@ if { [string equal $has_index_page t] } {
     " 
 }
 
-if { [template::util::is_nil template_id] } { 
+if { [string equal $template_id ""] } { 
     set preview_p f
 }
 

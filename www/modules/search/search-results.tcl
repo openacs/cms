@@ -29,13 +29,9 @@ if { ![util::is_nil sql_query] } {
   set rows_per_page 10
 
   # Perform the query, get results
-  template::query get_results results multirow "
-    select * from ($sql_query) 
-    where row_index >= :start_row and row_index < (:start_row + :rows_per_page)
-    order by search_score desc, title
-  " -eval {
-    clipboard::get_bookmark_icon $clip $mount_point $row(item_id)
-    set row(offset) [expr $row(rownum) + $start_row - 1]
+  db_multirow -extend offset results get_results "" {
+    clipboard::get_bookmark_icon $clip $mount_point $item_id
+    set offset [expr $rownum + $start_row - 1]
   }
 
   # Prepare a multirow datasource for pages

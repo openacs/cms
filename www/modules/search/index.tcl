@@ -8,12 +8,7 @@ request set_param parent_id -datatype keyword -optional
 set content_types [cm::modules::types::getTypesTree]
 
 # Get a list of mime-types
-template::query get_mime_types mime_types multilist "
-  select
-    label, mime_type as value
-  from 
-    cr_mime_types
-"
+set mime_types [db_list_of_lists get_mime_types ""]
 
 form create search -html { name search method post }
 
@@ -129,9 +124,7 @@ if { [form is_valid search] } {
   ns_log notice $sql_query
 
   # Perform the query and get the total results
-  template::query get_results total_results onevalue "
-    select count(*) from ($sql_query)
-  " 
+  set total_results [db_string get_results ""]
 
   # Memoize the query - can't pass it through :-(
   nsv_set browser_state "[User::getID].search.sql_query" $sql_query
