@@ -23,9 +23,7 @@ form create register_user -elements {
 
 if { [form is_request register_user] } {
     
-    template::query get_user_id user_id onevalue "
-      select acs_object_id_seq.nextval from dual
-    "
+    set user_id [db_string get_user_id ""]
 
     set cms_admin_exists [User::cms_admin_exists]
 
