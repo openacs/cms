@@ -32,7 +32,7 @@
   and 
     c.object_id = i.item_id
   and
-    content_workflow.is_overdue(c.case_id, ca.transition_key) = 't'
+    content_workflow.is_overdue(c.case_id, trans.transition_key) = 't'
   $transition_sql
   order by
     transition_name, dead.deadline desc, title, assigned_party
