@@ -1124,8 +1124,9 @@ ad_proc -public content::new_item_form { args } {
     if {![string equal {} $opts(section)] } { 
         template::form section $form_name $opts(section)
     } else { 
+        set id $opts(form_name)
         template::form::get_reference
-        set opts(section) form_properties(section)
+        set opts(section) $form_properties(section)
     } 
     
     # If we are handling a new request and were passed an item_id 
