@@ -18,7 +18,7 @@
         <release-date>2001-01-26</release-date>
         <vendor url="http://openacs.org">OpenACS</vendor>
         <description format="text/html">CMS is a full featured content management system implemented on top of
-        the content repository which supports workflow, composite objects, dynamicly created attributes, publishing to 
+        the content repository which supports workflow, composite objects, dynamically created attributes, publishing to 
         the filesystem and categorization.  The user interface needs a great deal of work and the package relies on 
         acs-workflow which has been deprecated.  Alternatives include etp and bcms (which is a work in progress), CMS 
         remains the best place to look to find examples of how the content repository should be used.
