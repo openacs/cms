@@ -104,11 +104,9 @@
             lpad(' ', tree_level(t.tree_sortkey), '-') || pretty_name as label,
             object_type as value
           from
-            acs_object_types t
-          where 
-            t.tree_sortkey like (select tree_sortkey || '%'
-                                   from acs_object_types 
-                                  where object_type = 'content_revision')
+            acs_object_types t, acs_object_types t2
+          where t2.object_type = 'content_revision'
+            and t.tree_sortkey between t2.tree_sortkey and tree_right(t2.tree_sortkey)
         
       </querytext>
 </fullquery>

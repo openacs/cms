@@ -12,9 +12,9 @@
 	begin
   
 	  for item_row in 
-	    select item_id from cr_items
-            where tree_sortkey like (select tree_sortkey || '%'
-                                     from cr_items where parent_id = 0)
+	    select c1.item_id from cr_items c1, cr_items c2
+            where c2.parent_id = 0
+              and c1.tree_sortkey between c2.tree_sortkey and tree_right(c2.tree_sortkey)
           LOOP 
 	    PERFORM acs_permission__grant_permission (
 	        item_row.item_id, 

@@ -87,7 +87,7 @@
      and 
        ot2.tree_sortkey <= ot1.tree_sortkey
      and 
-       ot1.tree_sortkey like (ot2.tree_sortkey || '%')) o
+       ot1.tree_sortkey between ot2.tree_sortkey and tree_right(ot2.tree_sortkey)) o
   where
     o.object_type = attr.object_type
   order by

@@ -282,10 +282,10 @@ begin
                             where object_id = v_context_id) ob1, 
                           acs_objects ob2
                     where ob2.tree_sortkey <= ob1.tree_sortkey
-                      and ob1.tree_sortkey like (ob2.tree_sortkey || ''%'')
+                      and ob1.tree_sortkey between ob2.tree_sortkey and tree_right(ob2.tree_sortkey)
                       and ob2.security_inherit_p = ''f'') o3        
             where o2.tree_sortkey <= o1.tree_sortkey
-              and o1.tree_sortkey like (o2.tree_sortkey || ''%'')
+              and o1.tree_sortkey between o2.tree_sortkey and tree_right(o2.tree_sortkey)
               and o2.tree_sortkey > o3.tree_sortkey
             order by o2.tree_sortkey desc) o
         where  
@@ -358,8 +358,7 @@ begin
           h2.privilege
         ) = ''f''
       and h1.child_privilege = ''cm_perm''
-      and h1.tree_sortkey like (h2.tree_sortkey || ''%'')
-      and h2.tree_sortkey <= h1.tree_sortkey
+      and h1.tree_sortkey between h2.tree_sortkey and tree_right(h2.tree_sortkey)
       limit 1;
    
 end;' language 'plpgsql';
@@ -425,11 +424,10 @@ begin
       select 
         item_id 
       from 
-        (select item_id from cr_items 
-          where tree_sortkey like (select tree_sortkey || ''%''
-                                    from cr_items
-                                   where item_id = p_item_id)
-       order by tree_sortkey) i
+        (select c1.item_id from cr_items c1, cr_items c2
+         where c2.item_id = p_item_id
+           and c1.tree_sortkey between c2.tree_sortkey and tree_right(c2.tree_sortkey)
+         order by c1.tree_sortkey) i
       where
         cms_permission__has_grant_authority (
           i.item_id, p_holder_id, p_privilege
@@ -529,11 +527,10 @@ begin
     -- Select child items 
     v_count := 0;
     for c_item_cur in
-     select item_id from cr_items
-     where tree_sortkey like (select tree_sortkey || ''%''
-                                from cr_items
-                               where item_id = p_item_id)
-      where
+     select c1.item_id from cr_items c1, cr_items c2
+     where c2.item_id = p_item_id
+       and c1.tree_sortkey between c2.tree_sortkey and tree_right(c2.tree_sortkey)
+      and
         cms_permission__has_revoke_authority (
           item_id, 
           p_holder_id,

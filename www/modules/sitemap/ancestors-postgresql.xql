@@ -29,9 +29,7 @@
       where
         i2.parent_id != 0
       and
-        i2.tree_sortkey <= i1.tree_sortkey
-      and
-        i1.tree_sortkey like (i2.tree_sortkey || '%')
+        i1.tree_sortkey between i2.tree_sortkey and tree_right(i2.tree_sortkey)
     ) t
   where
     i.item_id = t.parent_id

@@ -39,12 +39,12 @@
 	lpad(' ', t.tree_level * 24, '&nbsp;') || coalesce(p.pretty_name, t.child_privilege) as label,
 	cms_permission__permission_p(:object_id, :grantee_id, t.child_privilege) as permission_p,
         cms_permission__permission_p (:object_id, :grantee_id, t.privilege) as parent_permission_p
-      from (select privilege, child_privilege, 
-                tree_level(tree_sortkey) as tree_level
-	   from acs_privilege_hierarchy_index
-          where tree_sortkey like (select tree_sortkey || '%'
-                                   from acs_privilege_hierarchy_index 
-                                  where privilege = 'cm_root')
+      from (select h1.privilege, h1.child_privilege, 
+                tree_level(h1.tree_sortkey) as tree_level
+	   from acs_privilege_hierarchy_index h1, acs_privilege_hierarchy_index h2
+           where h2.privilege = 'cm_root'
+             and h1.tree_sortkey between h2.tree_sortkey and tree_right(h2.tree_sortkey)
+             and tree_ancestor_p(h2.tree_sortkey, h1.tree_sortkey)
 	) t, acs_privileges p
       where
 	p.privilege = t.child_privilege

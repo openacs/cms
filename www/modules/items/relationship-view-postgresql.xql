@@ -51,7 +51,7 @@
       and
         ot2.tree_sortkey <= ot2.tree_sortkey
       and 
-        ot1.tree_sortkey like (ot2.tree_sortkey || '%')) types 
+        ot1.tree_sortkey between ot2.tree_sortkey and tree_right(ot2.tree_sortkey)) types 
     using (object_type)
   order by
     inherit_level desc, attr.pretty_name

@@ -19,18 +19,21 @@
       (select o2.object_id 
          from (select * from acs_objects where object_id = :object_id) o1, 
               acs_objects o2
-        where o2.tree_sortkey <= o1.tree_sortkey
-          and o1.tree_sortkey like (o2.tree_sortkey || '%')
-          and o2.tree_sortkey >= (select case when max(ob2.tree_sortkey) is null 
-                                                  then '/' 
-                                                  else max(ob2.tree_sortkey) end
-                                   from (select * 
-                                           from acs_objects 
-                                          where object_id = :object_id) ob1,
-                                        acs_objects ob2
-                                  where ob2.tree_sortkey <= ob1.tree_sortkey
-                                    and ob1.tree_sortkey like (ob2.tree_sortkey || '%')
-                                    and ob2.security_inherit_p = 'f')) o
+        where o1.tree_sortkey between o2.tree_sortkey and tree_right(o2.tree_sortkey)
+          and tree_ancestor_p(o2.tree_sortkey, o1.tree_sortkey)
+          and tree_level(o2.tree_sortkey) >= (select
+                                                case when max(tree_level(ob2.tree_sortkey)) is null
+                                                  then 0
+                                                  else max(tree_level(ob2.tree_sortkey))
+                                                end  
+                                              from
+                                                (select * 
+                                                 from acs_objects 
+                                                 where object_id = :object_id) ob1,
+                                                acs_objects ob2
+                                              where ob1.tree_sortkey between ob2.tree_sortkey and tree_right(ob2.tree_sortkey)
+                                                and tree_ancestor_p(ob2.tree_sortkey, ob1.tree_sortkey)
+                                                and ob2.security_inherit_p = 'f')) o
     where
       per.privilege = p.privilege
     and

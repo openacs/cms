@@ -55,7 +55,7 @@
             AND
               o2.tree_sortkey <= o1.tree_sortkey
             AND
-              o1.tree_sortkey like (o2.tree_sortkey || '%')
+              o1.tree_sortkey between o2.tree_sortkey and tree_right(o2.tree_sortkey)
 
           ) types USING (object_type)
       ) attributes
@@ -121,7 +121,7 @@
 	      AND
 		o2.tree_sortkey <= o1.tree_sortkey
 	      AND
-		o1.tree_sortkey like (o2.tree_sortkey || '%')
+		o1.tree_sortkey between o2.tree_sortkey and tree_right(o2.tree_sortkey)
 
 	    ) types USING (object_type)
           order by 
@@ -153,7 +153,7 @@
 	      and
 		o2.tree_sortkey <= o1.tree_sortkey
 	      and
-		o1.tree_sortkey like (o2.tree_sortkey || '%')
+		o1.tree_sortkey between o2.tree_sortkey and tree_right(o2.tree_sortkey)
 
 	    ) types USING (object_type)
 
@@ -324,7 +324,7 @@
 	where
 	  o2.tree_sortkey <= o1.tree_sortkey
 	AND
-	  o1.tree_sortkey like (o2.tree_sortkey || '%')
+	  o1.tree_sortkey between o2.tree_sortkey and tree_right(o2.tree_sortkey)
 
       ) types
     where

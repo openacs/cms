@@ -38,10 +38,7 @@
         acs_object_types ot2
       where 
         ot2.object_type != 'acs_object'
-      and 
-        ot2.tree_sortkey <= ot1.tree_sortkey
-      and
-        ot1.tree_sortkey like (ot2.tree_sortkey || '%')) types        
+      and ot1.tree_sortkey between ot2.tree_sortkey and tree_right(ot2.tree_sortkey)) types        
   where 
     attr.object_type = types.object_type
   order by 
