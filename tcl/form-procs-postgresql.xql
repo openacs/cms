@@ -163,7 +163,7 @@
 <fullquery name="content::new_item.get_item_id">      
       <querytext>
 
-        select content_item__new(:name,
+        select content_item__new(varchar :name,
                                  :parent_id,
                                  :item_id,
                                  :locale,

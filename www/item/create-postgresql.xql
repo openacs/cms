@@ -6,7 +6,7 @@
 <fullquery name="new_content_item">      
       <querytext>
      
-    select content_item__new(:name, 
+    select content_item__new(varchar :name, 
                              :context_id, 
                              :item_id, 
                              null,

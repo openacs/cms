@@ -7,7 +7,7 @@
       <querytext>
 
         select content_item__new(
-          :name, 
+          varchar :name, 
           :parent_id, 
           null,
           now(),

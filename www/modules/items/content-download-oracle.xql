@@ -3,20 +3,6 @@
 <queryset>
    <rdbms><type>oracle</type><version>8.1.6</version></rdbms>
 
-<fullquery name="write_content">      
-      <querytext>
-      
-  select
-        [ad_decode $storage_type file "'[cr_fs_path]' || filename" content] as content
-  from 
-    cr_revisions
-  where
-    revision_id = $revision_id
-
-      </querytext>
-</fullquery>
-
- 
 <fullquery name="get_iteminfo">      
       <querytext>
       
@@ -29,6 +15,5 @@
 
       </querytext>
 </fullquery>
-
  
 </queryset>
