@@ -13,27 +13,16 @@ update cm_form_widget_params
 -- content_module inherit from content_item
 -- this way it is possible to grant permissions on content modules
 
+create function inline_0 ()
+returns integer as '
 declare
-  cursor c_module_cur is
-    select
-      module_id
-    from
-      cm_modules;
-
-  v_user_id   users.user_id%TYPE;
-  v_supertype acs_object_types.supertype%TYPE;
-  v_id	      cm_modules.module_id%TYPE;
-  attr_id     acs_attributes.attribute_id%TYPE;
-  v_module_id cm_modules.module_id%TYPE;
-
-  -- this is an upgrade hack
-  cursor c_sitemap_perms_cur is
-    select
-      grantee_id, privilege
-    from
-      acs_permissions
-    where
-      object_id = content_item.get_root_folder;
+  v_user_id             users.user_id%TYPE;
+  v_supertype           acs_object_types.supertype%TYPE;
+  v_id                  cm_modules.module_id%TYPE;
+  attr_id               acs_attributes.attribute_id%TYPE;
+  v_module_id           cm_modules.module_id%TYPE;
+  v_module_val          record;
+  v_sitemap_perms       record;
 begin
 
   select
@@ -41,75 +30,103 @@ begin
   from
     acs_object_types
   where
-    object_type = 'content_module';
+    object_type = ''content_module'';
 
-  if v_supertype ^= 'content_item' then
+  if v_supertype != ''content_item'' then
 
     -- delete all existing modules (they will be recreated)
     delete from acs_permissions 
       where object_id in (select module_id from cm_modules);
-    for v_module_val in c_module_cur loop
-      acs_object.delete( v_module_val.module_id );
-    end loop;
 
-    acs_object_type.drop_type ( 'content_module' );
+    for v_module_val in select
+                          module_id
+                        from
+                          cm_modules
+    LOOP
+      PERFORM acs_object__delete ( v_module_val.module_id );
+    end LOOP;
 
-    acs_object_type.create_type (
-        supertype     => 'content_item',
-        object_type   => 'content_module',
-        pretty_name   => 'Content Module',
-        pretty_plural => 'Content Modules',
-        table_name    => 'cm_modules',
-        id_column     => 'module_id',
-        name_method   => 'content_module.get_label'
-    );
+    attr_id := acs_attribute__create_attribute (
+	''content_module'',
+	''key'',
+	''string'',
+	''Key'',
+	''Keys'',
+	null,
+	null,
+	null,
+	1,
+	1,
+	null,
+	''type_specific'',
+	''f''
+	);
 
-    attr_id := acs_attribute.create_attribute (
-        object_type    => 'content_module',
-	attribute_name => 'key',
-	datatype       => 'string',
-	pretty_name    => 'Key',
-	pretty_plural  => 'Keys'
-    ); 
+    attr_id := acs_attribute__create_attribute (
+	''content_module'',
+	''name'',
+	''string'',
+	''Name'',
+	''Names'',
+	null,
+	null,
+	null,
+	1,
+	1,
+	null,
+	''type_specific'',
+	''f''
+	);
 
-    attr_id := acs_attribute.create_attribute (
-        object_type    => 'content_module',
-	attribute_name => 'name',
-	datatype       => 'string',
-	pretty_name    => 'Name',
-	pretty_plural  => 'Names'
-    ); 
+    attr_id := acs_attribute__create_attribute (
+       ''content_module'',
+       ''sort_key'',
+       ''number'',
+       ''Sort Key'',
+       ''Sort Keys'',
+       null,
+       null,
+       null,
+       1,
+       1,
+       null,
+       ''type_specific'',
+       ''f''
+       );
 
-    attr_id := acs_attribute.create_attribute (
-       object_type    => 'content_module',
-       attribute_name => 'sort_key',
-       datatype       => 'number',
-       pretty_name    => 'Sort Key',
-       pretty_plural  => 'Sort Keys'
-    );
-
-    v_id := content_module.new('My Tasks', 'workspace', NULL, 1,0);
-    v_id := content_module.new('Site Map', 'sitemap', 
+    v_id := content_module__new('My Tasks', 'workspace', NULL, 1,0);
+    v_id := content_module__new('Site Map', 'sitemap', 
                                  content_item.get_root_folder, 2,0);
-    v_id := content_module.new('Templates', 'templates', 
+    v_id := content_module__new('Templates', 'templates', 
                                  content_template.get_root_folder, 3,0);
-    v_id := content_module.new('Content Types', 'types', 
+    v_id := content_module__new('Content Types', 'types', 
                                  'content_revision', 4,0);
     v_module_id := v_id;
 
-    v_id := content_module.new('Search', 'search', null, 5,0);
-    v_id := content_module.new('Subject Keywords', 'categories', 0, 6,0);
-    v_id := content_module.new('Users', 'users', null, 7,0);
-    v_id := content_module.new('Workflows', 'workflow', null, 8,0);
+    v_id := content_module__new('Search', 'search', null, 5,0);
+    v_id := content_module__new('Subject Keywords', 'categories', 0, 6,0);
+    v_id := content_module__new('Users', 'users', null, 7,0);
+    v_id := content_module__new('Workflows', 'workflow', null, 8,0);
 
     -- upgrade hack, grant users with sitemap privs permission on types module
-    for v_sitemap_perms in c_sitemap_perms_cur loop
-      acs_permission.grant_permission( v_module_id, 
+    for v_sitemap_perms in 
+    select
+      grantee_id, privilege
+    from
+      acs_permissions
+    where
+      object_id = content_item__get_root_folder();
+    LOOP
+      PERFORM acs_permission__grant_permission( v_module_id, 
           v_sitemap_perms.grantee_id, v_sitemap_perms.privilege );
     end loop;
 
   end if;
 
-end;
-/
-show errors
+  return 0;
+end;' language 'plpgsql';
+
+select inline_0 ();
+
+drop function inline_0 ();
+

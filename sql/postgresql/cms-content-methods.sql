@@ -9,15 +9,15 @@
 
 
 
-/* Data model *?
+/* Data model */
 
 /* Means of inserting content into the database. */
 create table cm_content_methods (
-  content_method	varchar2(100)
+  content_method	varchar(100)
 			constraint cm_content_methods_pk
 			primary key,
-  label			varchar2(100) not null,
-  description		varchar2(4000)			
+  label			varchar(100) not null,
+  description		text
 );
 
 -- insert the standard content methods
@@ -46,22 +46,20 @@ insert into cm_content_methods (
 );
 
 
-/* Map a content type to a content method(s) */
+* Map a content type to a content method(s) */
 create table cm_content_type_method_map (
-  content_type		varchar2(100)
+  content_type		varchar(100)
 			constraint cm_type_method_map_type_fk
 			references acs_object_types,
-  content_method	varchar2(100) default 'no_content'
+  content_method	varchar(100) default 'no_content'
 			constraint cm_type_method_map_method_fk
 			references cm_content_methods,
-  is_default		char(1) 
-			constraint cm_method_map_is_default_ck
-			check (is_default in ('t','f'))
+  is_default		boolean
 );
 
 
-/* A view of all mapped content methods */
-create or replace view cm_type_methods
+* A view of all mapped content methods */
+create view cm_type_methods
 as
   select
     map.content_type, t.pretty_name, 
@@ -81,59 +79,59 @@ as
 
 /* PACKAGE DEFINITIONS */
 
-create or replace package content_method as
+-- create or replace package content_method as
+-- 
+--   function get_method (
+--     content_type        in cm_content_type_method_map.content_type%TYPE
+--   ) return cm_content_type_method_map.content_method%TYPE;
+-- 
+--   function is_mapped ( 
+--     content_type        in cm_content_type_method_map.content_type%TYPE,
+--     content_method	in cm_content_type_method_map.content_method%TYPE
+--   ) return char;
+-- 
+--   procedure add_method (
+--     content_type        in cm_content_type_method_map.content_type%TYPE,
+--     content_method	in cm_content_type_method_map.content_method%TYPE,
+--     is_default		in cm_content_type_method_map.is_default%TYPE
+-- 			   default 'f'
+--   );
+-- 
+--   procedure add_all_methods (
+--     content_type	in cm_content_type_method_map.content_type%TYPE
+--   );
+-- 
+--   procedure set_default_method ( 
+--     content_type	in cm_content_type_method_map.content_type%TYPE,
+--     content_method	in cm_content_type_method_map.content_method%TYPE
+--   );
+-- 
+--   procedure unset_default_method (
+--     content_type	in cm_content_type_method_map.content_type%TYPE
+--   );
+-- 
+--   procedure remove_method (
+--     content_type	in cm_content_type_method_map.content_type%TYPE,
+--     content_method	in cm_content_type_method_map.content_method%TYPE
+--   );
+-- 
+-- end content_method;
 
-  function get_method (
-    content_type        in cm_content_type_method_map.content_type%TYPE
-  ) return cm_content_type_method_map.content_method%TYPE;
-
-  function is_mapped ( 
-    content_type        in cm_content_type_method_map.content_type%TYPE,
-    content_method	in cm_content_type_method_map.content_method%TYPE
-  ) return char;
-
-  procedure add_method (
-    content_type        in cm_content_type_method_map.content_type%TYPE,
-    content_method	in cm_content_type_method_map.content_method%TYPE,
-    is_default		in cm_content_type_method_map.is_default%TYPE
-			   default 'f'
-  );
-
-  procedure add_all_methods (
-    content_type	in cm_content_type_method_map.content_type%TYPE
-  );
-
-  procedure set_default_method ( 
-    content_type	in cm_content_type_method_map.content_type%TYPE,
-    content_method	in cm_content_type_method_map.content_method%TYPE
-  );
-
-  procedure unset_default_method (
-    content_type	in cm_content_type_method_map.content_type%TYPE
-  );
-
-  procedure remove_method (
-    content_type	in cm_content_type_method_map.content_type%TYPE,
-    content_method	in cm_content_type_method_map.content_method%TYPE
-  );
-
-end content_method;
-/
-show errors
-
-
+-- show errors
 
 
 
-create or replace package body content_method as
 
-  function get_method (
-    content_type        in cm_content_type_method_map.content_type%TYPE
-  ) return cm_content_type_method_map.content_method%TYPE
-  is
-    v_method	cm_content_type_method_map.content_method%TYPE;
-    v_count	integer;
-  begin
+
+-- create or replace package body content_method as
+-- function get_method
+create function content_method__get_method (varchar)
+returns varchar as '
+declare
+  get_method__content_type    alias for $1;  
+  v_method                    cm_content_type_method_map.content_method%TYPE;
+  v_count                     integer;       
+begin
 
     -- first, look for the default
     select
@@ -141,9 +139,9 @@ create or replace package body content_method as
     from
       cm_content_type_method_map
     where
-      content_type = get_method.content_type
+      content_type = get_method__content_type
     and
-      is_default = 't';
+      is_default = ''t'';
 
     if v_method is null then
       -- then check to see if there is only one registered content method
@@ -152,7 +150,7 @@ create or replace package body content_method as
       from
         cm_content_type_method_map
       where
-        content_type = get_method.content_type;
+        content_type = get_method__content_type;
 
       if v_count = 1 then
         -- if so, return the only registered method
@@ -161,47 +159,48 @@ create or replace package body content_method as
 	from
 	  cm_content_type_method_map
 	where
-	  content_type = get_method.content_type;
+	  content_type = get_method__content_type;
       end if;      
     end if;
 
     return v_method;
-  exception 
-    when NO_DATA_FOUND then 
-      return null;
-  end get_method;
 
-  function is_mapped ( 
-    content_type        in cm_content_type_method_map.content_type%TYPE,
-    content_method	in cm_content_type_method_map.content_method%TYPE
-  ) return char
-  is
-    v_is_mapped		char(1);
-  begin
+--  exception 
+--    when NO_DATA_FOUND then 
+--      return null;
+   
+end;' language 'plpgsql';
+
+
+-- function is_mapped
+create function content_method__is_mapped (varchar,varchar)
+returns boolean as '
+declare
+  is_mapped__content_type          alias for $1;  
+  is_mapped__content_method        alias for $2;  
+begin
     
-    select
-      't' into v_is_mapped
+    return 
+      count(*) > 0
     from
       cm_content_type_method_map
     where
-      content_type = is_mapped.content_type
+      content_type = is_mapped__content_type
     and
-      content_method = is_mapped.content_method;
+      content_method = is_mapped__content_method;
+   
+end;' language 'plpgsql';
 
-    return v_is_mapped;
-    exception
-      when NO_DATA_FOUND then
-        return 'f';
-  end is_mapped;
 
-  procedure add_method (
-    content_type        in cm_content_type_method_map.content_type%TYPE,
-    content_method	in cm_content_type_method_map.content_method%TYPE,
-    is_default		in cm_content_type_method_map.is_default%TYPE
-			   default 'f'
-  ) is
-    v_method_already_mapped integer;
-  begin
+-- procedure add_method
+create function content_method__add_method (varchar,varchar,char)
+returns integer as '
+declare
+  add_method__content_type         alias for $1;  
+  add_method__content_method       alias for $2;  
+  add_method__is_default           alias for $3;  -- default ''f''
+  v_method_already_mapped          integer;       
+begin
 
     -- check if there is any existing mapping
     select
@@ -209,37 +208,42 @@ create or replace package body content_method as
     from
       cm_content_type_method_map
     where
-      content_type = add_method.content_type
+      content_type = add_method__content_type
     and
-      content_method = add_method.content_method;
+      content_method = add_method__content_method;
 
     if v_method_already_mapped = 1 then
 
       -- update the content type method mapping
       update cm_content_type_method_map
-        set is_default = add_method.is_default
-	where content_type = add_method.content_type
-	and content_method = add_method.content_method;
+        set is_default = add_method__is_default
+	where content_type = add_method__content_type
+	and content_method = add_method__content_method;
     else
       -- insert the content type method mapping
       insert into cm_content_type_method_map (
         content_type, content_method, is_default
       ) values (
-        add_method.content_type, add_method.content_method, 
-	add_method.is_default
+        add_method__content_type, add_method__content_method, 
+	add_method__is_default
       );
     end if;
-  end add_method;
 
-  procedure add_all_methods (
-    content_type	in cm_content_type_method_map.content_type%TYPE
-  ) is
-  begin
+    return 0; 
+end;' language 'plpgsql';
+
+
+-- procedure add_all_methods
+create function content_method__add_all_methods (varchar)
+returns integer as '
+declare
+  add_all_methods__content_type    alias for $1;  
+begin
     -- map all unmapped content methods to the content type 
     insert into cm_content_type_method_map (
       content_type, content_method, is_default
     ) select
-      add_all_methods.content_type, content_method, 'f'
+      add_all_methods__content_type, content_method, ''f''
     from
       cm_content_methods m
     where
@@ -250,49 +254,66 @@ create or replace package body content_method as
 	where
 	  content_method = m.content_method
         and
-          content_type = add_all_methods.content_type 
+          content_type = add_all_methods__content_type 
       );
-  end add_all_methods;
 
-  procedure set_default_method ( 
-    content_type	in cm_content_type_method_map.content_type%TYPE,
-    content_method	in cm_content_type_method_map.content_method%TYPE
-  ) is
-  begin
+      return 0; 
+end;' language 'plpgsql';
+
+
+-- procedure set_default_method
+create function content_method__set_default_method (varchar,varchar)
+returns integer as '
+declare
+  set_default_method__content_type      alias for $1;  
+  set_default_method__content_method    alias for $2;  
+begin
 
     -- unset old default
-    unset_default_method (
-        content_type => set_default_method.content_type
+    PERFORM content_method__unset_default_method (
+        set_default_method__content_type
     );
     -- set new default
     update cm_content_type_method_map
-      set is_default = 't'
-      where content_type = set_default_method.content_type
-      and content_method = set_default_method.content_method;
-  end set_default_method;
+      set is_default = ''t''
+      where content_type = set_default_method__content_type
+      and content_method = set_default_method__content_method;
 
-  procedure unset_default_method (
-    content_type	in cm_content_type_method_map.content_type%TYPE
-  ) is
-  begin
+    return 0; 
+end;' language 'plpgsql';
+
+
+-- procedure unset_default_method
+create function content_method__unset_default_method (varchar)
+returns integer as '
+declare
+  unset_default_method__content_type   alias for $1;  
+begin
 
     update cm_content_type_method_map
-      set is_default = 'f'
-      where content_type = unset_default_method.content_type;
-  end unset_default_method;
+      set is_default = ''f''
+      where content_type = unset_default_method__content_type;
 
-  procedure remove_method (
-    content_type	in cm_content_type_method_map.content_type%TYPE,
-    content_method	in cm_content_type_method_map.content_method%TYPE
-  ) is
-  begin
+    return 0; 
+end;' language 'plpgsql';
+
+
+-- procedure remove_method
+create function content_method__remove_method (varchar,varchar)
+returns integer as '
+declare
+  remove_method__content_type      alias for $1;  
+  remove_method__content_method    alias for $2;  
+begin
 
     -- delete the content type - method mapping    
     delete from cm_content_type_method_map
-      where content_type = remove_method.content_type
-      and content_method = remove_method.content_method;
-  end remove_method;
+      where content_type = remove_method__content_type
+      and content_method = remove_method__content_method;
 
-end content_method;
-/
-show errors
+    return 0; 
+end;' language 'plpgsql';
+
+
+
+-- show errors
