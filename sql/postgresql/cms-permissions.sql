@@ -53,16 +53,9 @@ begin
   return 0;
 end;' language 'plpgsql';
 
--- temporarily drop this trigger to avoid a data-change violation 
--- on acs_privilege_hierarchy_index while updating the child privileges.
-
-drop trigger acs_priv_hier_ins_del_tr on acs_privilege_hierarchy;
 
 select inline_0 ();
 
-create trigger acs_priv_hier_ins_del_tr after insert or delete
-on acs_privilege_hierarchy for each row
-execute procedure acs_priv_hier_ins_del_tr ();
 
 drop function inline_0 ();
 
