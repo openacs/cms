@@ -1,0 +1,78 @@
+# Edit a subgroup
+
+request create
+
+request set_param id -datatype integer -optional
+request set_param parent_id -datatype integer -optional
+request set_param mount_point -datatype keyword -optional -value users
+
+form create edit_group
+
+element create edit_group group_id \
+  -label "Group ID" -datatype integer -widget hidden -value $id
+
+element create edit_group user_id \
+  -label "User ID" -datatype integer -widget hidden -value [User::getID] 
+
+element create edit_group mount_point \
+  -label "Mount Point" -datatype keyword -widget hidden -param -optional
+
+element create edit_group parent_id \
+  -label "Parent ID" -datatype keyword -widget hidden -param -optional
+
+element create edit_group group_name \
+  -label "Name" -datatype text -widget text -html { size 20 }
+
+element create edit_group email \
+  -label "Email" -datatype text -widget text -optional -html { size 40 }
+
+element create edit_group url \
+  -label "URL" -datatype text -widget text -optional -html { size 40 }
+
+if { [form is_request edit_group] } {
+
+  query info onerow "
+    select
+      g.group_name, p.url, p.email
+    from
+      groups g, parties p
+    where
+      g.group_id = :id
+    and
+      p.party_id = :id
+  "
+
+  element set_properties edit_group group_name -value $info(group_name)
+  element set_properties edit_group email -value $info(email)
+  element set_properties edit_group url -value $info(url)
+}
+
+if { [form is_valid edit_group] } {
+ 
+  template::form get_values edit_group group_id user_id group_name \
+                            email url mount_point
+
+  set db [template::begin_db_transaction]
+  template::query edit_group_1 dml "
+    update groups 
+      set group_name = :group_name
+      where group_id = :group_id
+  "
+  template::query edit_group_2 dml "
+    update parties
+      set email = :email, url = :url
+      where party_id = :group_id
+  "
+  template::end_db_transaction
+  template::release_db_handle
+
+  refreshCachedFolder $user_id $mount_point $parent_id
+
+  template::forward "refresh-tree?id=$parent_id&goto_id=$group_id&mount_point=$mount_point"
+}
+
+
+  
+
+
+

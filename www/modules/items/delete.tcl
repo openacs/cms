@@ -1,0 +1,46 @@
+# Delete a content item and all of its revisions, 
+
+request create
+request set_param item_id -datatype keyword
+request set_param mount_point -datatype keyword -value sitemap
+
+set db [template::begin_db_transaction]
+
+# permissions check - must have cm_write permissions on item to delete
+content::check_access $item_id cm_write -user_id [User::getID]
+
+# get all the parent_id's of the items being deleted
+#   because we need to flush the paginator cache for each of these folders
+template::query flush_list onelist "
+  select
+    parent_id
+  from
+    cr_resolved_items
+  where
+    resolved_id = :item_id
+" 
+
+template::query item_delete dml "
+  begin 
+    content_item.delete(
+      item_id => :item_id
+    ); 
+  end;" 
+
+template::end_db_transaction
+template::release_db_handle
+
+# flush cache
+set root_id [cm::modules::${mount_point}::getRootFolderID]
+set flushed_list [list]
+foreach parent_id $flush_list {
+  if { [lsearch -exact $flushed_list $parent_id] == -1 } {
+    if { $parent_id == $root_id } {
+      set parent_id ""
+    }
+    cms_folder::flush $mount_point $parent_id
+    lappend flushed_list $parent_id
+  }
+}
+
+template::forward "../sitemap/index?id="

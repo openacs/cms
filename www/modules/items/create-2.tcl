@@ -1,0 +1,118 @@
+# /create-2.tcl
+# Get the folder where the item is being created
+
+# Parameters:
+#
+#  parent_id      - create the item under this parent (required)
+#  content_type   - use this content type (required)
+#  content_method - no_content file_upload text_entry
+#  return_url     - the url where the browser will go after the item is created
+#                   (default index)
+#  is_wizard      - use the wizard style form template?  if wizard exists, 
+#                   setting this to 'f' won't override the wizard formatting
+
+request create
+request set_param parent_id -datatype integer
+request set_param content_type -datatype keyword
+request set_param content_method -datatype keyword -value "no_content"
+request set_param relation_tag -datatype text -optional
+
+# optional
+request set_param return_url -datatype text -value "index"
+request set_param page_title -datatype text -optional
+request set_param is_wizard -datatype keyword -value f
+
+set db [template::get_db_handle]
+
+# permissions check - need cm_new on the parent item
+content::check_access $parent_id cm_new -user_id [User::getID]
+
+template::query new_item onerow "
+  select 
+    NVL(content_item.get_path(:parent_id), '/') as item_path,
+    pretty_name as content_type_name
+  from
+    acs_object_types
+  where
+    object_type = :content_type
+"
+
+template::release_db_handle
+
+# validate content_type and parent_id
+if { [template::util::is_nil new_item] } {
+    template::request::error create_item_form_generation_error \
+	    "Bad parent_id = $parent_id or bad content_type = $content_type"
+}
+template::util::array_to_vars new_item
+
+# set default page title
+if { [template::util::is_nil page_title] } {
+  set page_title "Create a $content_type_name"
+}
+
+
+# Create a form for the basic item, no revision info
+form create create_item -html { enctype "multipart/form-data" }
+
+element create create_item item_path \
+	 -datatype text \
+  	 -widget inform \
+	 -label "Folder" \
+	 -value $item_path
+
+element create create_item content_type_name \
+	-datatype text \
+	-widget inform \
+	-label "Content Type" \
+	-value $content_type_name 
+
+element create create_item return_url \
+        -datatype text \
+	-widget hidden \
+        -optional \
+	-value $return_url
+
+element create create_item relation_tag \
+        -datatype text \
+	-widget hidden \
+        -optional \
+	-param
+
+# auto-generated form
+content::new_item_form -form_name create_item \
+	-parent_id $parent_id \
+	-content_type $content_type \
+	-content_method $content_method
+
+
+if { [wizard exists] } {
+  set is_wizard t
+  wizard submit create_item
+}
+
+
+# create a new content item
+if { [form is_valid create_item] } {
+
+    # check for duplicate name within same folder or parent item.
+    if { ![content::validate_name create_item] } {
+	set name [template::element get_value create_item name]
+	template::element::set_error create_item name \
+		"The name \"$name\" is already in use by an existing item<br> 
+	         in the same folder or parent item."
+	return
+    }
+
+    form get_values create_item return_url item_id
+    
+    set item_id [content::new_item create_item]
+
+    # do wizard forward or forward to return_url
+    if { ![wizard exists] } { 
+	template::forward \
+		[content::assemble_url $return_url "item_id=$item_id"]
+    } else {
+	template::wizard forward
+    }
+}
