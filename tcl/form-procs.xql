@@ -8,7 +8,16 @@
 	and   r.revision_id = :revision_id
 	</querytext>
 
-</fulllquery>
+</fullquery>
+
+<partialquery name="cfe_attribute_name">
+	<querytext>
+
+	$attribute_name
+
+	</querytext>
+
+</partialquery>
 
 <fullquery name="get_element_value">      
 	<querytext>

@@ -34,7 +34,7 @@ ad_proc content::query_form_metadata {
   }  
 
   uplevel "
-    template::query $datasource_name $datasource_type \{$query\}
+    template::query get_form_metadata $datasource_name $datasource_type \{$query\}
   "
 
 }
@@ -153,7 +153,7 @@ ad_proc content::create_form_element {
   }
 
   template::util::array_to_vars "params:1"
-  assemble_form_element params $attribute_name 1 $db
+  assemble_form_element params $attribute_name 1
 
   # If the -revision_id switch exists, look up the existing value for the
   # element
@@ -163,16 +163,13 @@ ad_proc content::create_form_element {
     # the date widget will work :-/
     # In the future, upgrade the date widget and use acs_object.get_attribute
 
-    # RBM: FIXME.
-      
     switch $datatype {
-      date { 
-        set what "to_char($attribute_name, 'YYYY MM DD HH24 MI SS') 
-                   as $attribute_name"
+      date {
+	  set what [db_map cfe_attribute_name_to_char]
       }
 
       default {
-        set what "$attribute_name"
+	  set what [db_map cfe_attribute_name]
       }
     }
     
@@ -193,7 +190,7 @@ ad_proc content::create_form_element {
   
 # generate a form based on metadata
 
-proc content::get_revision_form { 
+ad_proc content::get_revision_form { 
   content_type item_id form_name {show_sections t} {element_override {}}
 } {
 
@@ -293,7 +290,7 @@ proc content::get_revision_form {
 #      to be set in the calling frame
 #
 # POST: appends the list of params neccessary to create a new element to code_params
-proc content::get_element_default_params {} {
+ad_proc content::get_element_default_params {} {
 
   uplevel {
     lappend code_params -datatype $datatype -widget $widget \
@@ -329,12 +326,12 @@ ad_proc content::get_revision_create_element {} {
                 
                 # if param_source is not 'literal' then 
                 # eval or query for the parameter value(s)
-		#RBM: FIX ME! What should be done with uplevel'd queries??
+
                 if { ![string equal $param_source ""] } {
                     if { [string equal $param_source "eval"] } {
                         set source [eval $value]
                     } elseif { [string equal $param_source "query"] } {
-                        template::query get_value source $param_type $value
+                        template::query revision_create_get_value source $param_type $value
                     } else {
                         set source $value
                     }
