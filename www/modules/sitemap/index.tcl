@@ -26,9 +26,7 @@ if { [template::util::is_nil id] } {
 
   set parent_var :root_id
 
-  template::query get_module_name module_name onevalue "
-    select name from cm_modules where key = :mount_point
-  " 
+  set module_name [db_string get_module_name ""]
 
   set info(label) $module_name
   set info(description) ""
@@ -37,14 +35,7 @@ if { [template::util::is_nil id] } {
 
   # get all the content types registered to this folder
   # check whether this folder allows subfolders, symlinks, and templates
-  template::query get_reg_types registered_types onelist "
-    select
-      content_type
-    from
-      cr_folder_type_map
-    where
-      folder_id = :root_id
-  " 
+  set registered_types [db_list get_reg_types ""]
 
   set subfolders_allowed f
   set symlinks_allowed f
@@ -66,9 +57,7 @@ if { [template::util::is_nil id] } {
   set parent_var :id
 
   # Resolve the symlink, if any
-  template::query get_resolved_id resolved_id onevalue "
-    select content_symlink.resolve( :id ) from dual
-  "
+  set_resolved_id [db_string get_resolved_id ""]
 
   if { $resolved_id != $id } {
     set is_symlink t
@@ -79,16 +68,7 @@ if { [template::util::is_nil id] } {
     set what "Folder"
   }
 
-  template::query get_info info onerow "
-    select
-      parent_id, NVL(label, name) label, description
-    from
-      cr_items i, cr_folders f
-    where
-      i.item_id = f.folder_id
-    and
-      f.folder_id = :id
-  " 
+  db_1row get_info "" -column_array info
 
   # Determine the parent id if none exists
   set parent_id $info(parent_id)
@@ -99,14 +79,7 @@ if { [template::util::is_nil id] } {
 
   # get all the content types registered to this folder
   # check whether this folder allows subfolders, symlinks, and templates
-  template::query get_types registered_types onelist "
-    select
-      content_type
-    from
-      cr_folder_type_map
-    where
-      folder_id = :id
-  " 
+  set_registered_types [db_list get_types ""]
 
   set subfolders_allowed f
   set symlinks_allowed f
@@ -155,9 +128,7 @@ if { [string equal $user_permissions(cm_new) f] } {
 
 # Get the index page ID
 
-template::query get_index_page_id index_page_id onevalue "
-  select content_folder.get_index_page($parent_var) from dual
-"
+set index_page_id [db_string get_index_page_id ""]
 
 # sort table by columns
 switch -exact -- $orderby {
@@ -234,18 +205,7 @@ for { set i 1 } { $i <= [multirow size items] } { incr i } {
 
 
 # symlinks to this folder/item
-template::query get_symlinks symlinks multirow "
-  select
-    i.item_id id,
-    content_item.get_path(i.item_id) path
-  from 
-    cr_items i, cr_symlinks s
-  where
-    i.item_id = s.target_id
-  and
-    i.item_id = :original_id
-"
-
+db_multirow symlinks get_symlinks ""
 
 form create add_item
 

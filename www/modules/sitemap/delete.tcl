@@ -12,9 +12,7 @@ request set_param mount_point -datatype keyword -optional -value sitemap
 content::check_access $id cm_write -user_id [User::getID]
 
 # Determine if the folder is empty
-template::query check_empty is_empty onevalue "
-  select content_folder.is_empty(:id) from dual
-" 
+set is_empty [db_string check_empty ""]
 
 # If nonempty, show error
 if { [string equal $is_empty "f"] } {

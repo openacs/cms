@@ -27,30 +27,12 @@ if { $clip_length == 0 } {
     set no_items_on_clipboard "f"
 }
 
-template::query get_path path onevalue "
-  select
-    content_item.get_path( :folder_id )
-  from 
-    dual
-" 
+set path [db_string get_path ""]
 
 ns_log Notice "path = $path"
 
 # get relevant marked items
-template::query get_marked marked_items multirow "
-  select
-    content_item.get_title(item_id) title, 
-    content_item.get_path(item_id,:root_id) name, 
-    item_id, parent_id
-  from
-    cr_items
-  where
-    item_id in ([join $clip_items ","])
-  and
-    -- only for those items which user has cm_write
-    cms_permission.permission_p(item_id, :user_id, 'cm_write') = 't'
-" 
-
+db_multirow marked_items get_marked ""
 
 form create move
 element create move mount_point \

@@ -30,21 +30,7 @@ if { $clip_length == 0 } {
 }
 
 # get title, name, item_id of each marked item
-template::query get_marked marked_items multirow "
-  select
-    content_item.get_title(item_id) title, 'symlink_to_' || name as name, 
-    item_id
-  from
-    cr_items
-  where
-    item_id in ([join $clip_items ","])
-  and
-    -- only items which have are not symlinks
-    content_type ^= 'content_symlink'
-  and
-    -- only for those item which user has cm_examine
-    cms_permission.permission_p(item_id, :user_id, 'cm_examine') = 't'
-" 
+db_multirow marked_items get_marked ""
 
 
 form create symlink

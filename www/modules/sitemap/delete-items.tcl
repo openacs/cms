@@ -19,30 +19,7 @@ set user_id [User::getID]
 
 # get title, content_type, path, item_id of each marked item
 
-template::query get_marked_items marked_items multirow "
-  select
-    item_id,
-    nvl(content_item.get_title(item_id),name) title, 
-    content_item.get_path(item_id) path,
-    pretty_name as content_type_pretty,
-    content_symlink.is_symlink(item_id) is_symlink,
-    content_folder.is_folder(item_id) is_folder,
-    content_template.is_template(item_id) is_template
-  from
-    cr_items i, acs_object_types t
-  where
-    i.content_type = t.object_type
-  and
-    item_id in ([join $clip_items ","])
-  and
-    -- permissions check
-    cms_permission.permission_p( item_id, :user_id, 'cm_write' ) = 't'
-  order by
-    -- this way parents are deleted after their children
-    item_id desc
-"
-
-
+db_multirow marked_items get_marked_items ""
 
 
 form create delete
@@ -97,15 +74,7 @@ if { [form is_valid delete] } {
             # get all the parent_id's of the items being deleted
             #   because we need to flush the paginator cache for each of 
             #   these folders
-            template::query get_list flush_list onelist "
-	  select
-	    parent_id
-          from
-            cr_resolved_items
-          where
-            resolved_id = :del_item_id
-	" 
-
+            set flush_list [db_list get_flush_list ""]
 
             # set up the call to the proper PL/SQL delete procedure
             if { [string equal $is_symlink "t"] } {

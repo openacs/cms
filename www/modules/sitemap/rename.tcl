@@ -40,15 +40,7 @@ if { [form is_request rename_folder] } {
   set item_id [element get_value rename_folder item_id]
 
   # Get existing folder parameters
-  template::query get_info info onerow "
-    select
-      i.name, f.label, f.description
-    from 
-      cr_items i, cr_folders f
-    where
-      i.item_id = :item_id
-    and
-      f.folder_id = :item_id"
+  db_1row get_info "" -column_array info
 
   element set_properties rename_folder name -value $info(name)
   element set_properties rename_folder label -value $info(label)

@@ -19,9 +19,7 @@ content::check_access $folder_id cm_examine -user_id [User::getID]
 cms_folder::get_registered_types $folder_id multirow content_types
 
 # Get other misc values
-template::query get_folder_name folder_name onevalue "
-  select label from cr_folders where folder_id = :folder_id
-" 
+set folder_name [db_string get_folder_name ""]
 
 set page_title "Folder Attributes - $folder_name"
 set register_marked_content_types \
@@ -38,15 +36,7 @@ set passthrough [content::assemble_passthrough \
 
 
 # Determine registered types
-template::query get_options folder_options onerow "
-  select
-    content_folder.is_registered(:folder_id,'content_folder') allow_subfolders,
-    content_folder.is_registered(:folder_id,'content_symlink') allow_symlinks,
-    content_folder.is_registered(:folder_id,'content_template') allow_templates
-  from dual
-" 
-
-
+db_1row get_options "" -column_array folder_options
 
 # Create the form for registering special types to the folder
 form create register_types

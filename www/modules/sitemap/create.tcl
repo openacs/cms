@@ -16,10 +16,7 @@ if { [util::is_nil parent_id] } {
 content::check_access $create_parent_id cm_new -user_id [User::getID] 
 
 # Get the path
-template::query get_path path onevalue "
-  select content_item.get_path(:create_parent_id) from dual
-" 
-
+set path [db_string get_path ""]
 
 # Create the form
 

@@ -8,12 +8,7 @@ set template_count [llength $in_list]
 
 if { $template_count > 0 } {
 
-  template::query get_templates templates multirow "select
-    template_id, content_item.get_path(template_id) path
-  from
-    cr_templates
-  where
-    template_id in ($in_list)"
+    db_multirow templates get_templates ""
 }
 
 set return_url [ns_set iget [ns_conn headers] Referer]
