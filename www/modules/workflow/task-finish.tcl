@@ -20,7 +20,7 @@ if { [string equal $is_valid_task f] } {
 
 # Get the name of the item and of the task
 
-db_1row get_task_info ""
+db_1row get_task_info "" -column_array task_info
 
 
 form create task_finish -elements {

@@ -709,7 +709,7 @@ ad_proc -public content::add_revision { form_name { tmpfile "" } } {
   ns_set put $bind_vars revision_id $revision_id
 
   # query for content_type and table_name
-  set info [db_1row addrev_get_content_type ""]
+  db_1row addrev_get_content_type "" -column_array info
 
   set insert_statement [attribute_insert_statement \
 	  $info(content_type) $info(table_name) $bind_vars $form_name]
@@ -1617,7 +1617,7 @@ ad_proc -private content::set_attribute_values { form_name content_type revision
       
   # Query for values from a previous revision
 
-  db_1row get_previous_version_values "" -column_array values
+  db_0or1row get_previous_version_values "" -column_array values
 
   # Set the form values, handling dates with the date acquire function
   foreach pair $attr_types {
@@ -1702,7 +1702,7 @@ ad_proc -private content::get_type_info { object_type ref args } {
       return $info
 
   } else {
-      uplevel 1 "db_1row get_type_info_2 {} -column_array $ref"
+      uplevel 1 "db_0or1row get_type_info_2 {} -column_array $ref"
   }
 }
 

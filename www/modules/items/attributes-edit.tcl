@@ -6,7 +6,7 @@ request set_param item_id -datatype integer
 # check permissions - user must have cm_write on the item
 content::check_access $item_id cm_write -user_id [User::getID]
 
-db_1row get_item_info ""
+db_0or1row get_item_info ""
 
 # flush the sitemap folder listing cache in anticipation 
 # of the new item

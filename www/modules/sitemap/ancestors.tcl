@@ -41,7 +41,7 @@ if { ![template::util::is_nil index_page_id] } {
 
 # get the path of the item
 
-db_1row get_preview_info ""
+db_1row get_preview_info "" -column_array preview_info
 
 template::util::array_to_vars preview_info
 # physical_path, virtual_path, is_folder, has_index_page

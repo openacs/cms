@@ -17,7 +17,7 @@ if { [string equal $is_valid_task f] } {
 
 
 # task info
-set task_info [db_1row get_task_info ""]
+db_1row get_task_info "" -column_array task_info
 
 set holding_user $task_info(holding_user)
 

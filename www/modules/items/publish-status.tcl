@@ -48,7 +48,7 @@ switch $info(publish_status) {
 
 # determine whether the item is publishable or not
 
-db_1row get_publish_info ""
+db_1row get_publish_info "" -column_array publish_info
 
 template::util::array_to_vars publish_info
 

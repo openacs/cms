@@ -75,7 +75,7 @@ ad_proc -private content_method::get_content_method_options { content_type } {
     
     set text_entry_filter [text_entry_filter_sql $content_type]
 
-    db_1row get_content_default_method ""
+    db_0or1row get_content_default_method ""
 
     if { ![template::util::is_nil content_method] } {
 	set methods [list [list $label $content_method]]
