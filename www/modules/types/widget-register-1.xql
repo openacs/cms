@@ -31,7 +31,7 @@
       from
         cm_attribute_widgets
       where
-        attribute_id = :attribute_id"
+        attribute_id = :attribute_id
       </querytext>
 </fullquery>
 
