@@ -340,7 +340,7 @@
 
 -- create or replace package body content_workflow 
 -- function is_overdue
-create function content_workflow__is_overdue (integer)
+create or replace function content_workflow__is_overdue (integer)
 returns boolean as '
 declare
   p_task_id            alias for $1;  
@@ -368,7 +368,7 @@ end;' language 'plpgsql';
 
 
 -- function is_overdue
-create function content_workflow__is_overdue (integer,varchar)
+create or replace function content_workflow__is_overdue (integer,varchar)
 returns boolean as '
 declare
   p_case_id                        alias for $1;  
@@ -393,7 +393,7 @@ end;' language 'plpgsql';
 
 
 -- function get_holding_user_name
-create function content_workflow__get_holding_user_name (integer)
+create or replace function content_workflow__get_holding_user_name (integer)
 returns varchar as '
 declare
   p_task_id                        alias for $1;  
@@ -417,7 +417,7 @@ end;' language 'plpgsql';
 
 
 
-create function content_workflow__get_first_place() returns varchar as '
+create or replace function content_workflow__get_first_place() returns varchar as '
 declare
     v_first_place wf_places.place_key%TYPE;
 begin
@@ -441,7 +441,7 @@ begin
 end;' language 'plpgsql';
 
 -- function get_this_place
-create function content_workflow__get_this_place (varchar)
+create or replace function content_workflow__get_this_place (varchar)
 returns varchar as '
 declare
   p_transition_key                 alias for $1;  
@@ -470,7 +470,7 @@ end;' language 'plpgsql';
 
 
 -- function get_next_place
-create function content_workflow__get_next_place (varchar)
+create or replace function content_workflow__get_next_place (varchar)
 returns varchar as '
 declare
   p_transition_key                 alias for $1;  
@@ -505,7 +505,7 @@ end;' language 'plpgsql';
 
 
 -- function get_previous_place
-create function content_workflow__get_previous_place (varchar)
+create or replace function content_workflow__get_previous_place (varchar)
 returns varchar as '
 declare
   p_transition_key                 alias for $1;  
@@ -540,7 +540,7 @@ end;' language 'plpgsql';
 
 
 -- procedure checkout
-create function content_workflow__checkout (integer,timestamp with time zone,integer,varchar,varchar)
+create or replace function content_workflow__checkout (integer,timestamp with time zone,integer,varchar,varchar)
 returns integer as '
 declare
   p_task_id                        alias for $1;  
@@ -634,7 +634,7 @@ end;' language 'plpgsql';
 
 
 -- procedure checkin
-create function content_workflow__checkin (integer,integer,varchar,varchar)
+create or replace function content_workflow__checkin (integer,integer,varchar,varchar)
 returns integer as '
 declare
   p_task_id                        alias for $1;  
@@ -694,7 +694,7 @@ end;' language 'plpgsql';
 
 
 -- procedure approve
-create function content_workflow__approve (integer,integer,varchar,varchar)
+create or replace function content_workflow__approve (integer,integer,varchar,varchar)
 returns integer as '
 declare
   p_task_id                        alias for $1;  
@@ -770,7 +770,7 @@ end;' language 'plpgsql';
 
 
 -- procedure reject
-create function content_workflow__reject (integer,integer,varchar,varchar,varchar)
+create or replace function content_workflow__reject (integer,integer,varchar,varchar,varchar)
 returns integer as '
 declare
   p_task_id                        alias for $1;  
@@ -877,7 +877,7 @@ end;' language 'plpgsql';
 
 
 -- procedure notify_of_checkout
-create function content_workflow__notify_of_checkout (integer,integer,integer,varchar)
+create or replace function content_workflow__notify_of_checkout (integer,integer,integer,varchar)
 returns integer as '
 declare
   p_task_id                        alias for $1;  
@@ -937,7 +937,7 @@ end;' language 'plpgsql';
 
 
 -- function can_reject
-create function content_workflow__can_reject (integer,integer)
+create or replace function content_workflow__can_reject (integer,integer)
 returns boolean as '
 declare
   p_task_id                        alias for $1;  
@@ -965,7 +965,7 @@ end;' language 'plpgsql';
 
 
 -- function can_approve
-create function content_workflow__can_approve (integer,integer)
+create or replace function content_workflow__can_approve (integer,integer)
 returns boolean as '
 declare
   p_task_id                        alias for $1;  
@@ -989,7 +989,7 @@ end;' language 'plpgsql';
 
 
 -- function can_start
-create function content_workflow__can_start (integer,integer)
+create or replace function content_workflow__can_start (integer,integer)
 returns boolean as '
 declare
   p_task_id                        alias for $1;  
@@ -1013,7 +1013,7 @@ end;' language 'plpgsql';
 
 
 -- function approve_string
-create function content_workflow__approve_string (integer,integer)
+create or replace function content_workflow__approve_string (integer,integer)
 returns varchar as '
 declare
   p_task_id                        alias for $1;  
@@ -1049,7 +1049,7 @@ end;' language 'plpgsql';
 
 
 -- function count_finished_tasks
-create function content_workflow__count_finished_tasks (integer)
+create or replace function content_workflow__count_finished_tasks (integer)
 returns integer as '
 declare
   p_case_id                        alias for $1;  
@@ -1086,7 +1086,7 @@ end;' language 'plpgsql';
 
 
 -- function count_unfinished_tasks
-create function content_workflow__count_unfinished_tasks (integer)
+create or replace function content_workflow__count_unfinished_tasks (integer)
 returns integer as '
 declare
   p_case_id                        alias for $1;  
@@ -1114,7 +1114,7 @@ end;' language 'plpgsql';
 
 
 -- function is_active
-create function content_workflow__is_active (integer,varchar)
+create or replace function content_workflow__is_active (integer,varchar)
 returns boolean as '
 declare
   p_case_id                        alias for $1;  
@@ -1136,7 +1136,7 @@ end;' language 'plpgsql';
 
 
 -- function is_finished
-create function content_workflow__is_finished (integer,varchar)
+create or replace function content_workflow__is_finished (integer,varchar)
 returns boolean as '
 declare
   p_case_id                        alias for $1;  
@@ -1186,7 +1186,7 @@ end;' language 'plpgsql';
 
 
 -- function is_checked_out
-create function content_workflow__is_checked_out (integer,varchar)
+create or replace function content_workflow__is_checked_out (integer,varchar)
 returns boolean as '
 declare
   p_case_id                        alias for $1;  
@@ -1209,7 +1209,7 @@ end;' language 'plpgsql';
 
 
 -- function is_checked_out
-create function content_workflow__is_checked_out (integer,varchar,integer)
+create or replace function content_workflow__is_checked_out (integer,varchar,integer)
 returns boolean as '
 declare
   p_case_id                        alias for $1;  
@@ -1235,7 +1235,7 @@ end;' language 'plpgsql';
 
 
 -- function get_status
-create function content_workflow__get_status (integer,varchar)
+create or replace function content_workflow__get_status (integer,varchar)
 returns varchar as '
 declare
   p_case_id                        alias for $1;  
@@ -1283,7 +1283,7 @@ end;' language 'plpgsql';
 
 
 -- function can_touch
-create function content_workflow__can_touch (integer,integer)
+create or replace function content_workflow__can_touch (integer,integer)
 returns boolean as '
 declare
   p_item_id                        alias for $1;  
@@ -1342,7 +1342,7 @@ end;' language 'plpgsql';
 
 
 -- function unfinished_workflow_exists
-create function content_workflow__unfinished_workflow_exists (integer)
+create or replace function content_workflow__unfinished_workflow_exists (integer)
 returns boolean as '
 declare
   p_item_id                        alias for $1;  

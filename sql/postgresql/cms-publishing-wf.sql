@@ -6,7 +6,7 @@ create table cr_workflows (
                  references wf_cases
 );
 
-create function inline_0 ()
+create or replace function inline_0 ()
 returns integer as '
 declare
   v_workflow_key varchar(100);
@@ -244,7 +244,7 @@ end;
 
 -- create or replace package body publishing_wf as
 -- function is_next
-create function publishing_wf__is_next (integer,varchar,varchar,varchar,varchar,varchar)
+create or replace function publishing_wf__is_next (integer,varchar,varchar,varchar,varchar,varchar)
 returns char as '
 declare
   p_case_id                        alias for $1;  
@@ -268,7 +268,7 @@ begin
 end;' language 'plpgsql';
 
 
-create function inline_2 ()
+create or replace function inline_2 ()
 returns integer as '
 declare
     v_attribute_id acs_attributes.attribute_id%TYPE;

@@ -120,99 +120,8 @@ create view cm_attribute_widget_param_ext as
   order by
     object_type, sort_order;
 
--- create or replace package cm_form_widget 
--- is
--- 
--- procedure set_attribute_order (
---   --/** Update the sort_order column of acs_attributes.
---   --    @author Karl Goldstein
---   --    @param content_type   The name of the content type
---   --    @param attribute_name The name of the attribute
---   --    @param sort_order     The sort order.
---   --*/
---   content_type   in acs_attributes.object_type%TYPE,
---   attribute_name in acs_attributes.attribute_name%TYPE,
---   sort_order     in acs_attributes.sort_order%TYPE
--- );
--- 
--- procedure register_attribute_widget (
---   --/** Register a form widget to a content type attribute.  The form widget
---   --    uses the default values if none are set. If there is already a widget
---   --    registered to the attribute, the new widget replaces the old widget,
---   --    and all parameters are set to their default values.
---   --    @author Karl Goldstein, Stanislav Freidin
---   --    @param content_type   The name of the content type
---   --    @param attribute_name The name of the attribute
---   --	@param widget	      The name of the form widget to use in metadata
---   --			      forms
---   --	@param is_required    Whether this form widget requires a value, 
---   --			      defaults to 'f'
---   --    @see <a href="">/ats/form-procs.tcl/element_create</a>,
---   --         {cm_form_widget.set_attribute_param_value},
---   --         {cm_form_widget.unregister_attribute_widget}
---   --*/
---   content_type   in acs_attributes.object_type%TYPE,
---   attribute_name in acs_attributes.attribute_name%TYPE,
---   widget         in cm_form_widgets.widget%TYPE,
---   is_required    in cm_attribute_widgets.is_required%TYPE default 'f'
--- );
--- 
--- procedure unregister_attribute_widget (
---   --/** Unregister a form widget from a content type attribute. 
---   --    The attribute will no longer show up on the dynamic revision
---   --    upload form.<p>If no widget is registered to the attribute,
---   --    the procedure does nothing.
---   --    @author Karl Goldstein, Stanislav Freidin 
---   --    @param content_type   The name of the content type
---   --    @param attribute_name The name of the attribute for which to
---   --                          unregister the widget
---   --    @see {cm_form_widget.register_attribute_widget}
---   --*/
---   content_type   in acs_attributes.object_type%TYPE,
---   attribute_name in acs_attributes.attribute_name%TYPE
--- );
--- 
--- procedure set_attribute_param_value (
---   --/** Sets custom values for the param tag of a form widget that is 
---   --    registered to a content type attribute. Unless this procedure is
---   --    called, the default form widget param values are used.<p>
---   --    If the parameter already has a value associated with it, the old
---   --    value is overwritten.
---   --    @author Karl Goldstein, Stanislav Freidin
---   --    @param content_type   The name of the content type
---   --    @param attribute_name The name of the attribute
---   --    @param param	      The name of the form widget parameter.
---   --			      Can be an ATS 'element create' flag or an
---   --			      HTML form widget tag
---   --    @param param_type     The type of value the param tag expects.
---   --			      Can be 'onevalue','onelist', or 'multilist',
---   --			      defaults to 'onevalue'
---   --    @param param_source   How the param value is to be acquired, either
---   --			      'literal', 'eval', or 'query', defaults to
---   --			      'literal'
---   --    @param value	      The value(s) or means or obtaining the value(s)
---   --			      for the param tag
---   --    @see <a href="">/ats/form-procs.tcl/element_create</a>,
---   --         {cm_form_widget.register_attribute_widget}
---   --*/
---   content_type   in acs_attributes.object_type%TYPE,
---   attribute_name in acs_attributes.attribute_name%TYPE,
---   param          in cm_form_widget_params.param%TYPE,
---   value          in cm_attribute_widget_params.value%TYPE,
---   param_type     in cm_attribute_widget_params.param_type%TYPE 
---                     default 'onevalue',
---   param_source   in cm_attribute_widget_params.param_source%TYPE
---                     default 'literal'
--- );
--- 
--- end cm_form_widget;
 
--- show errors
-
-
--- create or replace package body cm_form_widget 
--- procedure register_attribute_widget
-create function cm_form_widget__register_attribute_widget (varchar,varchar,varchar,boolean)
+create or replace function cm_form_widget__register_attribute_widget (varchar,varchar,varchar,boolean)
 returns integer as '
 declare
   p_content_type        alias for $1;  
@@ -272,7 +181,7 @@ end;' language 'plpgsql';
 
 
 -- procedure set_attribute_order
-create function cm_form_widget__set_attribute_order (varchar,varchar,integer)
+create or replace function cm_form_widget__set_attribute_order (varchar,varchar,integer)
 returns integer as '
 declare
   p_content_type        alias for $1;  
@@ -295,7 +204,7 @@ end;' language 'plpgsql';
 
 
 -- procedure unregister_attribute_widget
-create function cm_form_widget__unregister_attribute_widget (varchar,varchar)
+create or replace function cm_form_widget__unregister_attribute_widget (varchar,varchar)
 returns integer as '
 declare
   p_content_type        alias for $1;  
@@ -337,7 +246,7 @@ end;' language 'plpgsql';
 
 
 -- procedure set_attribute_param_value
-create function cm_form_widget__set_attribute_param_value (varchar,varchar,varchar,varchar,varchar,varchar)
+create or replace function cm_form_widget__set_attribute_param_value (varchar,varchar,varchar,varchar,varchar,varchar)
 returns integer as '
 declare
   p_content_type        alias for $1;  
@@ -405,13 +314,10 @@ begin
     return 0; 
 end;' language 'plpgsql';
 
-create function cm_form_widget__set_attribute_param_value (varchar,varchar,varchar,integer,varchar,varchar)
+create or replace function cm_form_widget__set_attribute_param_value (varchar,varchar,varchar,integer,varchar,varchar)
 returns integer as '
 begin
     return cm_form_widget__set_attribute_param_value($1, $2, $3, cast ($4 as varchar), $5, $6); 
 end;' language 'plpgsql';
-
--- show errors
-
 
 \i cms-widgets.sql

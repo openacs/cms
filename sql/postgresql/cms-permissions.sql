@@ -1,7 +1,7 @@
 -- This file will eventually replace content-perms.sql
 -- Implements the CMS permission
 
-create function inline_0 ()
+create or replace function inline_0 ()
 returns integer as '
 declare
   v_perms       boolean default ''f'';
@@ -220,7 +220,7 @@ limit 1;
 
 -- create or replace package body cms_permission
 -- procedure update_permissions
-create function cms_permission__update_permissions (integer,varchar)
+create or replace function cms_permission__update_permissions (integer,varchar)
 returns integer as '
 declare
   p_item_id                        alias for $1;  
@@ -311,7 +311,7 @@ end;' language 'plpgsql';
 
 
 -- function has_grant_authority
-create function cms_permission__has_grant_authority (integer,integer,varchar)
+create or replace function cms_permission__has_grant_authority (integer,integer,varchar)
 returns boolean as '
 declare
   p_item_id                        alias for $1;  
@@ -335,7 +335,7 @@ end;' language 'plpgsql';
 
 
 -- function has_revoke_authority
-create function cms_permission__has_revoke_authority (integer,integer,varchar,integer)
+create or replace function cms_permission__has_revoke_authority (integer,integer,varchar,integer)
 returns boolean as '
 declare
   p_item_id                        alias for $1;  
@@ -371,7 +371,7 @@ create table v_items (
 );
 insert into v_items (value) values ('{0}');
 
-create function v_items_tr () returns opaque as '
+create or replace function v_items_tr () returns opaque as '
 begin
         raise EXCEPTION ''Only updates are allowed on this table'';
         return null;
@@ -386,7 +386,7 @@ create table v_perms (
 );
 insert into v_perms (value) values ('{''}');
 
-create function v_perms_tr () returns opaque as '
+create or replace function v_perms_tr () returns opaque as '
 begin
         raise EXCEPTION ''Only updates are allowed on this table'';
         return null;
@@ -398,7 +398,7 @@ for each row execute procedure v_perms_tr();
 -- procedure grant_permission
 -- FIXME: need to fix problem with defined types
 
-create function cms_permission__grant_permission (integer,integer,varchar,integer,varchar)
+create or replace function cms_permission__grant_permission (integer,integer,varchar,integer,varchar)
 returns integer as '
 declare
   p_item_id                        alias for $1;  
@@ -487,7 +487,7 @@ end;' language 'plpgsql';
 
 
 -- procedure revoke_permission
-create function cms_permission__revoke_permission (integer,integer,varchar,integer,varchar)
+create or replace function cms_permission__revoke_permission (integer,integer,varchar,integer,varchar)
 returns integer as '
 declare
   p_item_id                        alias for $1;  
@@ -583,7 +583,7 @@ end;' language 'plpgsql';
 
 
 -- function permission_p
-create function cms_permission__permission_p (integer,integer,varchar)
+create or replace function cms_permission__permission_p (integer,integer,varchar)
 returns boolean as '
 declare
   p_item_id                        alias for $1;  
@@ -667,7 +667,7 @@ begin
     
 end;' language 'plpgsql';
 
-create function cms_permission__cm_admin_exists() returns boolean as '
+create or replace function cms_permission__cm_admin_exists() returns boolean as '
 declare
     v_exists    boolean;
 begin
@@ -692,7 +692,7 @@ end;' language 'plpgsql';
 -- A trigger to automatically grant item creators the cm_write and cm_perm
 -- permissions
 
-create function cr_items_permission_tr () returns opaque as '
+create or replace function cr_items_permission_tr () returns opaque as '
 declare
   v_user_id parties.party_id%TYPE;
 begin
@@ -808,7 +808,7 @@ for each row execute procedure cr_items_permission_tr ();
 
 -- create or replace package body content_permission 
 -- procedure inherit_permissions
-create function content_permission__inherit_permissions (integer,integer,integer)
+create or replace function content_permission__inherit_permissions (integer,integer,integer)
 returns integer as '
 declare
   p_parent_object_id               alias for $1;  
@@ -821,7 +821,7 @@ end;' language 'plpgsql';
 
 
 -- function has_grant_authority
-create function content_permission__has_grant_authority (integer,integer,varchar)
+create or replace function content_permission__has_grant_authority (integer,integer,varchar)
 returns boolean as '
 declare
   p_object_id                      alias for $1;  
@@ -836,7 +836,7 @@ end;' language 'plpgsql';
 
 
 -- procedure grant_permission_h
-create function content_permission__grant_permission_h (integer,integer,varchar)
+create or replace function content_permission__grant_permission_h (integer,integer,varchar)
 returns integer as '
 declare
   p_object_id                      alias for $1;  
@@ -848,7 +848,7 @@ end;' language 'plpgsql';
 
 
 -- procedure grant_permission
-create function content_permission__grant_permission (integer,integer,varchar,integer,varchar,varchar)
+create or replace function content_permission__grant_permission (integer,integer,varchar,integer,varchar,varchar)
 returns integer as '
 declare
   p_object_id                      alias for $1;  
@@ -867,7 +867,7 @@ end;' language 'plpgsql';
 
 
 -- function has_revoke_authority
-create function content_permission__has_revoke_authority (integer,integer,varchar,integer)
+create or replace function content_permission__has_revoke_authority (integer,integer,varchar,integer)
 returns boolean as '
 declare
   p_object_id                      alias for $1;  
@@ -883,7 +883,7 @@ end;' language 'plpgsql';
 
 
 -- procedure revoke_permission_h
-create function content_permission__revoke_permission_h (integer,integer,varchar)
+create or replace function content_permission__revoke_permission_h (integer,integer,varchar)
 returns integer as '
 declare
   p_object_id                      alias for $1;  
@@ -895,7 +895,7 @@ end;' language 'plpgsql';
 
 
 -- procedure revoke_permission
-create function content_permission__revoke_permission (integer,integer,varchar,integer,varchar,varchar)
+create or replace function content_permission__revoke_permission (integer,integer,varchar,integer,varchar,varchar)
 returns integer as '
 declare
   p_object_id                      alias for $1;  
@@ -914,7 +914,7 @@ end;' language 'plpgsql';
 
 
 -- function permission_p
-create function content_permission__permission_p (integer,integer,varchar)
+create or replace function content_permission__permission_p (integer,integer,varchar)
 returns boolean as '
 declare
   p_object_id                      alias for $1;  

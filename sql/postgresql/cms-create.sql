@@ -14,7 +14,7 @@
 
 \i cms-update.sql
 
-create function inline_0 ()
+create or replace function inline_0 ()
 returns integer as '
 declare
  attr_id	acs_attributes.attribute_id%TYPE;
@@ -149,7 +149,7 @@ comment on column cm_modules.root_key is '
 
 -- create or replace package body content_module
 
-create function content_module__new (varchar,varchar,varchar,integer,integer)
+create or replace function content_module__new (varchar,varchar,varchar,integer,integer)
 returns integer as '
 declare
   p_name                        alias for $1;  
@@ -172,14 +172,14 @@ begin
                                    );
 end;' language 'plpgsql';
 
-create function content_module__new (varchar,varchar,integer,integer,integer)
+create or replace function content_module__new (varchar,varchar,integer,integer,integer)
 returns integer as '
 begin
     return content_module__new ($1, $2, cast ($3 as varchar), $4, $5);
 end;' language 'plpgsql';
 
 -- function new
-create function content_module__new (varchar,varchar,varchar,integer,integer,integer,timestamp with time zone,integer,varchar,varchar)
+create or replace function content_module__new (varchar,varchar,varchar,integer,integer,integer,timestamp with time zone,integer,varchar,varchar)
 returns integer as '
 declare
   p_name                        alias for $1;  
@@ -223,7 +223,7 @@ begin
 end;' language 'plpgsql';
 
 
-create function content_module__get_label (integer) returns varchar as '
+create or replace function content_module__get_label (integer) returns varchar as '
 declare
         p_module_id     alias for $1;
         v_name          cm_modules.name%TYPE;
@@ -241,7 +241,7 @@ begin
 end;' language 'plpgsql';
 
 -- Insert the default modules
-create function inline_1 () returns integer as '
+create or replace function inline_1 () returns integer as '
 declare 
   v_id		integer;
   v_module_id	integer;
@@ -271,7 +271,7 @@ drop function inline_1 ();
 
 -- Get the alphabetical ordering of a string, based on the first
 -- character. Treat all non-alphabetical characters as before ''a''
-create function letter_placement (varchar) returns integer as '
+create or replace function letter_placement (varchar) returns integer as '
 declare
   p_word          alias for $1;
   v_letter        varchar(1);
