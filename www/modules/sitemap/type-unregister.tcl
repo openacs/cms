@@ -6,7 +6,6 @@ request set_param type_key -datatype keyword
 
 
 
-set db [template::begin_db_transaction]
 db_transaction {
     db_exec_plsql unregister "
          begin

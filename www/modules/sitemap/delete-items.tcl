@@ -109,16 +109,16 @@ if { [form is_valid delete] } {
 
             # set up the call to the proper PL/SQL delete procedure
             if { [string equal $is_symlink "t"] } {
-                set delete_proc "content_symlink.delete"
+                set delete_proc [db_map symlink_delete]
                 set delete_key "symlink_id"
             } elseif { [string equal $is_folder "t"] } {
-                set delete_proc "content_folder.delete"
+                set delete_proc [db_map folder_delete]
                 set delete_key "folder_id"   
             } elseif { [string equal $is_template "t"] } {
-                set delete_proc "content_template.delete"
+                set delete_proc [db_map template_delete]
                 set delete_key "template_id"
             } else {
-                set delete_proc "content_item.delete"
+                set delete_proc [db_map item_delete]
                 set delete_key "item_id"
             }
 

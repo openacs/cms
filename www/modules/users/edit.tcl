@@ -52,7 +52,6 @@ if { [form is_valid edit_group] } {
   template::form get_values edit_group group_id user_id group_name \
                             email url mount_point
 
-  set db [template::begin_db_transaction]
   db_transaction {
       db_dml edit_group_1 "
     update groups 

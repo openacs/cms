@@ -45,7 +45,6 @@ if { [form is_valid new_template] } {
   set creation_ip [ns_conn peeraddr]
   set creation_user [User::getID]
 
-  set db [template::begin_db_transaction]
   db_transaction {
 
 

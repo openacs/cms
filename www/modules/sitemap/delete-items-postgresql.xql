@@ -16,5 +16,37 @@
       </querytext>
 </fullquery>
 
+
+<partialquery name="symlink_delete">      
+      <querytext>
+
+        content_symlink__delete
+
+      </querytext>
+</partialquery>
+
+<partialquery name="folder_delete">      
+      <querytext>
+
+        content_folder__delete
+
+      </querytext>
+</partialquery>
+
+<partialquery name="template_delete">      
+      <querytext>
+
+        content_template__delete
+
+      </querytext>
+</partialquery>
+
+<partialquery name="item_delete">      
+      <querytext>
+
+        content_item__delete
+
+      </querytext>
+</partialquery>
  
 </queryset>

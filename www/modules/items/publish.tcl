@@ -38,7 +38,7 @@ db_transaction {
         
     } else {
 
-        db_dml abort "abort transaction"
+        db_abort_transaction
 
         set msg "This item is not in a publishable state" 
         set return_url "index?item_id=$item_id"

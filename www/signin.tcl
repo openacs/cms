@@ -21,34 +21,30 @@ if { [form is_valid sign_in_user] } {
 
   form get_values sign_in_user screen_name password
 
-  set db [template::begin_db_transaction]
+  db_transaction {
 
-  set query "select user_id, salt, password from users 
+      template::query get_info info onerow "select user_id, salt, password from users 
              where screen_name = :screen_name"
 
-  query info onerow $query -db $db
+      set is_valid_login 0
 
-  set is_valid_login 0
+      if { [array exists info] } {
 
-  if { [array exists info] } {
+          set hashed_password [ns_sha1 "$password$info(salt)"]
+          set is_valid_login [string equal $info(password) $hashed_password]
+      }
 
-    set hashed_password [ns_sha1 "$password$info(salt)"]
-    set is_valid_login [string equal $info(password) $hashed_password]
+      if { ! $is_valid_login } {
+
+          element set_error sign_in_user screen_name \
+              "The screen name and password combination is invalid."
+
+      } else {
+
+          User::login $db $info(user_id)
+          template::forward index
+          return
+      }
   }
-
-  if { ! $is_valid_login } {
-
-    element set_error sign_in_user screen_name \
-	"The screen name and password combination is invalid."
-
-  } else {
-
-    User::login $db $info(user_id)
-    template::end_db_transaction
-    template::forward index
-    return
-  }
-
-  template::end_db_transaction
 }
 

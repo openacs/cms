@@ -88,7 +88,6 @@ if { [form is_valid edit_user] } {
     append users_update ", password=:hashed_password, salt=:salt"
   }
 
-  set db [template::begin_db_transaction]
   db_transaction {
       db_dml edit_user_1 "
     update users $users_update where user_id = :item_id

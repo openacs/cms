@@ -127,7 +127,7 @@ if { [template::form is_valid reject] } {
              select content_workflow.can_reject( :task_id, :user_id ) from dual" 
 
         if { [string equal $is_valid_task f] } {
-            db_dml abort "abort transaction"
+            db_abort_transaction
             template::request::error invalid_task \
 		"task-reject.tcl - invalid task - $task_id"
             return

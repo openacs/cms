@@ -113,7 +113,6 @@ if { [form is_valid publish_status] } {
 
   form get_values publish_status publish_status start_when end_when item_id
 
-  set db [template::begin_db_transaction]
   db_transaction {
       publish::set_publish_status $db $item_id $publish_status
 

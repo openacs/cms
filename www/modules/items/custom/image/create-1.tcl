@@ -130,7 +130,7 @@ if { [form is_valid image] } {
 	    item_id = :item_id
 	" 
 
-            db_dml abort "abort transaction"
+            db_abort_transaction
 
             if { $clicks > 0 } {
                 # double click error - do nothing, forward to view the item

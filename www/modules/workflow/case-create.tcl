@@ -145,7 +145,6 @@ if { [form is_valid case_create] } {
     form get_values case_create item_id case_id is_edit transitions msg
     set creation_ip [ns_conn peeraddr]
 
-    set db [template::begin_db_transaction]
     db_transaction {
 
         if { ![string equal $is_edit t] } {

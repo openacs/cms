@@ -82,7 +82,7 @@ if { [form is_valid image] } {
 	    revision_id = :revision_id
 	" 
 
-            db_dml abort "abort transaction"
+            db_abort_transaction
 
             if { $clicks > 0 } {
                 # double click error - forward to view the item

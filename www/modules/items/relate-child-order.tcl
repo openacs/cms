@@ -14,7 +14,7 @@ db_transaction {
   where rel_id = :rel_id" 
 
     if { ![info exists rel_info] } {
-        db_dml abort "abort transaction"
+        db_abort_transaction
         request::error no_such_rel "The relationship $rel_id does not exist."
         return
     }

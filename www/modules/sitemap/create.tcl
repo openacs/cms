@@ -63,7 +63,6 @@ if { [form is_valid add_folder] } {
     set user_id [User::getID]
     set ip [ns_conn peeraddr]
   
-    set db [template::begin_db_transaction]
     db_transaction {
 
         set folder_id [db_exec_plsql new_folder "

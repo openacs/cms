@@ -44,7 +44,6 @@ if { [form is_valid register_user] } {
     form get_values register_user user_id email first_name last_name \
 	    password screen_name
 
-    set db [template::begin_db_transaction]
     db_transaction {
         
         set user_id [ad_user_new $email $first_name $last_name $password \

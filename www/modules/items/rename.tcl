@@ -48,7 +48,6 @@ if { [form is_valid rename_item] } {
   form get_values rename_item \
 	  mount_point item_id name
 
-  set db [template::begin_db_transaction]
   db_transaction {
       db_exec_plsql rename_item "
     begin 

@@ -91,7 +91,7 @@ if { [template::form is_valid task_finish] } {
              select content_workflow.can_approve( :task_id, :user_id ) from dual"
 
         if { [string equal $is_valid_task f] } {
-            db_dml abort "abort transaction"
+            db_abort_transaction
             template::request::error invalid_task \
 		"task-finish.tcl - This task is no longer valid - $task_id"
             return

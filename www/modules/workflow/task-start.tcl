@@ -112,14 +112,13 @@ if { [form is_valid task_start] } {
     set ip_address [ns_conn peeraddr]    
     set user_id [User::getID]
 
-    set db [template::begin_db_transaction]
     db_transaction {
         # check that task has not expired, if it has display error msg
         template::query get_status is_valid_task onevalue "
       select content_workflow.can_start( :task_id, :user_id ) from dual" 
 
         if { [string equal $is_valid_task f] } {
-            db_dml abort "abort transaction"
+            db_abort_transaction
             template::request::error invalid_task \
 		"task-start.tcl - invalid task - $task_id"
             return

@@ -13,7 +13,6 @@ if { [template::util::is_nil return_url] } {
 }
 
 
-set db [template::begin_db_transaction]
 db_transaction {
     db_exec_plsql unset_content_method_default "
   begin

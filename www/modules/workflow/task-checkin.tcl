@@ -105,7 +105,7 @@ if { [form is_valid task_start] } {
     " 
 
         if { [string equal $is_valid_task f] } {
-            db_dml abort "abort transaction"
+            db_abort_transaction
             template::request::error invalid_task \
 		"task-checkin.tcl - invalid task - $task_id"
             return

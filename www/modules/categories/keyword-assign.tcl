@@ -15,8 +15,6 @@ if { [template::util::is_nil item_id] } {
 # Preserve the item_id since the clipboard::parse_cookie wil overwrite it
 set saved_item_id $item_id
 set clip [clipboard::parse_cookie]
-
-set db [template::begin_db_transaction]
 db_transaction {
     clipboard::map_code $clip categories {
         if { [catch { 
