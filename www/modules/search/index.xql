@@ -16,7 +16,7 @@
 <fullquery name="get_results">      
       <querytext>
       
-    select count(*) from ($sql_query)
+    select count(*) from ($sql_query) x
   
       </querytext>
 </fullquery>

@@ -68,6 +68,7 @@ if { [form is_valid search] } {
   foreach word $word_list {
     append inter_clause "${the_or}%[string tolower $word]%"
     append within_clause "${the_or}%[string tolower $word]% within \$field"
+    #append within_clause [db_map within_clause]
     set the_or ","
   }
 
@@ -90,38 +91,21 @@ if { [form is_valid search] } {
       set search_clause $inter_clause
       set column_name "r.content"
     }
-    append contains_clause "$the_or contains($column_name, '$search_clause', $label) > 0"
+    append contains_clause [db_map contains_clause]
     set the_or " or "
-    append score_expr "$the_plus score($label)"
+    append score_expr [db_map score_expr]
     set the_plus " +"
     incr label 10
   }
 
   # Build the basic query
-
-  set sql_query "
-    select 
-      i.item_id, content_item.get_path(i.item_id) item_path,
-      r.revision_id,
-      t.pretty_name as pretty_type, t.object_type,
-      r.title, to_char(r.publish_date) as pretty_date,
-      NVL(NVL(m.label, r.mime_type), 'unknown') as pretty_mime_type,
-      rownum as row_index,
-      ($score_expr) as search_score
-    from
-      cr_items i, cr_revisions r, 
-      cr_mime_types m, acs_object_types t $attrs_table
-    where
-      m.mime_type(+) = r.mime_type
-    and
-      t.object_type = i.content_type $attrs_where
-    and
-      ($contains_clause)"
+  set live_p [string equal $which_revisions live]
+  set sql_query [db_map sql_query]
 
   # Append other search parameters to the query
 
-  if { [string equal $which_revisions live] } {
-    append sql_query "\n    and r.revision_id(+) = i.live_revision"
+  if { $live_p } {
+    append sql_query [db_map live_revision]
   } else {
     append sql_query "\n    and r.item_id = i.item_id"
   }
