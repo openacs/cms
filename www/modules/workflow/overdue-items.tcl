@@ -5,7 +5,7 @@ request set_param transition -datatype keyword -value "all"
 if { ![string equal $transition "all"] } {
     set transition_name [db_string get_transition_name ""]
 
-    set transition_sql "and ca.transition_key = :transition"
+    set transition_sql "and trans.transition_key = :transition"
 
 } else {
     set transition_name "All Tasks"

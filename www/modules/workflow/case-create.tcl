@@ -124,20 +124,23 @@ if { [form is_valid case_create] } {
         ); 
         end;"]
 
+
             # make assignments for each transition
             foreach transition $transitions {
                 foreach value [element get_values case_create \
                                    ${transition}_assign] {
 
-                    db_exec_plsql add_assignment "
-		  begin
-		  workflow_case.add_manual_assignment(
-		      case_id        => :case_id,
-		      transition_key => :transition,
-		      party_id       => :value
-		  );
-		  end;
-		"
+#                     db_exec_plsql add_assignment "
+# 		  begin
+# 		  workflow_case.add_manual_assignment(
+# 		      case_id        => :case_id,
+# 		      transition_key => :transition,
+# 		      party_id       => :value
+# 		  );
+# 		  end;
+# 		"
+
+                    db_exec_plsql add_assignment ""
                 }
 
                 set deadline [element get_value case_create \

@@ -7,7 +7,7 @@ request set_param mount_point -datatype keyword -value workflow
 
 # workflow totals
 
-db_1row get_stats ""
+db_1row get_stats "" -column_array wf_stats
     
 
 # workflow tasks by transition state: content items, overdue items
