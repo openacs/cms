@@ -241,7 +241,7 @@ if { [form is_valid case_create] } {
 		      begin
 	    	      workflow_case.add_manual_assignment(
 		          case_id         => :case_id,
-	                  tranisition_key => :transition,
+	                  transition_key  => :transition,
 	                  party_id        => :new_value
 		      );
 		      end;
