@@ -18,9 +18,11 @@ if {[string match *sitemap* $url]} {
     set section workspace
 } elseif {[string match *clipboard* $url]} {
     set section clipboard
+} elseif {[string match *categories* $url]} {
+    set section categories
 } elseif {[string match *users* $url]} {
     set section users
 }
 
 
-set clipboard_js "[ad_conn package_url]modules/clipboard/clipboard.js"
+set clipboard_js "${package_url}modules/clipboard/clipboard.js"

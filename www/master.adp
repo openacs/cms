@@ -65,6 +65,17 @@ div#section-header {
   </div>
  </else>
 
+ <if @section@ eq "categories">
+  <div class="tab" id="subnavbar-here">
+    Keywords
+  </div>
+ </if>
+ <else>
+  <div class="tab">
+    <a href="@package_url@modules/categories/index" title="">Keywords</a>
+  </div>
+ </else>
+
  <if @section@ eq "search">
   <div class="tab" id="subnavbar-here">
     Search
