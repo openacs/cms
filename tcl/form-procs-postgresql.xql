@@ -189,7 +189,8 @@ null
 	<querytext>
 
       update cr_revisions 
-      set content = empty_lob() where revision_id = :revision_id
+      set content = [set __lob_id [db_string get_id "select empty_lob()"]]
+      where revision_id = :revision_id
 
 	</querytext>
 <fullquery>
@@ -303,5 +304,89 @@ null
 
 	</querytext>
 </partialquery>
+
+<partialquery name="abr_new_revision_description">
+	<querytext>
+         , :description
+	</querytext>
+</partialquery>
+
+<partialquery name="abr_new_revision_publish_date">
+	<querytext>
+         , :publish_date
+	</querytext>
+</partialquery>
+
+<partialquery name="abr_new_revision_mime_type">
+	<querytext>
+         , :mime_type
+	</querytext>
+</partialquery>
+
+<partialquery name="abr_new_revision_nls_language">
+	<querytext>
+         , :nls_language
+	</querytext>
+</partialquery>
+
+<partialquery name="abr_new_revision_text">
+	<querytext>
+         , :text
+	</querytext>
+</partialquery>
+
+<partialquery name="abr_new_revision_description_ne">
+	<querytext>
+         , null
+	</querytext>
+</partialquery>
+
+<partialquery name="abr_new_revision_publish_date_ne">
+	<querytext>
+         , now()
+	</querytext>
+</partialquery>
+
+<partialquery name="abr_new_revision_mime_type_ne">
+	<querytext>
+         , 'text/plain'
+	</querytext>
+</partialquery>
+
+<partialquery name="abr_new_revision_nls_language_ne">
+	<querytext>
+         , null
+	</querytext>
+</partialquery>
+
+<partialquery name="abr_new_revision_text_ne">
+	<querytext>
+         , ' '
+	</querytext>
+</partialquery>
+
+<partialquery name="abr_new_revision_end_items">
+	<querytext>
+         , content_symlink__resolve(:item_id), :revision_id, now(), :creation_ip, :creation_user) as revision_id
+	</querytext>
+</partialquery>
+
+<fullquery name="upcff_update_cr_revisions">
+	<querytext>
+
+    update cr_revisions 
+    set content = [set __lob_id [db_string get_id "select empty_lob()"]]
+    where revision_id = :revision_id
+
+	</querytext>
+</fullquery>
+
+<fullquery name="cc_copy_content">
+	<querytext>
+
+          select content_revision__content_copy (:revision_id_src, :revision_id_dest)
+
+	</querytext>
+</fullquery>
 
 </queryset>

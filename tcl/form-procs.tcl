@@ -7,7 +7,6 @@ namespace eval content {
 # a custom form element based on stored metadata
 # Requires the variable content_type to be set in the calling frame
 
-# RBM: FIX ME! See comment on line 197
 ad_proc content::query_form_metadata { 
   {datasource_name rows} {datasource_type multirow} \
   {extra_where {}} {extra_orderby {}}
@@ -1806,7 +1805,7 @@ ad_proc content::get_latest_revision { item_id } {
 # @option mime_type
 # @option text
 # @option tmpfile
-
+# RBM: FIX ME. Not sure if this will work because of line 1822
 ad_proc content::add_basic_revision { item_id revision_id title args } {
 
   template::util::get_opts $args
@@ -1815,34 +1814,25 @@ ad_proc content::add_basic_revision { item_id revision_id title args } {
   set creation_user [User::getID]
 
   set sql [db_map abr_new_revision_title]
-             item_id       => content_symlink.resolve(:item_id),
-         revision_id   => :revision_id,
-         creation_date  => sysdate,
-         creation_ip   => :creation_ip,
-         creation_user => :creation_user
-
+  
   foreach param { description publish_date mime_type nls_language text } {
 
     if { [info exists opts($param)] } {
-      set $param $opts($param)
-	append sql [db_map abr_new_revision_$param]", $param => :$param"
+	set $param $opts($param)
+	append sql [db_map abr_new_revision_$param]
     } else {
-	switch $param {
-	    "description" 
+	append sql [db_map abr_new_revision_${param}_ne]
+    }
   }
 
-  append sql "); end;"
+  append sql [db_map abr_new_revision_end_items]
 
-  set db [template::begin_db_transaction]
-
-  ns_ora exec_plsql_bind $db $sql revision_id
+  db_transaction " db_exec_plsql abr_new_revision_final $sql -bind revision_id "
 
   if { [info exists opts(tmpfile)] } {
 
     update_content_from_file $revision_id $opts(tmpfile)
   }
-
-  template::end_db_transaction
 }
 
 # @private update_content_from_file
@@ -1853,14 +1843,14 @@ ad_proc content::add_basic_revision { item_id revision_id title args } {
 # @param tmpfile     The name of a temporary file containing the content.
 #                    The file is deleted following the update.
 
-proc content::update_content_from_file { revision_id tmpfile } {
+ad_proc content::update_content_from_file { revision_id tmpfile } {
 
-  set file_upload "update cr_revisions 
+  set file_upload "
+
+  db_dml upcff_update_cr_revisions "
+    update cr_revisions 
     set content = empty_blob() where revision_id = :revision_id
-    returning content into :1"
-
-  set db [template::get_db_handle]
-  ns_ora blob_dml_file_bind $db $file_upload [list 1] $tmpfile
+    returning content into :1" -blob_files [list $tmpfile]
 
   ns_unlink $tmpfile
 }
@@ -1877,32 +1867,32 @@ proc content::update_content_from_file { revision_id tmpfile } {
 # @param revision_id_dest  The object ID of the revision to be updated.
 # copied.
 
-proc content::copy_content { revision_id_src revision_id_dest } {
+ad_proc content::copy_content { revision_id_src revision_id_dest } {
 
-    set db [template::begin_db_transaction]
+    db_transaction {
 
-    # copy the content from the source to the target
-    ns_ora dml $db "
-      begin
-      content_revision.content_copy (
-          revision_id      => :revision_id_src,
-          revision_id_dest => :revision_id_dest
-      );
-      end;"
+	# copy the content from the source to the target
+	db_dml cc_copy_content {
+           begin
+             content_revision.content_copy (
+              revision_id      => :revision_id_src,
+              revision_id_dest => :revision_id_dest
+             );
+           end;
+	}
+	
+	# fetch the mime_type of the source revision
+	template::query cc_get_mime_type mime_type onevalue "
+      select mime_type from cr_revisions where revision_id = :revision_id_src" 
 
-    # fetch the mime_type of the source revision
-    template::query mime_type onevalue "
-      select mime_type from cr_revisions where revision_id = :revision_id_src
-    " -db $db
+	# copy the mime_type to the destination revision
+	db_dml cc_update_cr_revisions "
+           update cr_revisions
+           set mime_type = :mime_type
+           where revision_id = :revision_id_dest"
 
-    # copy the mime_type to the destination revision
-    ns_ora dml $db "
-     update cr_revisions
-       set mime_type = :mime_type
-       where revision_id = :revision_id_dest"
+    }
 
-
-    template::end_db_transaction
 }
 
 
@@ -1913,7 +1903,7 @@ proc content::copy_content { revision_id_src revision_id_dest } {
 
 # @param revision_id  The object ID of the revision to be updated.
 
-proc content::add_content { form_name revision_id } {
+ad_proc content::add_content { form_name revision_id } {
     
     # if content exists, prepare it for insertion
     if { [template::element exists $form_name content] } {
@@ -1925,12 +1915,10 @@ proc content::add_content { form_name revision_id } {
     }
 
     if { ![string equal $tmpfile {}] } {
-	set db [template::begin_db_transaction]
-	upload_content $db $revision_id $tmpfile $filename
-	template::end_db_transaction
-    } else {
-	# no content
-    }
+	db_transaction {
+	    upload_content $revision_id $tmpfile $filename
+	}
+    } 
 }
 
 
@@ -1941,12 +1929,12 @@ proc content::add_content { form_name revision_id } {
 
 # @param form_name The name of the form (containing name and parent_id)
 # @return 0 if there are items with the same name, 1 otherwise
-proc content::validate_name { form_name } {
+ad_proc content::validate_name { form_name } {
     set name [template::element get_value $form_name name] 
     set parent_id [template::element get_value $form_name parent_id]
 
     if { [template::util::is_nil parent_id] } {
-	template::query same_name_count onevalue "
+	template::query vn_same_name_count1 same_name_count onevalue "
 	  select
 	    count(1)
 	  from
@@ -1954,7 +1942,7 @@ proc content::validate_name { form_name } {
           where
 	    name = :name"
     } else {
-	template::query same_name_count onevalue "
+	template::query vn_same_name_count2 same_name_count onevalue "
 	  select
             count(1)
           from

@@ -206,4 +206,43 @@
 	</querytext>
 </fullquery>
 
+<fullquery name="cc_get_mime_type">
+	<querytext>
+
+      select mime_type from cr_revisions where revision_id = :revision_id_src
+
+	</querytext>
+</fullquery>
+
+<fullquery name="cc_update_cr_revisions">
+	<querytext>
+
+           update cr_revisions
+           set mime_type = :mime_type
+           where revision_id = :revision_id_dest
+
+	</querytext>
+</fullquery>
+
+<fullquery name="vn_same_name_count1">
+	<querytext>
+
+	  select count(1)
+	  from cr_items
+          where name = :name
+
+	</querytext>
+</fullquery>
+
+<fullquery name="vn_same_name_count2">
+	<querytext>
+
+	  select count(1)
+          from cr_items
+          where name = :name
+            and parent_id = :parent_id
+
+	</querytext>
+</fullquery>
+
 </queryset>
