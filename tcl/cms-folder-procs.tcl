@@ -45,7 +45,8 @@ ad_proc cms_folder::get_registered_types {
 } {
 
   if { [string equal $datasource "multirow"] } {
-      return [uplevel 1 "db_multirow $name get_name_type {}"]
+      set sql [db_map get_name_type]
+      return [uplevel 1 "db_multirow $name not_used \"${sql}\""]
   } else {
       return [db_list_of_lists get_name_type ""]
   }
