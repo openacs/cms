@@ -329,7 +329,7 @@ ad_proc content::get_revision_create_element {} {
                 
                 # if param_source is not 'literal' then 
                 # eval or query for the parameter value(s)
-		#RBM: FIXME! What should it be done with uplevel'd queries??
+		#RBM: FIX ME! What should be done with uplevel'd queries??
                 if { ![string equal $param_source ""] } {
                     if { [string equal $param_source "eval"] } {
                         set source [eval $value]
@@ -352,7 +352,7 @@ ad_proc content::process_revision_form { form_name content_type item_id {db{}} }
 
     template::form get_values $form_name title description mime_type
 
-
+    # FIX ME: check -postgresql version
     # create the basic revision
     db_exec_plsql new_content_revision {
              begin
@@ -371,7 +371,10 @@ ad_proc content::process_revision_form { form_name content_type item_id {db{}} }
     #ns_ora exec_plsql_bind $db $sql revision_id
 
     # query for extended attribute tables
-    set query "
+
+    set last_table ""
+    set last_id_column ""
+    template::query get_extended_attributes rows multirow "
           select 
             types.table_name, types.id_column, attr.attribute_name,
             attr.datatype
@@ -382,9 +385,9 @@ ad_proc content::process_revision_form { form_name content_type item_id {db{}} }
               from 
                 acs_object_types
               where 
-                object_type ^= 'acs_object'
+                object_type <> 'acs_object'
               and
-                object_type ^= 'content_revision'
+                object_type <> 'content_revision'
               connect by 
                 prior supertype = object_type
               start with 
@@ -394,9 +397,6 @@ ad_proc content::process_revision_form { form_name content_type item_id {db{}} }
           order by 
             types.inherit_level desc"
 
-    set last_table ""
-    set last_id_column ""
-    template::query rows multirow $query -db $db
     for { set i 1 } { $i <= ${rows:rowcount} } { incr i } {
         upvar 0 "rows:${i}" row
         template::util::array_to_vars row
@@ -441,7 +441,7 @@ ad_proc content::process_revision_form { form_name content_type item_id {db{}} }
 # helper function for process_revision_form
 # PRE: the following variables must be set in the uplevel scope:
 #      columns, values, last_table
-proc content::process_revision_form_dml {} {
+ad_proc content::process_revision_form_dml {} {
 
     uplevel {
 
@@ -449,14 +449,12 @@ proc content::process_revision_form_dml {} {
             lappend columns $last_id_column
             lappend values ":revision_id"
 
-            set sql "
+            db_dml insert_revision_form "
               insert into $last_table (
                 [join $columns ", "]
               ) values (
                 [join $values ", "]
               )"
-
-            ns_ora dml $db $sql
         }
     }
 }
@@ -468,7 +466,7 @@ proc content::process_revision_form_dml {} {
 #   are NOT to be inserted
 # id_value is the revision_id
 
-proc content::insert_element_data { 
+ad_proc content::insert_element_data { 
   form_name content_type exclusion_list id_value \
   {suffix ""} {extra_where ""}
 } {
@@ -476,38 +474,19 @@ proc content::insert_element_data {
     set sql_exclusion [template::util::tcl_to_sql_list $exclusion_list]
     set id_value_ref id_value
 
-    set query "
-          select 
-            types.table_name, types.id_column, attr.attribute_name,
-            attr.datatype
-          from 
-            acs_attributes attr,
-            ( select 
-                object_type, table_name, id_column, level as inherit_level
-              from 
-                acs_object_types
-              where 
-                object_type not in ($sql_exclusion)
-              connect by 
-                prior supertype = object_type
-              start with 
-                object_type = :content_type) types        
-          where 
-            attr.object_type (+) = types.object_type"
+    set query [db_map ied_get_objects_tree]
   
     if { ![template::util::is_nil extra_where] } {
-      append query " and $extra_where"
+	append query [db_map ied_get_objects_tree_extra_where]
     }
-           
-    append query "
-          order by 
-            types.inherit_level desc"
+
+    append query [db_map ied_get_objects_tree_order_by]
 
     #ns_log notice "$query"
 
     set last_table ""
     set last_id_column ""
-    template::query rows multirow $query
+    template::query insert_element_data rows multirow $query
 
     for { set i 1 } { $i <= ${rows:rowcount} } { incr i } {
         upvar 0 "rows:${i}" row
@@ -553,7 +532,7 @@ proc content::insert_element_data {
 # helper function for process_revision_form
 # PRE: the following variables must be set in the uplevel scope:
 #      columns, values, last_table, id_value_ref
-proc content::process_insert_statement {} {
+ad_proc content::process_insert_statement {} {
 
     uplevel {
 
@@ -561,14 +540,12 @@ proc content::process_insert_statement {} {
             lappend columns $last_id_column
             lappend values ":$id_value_ref"
 
-            set sql "
+	    db_dml process_insert_statement "
               insert into $last_table (
                 [join $columns ", "]
               ) values (
                 [join $values ", "]
               )"
-
-            ns_ora dml $db $sql
         }
     }
 }
@@ -632,7 +609,7 @@ proc content::assemble_url { base_url args } {
 
 # @see add_revision
 
-proc content::new_item { form_name { tmpfile "" } } {
+ad_proc content::new_item { form_name { tmpfile "" } } {
 
   foreach param { item_id name locale parent_id content_type } {
 
