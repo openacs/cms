@@ -10,7 +10,7 @@ set module_id [db_string get_module_id ""]
 # permissions check - must have cm_examine
 content::check_access $module_id cm_examine -user_id [User::getID]
 
-set type_name [db_string get_name ""]
+set content_type_name [db_string get_name ""]
 
 set unregistered_mime_types [db_list_of_lists get_unreg_mime_types ""]
 
