@@ -101,7 +101,7 @@
         where ar.rel_id = mr.rel_id
         and ar.object_id_two = u.user_id)
     order by
-      pretty_name
+      pretty_name 
 
       </querytext>
 </partialquery>
