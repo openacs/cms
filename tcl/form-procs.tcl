@@ -549,7 +549,7 @@ ad_proc content::process_insert_statement {} {
 
 
 # Assemble a passthrough list out of variables
-proc content::assemble_passthrough { args } {
+ad_proc content::assemble_passthrough { args } {
   set result [list]
   foreach varname $args {
     upvar $varname var
@@ -559,7 +559,7 @@ proc content::assemble_passthrough { args } {
 }
 
 # Convert passthrough to a URL fragment
-proc content::url_passthrough { passthrough } {
+ad_proc content::url_passthrough { passthrough } {
 
   set extra_url ""
   foreach pair $passthrough {
@@ -569,7 +569,7 @@ proc content::url_passthrough { passthrough } {
 }
 
 # Assemble a URL out of component parts
-proc content::assemble_url { base_url args } {
+ad_proc content::assemble_url { base_url args } {
   set result $base_url
   if { [string first $base_url "?"] == -1 } {
     set joiner "?"
@@ -608,39 +608,63 @@ proc content::assemble_url { base_url args } {
 
 ad_proc content::new_item { form_name { tmpfile "" } } {
 
-  foreach param { item_id name locale parent_id content_type } {
+  # RBM: Set defaults for PostgreSQL
+  # I'm assumming 'name' will always have something
+    
+  set paramList [list name parent_id item_id locale creation_date creation_user \
+		     context_id creation_ip item_subtype content_type title \
+		     description mime_type nls_language data]
+
+  set defaultList [list {} null null null "now()" "[User::getID]" \
+		       null "[ns_conn peeraddr]" content_item content_revision null \
+		       null "text/plain" null null]
+
+  for {set i 0} {$i < [llength $paramList]} {incr i} {
+      set defArray([lindex $paramList $i]) [lindex $defaultList $i]
+  }
+		    
+  foreach param $paramList {
 
     if { [template::element exists $form_name $param] } {
       set $param [template::element get_value $form_name $param]
 
+      
       if { ! [string equal [set $param] {}] } {
-
 	# include the parameter if it is not null
-	lappend params "$param => :$param"
+	lappend params [db_map cont_new_item_non_null_params]
+
+      } else {
+        lappend params [db_map cont_new_item_def_params]
       }
     }
   }
-
-  lappend params "creation_user => [User::getID]"
-  lappend params "creation_ip   => '[ns_conn peeraddr]'"
-
+  # RBM: FIX ME! In all PG content_item__new functions, relation_tag
+  #      is set to NULL. Is that ok?
+  
   # Use the correct relation tag, if specified
   if { [template::element exists $form_name relation_tag] } {
     set relation_tag [template::element get_value $form_name relation_tag]
-    lappend params "relation_tag => :relation_tag"
+      set rel_tag [string trim [db_map cont_new_item_rel_tag]]
+      
+    if{ $rel_tag != "null" } {
+	# The content_item__new PG functions don't take relation_tag as
+	# argument. So I made it so the PG .xql returns null, and the element
+	# is not included in the list. But the Oracle one is, if it exists.
+	
+	lappend params $rel_tag
+    }
   }
 
-  set sql "begin 
-    :item_id := content_item.new( [join $params ","] );
-  end;"
+  set sql 
 
-  set db [template::begin_db_transaction]
-
-  ns_ora exec_plsql_bind $db $sql item_id
-
-  add_revision $form_name $tmpfile
-
-  template::end_db_transaction
+  db_transaction {
+      db_exec_plsql create_new_content_item "
+        begin 
+          :item_id := content_item.new( [join $params ","] );
+        end;" -bind item_id
+      
+      add_revision $form_name $tmpfile
+  }
 
   # flush the sitemap folder listing cache
   #if { [template::element exists $form_name parent_id] } {
@@ -668,7 +692,7 @@ ad_proc content::new_item { form_name { tmpfile "" } } {
 # @param tmpfile Name of the temporary file containing the content to
 # upload.
 
-proc content::add_revision { form_name { tmpfile "" } } {
+ad_proc content::add_revision { form_name { tmpfile "" } } {
 
   # initialize an ns_set to hold bind values
   set bind_vars [ns_set create]
@@ -679,10 +703,11 @@ proc content::add_revision { form_name { tmpfile "" } } {
   ns_set put $bind_vars revision_id $revision_id
 
   # query for content_type and table_name
-  template::query info onerow "
-    select object_type content_type, table_name from acs_object_types
-     where object_type = (select content_type from cr_items 
-       where item_id = :item_id)"
+  template::query addrev_get_content_type info onerow "
+    select object_type content_type, table_name
+    from acs_object_types
+    where object_type = (select content_type from cr_items 
+                         where item_id = :item_id)"
 
   set insert_statement [attribute_insert_statement \
 	  $info(content_type) $info(table_name) $bind_vars $form_name]
@@ -725,7 +750,7 @@ proc content::add_revision { form_name { tmpfile "" } } {
 # @param form_name The name of the ATS form object used to process the
 # submission.
 
-proc content::attribute_insert_statement { 
+ad_proc content::attribute_insert_statement { 
   content_type table_name bind_vars form_name } {
 
   # get creation_user and creation_ip
@@ -788,23 +813,19 @@ proc content::attribute_insert_statement {
 
 # @see add_revision
 
-proc content::add_revision_dml { statement bind_vars tmpfile filename } {
+ad_proc content::add_revision_dml { statement bind_vars tmpfile filename } {
 
-  set db [template::begin_db_transaction]
+  db_transaction {
 
-  ns_ora dml $db -bind $bind_vars $statement
+      db_dml $statement -bind $bind_vars
 
+      if { ![string equal $tmpfile {}] } {
 
-  if { ![string equal $tmpfile {}] } {
-
-      set revision_id [ns_set get $bind_vars revision_id]
-      upload_content $db $revision_id $tmpfile $filename
+	  set revision_id [ns_set get $bind_vars revision_id]
+	  upload_content $revision_id $tmpfile $filename
       
-  } else {
-      # no content
+      } 
   }
-
-  template::end_db_transaction
 }
 
 # @private upload_content
@@ -812,8 +833,6 @@ proc content::add_revision_dml { statement bind_vars tmpfile filename } {
 # Inserts content into the database from an uploaded file.
 # Does automatic mime_type updating
 # Parses text/html content and removes <body></body> tags
-
-# @param db A db handle
 
 # @param revision_id The revision to which the content belongs
 
@@ -823,7 +842,7 @@ proc content::add_revision_dml { statement bind_vars tmpfile filename } {
 # @param filename The client-side name of the file containing the body of 
 # the revision to upload into the content BLOB column of cr_revisions
 
-proc content::upload_content { db revision_id tmpfile filename } {
+ad_proc content::upload_content { revision_id tmpfile filename } {
 
     # if it is HTML then strip out the body
     set mime_type [ns_guesstype $filename]
@@ -837,17 +856,19 @@ proc content::upload_content { db revision_id tmpfile filename } {
     }
     
     # upload the file into the revision content
-    set file_upload "update cr_revisions 
+
+    db_dml update_cr_revisions "
+      update cr_revisions 
       set content = empty_blob() where revision_id = :revision_id
-      returning content into :1"
-    ns_ora blob_dml_file_bind $db $file_upload [list 1] $tmpfile
+      returning content into :1" -blob_files $tmpfile
 
     # update mime_type to match the file 
     set mime_sql "
       update cr_revisions 
         set mime_type = :mime_type 
         where revision_id = :revision_id"
-    if { [catch {ns_ora dml $db $mime_sql} errmsg] } {
+    
+    if { [catch {db_dml update_mime_sql $mime_sql} errmsg] } {
 	#  if it fails, use user submitted mime_type
 	ns_log notice "form-procs - add_revision_dml - using user mime_type 
 	  instead of guessed mime type = $mime_type"
@@ -872,10 +893,10 @@ proc content::upload_content { db revision_id tmpfile filename } {
 
 # @param datatype The datatype of the column.
 
-proc content::get_sql_value { name datatype } {
+ad_proc content::get_sql_value { name datatype } {
 
   switch $datatype {
-    date { set wrapper "to_date(:$name, 'YYYY MM DD HH24 MI SS')" }
+      date { set wrapper [db_map string_to_timestamp] }
     default { set wrapper ":$name" }
   }
 
@@ -897,7 +918,7 @@ proc content::get_sql_value { name datatype } {
 #         string if the form does not include a content element or the value
 #         of the element is null.
 
-proc content::prepare_content_file { form_name } {
+ad_proc content::prepare_content_file { form_name } {
   
   if { ! [template::element exists $form_name content] } { return "" }
 
@@ -937,7 +958,7 @@ proc content::prepare_content_file { form_name } {
 
 # @param s The string to write to the file.
 
-proc content::string_to_file { s } {
+ad_proc content::string_to_file { s } {
 
   set tmp_file [ns_tmpnam]
 
@@ -988,7 +1009,7 @@ namespace eval content {
 # @option action       	 The URL to which the form should redirect following
 #                      	 a successful form submission.
 
-proc content::new_item_form { args } {
+ad_proc content::new_item_form { args } {
 
   array set opts [list form_name new_item content_type content_revision \
       parent_id {} name {} content_method {}]
@@ -1070,7 +1091,7 @@ proc content::new_item_form { args } {
 # @option action         The URL to which the form should redirect following
 #                        a successful form submission.
 
-proc content::add_revision_form { args } {
+ad_proc content::add_revision_form { args } {
 
   array set opts [list form_name add_revision content_type content_revision \
       item_id {} content_method {} revision_id {}]
@@ -1144,7 +1165,7 @@ proc content::add_revision_form { args } {
 #                        queried
 # @return The list of attributes that were added.
 
-proc content::add_attribute_elements { form_name content_type \
+ad_proc content::add_attribute_elements { form_name content_type \
   { revision_id "" } } {
 
   # query for attributes in the appropriate order
@@ -1204,7 +1225,7 @@ proc content::add_attribute_elements { form_name content_type \
 # @param attribute_data    Optional nested list of parameter data for the
 #                          the attribute (generated by get_attribute_params).
 
-proc content::add_attribute_element { 
+ad_proc content::add_attribute_element { 
   form_name content_type attribute { attribute_data "" } } {
 
   variable columns
@@ -1277,7 +1298,7 @@ proc content::add_attribute_element {
 #                       added.
 # @param content_method One of no_content, text_entry or file_upload
  
-proc content::add_content_element { 
+ad_proc content::add_content_element { 
   form_name content_method { section_name "Content" } } {
 
   template::element create $form_name content_method \
@@ -1300,7 +1321,7 @@ proc content::add_content_element {
 		  [template::element get_value $form_name content_type]
 
 	  # change mime types select widget to only allow text MIME types
-	  template::query text_mime_types multilist "
+	  template::query get_text_mime_types text_mime_types multilist "
 	    select
 	      label, map.mime_type as value
 	    from
@@ -1374,7 +1395,7 @@ proc content::add_child_relation_element { form_name args } {
   }
 
   # Get the parent type. If the parent is not an item, abort
-  template::query parent_type onevalue "
+  template::query get_parent_type parent_type onevalue "
     select content_type from cr_items 
     where item_id = :parent_id
    " -cache "item_content_type $parent_id" -persistent \
@@ -1385,7 +1406,7 @@ proc content::add_child_relation_element { form_name args } {
   }
 
   # Get a multilist of all valid relation tags
-  template::query options multilist "
+  template::query get_all_valid_relation_tags options multilist "
     select 
       relation_tag as label, relation_tag as value 
     from 
@@ -1404,7 +1425,7 @@ proc content::add_child_relation_element { form_name args } {
 
   # Create the section, if specified
   if { ![template::util::is_nil opts(section)] } {
-    template::query parent_title onevalue "
+    template::query get_parent_title parent_title onevalue "
       select content_item.get_title(:parent_id) from dual
     "
 
@@ -1430,7 +1451,7 @@ proc content::add_child_relation_element { form_name args } {
 #                      metadata.
 # @param content_type  The current content type; defaults to content_revision
 
-proc content::get_widget_param_value { 
+ad_proc content::get_widget_param_value { 
   array_ref {content_type content_revision}
 } {
 
@@ -1453,7 +1474,7 @@ proc content::get_widget_param_value {
       query {
 	#set content_type content_revision
 	set item_id {}
-	template::query value $param(param_type) $param(value)
+	template::query set_content_values value $param(param_type) $param(value)
       }
       default {
 	set value $param(value)
@@ -1478,7 +1499,7 @@ proc content::get_widget_param_value {
 #         and the is_html flag.  For attributes with no parameters,
 #         there is a single entry with is_html as null.
 
-proc content::get_type_attribute_params { args } {
+ad_proc content::get_type_attribute_params { args } {
 
   variable columns
 
@@ -1486,7 +1507,7 @@ proc content::get_type_attribute_params { args } {
     lappend in_list [ns_dbquotevalue $object_type]
   }
 
-  template::query attribute_data nestedlist "
+  template::query gtap_get_attribute_data attribute_data nestedlist "
     select
       [join $columns ","]
     from
@@ -1507,11 +1528,11 @@ proc content::get_type_attribute_params { args } {
 # @param attribute_name	   The name of the attribute, as represented in the
 #                  	   attribute_name column of the acs_attributes table.
 
-proc content::get_attribute_params { content_type attribute_name } {
+ad_proc content::get_attribute_params { content_type attribute_name } {
 
   variable columns
 
-  template::query attribute_data nestedlist "
+  template::query gap_get_attribute_data attribute_data nestedlist "
     select
       [join $columns ","]
     from
@@ -1536,7 +1557,7 @@ proc content::get_attribute_params { content_type attribute_name } {
 # @param revision_id       The revision ID from where to get the default values
 # @param attributes        The list of attributes whose values should be set.
 
-proc content::set_attribute_values { form_name content_type revision_id \
+ad_proc content::set_attribute_values { form_name content_type revision_id \
     attributes } {
 
   if { [llength $attributes] == 0 } {
@@ -1552,7 +1573,7 @@ proc content::set_attribute_values { form_name content_type revision_id \
     if { [template::element exists $form_name $attr] } {
       set datatype [template::element get_property $form_name $attr datatype]
       if { [string equal $datatype date] } {
-        lappend columns "to_char($attr, 'YYYY MM DD HH24 MI SS') as $attr"
+	  lappend columns [db_map timestamp_to_string]
       } else {
         lappend columns $attr
       }
@@ -1562,7 +1583,8 @@ proc content::set_attribute_values { form_name content_type revision_id \
   }
       
   # Query for values from a previous revision
-  set sql "
+
+  template::query get_previous_version_values values onerow  "
     select 
       [join $columns ", "] 
     from 
@@ -1570,8 +1592,6 @@ proc content::set_attribute_values { form_name content_type revision_id \
     where 
       revision_id = :revision_id
   "
-
-  template::query values onerow $sql
 
   # Set the form values, handling dates with the date acquire function
   foreach pair $attr_types {
@@ -1603,7 +1623,7 @@ proc content::set_attribute_values { form_name content_type revision_id \
 #                          the content element.
 # @param revision_id       The revision ID of the content to revise
 
-proc content::set_content_value { form_name revision_id } {
+ad_proc content::set_content_value { form_name revision_id } {
 
   set content [get_content_value $revision_id]
 
@@ -1617,9 +1637,9 @@ proc content::set_content_value { form_name revision_id } {
 
 # @param content_type  The content type for which an input method is needed.
 
-proc content::get_default_content_method { content_type } {
+ad_proc content::get_default_content_method { content_type } {
 
-  template::query is_text onevalue "select count(*) from cr_content_mime_type_map
+  template::query count_mime_type is_text onevalue "select count(*) from cr_content_mime_type_map
     where content_type = :content_type and mime_type like 'text/%'"
 
   if { $is_text > 0 } {
@@ -1645,11 +1665,11 @@ proc content::get_default_content_method { content_type } {
 #                    the array in which to store info in the calling
 # @param args        Column names to query.
 
-proc content::get_type_info { object_type ref args } {
+ad_proc content::get_type_info { object_type ref args } {
 
   if { [llength $args] == 0 } {
 
-    template::query info onevalue "
+    template::query get_type_info_1 info onevalue "
       select 
         $ref
       from 
@@ -1661,7 +1681,7 @@ proc content::get_type_info { object_type ref args } {
 
   } else {
 
-    template::query $ref onerow "
+    template::query get_type_info_2 $ref onerow "
       select 
         [join $args ","]
       from 
@@ -1675,16 +1695,12 @@ proc content::get_type_info { object_type ref args } {
 
 # Grab an object ID for creating a new ACS object.
 
-proc content::get_object_id {} {
+ad_proc content::get_object_id {} {
 
-  set sql "select acs_object_id_seq.nextval from dual"
-
-  template::query object_id onevalue $sql
-
-  return $object_id
+  return [db_nextval select acs_object_id_seq]
 }
 
-proc content::get_content_value { revision_id } {
+ad_proc content::get_content_value { revision_id } {
 
   set db [template::begin_db_transaction]
 

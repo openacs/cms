@@ -99,6 +99,7 @@
 
 <fullquery name="get_extended_attributes">
 	<querytext>
+
 	  select 
             types.table_name, types.id_column, attr.attribute_name,
             attr.datatype
@@ -125,6 +126,7 @@
 	    ) types USING (object_type)
           order by 
             types.inherit_level desc
+
 	</querytext>
 
 </fullquery>
@@ -155,22 +157,80 @@
 
 	    ) types USING (object_type)
 
-</querytext>
+	</querytext>
 </partialquery>
 
-<partialquery name="ied_get_objects_tree_extra_where">
+<partialquery name="cont_new_item_non_null_params">
+	<querytext>
+	:$param
+	</querytext>
+
+</partialquery>
+
+<partialquery name="db_map cont_new_item_def_params">
+	<querytext>
+	$defArray($param)
+	</querytext>
+</partialquery>
+
+<partialquery name="db_map cont_new_item_rel_tag">
+	<querytext>
+null
+	</querytext>
+</partialquery>
+
+<fullquery name="create_new_content_item">
+	<querytext>
+          select content_item__new( [join $params ","] ) as item_id
+        </querytext>
+</fullquery>
+
+<fullquery name="update_cr_revisions">
 	<querytext>
 
-	 and $extra_where
+      update cr_revisions 
+      set content = empty_blob() where revision_id = :revision_id
+
+	</querytext>
+<fullquery>
+
+<partialquery name="string_to_timestamp">
+	<querytext>
+
+	to_date(:$name, 'YYYY MM DD HH24 MI SS')
 
 	</querytext>
 </partialquery>
 
-<partialquery name="ied_get_objects_tree_order_by">
+<fullquery name="get_all_valid_relation_tags">
 	<querytext>
 
-          order by 
-            types.inherit_level desc
+    select 
+      relation_tag as label, relation_tag as value 
+    from 
+      cr_type_children c
+    where
+      content_item__is_subclass(:parent_type, c.parent_type) = 't'
+    and
+      content_item__is_subclass(:content_type, c.child_type) = 't'
+    and
+      content_item__is_valid_child(:parent_id, c.child_type) = 't'
+
+	</querytext>
+</fullquery>
+
+<fullquery name="get_parent_title">
+	<querytext>
+
+      select content_item__get_title(:parent_id)
+
+	</querytext>
+</fullquery>
+
+<partialquery name="timestamp_to_string">
+	<querytext>
+
+	to_char($attr, 'YYYY MM DD HH24 MI SS') as $attr
 
 	</querytext>
 </partialquery>

@@ -25,7 +25,7 @@ namespace eval content_method {}
 # @see {content_method::get_content_method_options, 
 #       content_method::text_entry_filter_sql }
 
-proc content_method::get_content_methods { content_type args } {
+ad_proc content_method::get_content_methods { content_type args } {
     template::util::get_opts $args
 
     if { [info exists opts(get_labels)] } {
@@ -37,7 +37,7 @@ proc content_method::get_content_methods { content_type args } {
     set text_entry_filter [text_entry_filter_sql $content_type]
 
     # get default content method (if any)
-    template::query default_method onevalue "
+    template::query get_default_method default_method onevalue "
       select 
         content_method 
       from
@@ -96,7 +96,7 @@ proc content_method::get_content_methods { content_type args } {
 # @see {content_method::get_content_methods,
 #       content_method::text_entry_filter_sql }
 
-proc content_method::get_content_method_options { content_type } {
+ad_proc content_method::get_content_method_options { content_type } {
     
     set text_entry_filter [text_entry_filter_sql $content_type]
 
@@ -158,11 +158,11 @@ proc content_method::get_content_method_options { content_type } {
 # @param  content_type
 # @return SQL stub that possibly filters out the text_entry content method
 
-proc content_method::text_entry_filter_sql { content_type } {
+ad_proc content_method::text_entry_filter_sql { content_type } {
     
     set text_entry_filter_sql ""
 
-    template::query has_text_mime_type onevalue "
+    template::query count_text_mime_types has_text_mime_type onevalue "
       select
         count(*)
       from
@@ -194,7 +194,7 @@ proc content_method::text_entry_filter_sql { content_type } {
 # @author Michael Pih
 # @param content_type The content type, default null
 
-proc content_method::flush_content_methods_cache { {content_type ""} } {
+ad_proc content_method::flush_content_methods_cache { {content_type ""} } {
 
     if { [template::util::is_nil content_type] } {
 

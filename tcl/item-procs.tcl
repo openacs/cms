@@ -24,7 +24,7 @@ namespace eval item {}
 # @see proc item::get_best_revision 
 # @see proc item::get_item_from_revision
 
-proc item::get_live_revision { item_id } {
+ad_proc item::get_live_revision { item_id } {
 
   template::query live_revision onevalue "
     select live_revision from cr_items
@@ -72,7 +72,7 @@ proc item::get_best_revision { item_id } {
 # @see proc item::get_live_revision 
 # @see proc item::get_best_revision
 
-proc item::get_item_from_revision { revision_id } {
+ad_proc item::get_item_from_revision { revision_id } {
   template::query item_id onevalue "
     select item_id from cr_revisions where revision_id = :revision_id
   " -cache "item_from_revision $revision_id"
