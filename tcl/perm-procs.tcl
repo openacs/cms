@@ -11,7 +11,7 @@
 # Will pick up mount_point, id, parent_id if they exist in the calling
 # frame
 
-proc content::show_error { 
+ad_proc content::show_error { 
   message {return_url {}} {passthrough {}}
 } {
   
@@ -42,7 +42,7 @@ proc content::show_error {
 # -request_error: if present, use request error as opposed to error box
 # -refresh: if present, update query cache
 
-proc content::check_access { object_id privilege args } { 
+ad_proc content::check_access { object_id privilege args } { 
 
   # Set up the default options
   foreach varname { mount_point return_url parent_id passthrough } {
@@ -62,16 +62,14 @@ proc content::check_access { object_id privilege args } {
   # Query the database, set up the array
   upvar user_permissions user_permissions
 
-  set query "
+  set code [list template::query ca_get_perm_list perm_list multilist "
     select 
       p.privilege,
       cms_permission.permission_p (
         :object_id, :user_id, p.privilege
       ) as is_granted
     from 
-      acs_privileges p"
-
-  set code [list template::query perm_list multilist $query \
+      acs_privileges p" \
       -cache "content::check_access $object_id $user_id" -persistent \
       -timeout 300]
   if { [info exists opts(refresh)] } {
@@ -88,7 +86,7 @@ proc content::check_access { object_id privilege args } {
     }
 
     # See if the user is even logged in
-    template::query user_name onevalue "
+    template::query ca_get_user_name user_name onevalue "
       select screen_name from users where user_id = :user_id
     " 
 
@@ -98,7 +96,7 @@ proc content::check_access { object_id privilege args } {
     } else {
 
       # Get the error message
-      template::query msg_info onerow "
+      template::query ca_get_msg_info msg_info onerow "
 	select 
 	  acs_object.name(:object_id) as obj_name, 
 	  pretty_name as perm_name
@@ -132,18 +130,22 @@ proc content::check_access { object_id privilege args } {
 }
 
 # Flush the cache used by check_access
-proc content::flush_access_cache { {object_id {}} } {
+ad_proc content::flush_access_cache { {object_id {}} } {
   template::query::flush_cache "content::check_access ${object_id}*"
 }
 
 # Generate a form for modifying permissions
 # Requires object_id, grantee_id, user_id to be set in calling frame
 
-proc content::perm_form_generate { form_name_in {passthrough "" } } {
+ad_proc content::perm_form_generate { form_name_in {passthrough "" } } {
 
   upvar perm_form_name form_name
   set form_name $form_name_in
 
+  # FIX ME
+  set sql [db_map pfg_get_permission_boxes]
+  upvar __sql sql
+  
   uplevel {
     set is_request [form is_request $perm_form_name]
    
@@ -152,7 +154,7 @@ proc content::perm_form_generate { form_name_in {passthrough "" } } {
     set permission_options [list]
     set permission_values  [list]
 
-    template::query permission_boxes multirow "
+    template::query permission_boxes multirow $__sql "
       select 
 	t.child_privilege as privilege, 
 	lpad(' ', t.tree_level * 24, '&nbsp;') || 
@@ -219,11 +221,16 @@ proc content::perm_form_generate { form_name_in {passthrough "" } } {
 
 # Process the permission form
 
-proc content::perm_form_process { form_name_in } {
+ad_proc content::perm_form_process { form_name_in } {
 
   upvar perm_form_name form_name
   set form_name $form_name_in
-
+  # FIX ME
+  set sql_grant [db_map pfp_grant_permission_1]
+  set sql_revoke [db_map pfp_revoke_permission_1]
+  upvar __sql_grant sql_grant
+  upvar __sql_revoke sql_revoke
+  
   uplevel {
 
     if { [form is_valid $perm_form_name] } {
@@ -233,37 +240,37 @@ proc content::perm_form_process { form_name_in } {
       form get_values $perm_form_name object_id grantee_id pf_is_recursive
       set permission_values [element get_values $perm_form_name pf_boxes]
 
-      template::begin_db_transaction
+      db_transaction {
 
-      # Assign checked permissions, unassign unchecked ones
-      foreach pair $permission_options {
-	set privilege [lindex $pair 1]
-	if { [lsearch $permission_values $privilege] >= 0 } {
-	  template::query grant_permission dml "
-            begin 
-	      cms_permission.grant_permission (
-		item_id => :object_id, 
-		holder_id => :user_id,
-		privilege => :privilege, 
-		recepient_id => :grantee_id,
-                is_recursive => :pf_is_recursive
-	      );
-	    end;"
-	} else {
-	  template::query revoke_permission dml "
-            begin 
-	      cms_permission.revoke_permission (
-		item_id => :object_id, 
-		holder_id => :user_id,
-		privilege => :privilege, 
-		revokee_id => :grantee_id,
-                is_recursive => :pf_is_recursive
-	      );
-	    end;"
-	}
+	  # Assign checked permissions, unassign unchecked ones
+	  foreach pair $permission_options {
+	      set privilege [lindex $pair 1]
+	      if { [lsearch $permission_values $privilege] >= 0 } {
+		  template::query pfp_grant_permission grant_permission dml $__sql_grant "
+                     begin 
+	               cms_permission.grant_permission (
+		         item_id => :object_id, 
+		         holder_id => :user_id,
+		         privilege => :privilege, 
+		         recepient_id => :grantee_id,
+                         is_recursive => :pf_is_recursive
+	               );
+	             end;"
+	      } else {
+		  template::query pfp_revoke_permission revoke_permission dml $__sql_revoke"
+                     begin 
+     	               cms_permission.revoke_permission (
+		         item_id => :object_id, 
+		         holder_id => :user_id,
+		         privilege => :privilege, 
+		         revokee_id => :grantee_id,
+                         is_recursive => :pf_is_recursive
+	               );
+	             end;"
+	      }
+	  }
+
       }
-
-      template::end_db_transaction
   
       # Recache the permissions
       content::check_access $object_id "cm_read" \

@@ -15,12 +15,12 @@ namespace eval pagination {}
 # @param sql The sql query to paginate
 # @param page The current page number
 
-proc pagination::paginate_query { sql page } {
+ad_proc pagination::paginate_query { sql page } {
 
     set rows_per_page [pagination::get_rows_per_page]
     set start_row [expr $rows_per_page*[expr $page-1]+1]
-
-    set query "
+    #FIX ME
+    set query [db_map pq_paginate_query] "
       select *
       from
         (
@@ -55,9 +55,9 @@ proc pagination::get_rows_per_page {} {
 
 # @param db A database handle
 
-proc pagination::get_total_pages {} {
+ad_proc pagination::get_total_pages {} {
     uplevel {
-	template::query total_pages onevalue "
+	template::query gtp_get_total_pages total_pages onevalue "
 	  select 
 	    ceil(count(*) / [pagination::get_rows_per_page] )
 	  from
@@ -78,7 +78,7 @@ proc pagination::get_total_pages {} {
 # @param page The current page number
 # @param total_pages The total pages returned by the query
 
-proc pagination::page_number_links { page total_pages } {
+ad_proc pagination::page_number_links { page total_pages } {
 
     if { $total_pages == 1 } {
 	return ""
@@ -144,7 +144,7 @@ proc pagination::page_number_links { page total_pages } {
 
 # @param set_id The set id
 
-proc pagination::ns_set_to_url_vars { set_id } {
+ad_proc pagination::ns_set_to_url_vars { set_id } {
     set url_vars ""
     set size [ns_set size $set_id]
     for { set i 0 } { $i < $size } { incr i } {

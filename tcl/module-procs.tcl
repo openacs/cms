@@ -23,8 +23,8 @@ namespace eval cm {
   namespace eval modules {
 
     # Get the id of some module, return empty string on failure
-    proc get_module_id { module_name } {
-      template::query id onevalue "
+    ad_proc get_module_id { module_name } {
+      template::query gmi_get_module_id id onevalue "
         select module_id from cm_modules
           where key = :module_name
       " -cache "get_module_name $module_name" -persistent
@@ -33,16 +33,15 @@ namespace eval cm {
     }
 
     # Get a list of all the mount points
-    proc getMountPoints {} {
+    ad_proc getMountPoints {} {
 
-      set query "select 
+      template::query gmp_get_mount_points mount_point_list multilist "
+       select 
          key, name, '' as id, 
          '' as children, 't' as expandable, 'f' as symlink,
          0 as update_time
        from cm_modules 
-       order by sort_key"  
-
-      template::query mount_point_list multilist $query 
+       order by sort_key" 
  
       # Append clipboard
       lappend mount_point_list [folderCreate "clipboard" "Clipboard" "" [list] t f 0]
@@ -51,12 +50,12 @@ namespace eval cm {
     }
 
     # Generic getCHildFolders procedure for sitemap and templates
-    proc getChildFolders { mount_point id } {
+    ad_proc getChildFolders { mount_point id } {
 
       # query for child site nodes
       set module_name [namespace tail [namespace current]]
 
-      set query "
+      template::query gcf_get_child_folders result multilist "
         select
 	  :mount_point as mount_point,
 	  r.name, 
@@ -77,15 +76,14 @@ namespace eval cm {
 	order by
 	  name"
 
-      template::query result multilist $query 
-
       return $result
     }
 
     namespace eval workspace {
-     proc getRootFolderID {} { return 0 } 
+     #RBM: FIX ME: This has got to be a hack that was left over in the code!
+     ad_proc getRootFolderID {} { return 0 } 
 
-      proc getChildFolders { id } {
+      ad_proc getChildFolders { id } {
         return [list]
       }
     }
@@ -93,9 +91,9 @@ namespace eval cm {
     namespace eval templates {
 
       # Retreive the id of the root folder
-      proc getRootFolderID {} {
+      ad_proc getRootFolderID {} {
         if { ![nsv_exists browser_state template_root] } {
-          template::query root_id onevalue "
+          template::query grfi_get_root_id root_id onevalue "
             select content_template.get_root_folder() from dual"
           nsv_set browser_state template_root $root_id
           return $root_id
@@ -104,7 +102,7 @@ namespace eval cm {
         }
       }
 
-      proc getChildFolders { id } {
+      ad_proc getChildFolders { id } {
         if { [string equal $id {}] } {
           set id [getRootFolderID]
         }
@@ -115,7 +113,7 @@ namespace eval cm {
         return [cm::modules::getChildFolders $module_name $id]
       }
 
-      proc getSortedPaths { name id_list {root_id 0} {eval_code {}}} {
+      ad_proc getSortedPaths { name id_list {root_id 0} {eval_code {}}} {
         uplevel "
           cm::modules::sitemap::getSortedPaths $name \{$id_list\} $root_id \{$eval_code\}
         "
@@ -123,9 +121,9 @@ namespace eval cm {
     }
 
     namespace eval workflow {
-      proc getRootFolderID {} { return 0 } 
+      ad_proc getRootFolderID {} { return 0 } 
 
-      proc getChildFolders { id } {
+      ad_proc getChildFolders { id } {
         return [list]
       }
     }
@@ -133,9 +131,9 @@ namespace eval cm {
     namespace eval sitemap {
 
       # Retreive the id of the root folder
-      proc getRootFolderID {} {
+      ad_proc getRootFolderID {} {
         if { ![nsv_exists browser_state sitemap_root] } {
-          template::query root_id onevalue "
+          template::query gri_get_root_id root_id onevalue "
             select content_item.get_root_folder() from dual"
           nsv_set browser_state sitemap_root $root_id
           return $root_id
@@ -144,7 +142,7 @@ namespace eval cm {
         }
       }
 
-      proc getChildFolders { id } {
+      ad_proc getChildFolders { id } {
         if { [string equal $id {}] } {
           set id [getRootFolderID]
         }
@@ -155,13 +153,14 @@ namespace eval cm {
         return [cm::modules::getChildFolders $module_name $id]
       }
 
-      proc getSortedPaths { name id_list {root_id 0} {eval_code {}}} {
+      ad_proc getSortedPaths { name id_list {root_id 0} {eval_code {}}} {
 
         set sql_id_list "'"
         append sql_id_list [join $id_list "','"]
         append sql_id_list "'"
-
-        set sql_query "select 
+	#FIX ME
+        set sql_query [db_map gsp_get_sorted_paths]
+	               "select 
                          item_id, 
                          content_item.get_path(item_id, :sorted_paths_root_id) as item_path,
                          content_type as item_type
@@ -171,10 +170,11 @@ namespace eval cm {
                          item_id in ($sql_id_list)
                        order by item_path"
 
+	upvar sql_query __sql
         upvar sorted_paths_root_id _root_id
         set _root_id $root_id
         uplevel "
-          template::query $name multirow \{$sql_query\} -eval \{$eval_code\}
+          template::query gsp_get_paths  multirow \{$__sql\} -eval \{$eval_code\}
         "
       } 
   
@@ -185,9 +185,9 @@ namespace eval cm {
 
       # Return a multilist representing the types tree,
       # for use in a select widget
-      proc getTypesTree { } {
+      ad_proc getTypesTree { } {
 
-        template::query result multilist "
+        template::query gtt_get_tree_types result multilist "
           select
             lpad(' ', level, '-') || pretty_name as label,
             object_type as value
@@ -204,9 +204,9 @@ namespace eval cm {
         return $result
       }
 
-      proc getRootFolderID {} { return "content_revision" } 
+      ad_proc getRootFolderID {} { return "content_revision" } 
 
-      proc getChildFolders { id } {
+      ad_proc getChildFolders { id } {
 
         set children [list]
 
@@ -217,7 +217,7 @@ namespace eval cm {
         # query for message categories
         set module_name [namespace tail [namespace current]]
 
-        set query "select
+        template::query gcf_get_child_folders result multilist "select
                      :module_name as mount_point,
                      t.pretty_name, 
                      t.object_type,
@@ -236,26 +236,25 @@ namespace eval cm {
                      supertype = :id
                    order by 
                      t.pretty_name"
-
-        template::query result multilist $query
+	
         return $result
       }
     }
     # end of types namespace
 
     namespace eval search {
-      proc getRootFolderID {} { return 0 } 
+      ad_proc getRootFolderID {} { return 0 } 
 
-      proc getChildFolders { id } {
+      ad_proc getChildFolders { id } {
         return [list]
       }
     }
 
     namespace eval categories {
 
-      proc getRootFolderID {} { return 0 } 
+      ad_proc getRootFolderID {} { return 0 } 
 
-      proc getChildFolders { id } {
+      ad_proc getChildFolders { id } {
 
         set children [list]
 
@@ -269,7 +268,8 @@ namespace eval cm {
 
         # query for keyword categories
 
-        set query "select 
+        template::query gcc_get_child_folders children multilist "
+                     select 
                      :module_name as mount_point,
                      content_keyword.get_heading(keyword_id) as name, 
                      keyword_id, 
@@ -290,19 +290,17 @@ namespace eval cm {
                      content_keyword.is_leaf(keyword_id) = 'f'
                    order by 
                      name"
-        
-        template::query children multilist $query
 
         return $children
       }
 
-      proc getSortedPaths { name id_list {root_id 0} {eval_code {}}} {
+      ad_proc getSortedPaths { name id_list {root_id 0} {eval_code {}}} {
 
         set sql_id_list "'"
         append sql_id_list [join $id_list "','"]
         append sql_id_list "'"
-
-        set sql_query "
+	# FIX ME
+        set sql_query [db_map gsp_get_query] "
           select 
             keyword_id as item_id,
             content_keyword.get_path(keyword_id) as item_path,
@@ -311,9 +309,10 @@ namespace eval cm {
             cr_keywords
           where 
             keyword_id in ($sql_id_list)"
-       
+
+	upvar __sql sql_query
         uplevel "
-          template::query $name multirow \{$sql_query\} -eval \{$eval_code\}
+          template::query $name multirow \{$__sql\} -eval \{$eval_code\}
         "
       }
 
@@ -321,9 +320,9 @@ namespace eval cm {
     # end of categories namespace
 
     namespace eval users {
-     proc getRootFolderID {} { return 0 }  
+     ad_proc getRootFolderID {} { return 0 }  
 
-     proc getChildFolders { id } {
+     ad_proc getChildFolders { id } {
       
         if { [string equal $id {}] } {
           set where_clause "not exists (select 1 from group_component_map m
@@ -336,7 +335,7 @@ namespace eval cm {
 
         set module_name [namespace tail [namespace current]]
 
-        set query "select
+        template::query gcf_get_child_folders result multilist "select
                      :module_name as mount_point,
                      g.group_name as name, 
                      g.group_id, '' as children,
@@ -355,20 +354,16 @@ namespace eval cm {
                      $where_clause
                    order by 
                      name"
-
-        ns_log notice $query
-
-        template::query result multilist $query
         return $result
       }
 
-      proc getSortedPaths { name id_list {root_id 0} {eval_code {}}} {
+      ad_proc getSortedPaths { name id_list {root_id 0} {eval_code {}}} {
 
         set sql_id_list "'"
         append sql_id_list [join $id_list "','"]
         append sql_id_list "'"
-
-        set sql_query "
+	# FIX ME
+        set sql_query [db_map gsp_get_sort_paths] "
           select 
             o.object_id as item_id,
             o.object_type || ': ' || acs_object.name(o.object_id) as item_path,
@@ -381,17 +376,18 @@ namespace eval cm {
             o.object_id in ($sql_id_list)
           order by
             item_path"
- 
-        uplevel "template::query $name multirow \{$sql_query\} -eval \{$eval_code\}"
+
+	upvar __sql sql_query
+        uplevel "template::query $name multirow \{$__sql\} -eval \{$eval_code\}"
       }
          
     }
 
     namespace eval clipboard {
 
-      proc getRootFolderID {} { return 0 } 
+      ad_proc getRootFolderID {} { return 0 } 
 
-      proc getChildFolders { id } {
+      ad_proc getChildFolders { id } {
 
         # Only the mount point is expandable
         if { ![template::util::is_nil id] } {
@@ -402,15 +398,14 @@ namespace eval cm {
  
         set module_name [namespace tail [namespace current]] 
 
-        set query "select
+        template::query gcf_child_folders result multilist "
+                     select
                      :module_name as mount_point,
                      name, key, '' as children,
                      'f' as expandable,
                      'f' as symlink,
                      0 as update_type
                    from cm_modules order by sort_key"
-
-        template::query result multilist $query 
         return $result
       }
     }

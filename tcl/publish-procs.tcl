@@ -328,14 +328,16 @@ proc publish::write_multiple_files { url text {root_path ""}} {
 # @see proc publish::get_publish_roots
 # @see proc publish::write_multiple_files
 
-proc publish::write_multiple_blobs { 
-  db url revision_id {root_path ""} 
+ad_proc publish::write_multiple_blobs { 
+  url revision_id {root_path ""} 
 } {
   foreach_publish_path $url {
     mkdirs $filename
-    ns_ora blob_get_file $db "
+      
+    db_blob_get_file wmb_get_blob_file "
       select content from cr_revisions where revision_id = $revision_id
     " $filename
+      
     ns_chmod $filename 0764
     ns_log notice "PUBLISH: Wrote revision $revision_id to $filename"
   } $root_path
@@ -389,7 +391,7 @@ proc publish::delete_multiple_files { url {root_path ""}} {
 # @see proc content::get_content_value
 # @see proc publish::get_publish_roots
 
-proc publish::write_content { revision_id args } {
+ad_proc publish::write_content { revision_id args } {
 
   template::util::get_opts $args
 
@@ -399,45 +401,45 @@ proc publish::write_content { revision_id args } {
     set root_path $opts(root_path)
   }
 
-  set db [template::begin_db_transaction]
+  db_transaction {
 
-  # Get the item id if none specified
-  if { [template::util::is_nil opts(item_id)] } {
-    set item_id [content_item::get_item_from_revision $revision_id]
-    
-    if { [template::util::is_nil item_id] } {
-      ns_log notice \
-        "WARNING: publish::write_content: No such revision $revision_id"
-      template::end_db_transaction
-      return ""
-    }
-  } else {
-    set item_id $opts(item_id)
+      # Get the item id if none specified
+      if { [template::util::is_nil opts(item_id)] } {
+	  set item_id [content_item::get_item_from_revision $revision_id]
+	  
+	  if { [template::util::is_nil item_id] } {
+	      ns_log notice \
+		  "WARNING: publish::write_content: No such revision $revision_id"
+	      return ""
+	  }
+      } else {
+	  set item_id $opts(item_id)
+      }
   }
   
   set file_url [item::get_extended_url $item_id -revision_id $revision_id]
 
-  # Write blob/text to file
-  ns_log notice "Writing item $item_id to $file_url"
+  db_transaction {
+      # Write blob/text to file
+      ns_log notice "Writing item $item_id to $file_url"
 
-  if { [info exists opts(text)] } {
-    set text [content::get_content_value $revision_id]
-    write_multiple_files $file_url $text $root_path
-  } else {
+      if { [info exists opts(text)] } {
+	  set text [content::get_content_value $revision_id]
+	  write_multiple_files $file_url $text $root_path
+      } else {
 
-    # Determine if the blob is null. If it is, give up (or else the
-    # ns_ora blob_get_file will crash).
-    if { [item::content_is_null $revision_id] } {
-      ns_log notice \
-       "WARNING: publish::write_content: No content supplied for revision $revision_id"
-      return ""
-    }
+	  # Determine if the blob is null. If it is, give up (or else the
+	  # ns_ora blob_get_file will crash).
+	  if { [item::content_is_null $revision_id] } {
+	      ns_log notice \
+		  "WARNING: publish::write_content: No content supplied for revision $revision_id"
+	      return ""
+	  }
 
-    # Write the blob
-    write_multiple_blobs $db $file_url $revision_id $root_path
+	  # Write the blob
+	  write_multiple_blobs $file_url $revision_id $root_path
+      }
   }
-
-  template::end_db_transaction
 
   # Return either the full path or the relative URL
   return $file_url
@@ -454,6 +456,8 @@ proc publish::write_content { revision_id args } {
 #
 # @return Everything between the &lt;body&gt; and the &lt;/body&gt; tags
 #    if they exist; the unchanged HTML if they do not
+#
+# FIX ME: This approach is not really flexible, as HTML 4 accepts tags broken in lines
 
 proc publish::get_html_body { html } {
   
@@ -503,7 +507,7 @@ proc publish::get_html_body { html } {
 # @see proc publish::merge_with_template
 # @see proc publish::handle_item
 
-proc publish::render_subitem { 
+ad_proc publish::render_subitem { 
   main_item_id relation_type relation_tag \
   index is_embed extra_args {is_merge t}
 } {
@@ -511,7 +515,7 @@ proc publish::render_subitem {
   # Get the child item
 
   if { [string equal $relation_type child] } {
-    template::query subitems onelist "
+    template::query rs_get_subitems subitems onelist "
       select 
         child_id
       from 
@@ -525,7 +529,7 @@ proc publish::render_subitem {
       order by 
         order_n" -cache "item_child_items $main_item_id $relation_tag"
   } else {
-    template::query subitems onelist "
+    template::query cs_get_subitems_related subitems onelist "
       select 
         related_object_id
       from 
@@ -543,7 +547,7 @@ proc publish::render_subitem {
   set sub_item_id [lindex $subitems [expr $index - 1]]
    
   if { [template::util::is_nil sub_item_id] } {
-    ns_log notice "No such subitem"
+    ns_log notice "publish::render_subitem: No such subitem"
     return ""
   }
 
@@ -1171,7 +1175,7 @@ proc publish::handle_binary_file {
 # tag. Uses the title for alt text if no alt text is specified 
 # externally.
 
-proc publish::handle::image { item_id args } {
+ad_proc publish::handle::image { item_id args } {
 
   template::util::get_opts $args
 
@@ -1190,7 +1194,7 @@ proc publish::handle::image { item_id args } {
   }
 
   # If the merging failed, output a straight <img> tag
-  template::query image_info onerow "
+  template::query i_get_image_info image_info onerow "
     select 
       im.width, im.height, r.title as image_alt
     from 
@@ -1294,7 +1298,7 @@ proc publish::handle::text { item_id args } {
 # @see proc publish::publish_revision
 # @see proc publish::unpublish_item
 
-proc publish::set_publish_status { item_id new_status {revision_id ""} } {
+ad_proc publish::set_publish_status { item_id new_status {revision_id ""} } {
 
 
   switch $new_status {
@@ -1340,8 +1344,8 @@ proc publish::set_publish_status { item_id new_status {revision_id ""} } {
 
   }
 
-  ns_ora dml $db "update cr_items set publish_status = :new_status
-                    where item_id = :item_id" 
+  db_dml sps_update_cr_items "update cr_items set publish_status = :new_status
+                              where item_id = :item_id" 
 
 }
      
@@ -1352,70 +1356,67 @@ proc publish::set_publish_status { item_id new_status {revision_id ""} } {
 #
 # @see proc publish::schedule_status_sweep
  
-proc publish::track_publish_status {} {
+ad_proc publish::track_publish_status {} {
   
   ns_log notice "PUBLISH: Tracking publish status"
 
-  set db [template::begin_db_transaction]
+  db_transaction {
 
-  if { [catch {
+      if { [catch {
 
-    # Get all ready but nonlive items, make them live
-    template::query items multilist "
-      select 
-	distinct i.item_id, i.live_revision 
-      from 
-	cr_items i, cr_release_periods p
-      where
-	i.publish_status = 'ready'
-      and
-	i.live_revision is not null
-      and 
-        i.item_id = p.item_id
-      and
-        (sysdate between p.start_when and p.end_when)
-      " -db $db 
+	  # Get all ready but nonlive items, make them live
+	  template::query tps_get_items_multilist items multilist "
+            select 
+	      distinct i.item_id, i.live_revision 
+            from 
+      	      cr_items i, cr_release_periods p
+            where
+  	      i.publish_status = 'ready'
+             and
+	      i.live_revision is not null
+             and 
+              i.item_id = p.item_id
+             and
+              (sysdate between p.start_when and p.end_when)
+          "
 
-    # Have to do it this way, or else "no active select", since
-    # the other queries will clobber the current query
-    foreach pair $items {
-      set item_id [lindex $pair 0]
-      set live_revision [lindex $pair 1]
-      publish::set_publish_status $db $item_id live $live_revision
-    }
+	  # Have to do it this way, or else "no active select", since
+	  # the other queries will clobber the current query
+	  foreach pair $items {
+	      set item_id [lindex $pair 0]
+	      set live_revision [lindex $pair 1]
+	      publish::set_publish_status $db $item_id live $live_revision
+	  }
     
 
-    # Get all live but expired items, make them nonlive
-    template::query items onelist "
-      select 
-	distinct i.item_id
-      from 
-	cr_items i, cr_release_periods p
-      where
-	i.publish_status = 'live'
-      and
-	i.live_revision is not null
-      and 
-        i.item_id = p.item_id     
-      and 
-	not exists (select 1 from cr_release_periods p2
-		 where p2.item_id = i.item_id
-		 and (sysdate between p2.start_when and p2.end_when)
-	)
-      " -db $db 
+	  # Get all live but expired items, make them nonlive
+	  template::query tps_get_items_onelist items onelist "
+            select 
+  	      distinct i.item_id
+            from 
+  	      cr_items i, cr_release_periods p
+            where
+	      i.publish_status = 'live'
+            and
+  	      i.live_revision is not null
+            and 
+              i.item_id = p.item_id     
+            and 
+	      not exists (select 1 from cr_release_periods p2
+		          where p2.item_id = i.item_id
+		           and (sysdate between p2.start_when and p2.end_when)
+	                 )
+            "
    
-    foreach item_id $items {
-      publish::set_publish_status $db $item_id expired 
-    }
+	  foreach item_id $items {
+	      publish::set_publish_status $db $item_id expired 
+	  }
     
 
-  } errmsg] } {
-    ns_log notice "Error in publish::track_publish_status: $errmsg"
+      } errmsg] } {
+	  ns_log notice "Error in publish::track_publish_status: $errmsg"
+      }
   }
-
-  template::end_db_transaction
-  template::release_db_handle
-  
 }
 
 # @public schedule_status_sweep

@@ -26,7 +26,7 @@ namespace eval item {}
 
 ad_proc item::get_live_revision { item_id } {
 
-  template::query live_revision onevalue "
+  template::query glr_get_live_revision live_revision onevalue "
     select live_revision from cr_items
       where item_id = :item_id" -cache "item_live_revision $item_id"
 
@@ -53,8 +53,8 @@ ad_proc item::get_live_revision { item_id } {
 # @see proc item::get_live_revision 
 # @see proc item::get_item_from_revision
 
-proc item::get_best_revision { item_id } {
-  template::query revision_id onevalue "
+ad_proc item::get_best_revision { item_id } {
+  template::query gbr_get_best_revision revision_id onevalue "
     select content_item.get_best_revision(:item_id) from dual
   " -cache "item_best_revision $item_id"
 
@@ -73,7 +73,7 @@ proc item::get_best_revision { item_id } {
 # @see proc item::get_best_revision
 
 ad_proc item::get_item_from_revision { revision_id } {
-  template::query item_id onevalue "
+  template::query gifr_get_one_revision item_id onevalue "
     select item_id from cr_revisions where revision_id = :revision_id
   " -cache "item_from_revision $revision_id"
   return $item_id
@@ -90,10 +90,10 @@ ad_proc item::get_item_from_revision { revision_id } {
 # @return The relative URL to the item, or an empty string on failure
 # @see proc item::get_extended_url
 
-proc item::get_url { item_id } {
+ad_proc item::get_url { item_id } {
 
   # Get the path
-  template::query item_path onevalue "
+  template::query gu_get_path item_path onevalue "
     select content_item.get_path(:item_id) from dual
   " -cache "item_path $item_id" 
 
@@ -116,22 +116,22 @@ proc item::get_url { item_id } {
 #   on failure
 # @see proc item::get_url
 
-proc item::get_id { url {root_folder ""}} {
+ad_proc item::get_id { url {root_folder ""}} {
 
   # Strip off file extension
   set last [string last "." $url]
   if { $last > 0 } {
     set url [string range $url 0 [expr $last - 1]]
   }
-
-  set sql "select content_item.get_id(:url"
+  # FIX ME
+  set sql [db_map gi_get_item_id_1] "select content_item.get_id(:url"
   if { ![template::util::is_nil root_folder] } {
-    append sql ", :root_folder"
+      append sql [db_map gi_get_item_id_2] ", :root_folder"
   } 
-  append sql ") from dual"
+  append sql [db_map gi_get_item_id_3] ") from dual"
 
   # Get the path
-  template::query item_id onevalue $sql -cache "item_id $url $root_folder" 
+  template::query gi_get_item_id item_id onevalue $sql -cache "item_id $url $root_folder" 
 
   if { [info exists item_id] } {
     return $item_id
@@ -154,9 +154,9 @@ proc item::get_id { url {root_folder ""}} {
 # return    1 (one) if the revision exists, 0 (zero) otherwise.
 # @see proc item::get_extended_url
 
-proc item::get_mime_info { revision_id {datasource_ref mime_info} } {
+ad_proc item::get_mime_info { revision_id {datasource_ref mime_info} } {
 
-  return [template::query mime_info onerow "
+  return [template::query gmi_get_mime_info mime_info onerow "
     select 
       m.mime_type, m.file_extension
     from
@@ -179,9 +179,9 @@ proc item::get_mime_info { revision_id {datasource_ref mime_info} } {
 # @return The content type of the item, or an empty string if no such
 #         item exists
 
-proc item::get_content_type { item_id } {
+ad_proc item::get_content_type { item_id } {
 
-  template::query content_type onevalue "
+  template::query gct_get_content_type content_type onevalue "
     select content_type from cr_items where
       item_id = :item_id
   " -cache "item_content_type $item_id"
@@ -218,7 +218,7 @@ proc item::get_content_type { item_id } {
 # @see proc item::get_mime_info
 # @see proc item::get_template_id
 
-proc item::get_extended_url { item_id args } {
+ad_proc item::get_extended_url { item_id args } {
 
   set item_url [get_url $item_id]
 
@@ -294,9 +294,9 @@ proc item::get_extended_url { item_id args } {
 #
 # @see proc item::get_template_url
 
-proc item::get_template_id { item_id {context public} } {
+ad_proc item::get_template_id { item_id {context public} } {
 
-  template::query template_id onevalue "
+  template::query gti_get_template_id template_id onevalue "
     select content_item.get_template(:item_id, :context) as template_id
     from dual" -cache "item_itemplate_id $item_id"
 
@@ -322,7 +322,7 @@ proc item::get_template_id { item_id {context public} } {
 #
 # @see proc item::get_template_id
 
-proc item::get_template_url { item_id {context public} } {
+ad_proc item::get_template_url { item_id {context public} } {
 
   set template_id [get_template_id $item_id $context]
 
@@ -341,8 +341,8 @@ proc item::get_template_url { item_id {context public} } {
 #
 # @return 1 if the content is null, 0 otherwise
 
-proc item::content_is_null { revision_id } {
-  template::query content_test onevalue "
+ad_proc item::content_is_null { revision_id } {
+  template::query cin_get_content content_test onevalue "
     select 't' from cr_revisions 
       where revision_id = :revision_id
       and content is not null"
@@ -367,11 +367,11 @@ proc item::content_is_null { revision_id } {
 #
 # @return A TCL list of all possible content methods
 
-proc item::content_methods_by_type { content_type args } {
+ad_proc item::content_methods_by_type { content_type args } {
   
   template::util::get_opts $args
 
-  template::query types onelist "
+  template::query cmbt_get_content_mime_types types onelist "
     select mime_type from cr_content_mime_type_map
       where content_type = :content_type
       and lower(mime_type) like 'text/%'
@@ -420,7 +420,7 @@ proc item::content_methods_by_type { content_type args } {
 # @see proc item::get_mime_info 
 # @see proc item::get_content_type
 
-proc item::get_revision_content { revision_id args } {
+ad_proc item::get_revision_content { revision_id args } {
 
   template::util::get_opts $args
  
@@ -438,10 +438,10 @@ proc item::get_revision_content { revision_id args } {
 
   # Get the mime type, decide if we want the text
   get_mime_info $revision_id
-  
+  # FIX ME
   if { [string equal \
            [lindex [split $mime_info(mime_type) "/"] 0] "text"] } {
-    set text_sql ",\n    content.blob_to_string(content) as text"
+      set text_sql [db_map grc_get_all_content_1] ",\n    content.blob_to_string(content) as text"
   } else {
     set text_sql ""
   }
@@ -450,14 +450,14 @@ proc item::get_revision_content { revision_id args } {
   set content_type [get_content_type $item_id]
 
   # Get the table name
-  template::query table_name onevalue "
+  template::query grc_get_table_names table_name onevalue "
     select table_name from acs_object_types 
     where object_type = :content_type
   " -cache "type_table_name $content_type" -persistent \
     -timeout 3600
 
   # Get (all) the content (note this is really dependent on file type)
-  template::query content onerow "select 
+  template::query grc_get_all_content content onerow "select 
     x.*, 
     :item_id as item_id $text_sql, 
     :content_type as content_type
@@ -496,8 +496,8 @@ proc item::get_revision_content { revision_id args } {
 #
 # @return    1 if the item is publishable, 0 otherwise
 
-proc item::is_publishable { item_id } {
-  template::query is_publishable onevalue "
+ad_proc item::is_publishable { item_id } {
+  template::query ip_is_publishable_p is_publishable onevalue "
     select content_item.is_publishable(:item_id) from dual
   " -cache "item_is_publishable $item_id"
 
@@ -523,8 +523,8 @@ proc item::is_publishable { item_id } {
 #
 # @see proc item::is_publishable
 
-proc item::get_publish_status { item_id } {
-  template::query publish_status onevalue "
+ad_proc item::get_publish_status { item_id } {
+  template::query gps_get_publish_status publish_status onevalue "
     select publish_status from cr_items where item_id = :item_id
   " -cache "item_publish_status $item_id"
 
@@ -542,8 +542,8 @@ proc item::get_publish_status { item_id } {
 #
 # @see proc item::get_best_revision
 
-proc item::get_title { item_id } {
-  template::query title onevalue "
+ad_proc item::get_title { item_id } {
+  template::query gt_get_title title onevalue "
     select content_item.get_title(:item_id) from dual
   " -cache "item_title $item_id"
 
