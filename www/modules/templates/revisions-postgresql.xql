@@ -9,7 +9,7 @@
   select
     revision_id,
     to_char(o.creation_date, 'MM/DD/YY HH:MI AM') as modified,
-    (round(r.content_length::float8 / 1000.0) || ' KB') as file_size,
+    (round(r.content_length::float8 / 1000.0,2)::float8::text || ' KB'::text) as file_size,
     case when coalesce(p.person_id, 0) = 0 
             then '-' 
             else substr(p.first_names, 1, 1) || substr(p.last_name, 1, 1) end as modified_by,

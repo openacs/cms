@@ -35,7 +35,7 @@
   select
     t.template_id, i.name, 
     to_char(o.last_modified, 'MM/DD/YY HH:MI AM') as modified,
-    coalesce(round(r.content_length::float8 / 1000), 0) || ' KB' as file_size
+    coalesce(round(r.content_length::float8 / 1000,2), 0)::float8::text || ' KB'::text as file_size
   from
     cr_templates t, acs_objects o, 
     cr_revisions r 
