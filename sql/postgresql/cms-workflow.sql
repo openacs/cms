@@ -344,7 +344,7 @@
 create function content_workflow__is_overdue (integer)
 returns boolean as '
 declare
-  p_v_task_id            alias for $1;  
+  p_task_id            alias for $1;  
 begin
 
     -- FIXME: is dead.deadline supposed to be a date-only (e.g. no time)
@@ -353,7 +353,7 @@ begin
     from
       wf_tasks t, wf_case_deadlines dead
     where
-      t.task_id = v_task_id
+      t.task_id = p_task_id
     and
       t.case_id = dead.case_id
     and
@@ -388,8 +388,7 @@ begin
     and
       deadline < date_trunc(''day'',now())
     and
-      content_workflow__is_finished(p_case_id, 
-        p_transition_key) = ''f'';
+      content_workflow__is_finished(p_case_id, p_transition_key) = ''f'';
    
 end;' language 'plpgsql';
 
@@ -398,8 +397,8 @@ end;' language 'plpgsql';
 create function content_workflow__get_holding_user_name (integer)
 returns varchar as '
 declare
-  p_v_task_id                      alias for $1;  
-  v_name                           varchar(100);  
+  p_task_id                        alias for $1;  
+  v_name                           varchar;  
 begin
 
     select
@@ -411,7 +410,7 @@ begin
     where
       t.holding_user = p.person_id
     and
-      t.task_id = p_v_task_id;
+      t.task_id = p_task_id;
 
     return v_name;
    
@@ -490,12 +489,12 @@ begin
       and
         here.workflow_key = there.workflow_key
       and
-        here.place_key = content_workflow.get_this_place(
-          get_next_place.transition_key )
+        here.place_key = content_workflow__get_this_place( p_transition_key )
       and
         there.sort_order > here.sort_order
       order by 
-        there.sort_order;
+        there.sort_order
+      limit 1;
 
     if NOT FOUND then
       raise EXCEPTION ''-20000: content_workflow.get_next_place - No next place - Dead End'';
@@ -511,7 +510,7 @@ create function content_workflow__get_previous_place (varchar)
 returns varchar as '
 declare
   p_transition_key                 alias for $1;  
-    v_previous_place               wf_places.place_key%TYPE;
+  v_previous_place                 wf_places.place_key%TYPE;
 begin
 
       select 
@@ -525,12 +524,12 @@ begin
       and
         here.workflow_key = there.workflow_key
       and
-        here.place_key = content_workflow.get_this_place(
-          get_previous_place.transition_key )
+        here.place_key = content_workflow__get_this_place( p_transition_key )
       and
         there.sort_order < here.sort_order
       order by 
-        there.sort_order desc;
+        there.sort_order desc
+      limit 1;
 
     if NOT FOUND then 
       raise EXCEPTION ''-20000: content_workflow.get_previous_place - No previous place - Dead End'';
@@ -542,7 +541,7 @@ end;' language 'plpgsql';
 
 
 -- procedure checkout
-create function content_workflow__checkout (integer,timestamp,integer,varchar,<=>)
+create function content_workflow__checkout (integer,timestamp,integer,varchar,varchar)
 returns integer as '
 declare
   p_task_id                        alias for $1;  
@@ -550,11 +549,11 @@ declare
   p_user_id                        alias for $3;  
   p_ip_address                     alias for $4;  
   p_msg                            alias for $5;  
-  v_task_state           wf_tasks.state%TYPE;
-  v_holding_user         wf_tasks.holding_user%TYPE;
-  v_journal_id           number;        
-  v_transition_key       wf_transitions.transition_key%TYPE;
-  v_this_place           wf_places.place_key%TYPE;
+  v_task_state                     wf_tasks.state%TYPE;
+  v_holding_user                   wf_tasks.holding_user%TYPE;
+  v_journal_id                     integer;        
+  v_transition_key                 wf_transitions.transition_key%TYPE;
+  v_this_place                     wf_places.place_key%TYPE;
 begin
     
     -- find out who is holding the task right now
@@ -616,7 +615,7 @@ begin
         where task_id = p_task_id;
 
       if v_holding_user is not null and 
-        v_holding_user ^= p_user_id then
+        v_holding_user != p_user_id then
 
         -- send a notification
         PERFORM content_workflow__notify_of_checkout(
@@ -628,7 +627,7 @@ begin
       end if;
 
     else
-      raise EXCEPTION ''-20000: Cannot check out this task because it''''s in an invalid state %'', v_task_state
+      raise EXCEPTION ''-20000: Cannot check out this task because it is in an invalid state %'', v_task_state
     end if;
 
     return 0; 
@@ -686,7 +685,7 @@ begin
 
 
     else if v_task_state != ''started'' then
-      raise EXCEPTION '' -20000:  Cannot chack in this task because it''''s in an invalid state %'', v_task_state;
+      raise EXCEPTION '' -20000:  Cannot chack in this task because it is in an invalid state %'', v_task_state;
     else
       raise EXCEPTION '' -20000: Cannot check in this task because user_id % is not the holding user'', user_id;
     end if; end if;
@@ -739,7 +738,7 @@ begin
 	    p_ip_address,
 	    p_msg
         );
-      end if; end if;
+      end if;
 
       v_journal_id := workflow_case__begin_task_action(
           p_task_id,
@@ -765,14 +764,14 @@ begin
           p_task_id
       );
 
-    end if;
+    end if; end if;
 
     return 0; 
 end;' language 'plpgsql';
 
 
 -- procedure reject
-create function content_workflow__reject (integer,integer,varchar,varchar,<=>)
+create function content_workflow__reject (integer,integer,varchar,varchar,varchar)
 returns integer as '
 declare
   p_task_id                        alias for $1;  
@@ -886,11 +885,11 @@ declare
   p_holding_user_old               alias for $2;  
   p_holding_user_new               alias for $3;  
   p_msg                            alias for $4;  
-  v_hold_user_old        varchar(100);  
-  v_hold_user_new        varchar(100);  
-  v_transition_name      wf_transitions.transition_name%TYPE;
-  v_request_id           nt_requests.request_id%TYPE;
-  v_item_name            varchar(100);  
+  v_hold_user_old                  varchar(100);  
+  v_hold_user_new                  varchar(100);  
+  v_transition_name                wf_transitions.transition_name%TYPE;
+--  v_request_id                     nt_requests.request_id%TYPE;
+  v_item_name                      varchar(100);  
 begin
 
     -- get the robbed users name
@@ -994,7 +993,7 @@ end;' language 'plpgsql';
 
 -- function can_start
 create function content_workflow__can_start (integer,integer)
-returns char as '
+returns boolean as '
 declare
   p_task_id                        alias for $1;  
   p_user_id                        alias for $2;  
@@ -1119,7 +1118,7 @@ end;' language 'plpgsql';
 
 -- function is_active
 create function content_workflow__is_active (integer,varchar)
-returns char as '
+returns boolean as '
 declare
   p_case_id                        alias for $1;  
   p_transition_key                 alias for $2;  
@@ -1141,7 +1140,7 @@ end;' language 'plpgsql';
 
 -- function is_finished
 create function content_workflow__is_finished (integer,varchar)
-returns char as '
+returns boolean as '
 declare
   p_case_id                        alias for $1;  
   p_transition_key                 alias for $2;  
@@ -1161,7 +1160,7 @@ begin
         here.workflow_key = trans.workflow_key
       and
         -- the task belongs to this case
-        t.case_id = p_.case_id
+        t.case_id = p_case_id
       and
         -- the task is active
         t.state in ('enabled','started')
@@ -1191,7 +1190,7 @@ end;' language 'plpgsql';
 
 -- function is_checked_out
 create function content_workflow__is_checked_out (integer,varchar)
-returns char as '
+returns boolean as '
 declare
   p_case_id                        alias for $1;  
   p_transition_key                 alias for $2;  
@@ -1214,7 +1213,7 @@ end;' language 'plpgsql';
 
 -- function is_checked_out
 create function content_workflow__is_checked_out (integer,varchar,integer)
-returns char as '
+returns boolean as '
 declare
   p_case_id                        alias for $1;  
   p_transition_key                 alias for $2;  
@@ -1288,7 +1287,7 @@ end;' language 'plpgsql';
 
 -- function can_touch
 create function content_workflow__can_touch (integer,integer)
-returns char as '
+returns boolean as '
 declare
   p_item_id                        alias for $1;  
   p_user_id                        alias for $2;  
@@ -1347,7 +1346,7 @@ end;' language 'plpgsql';
 
 -- function unfinished_workflow_exists
 create function content_workflow__unfinished_workflow_exists (integer)
-returns char as '
+returns boolean as '
 declare
   p_item_id                        alias for $1;  
 begin
