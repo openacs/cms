@@ -263,6 +263,8 @@ begin
     end if;
 
     -- Get permissions assigned to the parent(s), copy them into child
+    -- FIXME: this query needs optimization still
+
     for c_perm_cur in 
         select 
           p.grantee_id, p.privilege
@@ -273,23 +275,24 @@ begin
                      from acs_objects 
                     where object_id = v_context_id) o1,
                   acs_objects o2,
-                  (select case when max(ob2.tree_sortkey) is null 
-                                    then ''/'' 
-                                    else max(ob2.tree_sortkey) 
-                                end as tree_sortkey
+                  (select ob2.tree_sortkey
                      from (select * 
                              from acs_objects 
                             where object_id = v_context_id) ob1, 
                           acs_objects ob2
                     where ob2.tree_sortkey <= ob1.tree_sortkey
                       and ob1.tree_sortkey between ob2.tree_sortkey and tree_right(ob2.tree_sortkey)
-                      and ob2.security_inherit_p = ''f'') o3        
+                      and ob2.security_inherit_p = ''f''
+                    union
+                   select B''0'' as tree_sortkey
+                 order by tree_sortkey desc
+                          limit 1) o3        
             where o2.tree_sortkey <= o1.tree_sortkey
               and o1.tree_sortkey between o2.tree_sortkey and tree_right(o2.tree_sortkey)
               and o2.tree_sortkey > o3.tree_sortkey
             order by o2.tree_sortkey desc) o
         where  
-          p.object_id = o.object_id
+          p.object_id = o.object_id        
     LOOP
         v_grantee_id := c_perm_cur.grantee_id;
         v_privilege := c_perm_cur.privilege; 
