@@ -89,7 +89,7 @@ template::query get_items items multirow "
   select
     t.template_id, i.name, 
     to_char(o.last_modified, 'MM/DD/YY HH:MI AM') modified,
-    nvl(round(dbms_lob.getlength(r.content) / 1000), 0) || ' KB' as file_size
+    nvl(round(r.content_length / 1000), 0) || ' KB' as file_size
   from
     cr_templates t, cr_items i, acs_objects o, cr_revisions r
   where

@@ -22,7 +22,7 @@ template::query get_revision one_revision onerow "
        mime_type = cr_revisions.mime_type
     ) mime_type_pretty,
     to_char(publish_date,'Month DD, YYYY') as publish_date_pretty,
-    dbms_lob.getlength(content) as content_size
+    content_length as content_size
   from 
     cr_revisions
   where 

@@ -19,7 +19,7 @@ template::query get_revisions revisions multirow "
   select
     revision_id,
     to_char(o.creation_date, 'MM/DD/YY HH:MI AM') modified,
-    round(dbms_lob.getlength(r.content) / 1000) || ' KB' as file_size,
+    round(r.content_length / 1000) || ' KB' as file_size,
     decode(NVL(p.person_id, 0),
         0, '-',
         substr(p.first_names, 1, 1) || substr(p.last_name, 1, 1)) modified_by,

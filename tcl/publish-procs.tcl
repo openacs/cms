@@ -366,7 +366,14 @@ ad_proc -private publish::write_multiple_blobs {
 } {
   foreach_publish_path $url {
     mkdirs $filename
-      
+
+    db_1row get_storage_type "
+           select storage_type 
+             from cr_items 
+            where item_id = (select item_id 
+                               from cr_revisions 
+                              where revision_id = :revision_id)"
+
     db_blob_get_file wmb_get_blob_file "
       select content from cr_revisions where revision_id = $revision_id
     " -file $filename

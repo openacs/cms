@@ -43,17 +43,6 @@
   
       </querytext>
 </fullquery>
-
- 
-<fullquery name="item::content_is_null.cin_get_content">      
-      <querytext>
-      
-    select 't' from cr_revisions 
-      where revision_id = :revision_id
-      and content is not null
-      </querytext>
-</fullquery>
-
  
 <fullquery name="item::content_methods_by_type.cmbt_get_content_mime_types">      
       <querytext>

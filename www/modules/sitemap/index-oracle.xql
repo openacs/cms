@@ -12,7 +12,7 @@
 			  'content_folder', f.label,
 			  nvl(v.title, i.name)) title,
     decode(r.item_id, :index_page_id, 't', 'f') is_index_page,
-    nvl(to_char(round(dbms_lob.getlength(v.content) / 1000, 1)), '-') file_size
+    nvl(to_char(round(v.content_length / 1000, 1)), '-') file_size
   from 
     cr_resolved_items r, cr_items i, cr_folders f, cr_revisions v, 
     cr_revisions u, acs_objects o, acs_object_types t
@@ -53,7 +53,7 @@
     o.object_type, t.pretty_name content_type,
     to_char(o.last_modified, 'MM/DD/YYYY HH24:MI') last_modified_date,
     decode(r.item_id, :index_page_id, 't', 'f') is_index_page,
-    nvl(to_char(round(dbms_lob.getlength(v.content) / 1000, 1)), '-') file_size
+    nvl(to_char(round(v.content_length / 1000, 1)), '-') file_size
   from 
     cr_resolved_items r, cr_items i, cr_folders f, cr_revisions v, 
     cr_revisions u, acs_objects o, acs_object_types t
