@@ -98,8 +98,6 @@ if { [form is_valid copy] } {
         foreach cp_item_id $copied_items {
             set parent_id [element get_values copy "parent_id_$cp_item_id"]
 
-            set sql 
-
             if { [catch {db_exec_plsql copy_item "
 	    begin
             content_item.copy(

@@ -109,8 +109,6 @@ if { [form is_valid symlink] } {
             set name [element get_values symlink $element_name_1]
             set label [lindex [element get_values symlink $element_name_2] 0]
 
-            set sql 
-
             if { [catch {db_exec_plsql new_link "
 	    begin
             :1 := content_symlink.new(

@@ -101,8 +101,6 @@ if { [form is_valid move] } {
         foreach mv_item_id $moved_items {
             set parent_id [element get_values move "parent_id_$mv_item_id"]
 
-            set sql 
-
             if { [catch {db_exec_plsql move_items "
 	    begin
             content_item.move(
