@@ -24,7 +24,7 @@
 
 	  begin
 	  :1 := acs_mail_nt.post_request(
-	      party_from   => -1,
+	      party_from   => null,
 	      party_to     => :admin_id,
 	      expand_group => 'f',
 	      subject      => :subject,
@@ -40,7 +40,7 @@
 
 	  begin
 	  :1 := acs_mail_nt.post_request(
-	      party_from   => -1,
+	      party_from   => null,
 	      party_to     => :admin_id,
 	      expand_group => 'f',
 	      subject      => :subject,
@@ -146,7 +146,7 @@
 
 	  begin
 	    :1 := acs_mail_nt.post_request(
-	        party_from   => -1,
+	        party_from   => null,
 	        party_to     => :admin_id,
 	        expand_group => 'f',
 	        subject      => :subject,
@@ -201,7 +201,7 @@
 
 	  begin
 	    :1 := acs_mail_nt.post_request(
-	        party_from   => -1,
+	        party_from   => null,
 	        party_to     => :admin_id,
 	        expand_group => 'f',
 	        subject      => :subject,
