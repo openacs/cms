@@ -149,20 +149,21 @@ comment on column cm_modules.root_key is '
 
 -- create or replace package body content_module
 
-create function content_module__new (varchar,varchar,varchar,integer,integer,integer,timestamp,integer,varchar,varchar)
+create function content_module__new (varchar,varchar,varchar,integer,integer)
 returns integer as '
 declare
   p_name                        alias for $1;  
   p_key                         alias for $2;  
   p_root_key                    alias for $3;  
   p_sort_key                    alias for $4;  
+  p_parent_id                   alias for $5;  -- default null
 begin
 
         return content_module__new(p_name,
                                    p_key,
                                    p_root_key,
                                    p_sort_key,
-                                   null,
+                                   p_parent_id,
                                    null,
                                    now(),
                                    null,
@@ -187,7 +188,7 @@ declare
   p_object_type                 alias for $10; -- ''content_module''
   v_module_id                   integer;       
 begin
-  module_id := content_item__new(
+  v_module_id := content_item__new(
       p_name,
       p_parent_id,
       p_object_id,
@@ -209,9 +210,9 @@ begin
   insert into cm_modules
     (module_id, key, name, root_key, sort_key)
   values
-    (v_module_id, key, p_name, p_root_key, p_sort_key);
+    (v_module_id, p_key, p_name, p_root_key, p_sort_key);
 
-  return module_id;
+  return v_module_id;
 
 end;' language 'plpgsql';
 
@@ -242,7 +243,7 @@ begin
 
   v_id := content_module__new(''My Tasks'', ''workspace'', NULL, 1,0);
   v_id := content_module__new(''Site Map'', ''sitemap'', 
-    content_item__get_root_folder(), 2,0);
+    content_item__get_root_folder(null), 2,0);
   v_id := content_module__new(''Templates'', ''templates'', 
     content_template__get_root_folder(), 3,0);
   v_id := content_module__new(''Content Types'', ''types'', 

@@ -186,7 +186,7 @@ drop function inline_2 ();
 
 
 
-* Register attribute widgets for content_revision and image */
+/* Register attribute widgets for content_revision and image */
 
 create function inline_3 ()
 returns integer as '

@@ -102,7 +102,7 @@ insert into wf_places (
   'end', 'publishing_wf', 'Approved', 4
 );
 
-*
+/*
  * The next step is to define the valid transitions from one place in the 
  * workflow to another.  Transitions are where actions occur, either on the
  * part of users or machines.
@@ -126,7 +126,7 @@ insert into wf_transitions (
   'approval', 'Approval', 'publishing_wf', 3, 'user'
 );
 
-* 
+/* 
  * The next step is connect transitions to places.  This is analogous
  * to adding arrows or arcs to the workflow diagram, pointing from places
  * to transitions and from transitions to other places.

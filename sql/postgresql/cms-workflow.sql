@@ -418,7 +418,7 @@ end;' language 'plpgsql';
 
 
 
-create get_first_place() returns varchar as '
+create function get_first_place() returns varchar as '
 declare
     v_first_place wf_places.place_key%TYPE;
 begin
@@ -485,7 +485,7 @@ begin
       from
         wf_places here, wf_places there
       where
-        here.workflow_key = 'publishing_wf'
+        here.workflow_key = ''publishing_wf''
       and
         here.workflow_key = there.workflow_key
       and
@@ -520,7 +520,7 @@ begin
       from
         wf_places here, wf_places there
       where
-        here.workflow_key = 'publishing_wf'
+        here.workflow_key = ''publishing_wf''
       and
         here.workflow_key = there.workflow_key
       and
@@ -969,7 +969,7 @@ end;' language 'plpgsql';
 
 -- function can_approve
 create function content_workflow__can_approve (integer,integer)
-returns boolean
+returns boolean as '
 declare
   p_task_id                        alias for $1;  
   p_user_id                        alias for $2;  
@@ -1153,7 +1153,7 @@ begin
       from
         wf_transitions trans, wf_places here, wf_places there, wf_tasks t
       where
-        trans.workflow_key = 'publishing_wf'
+        trans.workflow_key = ''publishing_wf''
       and
         here.workflow_key = there.workflow_key
       and
@@ -1163,12 +1163,12 @@ begin
         t.case_id = p_case_id
       and
         -- the task is active
-        t.state in ('enabled','started')
+        t.state in (''enabled'',''started'')
       and
         -- here is the place the case is currently at
         here.place_key = content_workflow__get_this_place(t.transition_key)
       and
-        -- there is the place we're checking if it's finished
+        -- there is the place we are checking if it is finished
         there.place_key = content_workflow__get_this_place(
           trans.transition_key)
       and

@@ -66,7 +66,7 @@ drop function inline_1 ();
 create function inline_2 ()
 returns integer as '
 begin
-  -- FIXME: DCW - can't locate where this trigger is created.  Need a table
+  -- FIXME: DCW - can''t locate where this trigger is created.  Need a table
   -- name in order to drop it in pg.
 
   -- execute ''drop trigger cr_item_permission_tr'';

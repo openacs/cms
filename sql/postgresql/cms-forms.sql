@@ -83,9 +83,9 @@ create view cm_attribute_widget_param_ext as
   from
     acs_attributes at,
     (select
-      widgets.attribute_id, widgets.is_required widget_is_required, 
+      widgets.attribute_id, widgets.is_required as widget_is_required, 
       widgets.widget, params.param_id, params.param_type, params.param_source,
-      nvl(params.value,params.default_value) value, 
+      coalesce(params.value,params.default_value) as value, 
       params.param, params.param_is_required,
       params.is_html, params.default_value
     from 
@@ -93,7 +93,7 @@ create view cm_attribute_widget_param_ext as
       (select
 	awp.attribute_id, awp.param_id, awp.param_type, 
 	awp.param_source, awp.value, 
-	fwp.param, fwp.is_required param_is_required,
+	fwp.param, fwp.is_required as param_is_required,
 	fwp.is_html, fwp.default_value
       from
 	cm_form_widget_params fwp, cm_attribute_widget_params awp
@@ -103,7 +103,7 @@ create view cm_attribute_widget_param_ext as
       select
         aw.attribute_id, fwp.param_id, 
 	'onevalue' as param_type, 'literal' as param_source,
-	default_value as value, fwp.param, fwp.is_required param_is_required,
+	default_value as value, fwp.param, fwp.is_required as param_is_required,
 	fwp.is_html, fwp.default_value
       from
         cm_form_widget_params fwp, cm_attribute_widgets aw
@@ -364,8 +364,8 @@ begin
 	aw.attribute_id = a.attribute_id;
 
     if NOT FOUND then
-      raise EXCEPTION ''-20000: No widget is registered for attribute %''.% in cm_form_widget.set_attribute_param_value'', p_content_type, p_attribute_name;
-    end;
+      raise EXCEPTION ''-20000: No widget is registered for attribute %.% in cm_form_widget.set_attribute_param_value'', p_content_type, p_attribute_name;
+    end if;
 
     -- Get the param id
     select param_id into v_param_id from cm_form_widget_params

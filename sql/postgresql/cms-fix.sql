@@ -94,19 +94,19 @@ begin
        ''f''
        );
 
-    v_id := content_module__new('My Tasks', 'workspace', NULL, 1,0);
-    v_id := content_module__new('Site Map', 'sitemap', 
-                                 content_item.get_root_folder, 2,0);
-    v_id := content_module__new('Templates', 'templates', 
-                                 content_template.get_root_folder, 3,0);
-    v_id := content_module__new('Content Types', 'types', 
-                                 'content_revision', 4,0);
+    v_id := content_module__new(''My Tasks'', ''workspace'', NULL, 1,0);
+    v_id := content_module__new(''Site Map'', ''sitemap'', 
+                                 content_item__get_root_folder(), 2,0);
+    v_id := content_module__new(''Templates'', ''templates'', 
+                                 content_template__get_root_folder(), 3,0);
+    v_id := content_module__new(''Content Types'', ''types'', 
+                                 ''content_revision'', 4,0);
     v_module_id := v_id;
 
-    v_id := content_module__new('Search', 'search', null, 5,0);
-    v_id := content_module__new('Subject Keywords', 'categories', 0, 6,0);
-    v_id := content_module__new('Users', 'users', null, 7,0);
-    v_id := content_module__new('Workflows', 'workflow', null, 8,0);
+    v_id := content_module__new(''Search'', ''search'', null, 5,0);
+    v_id := content_module__new(''Subject Keywords'', ''categories'', 0, 6,0);
+    v_id := content_module__new(''Users'', ''users'', null, 7,0);
+    v_id := content_module__new(''Workflows'', ''workflow'', null, 8,0);
 
     -- upgrade hack, grant users with sitemap privs permission on types module
     for v_sitemap_perms in 
@@ -115,7 +115,7 @@ begin
     from
       acs_permissions
     where
-      object_id = content_item__get_root_folder();
+      object_id = content_item__get_root_folder()
     LOOP
       PERFORM acs_permission__grant_permission( v_module_id, 
           v_sitemap_perms.grantee_id, v_sitemap_perms.privilege );

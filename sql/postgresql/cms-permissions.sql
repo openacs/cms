@@ -4,7 +4,7 @@
 create function inline_0 ()
 returns integer as '
 declare
-  v_perms varchar2(1) := ''f'';
+  v_perms       boolean default ''f'';
 begin
     
   select ''t'' into v_perms from dual 
@@ -17,42 +17,62 @@ begin
 
   if v_perms <> ''t'' then
 
+
     -- Dummy root privilege
-    PERFORM acs_privilege__create_privilege('cm_root', 'Root', 'Root');
+    PERFORM acs_privilege__create_privilege(''cm_root'', ''Root'', ''Root'');
     -- He can do everything
-    PERFORM acs_privilege__create_privilege('cm_admin', 'Administrator', 'Administrators');
-    PERFORM acs_privilege__create_privilege('cm_relate', 'Relate Items', 'Relate Items');
-    PERFORM acs_privilege__create_privilege('cm_write', 'Write', 'Write');    
-    PERFORM acs_privilege__create_privilege('cm_new', 'Create New Item', 'Create New Item');    
-    PERFORM acs_privilege__create_privilege('cm_examine', 'Admin-level Read', 'Admin-level Read');    
-    PERFORM acs_privilege__create_privilege('cm_read', 'User-level Read', 'User-level Read');    
-    PERFORM acs_privilege__create_privilege('cm_item_workflow', 'Modify Workflow', 'Modify Workflow');    
-    PERFORM acs_privilege__create_privilege('cm_perm_admin', 'Modify Any Permissions', 'Modify Any Permissions');
+    PERFORM acs_privilege__create_privilege(''cm_admin'', ''Administrator'', ''Administrators'');
+    PERFORM acs_privilege__create_privilege(''cm_relate'', ''Relate Items'', ''Relate Items'');
+    PERFORM acs_privilege__create_privilege(''cm_write'', ''Write'', ''Write'');    
+    PERFORM acs_privilege__create_privilege(''cm_new'', ''Create New Item'', ''Create New Item'');    
+    PERFORM acs_privilege__create_privilege(''cm_examine'', ''Admin-level Read'', ''Admin-level Read'');    
+    PERFORM acs_privilege__create_privilege(''cm_read'', ''User-level Read'', ''User-level Read'');    
+    PERFORM acs_privilege__create_privilege(''cm_item_workflow'', ''Modify Workflow'', ''Modify Workflow'');    
+    PERFORM acs_privilege__create_privilege(''cm_perm_admin'', ''Modify Any Permissions'', ''Modify Any Permissions'');
     
-    PERFORM acs_privilege__create_privilege('cm_perm', 'Donate Permissions', 'Donate Permissions');    
+    PERFORM acs_privilege__create_privilege(''cm_perm'', ''Donate Permissions'', ''Donate Permissions'');    
 
-    PERFORM acs_privilege__add_child('cm_root', 'cm_admin');           -- Do anything
-    PERFORM acs_privilege__add_child('cm_admin', 'cm_relate');         -- Related/Child items
-    PERFORM acs_privilege__add_child('cm_relate', 'cm_write');         -- Modify the item
-    PERFORM acs_privilege__add_child('cm_write', 'cm_new');            -- Create subitems
-    PERFORM acs_privilege__add_child('cm_new', 'cm_examine');          -- View in admin mode 
-    PERFORM acs_privilege__add_child('cm_examine', 'cm_read');         -- View in user mode
-    PERFORM acs_privilege__add_child('cm_admin', 'cm_item_workflow');  -- Change item workflow
+    PERFORM acs_privilege__add_child(''cm_root'', ''cm_admin'');           -- Do anything
+    PERFORM acs_privilege__add_child(''cm_admin'', ''cm_relate'');         -- Related/Child items
+    PERFORM acs_privilege__add_child(''cm_relate'', ''cm_write'');         -- Modify the item
+    PERFORM acs_privilege__add_child(''cm_write'', ''cm_new'');            -- Create subitems
+    PERFORM acs_privilege__add_child(''cm_new'', ''cm_examine'');          -- View in admin mode 
+    PERFORM acs_privilege__add_child(''cm_examine'', ''cm_read'');         -- View in user mode
+    PERFORM acs_privilege__add_child(''cm_admin'', ''cm_item_workflow'');  -- Change item workflow
 
-    PERFORM acs_privilege__add_child('cm_admin', 'cm_perm_admin');     -- Modify any permissions
-    PERFORM acs_privilege__add_child('cm_perm_admin', 'cm_perm');      -- Modify any permissions on an item
+    PERFORM acs_privilege__add_child(''cm_admin'', ''cm_perm_admin'');     -- Modify any permissions
+
+    PERFORM acs_privilege__add_child(''cm_perm_admin'', ''cm_perm'');      -- Modify any permissions on an item
+
 
     -- Proper inheritance
-    PERFORM acs_privilege__add_child('admin', 'cm_root');
+    -- PERFORM acs_privilege__add_child(''admin'', ''cm_root'');
 
   end if;
   
   return 0;
 end;' language 'plpgsql';
 
+-- temporarily drop this trigger to avoid a data-change violation 
+-- on acs_privilege_hierarchy_index while updating the child privileges.
+
+drop trigger acs_priv_hier_ins_del_tr on acs_privilege_hierarchy;
+
 select inline_0 ();
 
+create trigger acs_priv_hier_ins_del_tr after insert or delete
+on acs_privilege_hierarchy for each row
+execute procedure acs_priv_hier_ins_del_tr ();
+
 drop function inline_0 ();
+
+select acs_privilege__add_child('admin', 'cm_root') 
+from dual 
+where not exists (select 1 
+                    from acs_privilege_hierarchy 
+                   where privilege = 'admin' 
+                     and child_privilege = 'cm_root') 
+limit 1;
 
 
 -- show errors
@@ -344,6 +364,34 @@ begin
    
 end;' language 'plpgsql';
 
+create table v_items (
+       value integer[]
+);
+insert into v_items (value) values ('{0}');
+
+create function v_items_tr () returns opaque as '
+begin
+        raise EXCEPTION ''Only updates are allowed on this table'';
+        return null;
+end;' language 'plpgsql';
+
+create trigger v_items_tr before insert or delete on v_items
+for each row execute procedure v_items_tr();
+
+
+create table v_perms (
+       value varchar(100)[]
+);
+insert into v_perms (value) values ('{''}');
+
+create function v_perms_tr () returns opaque as '
+begin
+        raise EXCEPTION ''Only updates are allowed on this table'';
+        return null;
+end;' language 'plpgsql';
+
+create trigger v_perms_tr before insert or delete on v_perms
+for each row execute procedure v_perms_tr();
 
 -- procedure grant_permission
 -- FIXME: need to fix problem with defined types
@@ -357,10 +405,10 @@ declare
   p_recepient_id                   alias for $4;  
   p_is_recursive                   alias for $5;  -- default ''f''
   v_item_id                        cr_items.item_id%TYPE;
-  v_items                          item_array_type;
+  -- v_items                          item_array_type;
   v_idx                            integer;       
   v_count                          integer;       
-  v_perms                          perm_array_type;
+  -- v_perms                          perm_array_type;
   v_perm                           acs_privileges.privilege%TYPE;
   v_perm_idx                       integer;       
   v_perm_count                     integer;       
@@ -393,7 +441,8 @@ begin
     LOOP
       v_item_id := c_item_cur.item_id;
       v_count := v_count + 1;
-      v_items(v_count) := v_item_id;
+      -- v_items(v_count) := v_item_id;
+      update v_items set value[v_count] = v_item_id;
       exit when p_is_recursive = ''f'';
     end loop;
 
@@ -404,7 +453,8 @@ begin
     -- Grant parent permission
     for v_idx in 1..v_count loop
       PERFORM acs_permission__grant_permission (
-        v_items(v_idx), p_recepient_id, p_privilege
+        -- v_items(v_idx), p_recepient_id, p_privilege
+        v_items.value[v_idx], p_recepient_id, p_privilege
       );
     end loop;  
 
@@ -417,14 +467,16 @@ begin
     loop
       v_perm := c_perm_cur.descendant;
       v_perm_count := v_perm_count + 1;
-      v_perms(v_perm_count) := v_perm;
+      -- v_perms(v_perm_count) := v_perm;
+      update v_perms set value[v_perm_count] = v_perm;
     end loop;
 
     -- Revoke child permissions
     for v_idx in 1..v_count loop
       for v_perm_idx in 1..v_perm_count loop
         PERFORM acs_permission__revoke_permission (
-          v_items(v_idx), p_recepient_id, v_perms(v_perm_idx)
+          -- v_items(v_idx), p_recepient_id, v_perms(v_perm_idx)
+          v_items.value[v_idx], p_recepient_id, v_perms.value[v_perm_idx]
         );
        end loop;
     end loop;
@@ -442,11 +494,11 @@ declare
   p_privilege                      alias for $3;  
   p_revokee_id                     alias for $4;  
   p_is_recursive                   alias for $5;  -- default ''f''
-  v_items                          item_array_type;
+  -- v_items                          item_array_type;
   v_item_id                        cr_items.item_id%TYPE;
   v_idx                            integer;       
   v_count                          integer;       
-  v_perms                          perm_array_type;
+  -- v_perms                          perm_array_type;
   v_perm                           acs_privileges.privilege%TYPE;
   v_perm_idx                       integer;       
   v_perm_count                     integer;       
@@ -470,7 +522,8 @@ begin
     LOOP
       v_perm := c_perm_cur.child_privilege;
       v_perm_count := v_perm_count + 1;
-      v_perms(v_perm_count) := v_perm;
+      -- v_perms(v_perm_count) := v_perm;
+      update v_perms set value[v_perm_count] = v_perm;
     end LOOP;
 
     -- Select child items 
@@ -496,7 +549,8 @@ begin
     LOOP
       v_item_id := c_item_cur.item_id;
       v_count := v_count + 1;
-      v_items(v_count) := v_item_id;
+      -- v_items(v_count) := v_item_id;
+      update v_items set value[v_count] = v_item_id;
       exit when p_is_recursive = ''f'';
     end loop;
 
@@ -508,7 +562,8 @@ begin
     for v_idx in 1..v_count loop
       for v_perm_idx in 1..v_perm_count loop
         PERFORM acs_permission__grant_permission (
-          v_items(v_idx), p_revokee_id, v_perms(v_perm_idx)
+          -- v_items(v_idx), p_revokee_id, v_perms(v_perm_idx)
+          v_items.value[v_idx], p_revokee_id, v_perms.value[v_perm_idx]
         );
        end loop;
     end loop;  
@@ -516,7 +571,8 @@ begin
     -- Revoke the parent permission
     for v_idx in 1..v_count loop
       PERFORM acs_permission__revoke_permission (
-        v_items(v_idx), 
+        -- v_items(v_idx), 
+        v_items.value[v_idx],
         p_revokee_id, 
         p_privilege
       );
@@ -616,10 +672,10 @@ declare
     v_exists    boolean;
 begin
     
-    select 't' into v_exists from dual 
+    select ''t'' into v_exists from dual 
      where exists (
        select 1 from acs_permissions 
-       where privilege in ('cm_admin', 'cm_root')
+       where privilege in (''cm_admin'', ''cm_root'')
      );
 
      if NOT FOUND then 
