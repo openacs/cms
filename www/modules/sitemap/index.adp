@@ -46,7 +46,7 @@
   <if @num_revision_types@ gt 0>
     <formtemplate id=add_item>
     <img src="../../resources/Add24.gif" width=24 height=24 border=0>
-    <formwidget id=item_id>
+    <formwidget id=folder_id>
     <formwidget id=mount_point>
     Add a new <formwidget id=content_type> under this @what@.
     <input type=submit value="Add Item">

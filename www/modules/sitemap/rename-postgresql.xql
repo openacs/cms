@@ -7,7 +7,7 @@
       <querytext>
 
         select content_folder__edit_name (
-        :item_id, 
+        :folder_id, 
         :name, 
         :label, 
         :description

@@ -19,10 +19,7 @@ if { [template::util::is_nil folder_resolved_id] } {
 }
 
 # permissions check - user must have cm_examine on this folder
-content::check_access $folder_id cm_examine -user_id [User::getID]
-
-# hack - breadcrumbs for path (need to think about this)
-set call_ancestors_p [expr ![expr $folder_id == [cm::modules::${mount_point}::getRootFolderID]]]
+#content::check_access $folder_id cm_examine -user_id [User::getID]
 
 # Get the registered types for the folder 
 # (besides symlinks/templates/subfolders)

@@ -8,13 +8,7 @@
 </nobr>
 <p/>
 
-<!-- MS: HACK -->
-<if @call_ancestors_p@>
- <include src="ancestors" item_id=@folder_id@ mount_point=@mount_point@> : <a href="index?item_id=@folder_id@&mount_point=@mount_point@">@folder_name@</a>
-</if>
-<else>
- <font size="-1"><strong>Path:</strong>&nbsp;&nbsp;<a href="index?item_id=@folder_id@&mount_point=@mount_point@">@folder_name@</a></font>
-</else>
+Back to <a href="index?folder_id=@folder_id@&mount_point=@mount_point@">@folder_name@</a> contents
 
 <p/>
 

@@ -1,97 +1,75 @@
-# Create a new folder under the current folder
+ad_page_contract {
 
-request create -params {
-  parent_id -datatype integer -optional
-  mount_point -datatype keyword
+    Create a new folder under the current folder
+
+} {
+    {folder_id:optional,integer }
+    {mount_point "sitemap"}
 }
 
-if { [util::is_nil parent_id] } {
-  set create_parent_id [cm::modules::${mount_point}::getRootFolderID]
-} else {
-  set create_parent_id $parent_id
-} 
-
-
 # permissions check - user must have cm_new on parent
-content::check_access $create_parent_id cm_new -user_id [auth::require_login] 
+#content::check_access $create_parent_id cm_new -user_id [auth::require_login] 
 
-# Get the path
-set path [db_string get_path ""]
-
-# Create the form
-
-form create add_folder
-
-element create add_folder parent_id \
-  -label "Parent ID" -integer keyword -widget hidden -param -optional
-
-element create add_folder mount_point \
-  -label "Mount Point" -datatype keyword -widget hidden -param -optional
-
-if { [string equal $path ""] } {
+set path [content::item::get_path -item_id $folder_id]
+if {[template::util::is_nil path]} {
     set path "/"
 }
 
-element create add_folder path \
-  -label "In" -datatype text -widget inform -value "<tt>$path</tt>"
+ad_form -name add_folder -form {
 
-element create add_folder name \
-  -label "Name" -datatype keyword -widget text -html { size 20 } \
-  -validate { { expr ![string match $value "/"] } 
-              { Folder name cannot contain slashes }}
+    {new_folder_id:key}
 
-element create add_folder label \
-  -label "Label" -widget text -datatype text \
-  -html { size 30 } -optional
-
-element create add_folder description \
-  -label "Description" -widget textarea -datatype text \
-  -html { rows 5 cols 40 wrap physical } -optional
-
-#set parent_id [element get_value add_folder parent_id]
-#set mount_point [element get_value add_folder mount_point]
-
-
-# Insert the folder
-if { [form is_valid add_folder] } {
-    form get_values add_folder \
-	    name label description parent_id mount_point
-
-    set user_id [User::getID]
-    set ip [ns_conn peeraddr]
-  
-    db_transaction {
-
-        set folder_id [db_exec_plsql new_folder "
-    begin 
-    :1 := content_folder.new(
-        name          => :name, 
-        label         => :label, 
-        description   => :description,
-        parent_id     => :create_parent_id, 
-        creation_user => :user_id, 
-        creation_ip   => :ip ); 
-    end;"]
-
-        if { [string equal $mount_point "templates"] } {
-
-            db_exec_plsql register_content_type "
-	  begin
-	  content_folder.register_content_type(
-	      folder_id        => :folder_id,
-	      content_type     => 'content_template',
-	      include_subtypes => 'f' 
-	  );
-	  end;"
-        }
-
+    {parent_id:integer(hidden)
+	{value $folder_id}
     }
 
-    # Flush the paginator cache
-    cms_folder::flush $mount_point $parent_id
+    {folder_id:integer(hidden)
+	{value $folder_id}
+    }
 
-    # Update the folder and refresh the tree
-    refreshCachedFolder $user_id sitemap $parent_id
+    {mount_point:text(hidden)
+	{value $mount_point}
+    }
 
-    forward "refresh-tree?id=$parent_id&goto_id=$parent_id&mount_point=$mount_point"
+    {path:text(inform)
+	{label "Create in"}
+	{value $path}
+    }
+
+    {name:text(text)
+	{label "Name"}
+	{help_text "Short name containing no special characters"}
+    }
+
+    {label:text(text),optional
+	{label "Label"}
+	{html {size 30}}
+	{help_text "More descriptive label"}
+    }
+
+    {description:text(textarea),optional
+	{label "Description"}
+	{html {rows 5 cols 40 wrap physical}}
+    }
+
+} -validate {
+
+    {name
+	{ ![ string match "*/*" $name ] }
+	{ Folder name cannot contain slashes }
+    }
+
+} -on_submit {
+
+    set folder_id [content::folder::new -folder_id $new_folder_id -name $name -label $label \
+		       -description $description -parent_id $parent_id]
+    if { [string equal $mount_point "templates"] } {
+	content::folder::register_content_type -folder_id $folder_id \
+	    -content_type content_template
+    }
+
+} -after_submit {
+
+    ad_returnredirect [export_vars -base index {folder_id mount_point parent_id}]
+
 }

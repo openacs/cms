@@ -1,42 +1,34 @@
-# Delete a folder (only if does not contain any items).
-# Delete any symlinks pointing to this folder (possibly give a warning).
+ad_page_contract {
 
-template::request create
-template::request set_param item_id -datatype keyword
-template::request set_param parent_id -datatype keyword -optional
-request set_param mount_point -datatype keyword -optional -value sitemap
+    Delete a folder (only if does not contain any items).
 
-
+} {
+    {folder_id:integer}
+    {parent_id:integer}
+    {mount_point "sitemap"}
+}
 
 # permission check - user must have cm_write on this folder to delete it
-content::check_access $item_id cm_write -user_id [auth::require_login]
+#content::check_access $item_id cm_write -user_id [auth::require_login]
 
 # Determine if the folder is empty
-set is_empty [db_string check_empty ""]
+if { [string match [content::folder::is_empty -folder_id $folder_id] "f" ] } {
 
-# If nonempty, show error
-if { [string equal $is_empty "f"] } {
-
-  set message "This folder is not empty."
-  set return_url "modules/sitemap/index"
-  set passthrough [list [list item_id $item_id] [list parent_id $parent_id]]
-  template::forward "../../error?message=$message&return_url=$return_url&passthrough=$passthrough"
+    util_user_message -message "Folder is not empty. Please delete folder contents and try again."
+    ad_returnredirect [export_vars -base index {folder_id}]
 
 } else {
 
-  # Otherwise, delete the folder
-  db_transaction {
-      db_exec_plsql delete_folder ""
-  }
+    content::folder::delete -folder_id $folder_id
+    
+    # Remove it from the clipboard, if it exists
+    set clip [clipboard::parse_cookie]
+    clipboard::remove_item $clip $mount_point $folder_id
+    clipboard::set_cookie $clip
+    clipboard::free $clip 
 
-  # Remove it from the clipboard, if it exists
-  set clip [clipboard::parse_cookie]
-  clipboard::remove_item $clip $mount_point $item_id
-  clipboard::set_cookie $clip
-  clipboard::free $clip 
+    # Redirect to parent folder
+    set folder_id $parent_id
+    ad_returnredirect [export_vars -base index {folder_id}]
 
-  # Flush paginator cache
-  #cms_folder::flush $mount_point $parent_id
-
-  template::forward "refresh-tree?id=$parent_id&goto_id=$parent_id&mount_point=$mount_point"
 }

@@ -3,11 +3,11 @@
 <queryset>
    <rdbms><type>oracle</type><version>8.1.6</version></rdbms>
 
-<fullquery name="create_folder">      
+<fullquery name="get_folder_contents_paginate">      
       <querytext>
       
   select
-    r.item_id, '' as context,
+    r.item_id,
     decode(o.object_type, 'content_symlink', r.label,
 			  'content_folder', f.label,
 			  nvl(v.title, i.name)) title,
@@ -30,30 +30,24 @@
     i.live_revision = u.revision_id (+)
   and
     i.item_id = f.folder_id (+)
-  order by
-    is_index_page desc $orderby_clause
-  
+   [template::list::orderby_clause -name folder_items -orderby]  
+
       </querytext>
 </fullquery>
 
-<partialquery name="display_data_partial">      
+<partialquery name="get_folder_contents">      
       <querytext>
 
   select
-    decode(i.content_type, 'content_folder', 't', 'f') is_folder,
-    decode(i.content_type, 'content_template', 't', 'f') is_template,
-    r.item_id, r.resolved_id, r.is_symlink, r.name,
+    r.item_id, r.item_id as id, v.revision_id, r.resolved_id, r.is_symlink,
+    r.name, i.parent_id, i.content_type, i.publish_status, u.publish_date,
     NVL(trim(
       decode(o.object_type, 'content_symlink', r.label,
 			  'content_folder', f.label,
 			  nvl(v.title, i.name))),
       '-') title,
-    decode(i.publish_status, 'live', 
-      to_char(u.publish_date, 'MM/DD/YYYY'), '-') publish_date,
-    o.object_type, t.pretty_name content_type,
-    to_char(o.last_modified, 'MM/DD/YYYY HH24:MI') last_modified_date,
-    decode(r.item_id, :index_page_id, 't', 'f') is_index_page,
-    nvl(to_char(round(v.content_length / 1000, 2)), '-') file_size
+    o.object_type, t.pretty_name as pretty_content_type, last_modified, 
+    v.content_length
   from 
     cr_resolved_items r, cr_items i, cr_folders f, cr_revisions v, 
     cr_revisions u, acs_objects o, acs_object_types t
@@ -72,10 +66,8 @@
   and
     i.item_id = f.folder_id (+)
   and
-    -- paginator sql
-    r.item_id in (CURRENT_PAGE_SET)
-  order by
-    is_index_page desc $orderby_clause
+   [template::list::page_where_clause -and -name folder_items -key r.item_id]
+   [template::list::orderby_clause -name folder_items -orderby]
   
       </querytext>
 </partialquery>

@@ -1,18 +1,18 @@
 # Change name, label and description of folder.
 
 request create
-request set_param item_id -datatype integer
+request set_param folder_id -datatype integer
 request set_param mount_point -datatype keyword -value sitemap
 
 
 # permissions check - renaming a folder requires cm_write on the folder
-content::check_access $item_id cm_write -user_id [auth::require_login] 
+#content::check_access $item_id cm_write -user_id [auth::require_login] 
 
 
 # Create then form
 form create rename_folder
 
-element create rename_folder item_id \
+element create rename_folder folder_id \
   -datatype integer -widget hidden -param
 
 element create rename_folder parent_id \
@@ -37,7 +37,7 @@ element create rename_folder description \
 
 if { [form is_request rename_folder] } {
   
-  set item_id [element get_value rename_folder item_id]
+  set folder_id [element get_value rename_folder folder_id]
 
   # Get existing folder parameters
   db_1row get_info "" -column_array info
@@ -47,33 +47,17 @@ if { [form is_request rename_folder] } {
   element set_properties rename_folder description -value $info(description)
 }
 
-
-
-
-
-
 # Rename
 if { [form is_valid rename_folder] } {
 
   form get_values rename_folder \
-	  item_id name label description parent_id mount_point
+	  folder_id name label description parent_id mount_point
 
   db_transaction {
-
-      db_exec_plsql rename_folder "
-    begin 
-    content_folder.edit_name (
-        folder_id   => :item_id, 
-        name        => :name, 
-        label       => :label, 
-        description => :description
-    ); 
-    end;"
+      db_exec_plsql rename_folder {}
   }
 
-  # flush paginator cache for this folder
-  cms_folder::flush $mount_point $parent_id
+  ad_returnredirect [export_vars -base index {folder_id}]
 
-  template::forward "refresh-tree?id=$parent_id&goto_id=$item_id"
 }
 

@@ -4,7 +4,7 @@
 <if @context:rowcount@ gt 0>
   <multiple name=context>
     <if @context.is_folder@ eq "t">
-      <a href="../@mount_point@/index?item_id=@context.parent_id@&mount_point=@mount_point@">
+      <a href="../@mount_point@/index?folder_id=@context.parent_id@&mount_point=@mount_point@">
         @context.title@
       </a>
     </if>

@@ -8,7 +8,7 @@
       
     begin 
     content_folder.edit_name (
-        folder_id   => :item_id, 
+        folder_id   => :folder_id, 
         name        => :name, 
         label       => :label, 
         description => :description

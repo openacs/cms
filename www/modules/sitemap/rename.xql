@@ -9,9 +9,9 @@
     from 
       cr_items i, cr_folders f
     where
-      i.item_id = :item_id
+      i.item_id = :folder_id
     and
-      f.folder_id = :item_id
+      f.folder_id = :folder_id
       </querytext>
 </fullquery>
 
