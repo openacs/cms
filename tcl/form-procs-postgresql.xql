@@ -214,7 +214,8 @@
       <querytext>
 
              update cr_revisions 
-             set content = [set __lob_id [db_string new_lob "select empty_lob()"]]
+             set lob = [set __lob_id [db_string new_lob "select empty_lob()"]],
+             content_length = [file size $tmpfile]
              where revision_id = :revision_id
       
       </querytext>
@@ -252,7 +253,8 @@
       <querytext>
 
              update cr_revisions 
-             set content = [set __lob_id [db_string new_lob "select empty_lob()"]]
+             set lob = [set __lob_id [db_string new_lob "select empty_lob()"]],
+             content_length = [file size $tmpfile]
              where revision_id = :revision_id
       
       </querytext>

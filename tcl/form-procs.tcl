@@ -911,13 +911,17 @@ ad_proc -public content::upload_content { revision_id tmpfile filename } {
     } elseif {[string equal $storage_type text]} {
         # upload the file into the revision content
         db_dml upload_text_revision "update cr_revisions 
-             set content = empty_blob() where revision_id = :revision_id
+             set content = empty_blob(), 
+             content_length = '[file size $tmpfile]' 
+             where revision_id = :revision_id
              returning content into :1" -blob_files [list $tmpfile]
 
     } else {
         # upload the file into the revision content
         db_dml upload_revision "update cr_revisions 
-             set content = empty_blob() where revision_id = :revision_id
+             set content = empty_blob(), 
+             content_length = '[file size $tmpfile]' 
+             where revision_id = :revision_id
              returning content into :1" -blob_files [list $tmpfile]
     }
 
@@ -2013,13 +2017,17 @@ ad_proc -private content::update_content_from_file { revision_id tmpfile } {
     } elseif {[string equal $storage_type text]} {
         # upload the file into the revision content
         db_dml upload_text_revision "update cr_revisions 
-             set content = empty_blob() where revision_id = :revision_id
+             set content = empty_blob(),
+             content_length = '[file size $tmpfile]' where 
+             revision_id = :revision_id
              returning content into :1" -blob_files [list $tmpfile]
 
     } else {
         # upload the file into the revision content
         db_dml upload_revision "update cr_revisions 
-             set content = empty_blob() where revision_id = :revision_id
+             set content = empty_blob(),
+             content_length = '[file size $tmpfile]' 
+             where revision_id = :revision_id
              returning content into :1" -blob_files [list $tmpfile]
     }
 

@@ -63,4 +63,15 @@
 	</querytext>
 </partialquery>
 
+<fullquery name="item::content_is_null.cin_get_content">      
+      <querytext>
+      
+    select 't' from cr_revisions r, cr_items i
+      where r.revision_id = :revision_id
+      and ((r.content is not null and i.storage_type in ('file','text')) or
+      (r.lob is not null and i.storage_type = 'lob'))
+
+      </querytext>
+</fullquery>
+
 </queryset>

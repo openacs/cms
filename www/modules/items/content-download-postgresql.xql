@@ -8,7 +8,9 @@
 
   select
     case when i.storage_type = 'file' 
-        then '[cr_fs_path]' || r.content 
+              then '[cr_fs_path]' || r.content 
+         when i.storage_type = 'lob'
+              then lob::text
         else r.content end as content, i.storage_type 
   from 
     cr_revisions r, cr_items i
