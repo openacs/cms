@@ -5,13 +5,13 @@
 
 <fullquery name="content">      
       <querytext>
--- FIXME: dynamic sql
 
-           begin
-             $subfolder_sql
-             $symlink_sql
-             return null;
-           end;
+             begin
+               PERFORM content_folder__${subfolder_method}(:folder_resolved_id,'content_folder');
+               PERFORM content_folder__${symlink_method}(:folder_resolved_id,'content_symlink');
+
+               return null;
+             end;
 
       </querytext>
 </fullquery>

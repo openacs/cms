@@ -97,7 +97,7 @@ if { [form is_valid upload] } {
 
           ns_log Notice "revision-upload.tcl - Creating content item... $name"
           set item_id [db_exec_plsql new_content "begin 
-      :item_id := content_item.new(
+      :1 := content_item.new(
           name          => :name, 
           parent_id     => :parent_id, 
           content_type  => :content_type,
@@ -112,11 +112,11 @@ if { [form is_valid upload] } {
       set tmp_filename [ns_queryget xml_file.tmpfile]
       set doc [template::util::read_file $tmp_filename]
 
-      db_clob_dml insert_content "insert into cr_xml_docs 
-  values ($revision_id, empty_clob()) returning doc into :1" $doc
+      db_dml insert_content "insert into cr_xml_docs 
+  values ($revision_id, empty_clob()) returning doc into :1" -clobs $doc
 
       set revision_id [db_exec_plsql import_xml "begin
-    :revision_id := content_revision.import_xml(
+    :1 := content_revision.import_xml(
       :item_id, :revision_id, :revision_id);
   end;"]
 

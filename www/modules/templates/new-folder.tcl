@@ -41,7 +41,7 @@ if { [form is_valid new_folder] } {
 
   db_transaction {
 
-      set folder_id [db_exec_plsql "begin :folder_id := content_folder.new(
+      set folder_id [db_exec_plsql "begin :1 := content_folder.new(
          folder_id => :folder_id,
          name => :name,
          label => :label,

@@ -3,7 +3,7 @@
 <queryset>
    <rdbms><type>postgresql</type><version>7.1</version></rdbms>
 
-<fullquery name="template_unregiser">      
+<fullquery name="template_unregister">      
       <querytext>
 
         select content_item__unregister_template(

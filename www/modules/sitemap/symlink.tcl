@@ -113,7 +113,7 @@ if { [form is_valid symlink] } {
 
             if { [catch {db_exec_plsql new_link "
 	    begin
-            :symlink_id := content_symlink.new(
+            :1 := content_symlink.new(
                 name          => :name, 
                 label         => :label,
                 target_id     => :sym_item_id, 

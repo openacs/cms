@@ -142,15 +142,15 @@ if { [form is_valid rel_form_2] || $form_complete } {
           }
 
           # Perform the insertion
-          db_exec_plsql relate "begin 
-      :rel_id := content_item.relate (
+          set rel_id [db_exec_plsql relate "begin 
+      :1 := content_item.relate (
           item_id       => :item_id,
           object_id     => :related_id,
           relation_tag  => :relation_tag,
           order_n       => :order_n,
           relation_type => :relation_type
       );
-    end;" rel_id
+    end;"]
 
           # Insert any extra attributes
           if { [llength $elements] > 0 } {

@@ -3,7 +3,7 @@
 <queryset>
    <rdbms><type>oracle</type><version>8.1.6</version></rdbms>
 
-<fullquery name="template_unregiser">      
+<fullquery name="template_unregister">      
       <querytext>
       begin
          content_item.unregister_template(

@@ -18,5 +18,20 @@
       </querytext>
 </fullquery>
 
+<fullquery name="register_rel_types">      
+      <querytext>
+
+	  
+          select content_type__${register_method} (
+	      :content_type,
+	      :target_type,
+	      :relation_tag,
+              :min_n,
+              :max_n
+          );
+          
+
+      </querytext>
+</fullquery>
  
 </queryset>

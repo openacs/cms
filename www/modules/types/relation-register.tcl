@@ -86,33 +86,28 @@ if { [form is_valid relation] } {
     }
 
     if { [string equal $rel_type item_rel] } {
-	set sql "
-	  begin
-          content_type.register_relation_type (
-	      content_type => :content_type,
-	      target_type  => :target_type,
-	      relation_tag => :relation_tag,
-              min_n        => :min_n,
-              max_n        => :max_n
-          );
-          end;"
+        set register_method "register_relation_type"
+        set content_key "content_type"
+        set target_key "target_type"
 
     } elseif { [string equal $rel_type child_rel] } {
-	set sql "
-	  begin
-	  content_type.register_child_type (
-	      parent_type  => :content_type,
-	      child_type   => :target_type,
-              relation_tag => :relation_tag,
-	      min_n        => :min_n,
-	      max_n        => :max_n
-          );
-          end;"
+        set register_method "register_child_type"
+        set content_key "parent_type"
+        set target_key "child_type"
     }
 
     db_transaction {
 
-        if { [catch {db_exec_plsql register_rel_types $sql} errmsg] } {
+        if { [catch {db_exec_plsql register_rel_types "
+	  begin
+          content_type.${register_method} (
+	      $content_key => :content_type,
+	      $target_key  => :target_type,
+	      relation_tag => :relation_tag,
+              min_n        => :min_n,
+              max_n        => :max_n
+          );
+          end;"} errmsg] } {
             template::request::error register_relation_type \
 		"Could not register relation type - $errmsg"
         }

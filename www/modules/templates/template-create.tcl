@@ -49,15 +49,15 @@ if { [form is_valid create_template] } {
  
     db_transaction {
 
-        db_exec_plsql new_template "begin 
-        :ret_val := content_template.new(
+        set ret_val [db_exec_plsql new_template "begin 
+        :1 := content_template.new(
             template_id   => :template_id,
             name          => :name,
             parent_id     => :parent_id,
             creation_user => :user_id,
             creation_ip   => :ip_address
         );
-        end;" ret_val
+        end;"]
     }
 
     template::forward ../templates/template?template_id=$template_id

@@ -7,7 +7,7 @@ request set_param context -datatype text
 
 
 db_transaction {
-    if { [catch { db_exec_plsql template_unregiser "begin
+    if { [catch { db_exec_plsql template_unregister "begin
          content_item.unregister_template(
              template_id => :template_id, 
              item_id     => :item_id, 

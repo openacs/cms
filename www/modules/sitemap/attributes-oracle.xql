@@ -5,10 +5,12 @@
 
 <fullquery name="content">      
       <querytext>
-      begin
-             $subfolder_sql
-             $symlink_sql
+
+             begin
+               content_folder.${subfolder_method}(:folder_resolved_id,'content_folder');
+               content_folder.${symlink_method}(:folder_resolved_id,'content_symlink');
              end;
+
       </querytext>
 </fullquery>
 

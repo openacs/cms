@@ -101,22 +101,21 @@ if { [form is_valid register_types] } {
 
 
         if { [string equal $allow_subfolders "t"] } {
-            set subfolder_sql "content_folder.register_content_type(:folder_resolved_id,'content_folder');"
+            set subfolder_method "register_content_type"
         } else {
-            set subfolder_sql "content_folder.unregister_content_type(:folder_resolved_id,'content_folder');"
+            set subfolder_method "unregister_content_type"
         }
 
         if { [string equal $allow_symlinks "t"] } {
-            set symlink_sql "content_folder.register_content_type(:folder_resolved_id,'content_symlink');"
+            set symlink_method "register_content_type"
         } else {
-            set symlink_sql "content_folder.unregister_content_type(:folder_resolved_id,'content_symlink');"
+            set symlink_method "unregister_content_type"
         }
 
-        set sql 
-
-        db_exec_plsql content "begin
-             $subfolder_sql
-             $symlink_sql
+        db_exec_plsql content "
+             begin
+               content_folder.${subfolder_method}(:folder_resolved_id,'content_folder');
+               content_folder.${symlink_method}(:folder_resolved_id,'content_symlink');
              end;"
     }
 

@@ -15,12 +15,14 @@ if { ! [string equal $submit {}] } {
           set creation_ip [ns_conn peeraddr]
 
           foreach template_id [ns_querygetall template_id] {
-              db_exec_plsql copy_item "declare copy_id integer; begin 
-        copy_id := content_item.copy2(
-          :template_id, :folder_id, :creation_user, :creation_ip
-        );
-        insert into cr_templates (template_id) values (copy_id);
-      end;"
+              db_exec_plsql copy_item "declare 
+                                          copy_id integer; 
+                                       begin 
+                                         copy_id := content_item.copy2(
+                                    :template_id, :folder_id, :creation_user, :creation_ip
+                                                     );
+                                         insert into cr_templates (template_id) values (copy_id);
+                                       end;"
           }
       }
   }
