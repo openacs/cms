@@ -27,5 +27,4 @@ if { ! [string equal $submit {}] } {
   template::forward [ns_queryget return_url]
 }
 
-template::query get_path path onevalue "select content_item.get_path(:folder_id) from dual"
-
+set path [db_string get_path ""]

@@ -19,31 +19,25 @@ if { $id == [cm::modules::templates::getRootFolderID] } {
 
 if { ! [string equal $path {}] } {
 
-  template::query get_id id onevalue "
-    select 
-      content_item.get_id(:path, content_template.get_root_folder) 
-    from dual"
+    set id [db_string get_id ""]
 
-  if { [string equal $id {}] } {
+    if { [string equal $id {}] } {
 
-    set msg "The requested folder <tt>$path</tt> does not exist."
-    request error invalid_path $msg
-  }
+        set msg "The requested folder <tt>$path</tt> does not exist."
+        request error invalid_path $msg
+    }
 } else {
 
   if { [string equal $id {}] } {
-    template::query get_root_folder_id id onevalue "
-      select content_template.get_root_folder from dual"
+      set id [db_string get_root_folder_id ""]
   }
 
-  template::query get_path path onevalue "
-    select content_item.get_path(:id) from dual"
+  set path [db_string get_path ""]
 }
 
 # query for the content type and redirect if a folder
 
-template::query get_type type onevalue "
-  select content_type from cr_items where item_id = :id"
+set type [db_string get_type ""]
 
 if { [string equal $type content_template] } {
   template::forward properties?id=$id
@@ -52,56 +46,16 @@ if { [string equal $type content_template] } {
 # Query for the parent
 
 if { ! [string equal $path /] } {
-template::query get_parent parent onerow "
-  select
-    f.folder_id, f.label, i.name, 
-    to_char(o.last_modified, 'MM/DD/YY HH:MI AM') modified
-  from
-    cr_folders f, cr_items i, acs_objects o
-  where
-    i.item_id = (select parent_id from cr_items where item_id = :id)
-  and
-    i.item_id = f.folder_id
-  and
-    i.item_id = o.object_id"
+    db_1row get_parent "" -column_array parent
 }
 
 # Query folders first
 
-template::query get_folders folders multirow "
-  select
-    f.folder_id, f.label, i.name, 
-    to_char(o.last_modified, 'MM/DD/YY HH:MI AM') modified
-  from
-    cr_folders f, cr_items i, acs_objects o
-  where
-    i.parent_id = :id
-  and
-    i.item_id = f.folder_id
-  and
-    i.item_id = o.object_id
-  order by
-    upper(f.label), upper(i.name)"
+db_multirow folders get_folders ""
 
 # items in the folder
 
-template::query get_items items multirow "
-  select
-    t.template_id, i.name, 
-    to_char(o.last_modified, 'MM/DD/YY HH:MI AM') modified,
-    nvl(round(r.content_length / 1000, 2), 0) || ' KB' as file_size
-  from
-    cr_templates t, cr_items i, acs_objects o, cr_revisions r
-  where
-    i.parent_id = :id
-  and
-    i.item_id = t.template_id
-  and
-    i.item_id = o.object_id
-  and
-    i.latest_revision = r.revision_id (+)
-  order by
-    upper(i.name)"
+db_multirow items get_items ""
 
 # set a flag indicating whether the folder is empty
 

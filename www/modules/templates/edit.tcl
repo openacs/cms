@@ -5,8 +5,7 @@ request create -params {
 
 if { ! [request is_valid] } { return }
 
-template::query get_path path onevalue "
-  select content_item.get_path(:template_id) from dual"
+set path [db_string get_path ""]
 
 form create edit_template -html { enctype multipart/form-data }
 
@@ -20,9 +19,7 @@ element create edit_template revision_id -datatype integer -widget hidden
 element create edit_template content -widget textarea -label {} \
     -datatype text -html { cols 80 rows 30 } template
 
-template::query get_mime_types mime_types multilist "
-  select label, m.mime_type from cr_mime_types m, cr_content_mime_type_map t
-  where t.content_type = 'content_template' and t.mime_type = m.mime_type"
+set mime_types [db_list_of_lists get_mime_types ""]
 
 element create edit_template mime_type -widget select -label "Template Type" \
     -datatype text -options $mime_types
@@ -54,8 +51,7 @@ if { [form is_request edit_template] } {
       element set_value edit_template content \
 	      [content::get_content_value $edit_revision]
 
-      template::query get_mime_type mime_type onevalue "
-        select mime_type from cr_revisions where revision_id = :edit_revision"
+      set mime_type [db_string get_mime_type ""]
 
       element set_value edit_template mime_type $mime_type      
   }
@@ -88,8 +84,7 @@ if { [form is_valid edit_template] } {
 
   set tmpfile [content::prepare_content_file edit_template]
 
-  template::query get_revision_count revision_count onevalue "
-    select count(revision_id) from cr_revisions where item_id = :template_id"
+  set revision_count [db_string get_revision_count ""]
 
   if { $revision_count == 0 } {
       set is_update t

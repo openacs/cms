@@ -6,32 +6,26 @@ request create -params {
 
 if { ! [string equal $path {}] } {
 
-  template::query get_id id onevalue "
-    select 
-      content_item.get_id(:path, content_template.get_root_folder) 
-    from dual"
+    set id [db_string get_id ""]
 
-  if { [string equal $id {}] } {
+    if { [string equal $id {}] } {
 
-    set msg "The requested folder <tt>$path</tt> does not exist."
-    request error invalid_path $msg
-  }
+        set msg "The requested folder <tt>$path</tt> does not exist."
+        request error invalid_path $msg
+    }
 
 } else {
 
   if { [string equal $id {}] } {
-    template::query get_root_id onevalue "
-      select content_template.get_root_folder from dual"
+      set id [db_string get_root_id ""]
   }
 
-  template::query get_path path onevalue "
-    select content_item.get_path(:id) from dual"
+  set path [db_string get_path ""]
 }
 
 # query for the content type and redirect if a folder
 
-template::query get_type type onevalue "
-  select content_type from cr_items where item_id = :id"
+set type [db_string get_type ""]
 
 if { [string equal $type content_folder] } {
   template::forward index?id=$id
