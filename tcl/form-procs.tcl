@@ -1121,6 +1121,13 @@ ad_proc -public content::new_item_form { args } {
     set name $opts(name)
     set form_name $opts(form_name)
 
+    if {![string equal {} $opts(section)] } { 
+        template::form section $form_name $opts(section)
+    } else { 
+        template::form::get_reference
+        set opts(section) form_properties(section)
+    } 
+    
     # If we are handling a new request and were passed an item_id 
     # get the revision_id if not provided
 
@@ -1136,10 +1143,6 @@ ad_proc -public content::new_item_form { args } {
         } 
     }
 
-    if {![string equal {} $opts(section)] } { 
-        template::form section $form_name $opts(section)
-    }
-    
     if { [string equal {} $opts(item_id)] } { 
         # Only add all this junk for 
         # new items.
@@ -1193,7 +1196,8 @@ ad_proc -public content::new_item_form { args } {
         -exclude $opts(exclude) \
         -item_id $opts(item_id) \
         -revision_id $opts(revision_id) \
-        -hidden $opts(hidden)
+        -hidden $opts(hidden) \
+        -section $opts(section)
 
     if { [template::form is_request $opts(form_name)] } {
         if {[template::util::is_nil item_id]} { 
