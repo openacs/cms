@@ -15,6 +15,7 @@ begin
   insert into cm_form_widgets (widget) values (''select'');
   insert into cm_form_widgets (widget) values (''multiselect'');
   insert into cm_form_widgets (widget) values (''date'');
+  insert into cm_form_widgets (widget) values (''richtext'');
 
 
   -- insert the standard form widget params and ATS form element params
@@ -164,6 +165,21 @@ begin
     (param_id, widget, param, is_required, is_html, default_value)
   values
     (121, ''search'', ''result_datatype'', ''f'', ''f'', ''search'');
+
+  insert into cm_form_widget_params 
+    (param_id, widget, param, is_required, is_html, default_value)
+  values
+    (200, ''richtext'', ''rows'', ''f'', ''t'', ''20'');
+
+  insert into cm_form_widget_params 
+    (param_id, widget, param, is_required, is_html, default_value)
+  values
+    (230, ''richtext'', ''cols'', ''f'', ''t'', ''80'');
+
+  insert into cm_form_widget_params
+    (param_id, widget, param, is_required, is_html, default_value)
+  values
+    (231, ''richtext'', ''wrap'', ''f'', ''t'', ''physical'');
 
   return 0;
 end;' language 'plpgsql';

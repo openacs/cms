@@ -1519,7 +1519,7 @@ ad_proc -public content::add_content_element {
 
             template::form section $form_name $section
             template::element create $form_name "${prefix}content" \
-                -widget textarea \
+                -widget richtext \
                 -label {} \
                 -datatype text \
                 -html { cols 80 rows 20 wrap physical } 
