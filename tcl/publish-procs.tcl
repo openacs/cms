@@ -186,7 +186,7 @@ ad_proc -public publish::publish_revision { revision_id args} {
   } else {
     set root_path $opts(root_path)
   }
-
+  ns_log Notice "PUBLISH REVISION: root_path = $root_path"
   # Get tem id
   set item_id [item::get_item_from_revision $revision_id]
   # Render the item
