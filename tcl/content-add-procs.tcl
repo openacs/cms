@@ -25,7 +25,7 @@ ad_proc content_add::content_method_html { content_type item_id } {
 
     set target "revision-add-2?item_id=$item_id"
 
-    template::query has_text_mime_type onevalue "
+    template::query count_text_mime_types has_text_mime_type onevalue "
       select
         count(*)
       from
@@ -36,7 +36,7 @@ ad_proc content_add::content_method_html { content_type item_id } {
         content_type = :content_type
     "
 
-    template::query mime_type_count onevalue "
+    template::query count_mime_types mime_type_count onevalue "
       select
         count(*)
       from
