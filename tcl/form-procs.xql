@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <queryset>
 
-<fullquery name="get_content_type">      
+<fullquery name="content::create_form_element.get_content_type">      
 	<querytext>
 	select content_type from cr_items i, cr_revisions r
 	where r.item_id = i.item_id
@@ -10,7 +10,7 @@
 
 </fullquery>
 
-<partialquery name="cfe_attribute_name">
+<partialquery name="content::create_form_element.cfe_attribute_name">
 	<querytext>
 
 	$attribute_name
@@ -19,13 +19,21 @@
 
 </partialquery>
 
-<fullquery name="get_element_value">      
+<fullquery name="content::create_form_element.get_element_value">      
 	<querytext>
 	select $what from ${table_name}x where revision_id = :revision_id
 	</querytext>
 </fullquery>
 
-<fullquery name="insert_revision_form">
+<partialquery name="content::query_form_metadata.attributes_query_extra_where">
+	<querytext>
+
+	 and $extra_where
+
+	</querytext>
+</partialquery>
+
+<fullquery name="content::process_revision_form_dml.insert_revision_form">
 	<querytext>
               insert into $__last_table (
                 [join $__columns ", "]
@@ -35,7 +43,7 @@
 	</querytext>
 </fullquery>
 
-<partialquery name="ied_get_objects_tree_extra_where">
+<partialquery name="content::insert_element_data.ied_get_objects_tree_extra_where">
 	<querytext>
 
 	 and $extra_where
@@ -43,7 +51,7 @@
 	</querytext>
 </partialquery>
 
-<partialquery name="ied_get_objects_tree_order_by">
+<partialquery name="content::insert_element_data.ied_get_objects_tree_order_by">
 	<querytext>
 
           order by 
@@ -52,7 +60,7 @@
 	</querytext>
 </partialquery>
 
-<fullquery name="process_insert_statement">
+<fullquery name="content::process_insert_statement.process_insert_statement">
 	<querytext>
               insert into $__last_table (
                 [join $__columns ", "]
@@ -62,7 +70,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="addrev_get_content_type">
+<fullquery name="content::add_revision.addrev_get_content_type">
 	<querytext>
     select object_type content_type, table_name
     from acs_object_types
@@ -71,7 +79,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="update_mime_sql">
+<fullquery name="content::upload_content.update_mime_sql">
 	<querytext>
 
       update cr_revisions 
@@ -81,7 +89,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="get_text_mime_types">
+<fullquery name="content::add_content_element.get_text_mime_types">
 	<querytext>
 
 	    select
@@ -100,7 +108,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="get_parent_type">
+<fullquery name="content::add_child_relation_element.get_parent_type">
 	<querytext>
 
     select content_type from cr_items 
@@ -109,7 +117,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="set_content_values">
+<fullquery name="content::get_widget_param_value.set_content_values">
 	<querytext>
 
 	$param(value)
@@ -117,7 +125,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="gtap_get_attribute_data">
+<fullquery name="content::get_type_attribute_params.gtap_get_attribute_data">
 	<querytext>
 
     select
@@ -130,7 +138,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="gap_get_attribute_data">
+<fullquery name="content::get_attribute_params.gap_get_attribute_data">
 	<querytext>
 
     select
@@ -145,7 +153,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="get_previous_version_values">
+<fullquery name="content::set_attribute_values.get_previous_version_values">
 	<querytext>
 
     select 
@@ -158,7 +166,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="count_mime_type">
+<fullquery name="content::get_default_content_method.count_mime_type">
 	<querytext>
 
 	select count(*) from cr_content_mime_type_map
@@ -167,7 +175,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="get_type_info_1">
+<fullquery name="content::get_type_info.get_type_info_1">
 	<querytext>
 
       select 
@@ -180,7 +188,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="get_type_info_2">
+<fullquery name="content::get_type_info.get_type_info_2">
 	<querytext>
 
       select 
@@ -193,7 +201,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="gcv_get_previous_content">
+<fullquery name="content::get_content_value.gcv_get_previous_content">
 	<querytext>
 
     select 
@@ -206,7 +214,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="cc_get_mime_type">
+<fullquery name="content::copy_content.cc_get_mime_type">
 	<querytext>
 
       select mime_type from cr_revisions where revision_id = :revision_id_src
@@ -214,7 +222,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="cc_update_cr_revisions">
+<fullquery name="cc_update_cr_revisions.cc_update_cr_revisions">
 	<querytext>
 
            update cr_revisions
@@ -224,7 +232,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="vn_same_name_count1">
+<fullquery name="content::validate_name.vn_same_name_count1">
 	<querytext>
 
 	  select count(1)
@@ -234,7 +242,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="vn_same_name_count2">
+<fullquery name="content::validate_name.vn_same_name_count2">
 	<querytext>
 
 	  select count(1)

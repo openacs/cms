@@ -2,7 +2,7 @@
 <queryset>
 <rdbms><type>postgresql</type><version>7.1</version></rdbms>
 
-<fullquery name="attributes_query_1">      
+<partialquery name="content::query_form_metadata.attributes_query_1">      
 	<querytext>
 		
     select
@@ -65,7 +65,7 @@
 	</querytext>
 </fullquery>
 
-<partialquery name="cfe_attribute_name_to_char">
+<partialquery name="content::create_form_element.cfe_attribute_name_to_char">
 	<querytext>
 
 	to_char($attribute_name, 'YYYY MM DD HH24 MI SS') 
@@ -74,13 +74,13 @@
 	</querytext>
 </partialquery>
 
-<fullquery name="get_revision_id">
+<fullquery name="content::create_form_element.get_revision_id">
 	<querytext>
 	select content_item__get_latest_revision(:item_id)
 	</querytext>
 </fullquery>
 
-<partialquery name="get_enum_1">
+<partialquery name="content::get_revision_create_element.get_enum_1">
 	<querytext>
 	select coalesce(pretty_name,enum_value), enum_value
 	from acs_enum_values
@@ -89,7 +89,7 @@
 	</querytext>
 </partialquery>
 
-<fullquery name="new_content_revision">
+<fullquery name="content::process_revision_form.new_content_revision">
 	<querytext>
 
 	     select content_revision__new(:title,:description,:mime_type,' ',content_symlink__resolve(:item_id),'[ns_conn peeraddr]',[User::getID]) as revision_id
@@ -97,7 +97,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="get_extended_attributes">
+<fullquery name="content::process_revision_form.get_extended_attributes">
 	<querytext>
 
 	  select 
@@ -131,7 +131,7 @@
 
 </fullquery>
 
-<partialquery name="ied_get_objects_tree">
+<partialquery name="content::insert_element_data.ied_get_objects_tree">
 	<querytext>
 
           select 
@@ -160,32 +160,32 @@
 	</querytext>
 </partialquery>
 
-<partialquery name="cont_new_item_non_null_params">
+<partialquery name="content::new_item.cont_new_item_non_null_params">
 	<querytext>
 	:$param
 	</querytext>
 
 </partialquery>
 
-<partialquery name="cont_new_item_def_params">
+<partialquery name="content::new_item.cont_new_item_def_params">
 	<querytext>
 	$defArray($param)
 	</querytext>
 </partialquery>
 
-<partialquery name="cont_new_item_rel_tag">
+<partialquery name="content::new_item.cont_new_item_rel_tag">
 	<querytext>
 null
 	</querytext>
 </partialquery>
 
-<fullquery name="create_new_content_item">
+<fullquery name="content::new_item.create_new_content_item">
 	<querytext>
           select content_item__new( [join $params ","] ) as item_id
         </querytext>
 </fullquery>
 
-<fullquery name="update_cr_revisions">
+<fullquery name="content::upload_content.update_cr_revisions">
 	<querytext>
 
       update cr_revisions 
@@ -195,7 +195,7 @@ null
 	</querytext>
 </fullquery>
 
-<partialquery name="string_to_timestamp">
+<partialquery name="content::get_sql_value.string_to_timestamp">
 	<querytext>
 
 	to_date(:$name, 'YYYY MM DD HH24 MI SS')
@@ -203,7 +203,7 @@ null
 	</querytext>
 </partialquery>
 
-<fullquery name="get_all_valid_relation_tags">
+<fullquery name="content::add_child_relation_element.get_all_valid_relation_tags">
 	<querytext>
 
     select 
@@ -220,7 +220,7 @@ null
 	</querytext>
 </fullquery>
 
-<fullquery name="get_parent_title">
+<fullquery name="content::add_child_relation_element.get_parent_title">
 	<querytext>
 
       select content_item__get_title(:parent_id)
@@ -228,7 +228,7 @@ null
 	</querytext>
 </fullquery>
 
-<partialquery name="timestamp_to_string">
+<partialquery name="content::set_attribute_values.timestamp_to_string">
 	<querytext>
 
 	to_char($attr, 'YYYY MM DD HH24 MI SS') as $attr
@@ -236,7 +236,7 @@ null
 	</querytext>
 </partialquery>
 
-<fullquery name="gcv_get_revision_id">
+<fullquery name="content::get_content_value.gcv_get_revision_id">
 	<querytext>
 
 	    select content_revision__to_temporary_clob(:revision_id) as revision_id;
@@ -244,7 +244,7 @@ null
 	</querytext>
 </fullquery>
 
-<fullquery name="ga_get_attributes">
+<fullquery name="content::get_attributes.ga_get_attributes">
 	<querytext>
 
     select
@@ -275,7 +275,7 @@ null
 	</querytext>
 </fullquery>
 
-<fullquery name="gaev_get_enum_values">
+<fullquery name="content::get_attribute_enum_values.gaev_get_enum_values">
 	<querytext>
 
            select
@@ -291,7 +291,7 @@ null
 	</querytext>
 </fullquery>
 
-<fullquery name="glr_get_latest_revision">
+<fullquery name="content::get_latest_revision.glr_get_latest_revision">
 	<querytext>
 
     select content_item__get_latest_revision(:item_id)
@@ -299,7 +299,7 @@ null
 	</querytext>
 </fullquery>
 
-<partialquery name="abr_new_revision_title">
+<partialquery name="content::add_basic_revision.abr_new_revision_title">
 	<querytext>
 
    select content_revision__new(:title
@@ -307,73 +307,73 @@ null
 	</querytext>
 </partialquery>
 
-<partialquery name="abr_new_revision_description">
+<partialquery name="content::add_basic_revision.abr_new_revision_description">
 	<querytext>
          , :description
 	</querytext>
 </partialquery>
 
-<partialquery name="abr_new_revision_publish_date">
+<partialquery name="content::add_basic_revision.abr_new_revision_publish_date">
 	<querytext>
          , :publish_date
 	</querytext>
 </partialquery>
 
-<partialquery name="abr_new_revision_mime_type">
+<partialquery name="content::add_basic_revision.abr_new_revision_mime_type">
 	<querytext>
          , :mime_type
 	</querytext>
 </partialquery>
 
-<partialquery name="abr_new_revision_nls_language">
+<partialquery name="content::add_basic_revision.abr_new_revision_nls_language">
 	<querytext>
          , :nls_language
 	</querytext>
 </partialquery>
 
-<partialquery name="abr_new_revision_text">
+<partialquery name="content::add_basic_revision.abr_new_revision_text">
 	<querytext>
          , :text
 	</querytext>
 </partialquery>
 
-<partialquery name="abr_new_revision_description_ne">
+<partialquery name="content::add_basic_revision.abr_new_revision_description_ne">
 	<querytext>
          , null
 	</querytext>
 </partialquery>
 
-<partialquery name="abr_new_revision_publish_date_ne">
+<partialquery name="content::add_basic_revision.abr_new_revision_publish_date_ne"
 	<querytext>
          , now()
 	</querytext>
 </partialquery>
 
-<partialquery name="abr_new_revision_mime_type_ne">
+<partialquery name="content::add_basic_revision.abr_new_revision_mime_type_ne">
 	<querytext>
          , 'text/plain'
 	</querytext>
 </partialquery>
 
-<partialquery name="abr_new_revision_nls_language_ne">
+<partialquery name="content::add_basic_revision.abr_new_revision_nls_language_ne">
 	<querytext>
          , null
 	</querytext>
 </partialquery>
 
-<partialquery name="abr_new_revision_text_ne">
+<partialquery name="content::add_basic_revision.abr_new_revision_text_ne">
 	<querytext>
          , ' '
 	</querytext>
 </partialquery>
 
-<partialquery name="abr_new_revision_end_items">
+<partialquery name="content::add_basic_revision.abr_new_revision_end_items">
 	<querytext>
          , content_symlink__resolve(:item_id), :revision_id, now(), :creation_ip, :creation_user) as revision_id
 	</querytext>
 </partialquery>
 
-<fullquery name="upcff_update_cr_revisions">
+<fullquery name="content::update_content_from_file.upcff_update_cr_revisions">
 	<querytext>
 
     update cr_revisions 
@@ -383,7 +383,7 @@ null
 	</querytext>
 </fullquery>
 
-<fullquery name="cc_copy_content">
+<fullquery name="content::copy_content.cc_copy_content">
 	<querytext>
 
           select content_revision__content_copy (:revision_id_src, :revision_id_dest)

@@ -2,7 +2,7 @@
 <queryset>
 <rdbms><type>postgresql</type><version>7.1</version></rdbms>
 
-<fullquery name="get_name_type">
+<fullquery name="cms_folder::get_registered_types.get_name_type">
 	<querytext>
     select
       o.pretty_name,

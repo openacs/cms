@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <queryset>
 
-<fullquery name="get_module_id.gmi_get_module_id">      
+<fullquery name="cm::modules::get_module_id.gmi_get_module_id">      
       <querytext>
       
         select module_id from cm_modules
@@ -11,7 +11,7 @@
 </fullquery>
 
  
-<fullquery name="getMountPoints.gmp_get_mount_points">      
+<fullquery name="cm::modules::getMountPoints.gmp_get_mount_points">      
       <querytext>
       
        select 
@@ -24,7 +24,7 @@
 </fullquery>
 
  
-<fullquery name="getChildFolders.gcf_child_folders">      
+<fullquery name="cm::modules::clipboard::getChildFolders.gcf_get_child_folders">      
       <querytext>
       
                      select

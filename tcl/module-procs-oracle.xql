@@ -3,22 +3,7 @@
 <queryset>
    <rdbms><type>oracle</type><version>8.1.6</version></rdbms>
 
-<fullquery name="getSortedPaths.">      
-      <querytext>
-      select 
-                         item_id, 
-                         content_item.get_path(item_id, :sorted_paths_root_id) as item_path,
-                         content_type as item_type
-                       from 
-                         cr_items
-                       where
-                         item_id in ($sql_id_list)
-                       order by item_path
-      </querytext>
-</fullquery>
-
- 
-<fullquery name="getChildFolders.gcf_get_child_folders">      
+<fullquery name="cm::modules::getChildFolders.gcf_get_child_folders">      
       <querytext>
       
         select
@@ -44,7 +29,7 @@
 </fullquery>
 
  
-<fullquery name="getChildFolders.grfi_get_root_id">      
+<fullquery name="cm::modules::templates::getRootFolderId.grfi_get_root_id">      
       <querytext>
       
             select content_template.get_root_folder() from dual
@@ -52,7 +37,7 @@
 </fullquery>
 
  
-<fullquery name="getSortedPaths.gri_get_root_id">      
+<fullquery name="cm::modules::sitemap::getRootFolderID.grfi_get_root_id">      
       <querytext>
       
             select content_item.get_root_folder() from dual
@@ -60,7 +45,7 @@
 </fullquery>
 
  
-<fullquery name="getChildFolders.gtt_get_tree_types">      
+<fullquery name="cm::modules::types::getTreeTypes.gtt_get_tree_types">      
       <querytext>
       
           select
@@ -76,34 +61,35 @@
       </querytext>
 </fullquery>
 
- 
-<fullquery name="getChildFolders.gcf_get_child_folders">      
+
+<fullquery name="cm::modules::types::getChildFolders.gcf_get_child_folders">      
       <querytext>
-      
-        select
-	  :mount_point as mount_point,
-	  r.name, 
-          r.item_id,
-          '' as children,
-	  nvl((select 't' from dual where exists
-	    (select 1 from cr_folders f_child, cr_resolved_items r_child
-	       where r_child.parent_id = r.resolved_id
-		 and f_child.folder_id = r_child.resolved_id)), 'f') expandable,
-	  r.is_symlink symlink, 
-          0 update_time
-	from
-	  cr_folders f, cr_resolved_items r
-	where
-	  r.parent_id = :id
-	and
-	  r.resolved_id = f.folder_id
-	order by
-	  name
+
+		   select
+                     :module_name as mount_point,
+                     t.pretty_name, 
+                     t.object_type,
+                     '' as children,
+                     NVL(
+                      (select 't' from dual 
+                        where exists (select 1 from acs_object_types
+                          where supertype = t.object_type)),
+                      'f'
+                     ) as expandable,
+                     'f' as symlink, 
+                     0 as update_time
+                   from 
+                     acs_object_types t
+                   where 
+                     supertype = :id
+                   order by 
+                     t.pretty_name
+
       </querytext>
 </fullquery>
 
  
-<fullquery name="getChildFolders.gcc_get_child_folders">      
+<fullquery name="cm::modules::categories::getChildFolders.gcf_get_child_folders">      
       <querytext>
       
                      select 
@@ -130,33 +116,35 @@
       </querytext>
 </fullquery>
 
- 
-<fullquery name="getChildFolders.gcf_get_child_folders">      
+
+<fullquery name="cm::modules::users::getChildFolders.gcf_get_child_folders">      
       <querytext>
-      
-        select
-	  :mount_point as mount_point,
-	  r.name, 
-          r.item_id,
-          '' as children,
-	  nvl((select 't' from dual where exists
-	    (select 1 from cr_folders f_child, cr_resolved_items r_child
-	       where r_child.parent_id = r.resolved_id
-		 and f_child.folder_id = r_child.resolved_id)), 'f') expandable,
-	  r.is_symlink symlink, 
-          0 update_time
-	from
-	  cr_folders f, cr_resolved_items r
-	where
-	  r.parent_id = :id
-	and
-	  r.resolved_id = f.folder_id
-	order by
-	  name
+
+		   select
+                     :module_name as mount_point,
+                     g.group_name as name, 
+                     g.group_id, '' as children,
+                     NVL(
+                      (select 't' from dual 
+                        where exists (
+                          select 1 from group_component_map m2
+                          where m2.group_id = g.group_id)),
+                      'f' 
+                     ) as expandable,
+                     'f' as symlink,
+                     0 as update_time
+                   from 
+                     groups g $map_table
+                   where 
+                     $where_clause
+                   order by 
+                     name
+
       </querytext>
 </fullquery>
 
-<partialquery name="getSortedPaths.gsp_get_sorted_paths">
+ 
+<partialquery name="cm::modules::sitemap::getSortedPaths.gsp_get_sorted_paths">
 	<querytext>
 	               select 
                          item_id, 
@@ -170,7 +158,7 @@
 	</querytext>
 </partialquery>
 
-<partialquery name="getSortedPaths.gsp_get_query">
+<partialquery name="cm::modules::categories::getSortedPaths.gsp_get_query">
 	<querytext>
 
           select 
@@ -185,7 +173,7 @@
 	</querytext>
 </partialquery>
 
-<partialquery name="getSortedPaths.gsp_get_sort_paths">
+<partialquery name="cm::modules::users::getSortedPaths.gsp_get_sort_paths">
 	<querytext>
 
           select 

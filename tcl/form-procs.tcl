@@ -21,7 +21,7 @@ ad_proc content::query_form_metadata {
   set query [db_map attributes_query_1] 
  
   if { ![template::util::is_nil extra_where] } {      
-    append query "\n   and\n      $extra_where"
+      append query [db_map attributes_query_extra_where]
   }
 
   append query "
@@ -864,12 +864,12 @@ ad_proc content::upload_content { revision_id tmpfile filename } {
       returning content into :1" -blob_files $tmpfile
 
     # update mime_type to match the file 
-    set mime_sql "
+
+    if { [catch {db_dml update_mime_sql "
       update cr_revisions 
         set mime_type = :mime_type 
-        where revision_id = :revision_id"
-    
-    if { [catch {db_dml update_mime_sql $mime_sql} errmsg] } {
+        where revision_id = :revision_id" } errmsg] } {
+	
 	#  if it fails, use user submitted mime_type
 	ns_log notice "form-procs - add_revision_dml - using user mime_type 
 	  instead of guessed mime type = $mime_type"

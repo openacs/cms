@@ -133,7 +133,7 @@ namespace eval cm {
       # Retreive the id of the root folder
       ad_proc getRootFolderID {} {
         if { ![nsv_exists browser_state sitemap_root] } {
-          template::query gri_get_root_id root_id onevalue "
+          template::query grfi_get_root_id root_id onevalue "
             select content_item.get_root_folder() from dual"
           nsv_set browser_state sitemap_root $root_id
           return $root_id
@@ -259,7 +259,7 @@ namespace eval cm {
 
         # query for keyword categories
 
-        template::query gcc_get_child_folders children multilist "
+        template::query gcf_get_child_folders children multilist "
                      select 
                      :module_name as mount_point,
                      content_keyword.get_heading(keyword_id) as name, 
@@ -369,7 +369,7 @@ namespace eval cm {
  
         set module_name [namespace tail [namespace current]] 
 
-        template::query gcf_child_folders result multilist "
+        template::query gcf_get_child_folders result multilist "
                      select
                      :module_name as mount_point,
                      name, key, '' as children,

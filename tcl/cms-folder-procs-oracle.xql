@@ -2,7 +2,7 @@
 <queryset>
 <rdbms><type>oracle</type><version>8.1.6</version></rdbms>
 
-<fullquery name="get_name_type">
+<fullquery name="cms_folder::get_registered_types.get_name_type">
 	<querytext>
     select
       o.pretty_name,

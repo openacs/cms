@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <queryset>
 
-<fullquery name="getName.gn_get_name">      
+<fullquery name="User::getName.gn_get_name">      
       <querytext>
       select 
         $col

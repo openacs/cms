@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <queryset> 
-	<fullquery name="count_text_mime_types">
+	<fullquery name="content_method::text_entry_filter_sql.count_text_mime_types">
 		<querytext>
 			select count(*)
 			from cr_content_mime_type_map

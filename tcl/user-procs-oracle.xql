@@ -3,7 +3,7 @@
 <queryset>
    <rdbms><type>oracle</type><version>8.1.6</version></rdbms>
 
-<fullquery name="cms_admin_exists.cae_admin_exists">      
+<fullquery name="User::cms_admin_exists.cae_admin_exists">      
       <querytext>
       
       select content_permission.cm_admin_exists from dual
