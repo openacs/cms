@@ -103,7 +103,7 @@ if { [form is_valid delete] } {
           );
           end;" } errmsg] } {
                 ns_log notice \
-                    "../../sitemap/delete.tcl caught error in dml: $sql - $errmsg"
+                    "../../sitemap/delete.tcl caught error in dml: - $errmsg"
                 ns_log notice \
                     "../../sitemap/delete.tcl - Item $del_item_id was not deleted"
             }
