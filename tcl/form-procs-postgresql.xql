@@ -193,7 +193,7 @@ null
       where revision_id = :revision_id
 
 	</querytext>
-<fullquery>
+</fullquery>
 
 <partialquery name="string_to_timestamp">
 	<querytext>

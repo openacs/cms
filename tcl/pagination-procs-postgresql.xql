@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <queryset>
 
-<partialquery="pagination::paginate_query.pg_paginate_query">
+<partialquery name="pagination::paginate_query.pg_paginate_query">
 	<querytext>
 
       select *

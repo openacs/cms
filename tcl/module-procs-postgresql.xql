@@ -47,7 +47,7 @@
 <fullquery name="getChildFolders.grfi_get_root_id">      
       <querytext>
       
-            select content_template__get_root_folder() 
+            select content_template__get_root_folder(null) 
       </querytext>
 </fullquery>
 
@@ -55,7 +55,7 @@
 <fullquery name="getSortedPaths.gri_get_root_id">      
       <querytext>
       
-            select content_item__get_root_folder() 
+            select content_item__get_root_folder(null) 
       </querytext>
 </fullquery>
 
