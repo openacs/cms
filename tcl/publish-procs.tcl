@@ -420,6 +420,10 @@ ad_proc -public publish::schedule_status_sweep { {interval ""} } {
     set package_id [apm_package_id_from_key "cms"]
     if { ![template::util::is_nil package_id] } {
       set interval [ad_parameter -package_id $package_id StatusSweepInterval 3600]
+      # if cms is installed but not mounted, return reasonable default
+      if { $interval == "" } {
+        set interval 3600
+      }
     } else { 
       ns_log Warning "publish::schedule_status_sweep: unable to lookup package_id for cms defaulting to interval 3600"
       set interval 3600
