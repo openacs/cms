@@ -564,7 +564,7 @@ begin
       wf_tasks
     where
       task_id = p_task_id;
-
+   
     -- someone else has already holds this task
     -- we need to check in the task as the other person before 
     --    this user can check it out
@@ -595,13 +595,13 @@ begin
 
       v_this_place := content_workflow__get_this_place( v_transition_key );
 
-      workflow_case__set_attribute_value(
+      PERFORM workflow_case__set_attribute_value(
           v_journal_id,
 	  ''next_place'',
 	  v_transition_key
       );
 
-      workflow_case__end_task_action(
+      PERFORM workflow_case__end_task_action(
           v_journal_id,
           ''start'',
           p_task_id
@@ -626,7 +626,7 @@ begin
       end if;
 
     else
-      raise EXCEPTION ''-20000: Cannot check out this task because it is in an invalid state %'', v_task_state
+      raise EXCEPTION ''-20000: Cannot check out this task because it is in an invalid state %'', v_task_state;
     end if;
 
     return 0; 
@@ -858,13 +858,13 @@ begin
           p_transition_key
       );
 
-      workflow_case__set_attribute_value(
+      PERFORM workflow_case__set_attribute_value(
           v_journal_id,
 	  ''next_place'',
 	  v_previous_place
       );
 
-      workflow_case__end_task_action(
+      PERFORM workflow_case__end_task_action(
           v_journal_id,
           ''finish'',
           p_task_id

@@ -38,6 +38,7 @@ content::check_access $item_id cm_examine \
 	-return_url "modules/sitemap/index" 
 
 
+ns_log notice "user_permissions = [array get user_permissions]"
 # validate revision
 if { [template::util::is_nil item_id] } {
     template::request::error invalid_revision \

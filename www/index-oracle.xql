@@ -12,7 +12,7 @@
 </fullquery>
 
  
-<fullquery name="content_template">      
+<fullquery name="template_root">      
       <querytext>
 
       select content_template.get_root_folder from dual

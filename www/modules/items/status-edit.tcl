@@ -44,9 +44,9 @@ set is_live [element get_value publish_status is_live]
 
 # show "Ready" and "Live" if a live revision exists and the item is 
 #   publishable
-if { [string equal $is_live t] && [string equal $is_publishable t] } {
+#if { [string equal $is_live t] && [string equal $is_publishable t] } {
   lappend options [list "Ready" ready] [list "Live (publishes the item)" live]
-}
+#}
 
 template::query check_published is_published onevalue "
   select content_item.is_published( :item_id ) from dual"

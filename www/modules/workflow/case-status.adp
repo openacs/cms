@@ -24,14 +24,14 @@
       <td>@transinfo.transition_name@
         <if @is_assigned@ eq "yes">
           <if @transinfo.holding_user@ nil>
-            (<a href="task-finish?task_id=@transinfo.task_id@&return_url=@return_url@">Finish</a>)
+            (<a href="../workflow/task-finish?task_id=@transinfo.task_id@&return_url=@return_url@">Finish</a>)
           </if>
           <else>
             <if @transinfo.holding_user@ eq @user_id@>
-              (<a href="task-finish?task_id=@transinfo.task_id@&return_url=@return_url@">Finish</a>)
+              (<a href="../workflow/task-finish?task_id=@transinfo.task_id@&return_url=@return_url@">Finish</a>)
             </if>
             <else>
-              (<a href="task-start?task_id=@transinfo.task_id@&return_url=@return_url@">Steal</a> from @transinfo.hold_name@)
+              (<a href="../workflow/task-start?task_id=@transinfo.task_id@&return_url=@return_url@">Steal</a> from @transinfo.hold_name@)
             </else>
           </else>
         </if>    

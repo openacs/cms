@@ -66,7 +66,7 @@ declare
   v_result                         boolean;
 begin
 
-    v_next_place := workflow_case__get_attribute_value(case_id,''next_place'');
+    v_next_place := workflow_case__get_attribute_value(p_case_id,''next_place'');
 
     if v_next_place = p_place_key then
       v_result := ''t'';
@@ -144,7 +144,7 @@ insert into wf_arcs (
 insert into wf_arcs (
   workflow_key, transition_key, place_key, direction, guard_callback
 ) values (
-  'publishing_wf', 'authoring', 'authored', 'out', 'publishing_wf.is_next'
+  'publishing_wf', 'authoring', 'authored', 'out', 'publishing_wf__is_next'
 );
 
 insert into wf_arcs (
@@ -172,13 +172,13 @@ insert into wf_arcs (
 insert into wf_arcs (
   workflow_key, transition_key, place_key, direction, guard_callback
 ) values (
-  'publishing_wf', 'editing', 'edited', 'out', 'publishing_wf.is_next'
+  'publishing_wf', 'editing', 'edited', 'out', 'publishing_wf__is_next'
 );
 
 insert into wf_arcs (
   workflow_key, transition_key, place_key, direction, guard_callback
 ) values (
-  'publishing_wf', 'editing', 'start', 'out', 'publishing_wf.is_next'
+  'publishing_wf', 'editing', 'start', 'out', 'publishing_wf__is_next'
 );
 
 insert into wf_arcs (
@@ -201,19 +201,19 @@ insert into wf_arcs (
 insert into wf_arcs (
   workflow_key, transition_key, place_key, direction, guard_callback
 ) values (
-  'publishing_wf', 'approval', 'end', 'out', 'publishing_wf.is_next'
+  'publishing_wf', 'approval', 'end', 'out', 'publishing_wf__is_next'
 );
 
 insert into wf_arcs (
   workflow_key, transition_key, place_key, direction, guard_callback
 ) values (
-  'publishing_wf', 'approval', 'authored', 'out', 'publishing_wf.is_next'
+  'publishing_wf', 'approval', 'authored', 'out', 'publishing_wf__is_next'
 );
 
 insert into wf_arcs (
   workflow_key, transition_key, place_key, direction, guard_callback
 ) values (
-  'publishing_wf', 'approval', 'start', 'out', 'publishing_wf.is_next'
+  'publishing_wf', 'approval', 'start', 'out', 'publishing_wf__is_next'
 );
 
 
