@@ -540,7 +540,7 @@ end;' language 'plpgsql';
 
 
 -- procedure checkout
-create function content_workflow__checkout (integer,timestamp,integer,varchar,varchar)
+create function content_workflow__checkout (integer,timestamp with time zone,integer,varchar,varchar)
 returns integer as '
 declare
   p_task_id                        alias for $1;  

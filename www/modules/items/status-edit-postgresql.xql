@@ -40,7 +40,7 @@
     select
       coalesce(publish_status, 'production') as publish_status,
       to_char(coalesce(start_when, current_timestamp), 'YYYY MM DD HH24 MI SS') as start_when,
-      to_char(coalesce(end_when, current_timestamp + 365), 'YYYY MM DD HH24 MI SS') as end_when
+      to_char(coalesce(end_when, current_timestamp + interval '365 days'), 'YYYY MM DD HH24 MI SS') as end_when
     from
       cr_items i left outer join cr_release_periods r using (item_id)
     where

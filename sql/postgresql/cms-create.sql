@@ -172,8 +172,20 @@ begin
                                    );
 end;' language 'plpgsql';
 
+create function content_module__new (varchar,varchar,integer,integer,integer)
+returns integer as '
+begin
+    return content_module__new ($1, $2, cast ($3 as varchar), $4, $5);
+end;' language 'plpgsql';
+
+create function content_module__new (varchar,varchar,integer,integer,integer)
+returns integer as '
+begin
+    return content_module__new ($1, $2, cast ($3 as varchar), $4, $5);
+end;' language 'plpgsql';
+
 -- function new
-create function content_module__new (varchar,varchar,varchar,integer,integer,integer,timestamp,integer,varchar,varchar)
+create function content_module__new (varchar,varchar,varchar,integer,integer,integer,timestamp with time zone,integer,varchar,varchar)
 returns integer as '
 declare
   p_name                        alias for $1;  
