@@ -13,7 +13,7 @@ set user_id [User::getID]
 db_transaction {
 
     content::check_access [cm::modules::sitemap::getRootFolderID] "cm_admin" \
-        -mount_point $mount_point -parent_id $parent_id -db $db
+        -mount_point $mount_point -parent_id $parent_id 
 
     # Grant cm_admin on sitemap, templates, users
 

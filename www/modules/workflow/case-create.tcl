@@ -18,7 +18,6 @@ set item_id [element get_value case_create item_id]
 content::check_access $item_id cm_item_workflow \
 	-mount_point workflow \
 	-return_url "../items/index?item_id=$item_id" \
-	-db $db \
 	-request_error
 
 # get a list of users (this should be context-specific)
@@ -265,7 +264,7 @@ if { [form is_valid case_create] } {
     "
 
         # email notifications of task assignments
-        workflow::notify_of_assignments $db $case_id $user_id
+        workflow::notify_of_assignments $case_id $user_id
 
     }
 

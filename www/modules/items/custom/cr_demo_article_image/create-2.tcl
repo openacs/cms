@@ -8,10 +8,8 @@ request set_param content_type   -datatype keyword
 request set_param content_method -datatype keyword
 
 
-set db [ns_db gethandle]
-
 # permissions check - need cm_new on parent_id to create new captioned image
-content::check_access $parent_id cm_new -user_id [User::getID] -db $db
+content::check_access $parent_id cm_new -user_id [User::getID]
 
 
 
@@ -22,8 +20,6 @@ form create captioned_image -html { enctype "multipart/form-data" } -elements {
     item_id        -datatype integer -widget hidden
     name           -datatype keyword -widget hidden
 }
-
-ns_db releasehandle $db
 
 content::add_attribute_element captioned_image content_revision title
 content::add_attribute_element captioned_image content_revision description

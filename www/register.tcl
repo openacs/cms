@@ -50,13 +50,13 @@ if { [form is_valid register_user] } {
                          "" "" "" "" "" $user_id]
 
         db_dml update_users "
-      update users
+        update users
         set screen_name = :screen_name
         where user_id = :user_id"
 
         # if there are no users with the 'cm_admin' privilege 
         #   (the CMS has never been used), then this user will be the admin
-        set cms_admin_exists [User::cms_admin_exists $db]
+        set cms_admin_exists [User::cms_admin_exists]
         if { $cms_admin_exists == 0 } {
             set is_admin t
         } else {
@@ -98,7 +98,7 @@ if { [form is_valid register_user] } {
 	"
         }
 
-        User::login $db $user_id
+        User::login $user_id
     }
 
     template::forward index

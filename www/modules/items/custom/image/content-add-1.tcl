@@ -4,19 +4,18 @@ request create
 request set_param revision_id -datatype integer
 
 
-set db [ns_db gethandle]
 
-query item_id onevalue "
+template::query get_item_id item_id onevalue "
   select
     item_id
   from
     cr_revisions
   where
     revision_id = :revision_id
-" -db $db
+"
 
 # permissions check - need cm_new on parent_id to create new image
-content::check_access $item_id cm_write -user_id [User::getID] -db $db
+content::check_access $item_id cm_write -user_id [User::getID]
 
 
 
@@ -32,7 +31,6 @@ element create image upload \
 	-widget file \
 	-label "Upload Image"
 
-ns_db releasehandle $db
 
 
 

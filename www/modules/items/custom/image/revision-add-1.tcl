@@ -4,10 +4,9 @@
 request create
 request set_param item_id -datatype integer
 
-set db [ns_db gethandle]
 
 # permissions check - need cm_write on item_id to add a revision
-content::check_access $item_id cm_write -user_id [User::getID] -db $db
+content::check_access $item_id cm_write -user_id [User::getID]
 
 
 
@@ -16,7 +15,7 @@ form create image -html { enctype "multipart/form-data" } -elements {
     item_id      -datatype integer -widget hidden -param
 }
 
-query item_info onerow "
+template::query get_item_info item_info onerow "
   select 
     i.name, i.latest_revision, r.title 
   from 
@@ -27,11 +26,10 @@ query item_info onerow "
     i.item_id = r.item_id
   and
     i.latest_revision = r.revision_id
-" -db $db
+" 
 
 template::util::array_to_vars item_info
 
-ns_db releasehandle $db
 
 
 content::add_attribute_elements image image $latest_revision
@@ -45,16 +43,6 @@ element create image upload \
 	-datatype text \
 	-widget file \
 	-label "Upload Image"
-
-# a noop ?
-# if { [form is_request image] } {
-  
-#     set db [template::get_db_handle]
-#     ns_db releasehandle $db
-# }
-
-
-
 
 
 

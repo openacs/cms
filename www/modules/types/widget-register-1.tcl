@@ -13,16 +13,14 @@ form create widget_register -elements {
 }
 
 
-set db [ns_db gethandle]
 
-query form_widgets multilist "
+template::query get_form_widgets form_widgets multilist "
   select
     widget, widget
   from
     cm_form_widgets
-" -db $db
+"
 
-ns_db releasehandle $db
 
 element create widget_register widget \
 	-datatype keyword \
@@ -43,9 +41,8 @@ wizard submit widget_register -buttons { next }
 
 if { [form is_request widget_register] } {
 
-    set db [ns_db gethandle]
 
-    query attribute_info onerow "
+    template::query get_attr_info attribute_info onerow "
       select
         a.pretty_name as attribute_name_pretty, 
         t.pretty_name as content_type_pretty,
@@ -57,18 +54,17 @@ if { [form is_request widget_register] } {
         a.object_type = t.object_type
       and
         a.attribute_id = :attribute_id
-    " -db $db
+    "
 
-    query register_widget onerow "
+    template::query get_reg_widget register_widget onerow "
       select
         widget as registered_widget, is_required
       from
         cm_attribute_widgets
       where
         attribute_id = :attribute_id
-    " -db $db
+    " 
 
-    ns_db releasehandle $db
 
     template::util::array_to_vars attribute_info
     element set_properties widget_register content_type_pretty \

@@ -100,7 +100,7 @@ if { [form is_valid widget_register] } {
     db_transaction {
 
         for { set i 0 } { $i < $param_count } { incr i } {
-            widget::process_param $db \
+            widget::process_param  \
 		widget_register $i $content_type $attribute_name
         }
     }

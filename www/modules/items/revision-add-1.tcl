@@ -6,7 +6,7 @@ request create
 request set_param item_id -datatype integer
 
 # check permissions
-content::check_access $item_id cm_write -user_id [User::getID] -db $db
+content::check_access $item_id cm_write -user_id [User::getID]
 
 template::query get_content_type content_type onevalue "
   select

@@ -20,8 +20,7 @@ db_transaction {
     # Check permissions
     content::check_access $item_id cm_relate \
         -mount_point $mount_point \
-        -return_url "modules/sitemap/index" \
-        -db $db
+        -return_url "modules/sitemap/index"
 
     lappend passthrough [list item_id $item_id]
 

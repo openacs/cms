@@ -14,7 +14,7 @@ namespace eval workflow {}
 # @param case_id The publishing workflow
 # @param user_id The From: user when sending the email
 
-proc workflow::notify_of_assignments { db case_id user_id } {
+proc workflow::notify_of_assignments { case_id user_id } {
 
     template::query assignments multilist "
       select
@@ -43,7 +43,7 @@ proc workflow::notify_of_assignments { db case_id user_id } {
         c.state = 'active'
       and
         c.object_id = i.item_id
-    " -db $db
+    " 
 
     
     foreach assignment $assignments {
@@ -168,13 +168,13 @@ This task is due on $deadline_pretty.
 # @param db A database handle
 # @param task_id The task
 
-proc workflow::notify_admin_of_finished_task { db task_id } {
+proc workflow::notify_admin_of_finished_task { task_id } {
 
     # the user who finished the task
     set user_id [User::getID]
     template::query name onevalue "
       select person.name( :user_id ) from dual
-    " -db $db
+    " 
 
     # get the task name, the creation_user, title, and date of the item
     template::query task_info onerow "
@@ -199,7 +199,7 @@ proc workflow::notify_admin_of_finished_task { db task_id } {
         i.item_id = o.object_id
       and
         t.task_id = :task_id
-    " -db $db
+    " 
 
     template::util::array_to_vars task_info
 

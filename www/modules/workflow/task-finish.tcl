@@ -108,7 +108,7 @@ if { [template::form is_valid task_finish] } {
             end;"
 
         # send email notification to the creator of the item
-        workflow::notify_admin_of_finished_task $db $task_id
+        workflow::notify_admin_of_finished_task $task_id
 
     }
 

@@ -55,14 +55,14 @@ proc pagination::get_rows_per_page {} {
 
 # @param db A database handle
 
-proc pagination::get_total_pages { db } {
+proc pagination::get_total_pages {} {
     uplevel {
 	template::query total_pages onevalue "
 	  select 
 	    ceil(count(*) / [pagination::get_rows_per_page] )
 	  from
             ($sql)
-	" -db $db
+	"
 
 	return $total_pages
     }

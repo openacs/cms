@@ -519,7 +519,7 @@ proc content::process_revision_form_dml {} {
 # id_value is the revision_id
 
 proc content::insert_element_data { 
-  db form_name content_type exclusion_list id_value \
+  form_name content_type exclusion_list id_value \
   {suffix ""} {extra_where ""}
 } {
 
@@ -557,7 +557,7 @@ proc content::insert_element_data {
 
     set last_table ""
     set last_id_column ""
-    template::query rows multirow $query -db $db
+    template::query rows multirow $query
 
     for { set i 1 } { $i <= ${rows:rowcount} } { incr i } {
         upvar 0 "rows:${i}" row

@@ -114,7 +114,7 @@ if { [form is_valid publish_status] } {
   form get_values publish_status publish_status start_when end_when item_id
 
   db_transaction {
-      publish::set_publish_status $db $item_id $publish_status
+      publish::set_publish_status $item_id $publish_status
 
       set start_when [template::util::date get_property sql_date $start_when]
       set end_when [template::util::date get_property sql_date $end_when]

@@ -41,7 +41,7 @@ if { [form is_valid sign_in_user] } {
 
       } else {
 
-          User::login $db $info(user_id)
+          User::login $info(user_id)
           template::forward index
           return
       }

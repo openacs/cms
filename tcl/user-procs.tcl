@@ -11,7 +11,7 @@ namespace eval User {
 
   # set the ad_user_login cookie 
 
-  proc login { db user_id } {
+  proc login { user_id } {
 
     ad_user_login -forever $user_id
 
@@ -52,10 +52,10 @@ namespace eval User {
 
   # a cms admin exists if a user has the 'cm_admin' privilege
   #   on the CMS pages root folder
-  proc cms_admin_exists { db } {
+  proc cms_admin_exists {} {
   
     template::query admin_exists onevalue "
-      select content_permission.cm_admin_exists from dual" -db $db
+      select content_permission.cm_admin_exists from dual"
 
     if { [string equal $admin_exists t] } {
       return 1

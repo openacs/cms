@@ -52,6 +52,6 @@ template::query get_revisions revisions multirow [pagination::paginate_query "
   order by
     revision_number desc" $page]
 
-set total_pages [pagination::get_total_pages $db]
+set total_pages [pagination::get_total_pages]
 
 set pagination_html [pagination::page_number_links $page $total_pages]

@@ -222,7 +222,7 @@ proc widget::create_values_param { form order default is_required param_source} 
 # @param content_type The content type to which the attribute belongs
 # @param attribute_name The name of the attribute
 
-proc widget::process_param { db form order content_type attribute_name } {    
+proc widget::process_param { form order content_type attribute_name } {    
     template::form get_values $form \
 	    param_$order param_type_$order \
 	    param_source_$order param_value_$order

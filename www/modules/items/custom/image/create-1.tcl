@@ -5,10 +5,8 @@ request set_param parent_id    -datatype integer
 request set_param content_type -datatype keyword
 
 
-set db [ns_db gethandle]
-
 # permissions check - need cm_new on parent_id to create new image
-content::check_access $parent_id cm_new -user_id [User::getID] -db $db
+content::check_access $parent_id cm_new -user_id [User::getID]
 
 
 
@@ -19,7 +17,6 @@ form create image -html { enctype "multipart/form-data" } -elements {
     name         -datatype keyword -widget hidden
 }
 
-ns_db releasehandle $db
 	
 content::add_attribute_element image content_revision title
 content::add_attribute_element image content_revision description

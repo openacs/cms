@@ -11,7 +11,7 @@ if { [template::util::is_nil folder_id] } {
 
 
 # permissions check - user must have cm_examine on this folder
-content::check_access $folder_id cm_examine -user_id [User::getID] -db $db
+content::check_access $folder_id cm_examine -user_id [User::getID]
 
 
 # Get the registered types for the folder 
@@ -97,7 +97,7 @@ if { [form is_valid register_types] } {
 
         # permissions check - must have cm_write on folder to modify its options
         content::check_access $folder_resolved_id cm_write \
-	    -user_id [User::getID] -db $db
+	    -user_id [User::getID]
 
 
         if { [string equal $allow_subfolders "t"] } {

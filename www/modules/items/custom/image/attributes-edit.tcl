@@ -5,7 +5,7 @@ request create
 request set_param item_id -datatype integer
 
 # permissions check - need cm_write on item_id to add a revision
-content::check_access $item_id cm_write -user_id [User::getID] -db $db
+content::check_access $item_id cm_write -user_id [User::getID]
 
 form create image -html { enctype "multipart/form-data" } -elements {
     item_id      -datatype integer -widget hidden -param

@@ -1294,7 +1294,7 @@ proc publish::handle::text { item_id args } {
 # @see proc publish::publish_revision
 # @see proc publish::unpublish_item
 
-proc publish::set_publish_status { db item_id new_status {revision_id ""} } {
+proc publish::set_publish_status { item_id new_status {revision_id ""} } {
 
 
   switch $new_status {

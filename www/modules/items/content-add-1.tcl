@@ -19,7 +19,7 @@ template::query get_revision one_revision onerow "
 template::util::array_to_vars one_revision
 
 # permissions check - must have cm_write on the item
-content::check_access $item_id cm_write -user_id [User::getID] -db $db
+content::check_access $item_id cm_write -user_id [User::getID]
 
 
 # check for custom content-add-1 form

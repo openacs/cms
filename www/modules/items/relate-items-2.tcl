@@ -156,7 +156,7 @@ if { [form is_valid rel_form_2] || $form_complete } {
           if { [llength $elements] > 0 } {
               set attr_list [template::util::tcl_to_sql_list $elements]
               ns_log notice "$i : $attr_list"
-              content::insert_element_data $db rel_form_2 $relation_type \
+              content::insert_element_data rel_form_2 $relation_type \
                   [list acs_object cr_item_rel] $rel_id "_$i" \
                   " attribute_name in ($attr_list)"
           }
