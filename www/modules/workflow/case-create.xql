@@ -29,5 +29,19 @@
       </querytext>
 </fullquery>
 
+
+<fullquery name="get_name_key">      
+      <querytext>
+  select 
+    transition_name, transition_key 
+  from 
+    wf_transitions
+  where 
+    workflow_key = 'publishing_wf' 
+  order by 
+    sort_order      
+      </querytext>
+</fullquery>
+
  
 </queryset>

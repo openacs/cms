@@ -8,7 +8,8 @@ request create -params {
 # flag indicating this is the live revision
 set live_revision_p 0
 
-db_1row get_revision_one "" 
+db_1row get_revision "" -column_array one_revision
+template::util::array_to_vars one_revision
 
 # Check permissions - must have cm_examine on the item
 content::check_access $item_id cm_examine \

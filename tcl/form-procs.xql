@@ -210,7 +210,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="cc_update_cr_revisions.cc_update_cr_revisions">
+<fullquery name="content::copy_content.cc_update_cr_revisions">
 	<querytext>
 
            update cr_revisions

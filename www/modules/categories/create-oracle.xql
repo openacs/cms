@@ -25,11 +25,8 @@
 </fullquery>
 
 <partialquery name="pid">      
-      <querytext>
-      
-         ,parent_id => :parent_id
-
-  
+      <querytext>      
+         ,parent_id => :parent_id  
       </querytext>
 </partialquery>
 

@@ -31,7 +31,7 @@ if { [form is_valid add_keyword] } {
   db_transaction {
 
       if { ![template::util::is_nil parent_id] } {
-          set pid [db_map pid]
+          set pid [string trim [db_map pid]]
       } else {
           set pid ""
       }

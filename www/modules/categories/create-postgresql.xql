@@ -30,11 +30,8 @@
 
  
 <partialquery name="pid">      
-      <querytext>
-      
-         $parent_id
-
-  
+      <querytext>      
+$parent_id  
       </querytext>
 </partialquery>
 

@@ -4,7 +4,7 @@
 request create
 request set_param revision_id -datatype integer
 
-db_1row get_revision_one ""
+db_1row get_revision ""
 
 # permissions check - must have cm_write on the item
 content::check_access $item_id cm_write -user_id [User::getID]

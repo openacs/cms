@@ -9,7 +9,7 @@ content::check_access $item_id cm_examine -user_id [User::getID]
 
 # Query for publish status and release schedule, if any
 
-db_string get_info "" -column_array info
+db_1row get_info "" -column_array info
 
 # Build a sentence describing the publishing status
 
