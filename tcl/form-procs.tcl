@@ -3,21 +3,24 @@ namespace eval content {
   # namespace import ::template::query ::template::form ::template::element
 }
 
-# Helper proc: query out all the information neccessary to create
-# a custom form element based on stored metadata
-# Requires the variable content_type to be set in the calling frame
 
-ad_proc content::query_form_metadata { 
+ad_proc -public content::query_form_metadata { 
   {datasource_name rows} {datasource_type multirow} \
   {extra_where {}} {extra_orderby {}}
 } {
+
+  Helper proc: query out all the information neccessary to create
+  a custom form element based on stored metadata
+  Requires the variable content_type to be set in the calling frame
+
+} {
+
 
   # query for all attribute widget param values associated with a content 
   #   the 3 nvl subqueries are necessary because we cannot outer join
   #   to more than one table without doing multiple subqueries (which is
   #   even less efficient than this way)
 
-  upvar __query query
   set query [db_map attributes_query_1] 
  
   if { ![template::util::is_nil extra_where] } {      
@@ -34,16 +37,19 @@ ad_proc content::query_form_metadata {
   }  
 
   uplevel "
-    template::query get_form_metadata $datasource_name $datasource_type \{$__query\}
+    template::query get_form_metadata $datasource_name $datasource_type \{$query\}
   "
 
 }
 
-# Process the query and assemble the "element create..." statement
-# PRE:  uber-query has been run
-# POST: html_params, code_params set; returns the index of the next
-# available row
-ad_proc content::assemble_form_element { datasource_ref the_attribute_name start_row {db {}}} {
+ad_proc -public content::assemble_form_element { datasource_ref the_attribute_name start_row {db {}}} {
+
+  Process the query and assemble the "element create..." statement
+  PRE:  uber-query has been run
+  POST: html_params, code_params set; returns the index of the next
+  available row
+
+} {
 
   upvar "${datasource_ref}:rowcount" rowcount
   upvar code_params code_params
@@ -89,25 +95,28 @@ ad_proc content::assemble_form_element { datasource_ref the_attribute_name start
   return $last_row
 }
 
-# Create a form widget based on the given attribute. Query parameters
-# out of the database, override them with the passed-in parameters
-# if they exist.
-# If the -revision_id flag exists, fills in the value of the attribute from 
-# the database, based on the given revision_id.
-# If the -content_type flag exists, uses the attribute for the given content
-# type (without inheritance). 
-# If the -item_id flag is present, the live revision for the item will be 
-# used.
-# If the -item_id and the -revision_id flags are missing, the -content_type
-# flag must be specified.
-# Example: 
-# content::create_form_element my_form width -revision_id $image_id -size 10
-#   This call will create an element representing the width attribute
-#   of the image type, with the textbox size set to 10 characters,
-#   and query the current value of the attribute out of the database.
 
-ad_proc content::create_form_element {
+ad_proc -public content::create_form_element {
     form_name attribute_name args
+} {
+
+  Create a form widget based on the given attribute. Query parameters
+  out of the database, override them with the passed-in parameters
+  if they exist.
+  If the -revision_id flag exists, fills in the value of the attribute from 
+  the database, based on the given revision_id.
+  If the -content_type flag exists, uses the attribute for the given content
+  type (without inheritance). 
+  If the -item_id flag is present, the live revision for the item will be 
+  used.
+  If the -item_id and the -revision_id flags are missing, the -content_type
+  flag must be specified.
+  Example: 
+  content::create_form_element my_form width -revision_id $image_id -size 10
+    This call will create an element representing the width attribute
+    of the image type, with the textbox size set to 10 characters,
+    and query the current value of the attribute out of the database.
+
 } {
   template::util::get_opts $args
 
@@ -188,10 +197,13 @@ ad_proc content::create_form_element {
   eval $form_element
 }  
   
-# generate a form based on metadata
 
-ad_proc content::get_revision_form { 
+ad_proc -public content::get_revision_form { 
   content_type item_id form_name {show_sections t} {element_override {}}
+} {
+
+  generate a form based on metadata
+
 } {
 
     # Convert overrides to an array
@@ -205,7 +217,7 @@ ad_proc content::get_revision_form {
     set html_params [list]
     
     # Perform a gigantic query to retreive all metadata
-    query_form_metadata $db
+    query_form_metadata
 
     # Process the results and create the elements
     for { set i 1 } { $i <= ${rows:rowcount} } { incr i } {
@@ -286,11 +298,14 @@ ad_proc content::get_revision_form {
 }
 
 
-# PRE: requires datatype, widget, attribute_label, is_required code_params
-#      to be set in the calling frame
-#
-# POST: appends the list of params neccessary to create a new element to code_params
-ad_proc content::get_element_default_params {} {
+ad_proc -public content::get_element_default_params {} {
+
+  PRE: requires datatype, widget, attribute_label, is_required code_params
+       to be set in the calling frame
+ 
+  POST: appends the list of params neccessary to create a new element to code_params
+
+} {
 
   uplevel {
     lappend code_params -datatype $datatype -widget $widget \
@@ -301,12 +316,15 @@ ad_proc content::get_element_default_params {} {
   }
 }
 
-# PRE:  requires the following variables to be set in the uplevel scope:
-#     db, code_params, html_params, 
-#     attribute_id, attribute_name, datatype, is_html,
-#     param_source, param_type, value
-# POST: adds params to the 'element create' command
 ad_proc content::get_revision_create_element {} {
+
+  PRE:  requires the following variables to be set in the uplevel scope:
+      db, code_params, html_params, 
+      attribute_id, attribute_name, datatype, is_html,
+      param_source, param_type, value
+  POST: adds params to the 'element create' command
+
+} {
     upvar __sql sql
     set sql [db_map get_enum_1]
     
@@ -344,16 +362,18 @@ ad_proc content::get_revision_create_element {} {
 }
 
 
-# perform the appropriate DML based on metadata
+ad_proc -public content::process_revision_form { form_name content_type item_id {db{}} } {
 
-ad_proc content::process_revision_form { form_name content_type item_id {db{}} } {
+  perform the appropriate DML based on metadata
+
+} {
 
     template::form get_values $form_name title description mime_type
 
     # create the basic revision
-    db_exec_plsql new_content_revision {
+    set revision_id [db_exec_plsql new_content_revision "
              begin
-	     :revision_id := content_revision.new(
+	     :1 := content_revision.new(
                  title         => :title,
                  description   => :description,
                  mime_type     => :mime_type,
@@ -362,10 +382,8 @@ ad_proc content::process_revision_form { form_name content_type item_id {db{}} }
                  creation_ip   => '[ns_conn peeraddr]',
                  creation_user => [User::getID]
              );
-             end;
-    }
+        end;"]
 
-    #ns_ora exec_plsql_bind $db $sql revision_id
 
     # query for extended attribute tables
 
@@ -435,10 +453,13 @@ ad_proc content::process_revision_form { form_name content_type item_id {db{}} }
     return $revision_id
 }
 
-# helper function for process_revision_form
-# PRE: the following variables must be set in the uplevel scope:
-#      columns, values, last_table
-ad_proc content::process_revision_form_dml {} {
+ad_proc -public content::process_revision_form_dml {} {
+
+  helper function for process_revision_form
+  PRE: the following variables must be set in the uplevel scope:
+       columns, values, last_table
+
+} {
 
     upvar last_table __last_table
     upvar columns __columns
@@ -458,15 +479,17 @@ ad_proc content::process_revision_form_dml {} {
 }
 
 
-# Perform an insert for some form, adding all attributes of a 
-# specific type
-# exclusion_list is a list of all object types for which the elements
-#   are NOT to be inserted
-# id_value is the revision_id
-
-ad_proc content::insert_element_data { 
+ad_proc -public content::insert_element_data { 
   form_name content_type exclusion_list id_value \
   {suffix ""} {extra_where ""}
+} {
+
+  Perform an insert for some form, adding all attributes of a 
+  specific type
+  exclusion_list is a list of all object types for which the elements
+    are NOT to be inserted
+  id_value is the revision_id
+
 } {
 
     set sql_exclusion [template::util::tcl_to_sql_list $exclusion_list]
@@ -527,10 +550,13 @@ ad_proc content::insert_element_data {
 
 }
 
-# helper function for process_revision_form
-# PRE: the following variables must be set in the uplevel scope:
-#      columns, values, last_table, id_value_ref
-ad_proc content::process_insert_statement {} {
+ad_proc -public content::process_insert_statement {} {
+
+  helper function for process_revision_form
+  PRE: the following variables must be set in the uplevel scope:
+       columns, values, last_table, id_value_ref
+
+} {
     upvar last_table __last_table
     upvar columns __columns
     upvar values __values
@@ -548,9 +574,11 @@ ad_proc content::process_insert_statement {} {
     }
 }
 
+ad_proc -public content::assemble_passthrough { args } {
 
-# Assemble a passthrough list out of variables
-ad_proc content::assemble_passthrough { args } {
+  Assemble a passthrough list out of variables
+
+} {
   set result [list]
   foreach varname $args {
     upvar $varname var
@@ -559,8 +587,11 @@ ad_proc content::assemble_passthrough { args } {
   return $result
 }
 
-# Convert passthrough to a URL fragment
-ad_proc content::url_passthrough { passthrough } {
+ad_proc -public content::url_passthrough { passthrough } {
+
+  Convert passthrough to a URL fragment
+
+} {
 
   set extra_url ""
   foreach pair $passthrough {
@@ -569,8 +600,11 @@ ad_proc content::url_passthrough { passthrough } {
   return $extra_url
 }
 
-# Assemble a URL out of component parts
-ad_proc content::assemble_url { base_url args } {
+ad_proc -public content::assemble_url { base_url args } {
+
+  Assemble a URL out of component parts
+
+} {
   set result $base_url
   if { [string first $base_url "?"] == -1 } {
     set joiner "?"
@@ -594,20 +628,26 @@ ad_proc content::assemble_url { base_url args } {
 # Procedures for generating and processing content content creation
 # and editing forms..
 
-# @public new_item
-# Create a new item, including the initial revision, based on a valid
-# form submission.
+ad_proc -public content::new_item { form_name { storage_type text } { tmpfile "" } } {
 
-# @param form_name Name of the form from which to obtain item
-# attributes, as well as attributes of the initial revision.  The form
-# should include an item_id, name and revision_id.
+  @public new_item
+  Create a new item, including the initial revision, based on a valid
+  form submission.
 
-# @param tmpfile Name of the temporary file containing the content to
-# upload for the initial revision.
+  @param form_name Name of the form from which to obtain item
+  attributes, as well as attributes of the initial revision.  The form
+  should include an item_id, name and revision_id.
 
-# @see add_revision
+  @param storage_type Method for storing content.  Can be one of content_text,
+  content_lob, content_file.  This is an openacs extension for allowing the 
+  storage of content in the file-system.
 
-ad_proc content::new_item { form_name { storage_type text } { tmpfile "" } } {
+  @param tmpfile Name of the temporary file containing the content to
+  upload for the initial revision.
+
+  @see add_revision
+
+} {
 
   array set defaults [list item_id "" locale "" parent_id "" content_type "content_revision"]
 
@@ -658,21 +698,24 @@ ad_proc content::new_item { form_name { storage_type text } { tmpfile "" } } {
   return $item_id
 }
 
-# @public add_revision
 
-# Create a new revision for an existing item based on a valid form
-# submission.  Queries for attribute names and inserts a row into the
-# attribute input view for the appropriate content type.  Inserts the
-# contents of a file into the content column of the cr_revisions table
-# for the revision as well.  
+ad_proc -public content::add_revision { form_name { tmpfile "" } } {
 
-# @param form_name Name of the form from which to obtain attribute
-# values.  The form should include an item_id and revision_id.
+  @public add_revision
 
-# @param tmpfile Name of the temporary file containing the content to
-# upload.
+  Create a new revision for an existing item based on a valid form
+  submission.  Queries for attribute names and inserts a row into the
+  attribute input view for the appropriate content type.  Inserts the
+  contents of a file into the content column of the cr_revisions table
+  for the revision as well.  
 
-ad_proc content::add_revision { form_name { tmpfile "" } } {
+  @param form_name Name of the form from which to obtain attribute
+  values.  The form should include an item_id and revision_id.
+
+  @param tmpfile Name of the temporary file containing the content to
+  upload.
+
+} {
 
   # initialize an ns_set to hold bind values
   set bind_vars [ns_set create]
@@ -712,26 +755,29 @@ ad_proc content::add_revision { form_name { tmpfile "" } } {
   #cms_folder::flush sitemap $parent_id
 }
 
-# @private attribute_insert_statement 
 
-# Prepare the insert statement into the attribute input view for a new
-# revision (see the content repository documentation for details about
-# the view).
-
-# @param content_type The content type of the item for which a new
-# revision is being prepared.
-
-# @param table_name The storage table of the content type.
-
-# @param bind_vars The name of an ns_set in which to store the
-# attribute values for the revision.  (Typically duplicates the contents
-# of [ns_getform].
-
-# @param form_name The name of the ATS form object used to process the
-# submission.
-
-ad_proc content::attribute_insert_statement { 
+ad_proc -public content::attribute_insert_statement { 
   content_type table_name bind_vars form_name } {
+
+  @private attribute_insert_statement 
+
+  Prepare the insert statement into the attribute input view for a new
+  revision (see the content repository documentation for details about
+  the view).
+
+  @param content_type The content type of the item for which a new
+  revision is being prepared.
+
+  @param table_name The storage table of the content type.
+
+  @param bind_vars The name of an ns_set in which to store the
+  attribute values for the revision.  (Typically duplicates the contents
+  of [ns_getform].
+
+  @param form_name The name of the ATS form object used to process the
+  submission.
+
+} {
 
   # get creation_user and creation_ip
   set creation_user [User::getID]
@@ -776,24 +822,27 @@ ad_proc content::attribute_insert_statement {
   return $insert_statement
 }
 
-# @private add_revision_dml 
 
-# Perform the DML to insert a revision into the appropriate input view.
+ad_proc -private content::add_revision_dml { statement bind_vars tmpfile filename } {
 
-# @param statement The DML for the insert statement, specifying a bind
-# variable for each column value.
+  @private add_revision_dml 
 
-# @param bind_vars An ns_set containing the values for all bind variables.
+  Perform the DML to insert a revision into the appropriate input view.
 
-# @param tmpfile The server-side name of the file containing the body of the 
-# revision to upload into the content BLOB column of cr_revisions.
+  @param statement The DML for the insert statement, specifying a bind
+  variable for each column value.
 
-# @param filename The client-side name of the file containing the body of 
-# the revision to upload into the content BLOB column of cr_revisions
+  @param bind_vars An ns_set containing the values for all bind variables.
 
-# @see add_revision
+  @param tmpfile The server-side name of the file containing the body of the 
+  revision to upload into the content BLOB column of cr_revisions.
 
-ad_proc content::add_revision_dml { statement bind_vars tmpfile filename } {
+  @param filename The client-side name of the file containing the body of 
+  the revision to upload into the content BLOB column of cr_revisions
+
+  @see add_revision
+
+} {
 
   db_transaction {
 
@@ -808,21 +857,27 @@ ad_proc content::add_revision_dml { statement bind_vars tmpfile filename } {
   }
 }
 
-# @private upload_content
 
-# Inserts content into the database from an uploaded file.
-# Does automatic mime_type updating
-# Parses text/html content and removes <body></body> tags
+ad_proc -public content::upload_content { revision_id tmpfile filename } {
 
-# @param revision_id The revision to which the content belongs
+  @private upload_content
 
-# @param tmpfile The server-side name of the file containing the body of the 
-# revision to upload into the content BLOB column of cr_revisions.
+  Inserts content into the database from an uploaded file.
+  Does automatic mime_type updating
+  Parses text/html content and removes <body></body> tags
 
-# @param filename The client-side name of the file containing the body of 
-# the revision to upload into the content BLOB column of cr_revisions
+  @param db A db handle
 
-ad_proc content::upload_content { revision_id tmpfile filename } {
+  @param revision_id The revision to which the content belongs
+
+  @param tmpfile The server-side name of the file containing the body of the 
+  revision to upload into the content BLOB column of cr_revisions.
+
+  @param filename The client-side name of the file containing the body of 
+  the revision to upload into the content BLOB column of cr_revisions
+
+
+} {
 
     # if it is HTML then strip out the body
     set mime_type [ns_guesstype $filename]
@@ -834,21 +889,42 @@ ad_proc content::upload_content { revision_id tmpfile filename } {
             close $fd
 	}
     }
-    
-    # upload the file into the revision content
 
-    db_dml update_cr_revisions "
-      update cr_revisions 
-      set content = empty_blob() where revision_id = :revision_id
-      returning content into :1" -blob_files $tmpfile
+    db_1row get_storage_type {select 
+                                storage_type, item_id 
+                              from 
+                                cr_items 
+                              where 
+                                item_id = (select 
+                                             item_id 
+                                           from 
+                                             cr_revisions 
+                                           where revision_id = :revision_id)}
+
+    if {[string equal $storage_type file]} {
+        db_dml upload_file_revision "
+                             update cr_revisions 
+                             set content = '[set file_path [cr_create_content_file $item_id $revision_id $tmpfile]]',
+                             content_length = [cr_file_size $file_path]
+                             where revision_id = :revision_id"
+    } elseif {[string equal $storage_type text]} {
+        # upload the file into the revision content
+        db_dml upload_text_revision "update cr_revisions 
+             set content = empty_blob() where revision_id = :revision_id
+             returning content into :1" -blob_files [list $tmpfile]
+
+    } else {
+        # upload the file into the revision content
+        db_dml upload_revision "update cr_revisions 
+             set content = empty_blob() where revision_id = :revision_id
+             returning content into :1" -blob_files [list $tmpfile]
+    }
 
     # update mime_type to match the file 
-
-    if { [catch {db_dml update_mime_sql "
+    if { [catch {db_dml update_mime_type "
       update cr_revisions 
         set mime_type = :mime_type 
-        where revision_id = :revision_id" } errmsg] } {
-	
+        where revision_id = :revision_id"} errmsg] } {
 	#  if it fails, use user submitted mime_type
 	ns_log notice "form-procs - add_revision_dml - using user mime_type 
 	  instead of guessed mime type = $mime_type"
@@ -856,24 +932,24 @@ ad_proc content::upload_content { revision_id tmpfile filename } {
 
     # delete the tempfile
     ns_unlink $tmpfile
-
 }
 
 
+ad_proc -private content::get_sql_value { name datatype } {
+
+  @private get_sql_value
+
+  Return the sql statement for a column value in an insert or update
+  statement, using a bind variable for the actual value and wrapping it
+  in a conversion function where appropriate.  
+
+  @param name The name of the column and bind variable (they should be
+  the same).
+
+  @param datatype The datatype of the column.
 
 
-# @private get_sql_value
-
-# Return the sql statement for a column value in an insert or update
-# statement, using a bind variable for the actual value and wrapping it
-# in a conversion function where appropriate.  
-
-# @param name The name of the column and bind variable (they should be
-# the same).
-
-# @param datatype The datatype of the column.
-
-ad_proc content::get_sql_value { name datatype } {
+} {
 
   switch $datatype {
       date { set wrapper [db_map string_to_timestamp] }
@@ -883,22 +959,25 @@ ad_proc content::get_sql_value { name datatype } {
   return $wrapper
 }
 
-# @private prepare_content_file
 
-# Looks for an element named "content" in a form and prepares a
-# temporarily file in UTF-8 for uploading to the content repository.
-# Checks for a query variable named "content.tmpfile" to distinguish
-# between file uploads and text entry.  If the type of the file is
-# text, then ensures that is in UTF-8.  Does nothing if the uploaded
-# file is in binary format.
+ad_proc -private content::prepare_content_file { form_name } {
 
-# @param form_name  The name of the form object in which content was submitted.
+  @private prepare_content_file
 
-# @return The path of the temporary file containing the content, or an empty
-#         string if the form does not include a content element or the value
-#         of the element is null.
+  Looks for an element named "content" in a form and prepares a
+  temporarily file in UTF-8 for uploading to the content repository.
+  Checks for a query variable named "content.tmpfile" to distinguish
+  between file uploads and text entry.  If the type of the file is
+  text, then ensures that is in UTF-8.  Does nothing if the uploaded
+  file is in binary format.
 
-ad_proc content::prepare_content_file { form_name } {
+  @param form_name  The name of the form object in which content was submitted.
+
+  @return The path of the temporary file containing the content, or an empty
+          string if the form does not include a content element or the value
+          of the element is null.
+
+} {  
   
   if { ! [template::element exists $form_name content] } { return "" }
 
@@ -930,15 +1009,18 @@ ad_proc content::prepare_content_file { form_name } {
   return $tmpfile
 }
 
-# @private string_to_file
 
-# Write a string in UTF-8 encoding to of temp file so it can be
-# uploaded into a BLOB (which is blind to character encodings).
-# Returns the name of the temp file.
+ad_proc -private content::string_to_file { s } {
 
-# @param s The string to write to the file.
+  @private string_to_file
 
-ad_proc content::string_to_file { s } {
+  Write a string in UTF-8 encoding to of temp file so it can be
+  uploaded into a BLOB (which is blind to character encodings).
+  Returns the name of the temp file.
+
+  @param s The string to write to the file.
+
+} {
 
   set tmp_file [ns_tmpnam]
 
@@ -964,32 +1046,35 @@ namespace eval content {
       is_html default_value datatype]
 }
 
-# @public new_item_form
 
-# Adds elements to an ATS form object for creating an item and its
-# initial revision.  If the form does not already exist, creates the
-# form object and sets its enctype to multipart/form-data to allow for
-# text entries greater than 4000 characters.
+ad_proc -public content::new_item_form { args } {
 
-# @option form_name    	 The name of the ATS form object.  Defaults to 
-#                      	 "new_item".
-# @option content_type 	 The content_type of the item.  Defaults to
-#                      	 "content_revision".
-# @option content_method The method to use for uploading the content body.
-#                        Valid values are "no_content", "text_entry", 
-#                        and "file_upload".
-#                      	 If the content type allows text, defaults to
-#                      	 text entry, otherwise defaults to file upload.
-# @option parent_id    	 The item ID of the parent.  Defaults to null (Parent
-#                      	 is the root folder).
-# @option name         	 The default name of the item.  Default is an empty 
-#                      	 string (User must supply name).
-# @option attributes   	 A list of attribute names for which to create form
-#                      	 elements.
-# @option action       	 The URL to which the form should redirect following
-#                      	 a successful form submission.
+  @public new_item_form
 
-ad_proc content::new_item_form { args } {
+  Adds elements to an ATS form object for creating an item and its
+  initial revision.  If the form does not already exist, creates the
+  form object and sets its enctype to multipart/form-data to allow for
+  text entries greater than 4000 characters.
+
+  @option form_name    	 The name of the ATS form object.  Defaults to 
+                       	 "new_item".
+  @option content_type 	 The content_type of the item.  Defaults to
+                       	 "content_revision".
+  @option content_method The method to use for uploading the content body.
+                         Valid values are "no_content", "text_entry", 
+                         and "file_upload".
+                       	 If the content type allows text, defaults to
+                       	 text entry, otherwise defaults to file upload.
+  @option parent_id    	 The item ID of the parent.  Defaults to null (Parent
+                       	 is the root folder).
+  @option name         	 The default name of the item.  Default is an empty 
+                       	 string (User must supply name).
+  @option attributes   	 A list of attribute names for which to create form
+                       	 elements.
+  @option action       	 The URL to which the form should redirect following
+                       	 a successful form submission.
+
+} {
 
   array set opts [list form_name new_item content_type content_revision \
       parent_id {} name {} content_method {}]
@@ -1046,32 +1131,35 @@ ad_proc content::new_item_form { args } {
   }
 }
 
-# @public add_revision_form
 
-# Adds elements to an ATS form object for adding a revision to an
-# existing item.  If the item already exists, element values default a
-# previous revision (the latest one by default).  If the form does not
-# already exist, creates the form object and sets its enctype to
-# multipart/form-data to allow for text entries greater than 4000
-# characters.
+ad_proc -public content::add_revision_form { args } {
 
-# @option form_name      The name of the ATS form object.  Defaults to 
-#                        "new_item".
-# @option content_type   The content_type of the item.  Defaults to
-#                        "content_revision".
-# @option content_method The method to use for uploading the content body.
-#                        If the content type is text, defaults to
-#                        text entry, otherwise defaults to file upload.
-# @option item_id        The item ID of the revision.  Defaults to null 
-#                        (item_id must be set by the calling code).
-# @option revision_id    The revision ID from which to draw default values.  
-#                        Defaults to the latest revision
-# @option attributes     A list of attribute names for which to create form
-#                        elements.
-# @option action         The URL to which the form should redirect following
-#                        a successful form submission.
+  @public add_revision_form
 
-ad_proc content::add_revision_form { args } {
+  Adds elements to an ATS form object for adding a revision to an
+  existing item.  If the item already exists, element values default a
+  previous revision (the latest one by default).  If the form does not
+  already exist, creates the form object and sets its enctype to
+  multipart/form-data to allow for text entries greater than 4000
+  characters.
+
+  @option form_name      The name of the ATS form object.  Defaults to 
+                         "new_item".
+  @option content_type   The content_type of the item.  Defaults to
+                         "content_revision".
+  @option content_method The method to use for uploading the content body.
+                         If the content type is text, defaults to
+                         text entry, otherwise defaults to file upload.
+  @option item_id        The item ID of the revision.  Defaults to null 
+                         (item_id must be set by the calling code).
+  @option revision_id    The revision ID from which to draw default values.  
+                         Defaults to the latest revision
+  @option attributes     A list of attribute names for which to create form
+                         elements.
+  @option action         The URL to which the form should redirect following
+                         a successful form submission.
+
+} {
 
   array set opts [list form_name add_revision content_type content_revision \
       item_id {} content_method {} revision_id {}]
@@ -1132,21 +1220,25 @@ ad_proc content::add_revision_form { args } {
   }
 }
 
-# @public add_attribute_elements
 
-# Add form elements to an ATS form object for all attributes of a
-# content type.
-
-# @param form_name   	 The name of the ATS form object to which objects
-#                    	 should be added.
-# @param content_type	 The content type keyword for which attribute
-#                    	 widgets should be added.
-# @param revision_id     The revision from which default values should be
-#                        queried
-# @return The list of attributes that were added.
-
-ad_proc content::add_attribute_elements { form_name content_type \
+ad_proc -public content::add_attribute_elements { form_name content_type \
   { revision_id "" } } {
+
+  @public add_attribute_elements
+
+  Add form elements to an ATS form object for all attributes of a
+  content type.
+
+  @param form_name   	 The name of the ATS form object to which objects
+                     	 should be added.
+  @param content_type	 The content type keyword for which attribute
+                     	 widgets should be added.
+  @param revision_id     The revision from which default values should be
+                         queried
+  @return The list of attributes that were added.
+
+
+} {
 
   # query for attributes in the appropriate order
   set attribute_list [get_attributes $content_type object_type attribute_name]
@@ -1191,22 +1283,25 @@ ad_proc content::add_attribute_elements { form_name content_type \
   return $attribute_names
 }
 
-# @public add_attribute_element
 
-# Add a form element (possibly a compound widget) to an ATS form object.
-# for entering or editing an attribute value.
-
-# @param form_name 	   The name of the ATS form object to which the element
-#                  	   should be added.
-# @param content_type      The content type keyword to which this attribute
-#                          belongs.
-# @param attribute 	   The name of the attribute, as represented in the
-#                  	   attribute_name column of the acs_attributes table.
-# @param attribute_data    Optional nested list of parameter data for the
-#                          the attribute (generated by get_attribute_params).
-
-ad_proc content::add_attribute_element { 
+ad_proc -public content::add_attribute_element { 
   form_name content_type attribute { attribute_data "" } } {
+
+  @public add_attribute_element
+
+  Add a form element (possibly a compound widget) to an ATS form object.
+  for entering or editing an attribute value.
+
+  @param form_name 	   The name of the ATS form object to which the element
+                   	   should be added.
+  @param content_type      The content type keyword to which this attribute
+                           belongs.
+  @param attribute 	   The name of the attribute, as represented in the
+                   	   attribute_name column of the acs_attributes table.
+  @param attribute_data    Optional nested list of parameter data for the
+                           the attribute (generated by get_attribute_params).
+
+} {
 
   variable columns
 
@@ -1262,7 +1357,8 @@ ad_proc content::add_attribute_element {
   lappend command -label $param(pretty_name) -widget $param(widget) \
 	  -datatype $param(datatype)
   
-  if { [string equal $param(widget_is_required) f] } {
+  # changed from widget_is_required to param_is_required (OpenACS - DanW)
+  if { [string equal $param(param_is_required) f] } {
       lappend command -optional
   }
 
@@ -1270,16 +1366,19 @@ ad_proc content::add_attribute_element {
   eval $command
 }
 
-# @public add_content_element
-
-# Adds a content input element to an ATS form object.
-
-# @param form_name      The name of the form to which the object should be
-#                       added.
-# @param content_method One of no_content, text_entry or file_upload
  
-ad_proc content::add_content_element { 
+ad_proc -public content::add_content_element { 
   form_name content_method { section_name "Content" } } {
+
+  @public add_content_element
+
+  Adds a content input element to an ATS form object.
+
+  @param form_name      The name of the form to which the object should be
+                        added.
+  @param content_method One of no_content, text_entry or file_upload
+
+} {
 
   template::element create $form_name content_method \
 	  -datatype keyword \
@@ -1334,21 +1433,25 @@ ad_proc content::add_content_element {
   }
 }
 
-# @public add_child_relation_element
-#
-# Add a select box listing all valid child relation tags.
-# The form must contain a parent_id element and a content_type element.
-# If the elements do not exist, or if there are no valid relation tags,
-# this proc does nothing. 
-#
-# @param form_name  The name of the form 
-#
-# @option section {<i>none</i>} If present, creates a new form section
-#   for the element. 
-#
-# @option label {Child relation tag} The label for the element
 
 ad_proc content::add_child_relation_element { form_name args } {
+
+  @public add_child_relation_element
+ 
+  Add a select box listing all valid child relation tags.
+  The form must contain a parent_id element and a content_type element.
+  If the elements do not exist, or if there are no valid relation tags,
+  this proc does nothing. 
+ 
+  @param form_name  The name of the form 
+ 
+  @option section {<i>none</i>} If present, creates a new form section
+    for the element. 
+ 
+  @option label {Child relation tag} The label for the element
+
+
+} {
   
   # Process parameters
 
@@ -1422,17 +1525,19 @@ ad_proc content::add_child_relation_element { form_name args } {
 }
 
 
-# @private get_widget_param_value
-
-# Utility procedure to return the value of a widget parameter
-
-# @param array_ref     The name of an array in the calling frame
-#                      containing parameter data selected from the form 
-#                      metadata.
-# @param content_type  The current content type; defaults to content_revision
-
-ad_proc content::get_widget_param_value { 
+ad_proc -private content::get_widget_param_value { 
   array_ref {content_type content_revision}
+} {
+
+  @private get_widget_param_value
+
+  Utility procedure to return the value of a widget parameter
+
+  @param array_ref     The name of an array in the calling frame
+                       containing parameter data selected from the form 
+                       metadata.
+  @param content_type  The current content type; defaults to content_revision
+
 } {
 
   upvar $array_ref param
@@ -1469,17 +1574,20 @@ ad_proc content::get_widget_param_value {
   return $value
 }
 
-# @private get_type_attribute_params
 
-# Query for attribute form metadata
+ad_proc -private content::get_type_attribute_params { args } {
 
-# @param args Any number of object types
+  @private get_type_attribute_params
 
-# @return A list of attribute parameters nested by object_type, attribute_name
-#         and the is_html flag.  For attributes with no parameters,
-#         there is a single entry with is_html as null.
+  Query for attribute form metadata
 
-ad_proc content::get_type_attribute_params { args } {
+  @param args Any number of object types
+
+  @return A list of attribute parameters nested by object_type, attribute_name
+          and the is_html flag.  For attributes with no parameters,
+          there is a single entry with is_html as null.
+
+} {
 
   variable columns
 
@@ -1499,16 +1607,19 @@ ad_proc content::get_type_attribute_params { args } {
   return $attribute_data
 }
 
-# @private get_attribute_params
 
-# Query for parameters associated with a particular attribute
+ad_proc -private content::get_attribute_params { content_type attribute_name } {
 
-# @param content_type      The content type keyword to which this attribute
-#                          belongs.
-# @param attribute_name	   The name of the attribute, as represented in the
-#                  	   attribute_name column of the acs_attributes table.
+  @private get_attribute_params
 
-ad_proc content::get_attribute_params { content_type attribute_name } {
+  Query for parameters associated with a particular attribute
+
+  @param content_type      The content type keyword to which this attribute
+                           belongs.
+  @param attribute_name	   The name of the attribute, as represented in the
+                   	   attribute_name column of the acs_attributes table.
+
+} {
 
   variable columns
 
@@ -1526,19 +1637,22 @@ ad_proc content::get_attribute_params { content_type attribute_name } {
   return $attribute_data
 }
 
-# @private set_attribute_values
 
-# Set the default values for attribute elements in ATS form object
-# based on a previous revision
-
-# @param form_name         The name of the ATS form object containing
-#                          the attribute elements.
-# @param content_type      The type of item being revised in the form.
-# @param revision_id       The revision ID from where to get the default values
-# @param attributes        The list of attributes whose values should be set.
-
-ad_proc content::set_attribute_values { form_name content_type revision_id \
+ad_proc -private content::set_attribute_values { form_name content_type revision_id \
     attributes } {
+
+  @private set_attribute_values
+
+  Set the default values for attribute elements in ATS form object
+  based on a previous revision
+
+  @param form_name         The name of the ATS form object containing
+                           the attribute elements.
+  @param content_type      The type of item being revised in the form.
+  @param revision_id       The revision ID from where to get the default values
+  @param attributes        The list of attributes whose values should be set.
+
+} {
 
   if { [llength $attributes] == 0 } {
     set attributes [get_attributes $content_type]
@@ -1594,30 +1708,36 @@ ad_proc content::set_attribute_values { form_name content_type revision_id \
     
 }
 
-# @private set_content_value
 
-# Set the default value for the content text area in an ATS form object
-# based on a previous revision
+ad_proc -private content::set_content_value { form_name revision_id } {
 
-# @param form_name         The name of the ATS form object containing
-#                          the content element.
-# @param revision_id       The revision ID of the content to revise
+  @private set_content_value
 
-ad_proc content::set_content_value { form_name revision_id } {
+  Set the default value for the content text area in an ATS form object
+  based on a previous revision
+
+  @param form_name         The name of the ATS form object containing
+                           the content element.
+  @param revision_id       The revision ID of the content to revise
+
+} {
 
   set content [get_content_value $revision_id]
 
   template::element set_properties $form_name content -value $content
 }
 
-# @private get_default_content_method
 
-# Gets the content input method most appropriate for an content type,
-# based on the MIME types that are registered for that content type.
+ad_proc -private content::get_default_content_method { content_type } {
 
-# @param content_type  The content type for which an input method is needed.
+  @private get_default_content_method
 
-ad_proc content::get_default_content_method { content_type } {
+  Gets the content input method most appropriate for an content type,
+  based on the MIME types that are registered for that content type.
+
+  @param content_type  The content type for which an input method is needed.
+
+} {
 
   template::query count_mime_type is_text onevalue "select count(*) from cr_content_mime_type_map
     where content_type = :content_type and mime_type like 'text/%'"
@@ -1635,17 +1755,20 @@ ad_proc content::get_default_content_method { content_type } {
 # Procedure wrappers for basic ACS Object and Content Repository queries 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-# @private get_type_info
 
-# Return specified columns from the acs_object_types table.
+ad_proc -private content::get_type_info { object_type ref args } {
 
-# @param object_type Object type key for which info is required.
-# @param ref         If no further arguments, name of the column value to
-#                    return.  If further arguments are specified, name of 
-#                    the array in which to store info in the calling
-# @param args        Column names to query.
+  @private get_type_info
 
-ad_proc content::get_type_info { object_type ref args } {
+  Return specified columns from the acs_object_types table.
+
+  @param object_type Object type key for which info is required.
+  @param ref         If no further arguments, name of the column value to
+                     return.  If further arguments are specified, name of 
+                     the array in which to store info in the calling
+  @param args        Column names to query.
+
+} {
 
   if { [llength $args] == 0 } {
 
@@ -1671,16 +1794,19 @@ ad_proc content::get_type_info { object_type ref args } {
   }
 }
 
-# @public get_object_id
 
-# Grab an object ID for creating a new ACS object.
+ad_proc -public content::get_object_id {} {
 
-ad_proc content::get_object_id {} {
+  @public get_object_id
+
+  Grab an object ID for creating a new ACS object.
+
+} {
 
   return [db_string nextval "select acs_object_id_seq.nextval from dual"]
 }
 
-ad_proc content::get_content_value { revision_id } {
+ad_proc -public content::get_content_value { revision_id } {
 
   db_transaction {
       db_exec_plsql gcv_get_revision_id {
@@ -1704,17 +1830,20 @@ ad_proc content::get_content_value { revision_id } {
   return $content
 }
 
-# @private get_attributes
 
-# Returns columns from the acs_attributes table for all attributes
-# associated with a content type.
+ad_proc -private content::get_attributes { content_type args } {
 
-# @param content_type The name of the content type (ACS Object Type)
-# for which to obtain the list of attributes.
-# @param args Names of columns to query.  If no columns are specified,
-# returns a simple list of attribute names.
+  @private get_attributes
 
-ad_proc content::get_attributes { content_type args } {
+  Returns columns from the acs_attributes table for all attributes
+  associated with a content type.
+
+  @param content_type The name of the content type (ACS Object Type)
+  for which to obtain the list of attributes.
+  @param args Names of columns to query.  If no columns are specified,
+  returns a simple list of attribute names.
+
+} {
 
   if { [llength $args] == 0 } {
     set args [list attribute_name]
@@ -1753,15 +1882,18 @@ ad_proc content::get_attributes { content_type args } {
   return $attributes
 }
 
-# @public get_attribute_enum_values
 
-# Returns a list of { pretty_name enum_value } for an attribute of
-# datatype enumeration.
+ad_proc -public content::get_attribute_enum_values { attribute_id } {
 
-# @param attribute_id   The primary key of the attribute as in the
-#                       attribute_id column of the acs_attributes table.
+  @public get_attribute_enum_values
 
-ad_proc content::get_attribute_enum_values { attribute_id } {
+  Returns a list of { pretty_name enum_value } for an attribute of
+  datatype enumeration.
+
+  @param attribute_id   The primary key of the attribute as in the
+                        attribute_id column of the acs_attributes table.
+
+} {
 
   template::query gaev_get_enum_values enum multilist "
            select
@@ -1778,13 +1910,15 @@ ad_proc content::get_attribute_enum_values { attribute_id } {
   return $enum
 }
 
-# @public get_latest_revision
+ad_proc -public content::get_latest_revision { item_id } {
 
-# Get the ID of the latest revision for the specified content item.
+  @public get_latest_revision
 
-# @param item_id  The ID of the content item.
+  Get the ID of the latest revision for the specified content item.
 
-ad_proc content::get_latest_revision { item_id } {
+  @param item_id  The ID of the content item.
+
+} {
 
   template::query glr_get_latest_revision latest_revision onevalue "
     select content_item.get_latest_revision(:item_id) from dual"
@@ -1793,59 +1927,69 @@ ad_proc content::get_latest_revision { item_id } {
 }
 
 
-# @public add_basic_revision
+ad_proc -public content::add_basic_revision { item_id revision_id title args } {
 
-# Create a basic new revision using the content_revision PL/SQL API.
+  @public add_basic_revision
 
-# @param item_id
-# @param revision_id
-# @param title
+  Create a basic new revision using the content_revision PL/SQL API.
 
-# @option description
-# @option mime_type
-# @option text
-# @option tmpfile
-# RBM: FIX ME. Not sure if this will work because of line 1822
-ad_proc content::add_basic_revision { item_id revision_id title args } {
+  @param item_id
+  @param revision_id
+  @param title
+
+  @option description
+  @option mime_type
+  @option text
+  @option tmpfile
+
+} {
 
   template::util::get_opts $args
 
   set creation_ip [ns_conn peeraddr]
   set creation_user [User::getID]
 
-  set sql [db_map abr_new_revision_title]
-  
-  foreach param { description publish_date mime_type nls_language text } {
+  set param_sql ""
+  array set defaults [list description "" mime_type "text/plain" text " "]
+  foreach param { description mime_type text } {
 
     if { [info exists opts($param)] } {
-	set $param $opts($param)
-	append sql [db_map abr_new_revision_$param]
+      set $param $opts($param)
+      append param_sql ", $param => :$param"
     } else {
-	append sql [db_map abr_new_revision_${param}_ne]
+      set $param $defaults($param)
     }
   }
 
-  append sql [db_map abr_new_revision_end_items]
+  db_transaction {
 
-  db_transaction " db_exec_plsql abr_new_revision_final $sql -bind revision_id "
+      set revision_id [db_exec_plsql basic_get_revision_id "begin :1 := content_revision.new(
+               item_id       => content_symlink.resolve(:item_id),
+               revision_id   => :revision_id,
+               title         => :title,
+               creation_ip   => :creation_ip,
+               creation_user => :creation_user $param_sql); end;"]
 
-  if { [info exists opts(tmpfile)] } {
+      if { [info exists opts(tmpfile)] } {
 
-    update_content_from_file $revision_id $opts(tmpfile)
+          update_content_from_file $revision_id $opts(tmpfile)
+      }
   }
 }
 
-# @private update_content_from_file
 
-# Update the BLOB column of a revision with the contents of a file
+ad_proc -private content::update_content_from_file { revision_id tmpfile } {
 
-# @param revision_id The object ID of the revision to update.
-# @param tmpfile     The name of a temporary file containing the content.
-#                    The file is deleted following the update.
+  @private update_content_from_file
 
-ad_proc content::update_content_from_file { revision_id tmpfile } {
+  Update the BLOB column of a revision with the contents of a file
 
-  set file_upload "
+  @param revision_id The object ID of the revision to update.
+  @param tmpfile     The name of a temporary file containing the content.
+                     The file is deleted following the update.
+
+} {
+
 
   db_dml upcff_update_cr_revisions "
     update cr_revisions 
@@ -1857,22 +2001,24 @@ ad_proc content::update_content_from_file { revision_id tmpfile } {
 
 
 
-# @public copy_latest_content
+ad_proc -public content::copy_content { revision_id_src revision_id_dest } {
 
-# Update the BLOB column of one revision with the content of another revision
+  @public copy_latest_content
 
-# @param revision_id_src  The object ID of the revision with the content to be 
-# copied.
+  Update the BLOB column of one revision with the content of another revision
 
-# @param revision_id_dest  The object ID of the revision to be updated.
-# copied.
+  @param revision_id_src  The object ID of the revision with the content to be 
+  copied.
 
-ad_proc content::copy_content { revision_id_src revision_id_dest } {
+  @param revision_id_dest  The object ID of the revision to be updated.
+  copied.
+
+} {
 
     db_transaction {
 
 	# copy the content from the source to the target
-	db_dml cc_copy_content {
+	db_exec_plsql cc_copy_content {
            begin
              content_revision.content_copy (
               revision_id      => :revision_id_src,
@@ -1896,14 +2042,15 @@ ad_proc content::copy_content { revision_id_src revision_id_dest } {
 }
 
 
+ad_proc -public content::add_content { form_name revision_id } {
 
-# @public add_content
+  @public add_content
 
-# Update the BLOB column of a revision with content submitted in a form
+  Update the BLOB column of a revision with content submitted in a form
 
-# @param revision_id  The object ID of the revision to be updated.
+  @param revision_id  The object ID of the revision to be updated.
 
-ad_proc content::add_content { form_name revision_id } {
+} {
     
     # if content exists, prepare it for insertion
     if { [template::element exists $form_name content] } {
@@ -1921,15 +2068,16 @@ ad_proc content::add_content { form_name revision_id } {
     } 
 }
 
+ad_proc -public content::validate_name { form_name } {
 
+  @public validate_name
 
-# @public validate_name
+  Make sure that name is unique for the folder
 
-# Make sure that name is unique for the folder
+  @param form_name The name of the form (containing name and parent_id)
+  @return 0 if there are items with the same name, 1 otherwise
 
-# @param form_name The name of the form (containing name and parent_id)
-# @return 0 if there are items with the same name, 1 otherwise
-ad_proc content::validate_name { form_name } {
+} {
     set name [template::element get_value $form_name name] 
     set parent_id [template::element get_value $form_name parent_id]
 

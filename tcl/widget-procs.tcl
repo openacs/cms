@@ -7,29 +7,32 @@
 namespace eval widget {}
 
 
-# @public param_element_create
-# Dipatches subprocs to generate the form elements for
-#   setting an attribute widget param
 
-# @param form Name of the form in which to generate the form elements
-
-# @param param Name of the form widget param for which to generate a
-# form element
-
-# @param order The order that the param form widget will appear in the form
-
-# @param param_id The ID of the form widget param
-
-# @param default The default value of the form widget param
-
-# @param is_required Flag indicating whether the form widget param is
-# optional or required
-
-# @param param_source The default source of the value of the form widget
-# param.  One of literal, eval, query
-
-proc widget::param_element_create { form param order param_id \
+ad_proc -public widget::param_element_create { form param order param_id \
 	{default ""} {is_required ""} {param_source ""}} {
+
+  @public param_element_create
+  Dipatches subprocs to generate the form elements for
+    setting an attribute widget param
+
+  @param form Name of the form in which to generate the form elements
+
+  @param param Name of the form widget param for which to generate a
+  form element
+
+  @param order The order that the param form widget will appear in the form
+
+  @param param_id The ID of the form widget param
+
+  @param default The default value of the form widget param
+
+  @param is_required Flag indicating whether the form widget param is
+  optional or required
+
+  @param param_source The default source of the value of the form widget
+  param.  One of literal, eval, query
+
+} {
 
     template::element create $form param_$order \
 	    -datatype keyword \
@@ -47,17 +50,20 @@ proc widget::param_element_create { form param order param_id \
 }
 
 
-# @private create_param_type
 
-# Create default param_type form widget for adding/editing 
-# metadata form widgets
+ad_proc -private widget::create_param_type { form order } {
 
-# @author Michael Pih
+  @private create_param_type
 
-# @param form The name of the form
-# @param order The order of placement of the form widget within the form
+  Create default param_type form widget for adding/editing 
+  metadata form widgets
 
-proc widget::create_param_type { form order } {
+  @author Michael Pih
+
+  @param form The name of the form
+  @param order The order of placement of the form widget within the form
+
+} {
     template::element create $form param_type_$order \
 	    -datatype keyword \
 	    -widget select \
@@ -70,19 +76,22 @@ proc widget::create_param_type { form order } {
 }
 
 
-# @private create_param_source
 
-# Create default param_source form widget for adding/editing metadata
-# form widgets
+ad_proc -private widget::create_param_source { form order param_source } {
 
-# @author Michael Pih
+  @private create_param_source
 
-# @param form
-# @param order The order of placement of the form widget within the form
-# @param param_source The default param source of the metadata widget
-#        (literal, query, eval) 
+  Create default param_source form widget for adding/editing metadata
+  form widgets
 
-proc widget::create_param_source { form order param_source } {
+  @author Michael Pih
+
+  @param form
+  @param order The order of placement of the form widget within the form
+  @param param_source The default param source of the metadata widget
+         (literal, query, eval) 
+
+} {
     template::element create $form param_source_$order \
 	    -datatype keyword \
 	    -widget select \
@@ -92,20 +101,21 @@ proc widget::create_param_source { form order param_source } {
 }
 
 
+ad_proc -private widget::create_param_value { form order default is_required } {
 
-# @private create_param_value
+  @private create_param_value
 
-# Create default param_value form widget for adding/editing metadata form
-# widgets
+  Create default param_value form widget for adding/editing metadata form
+  widgets
 
-# @author Michael Pih
+  @author Michael Pih
 
-# @param form The name of the form
-# @param order The order of placement of the form widget within the form
-# @param is_required A flag indicating whether the value of the form widget
-#        param is mandatory
+  @param form The name of the form
+  @param order The order of placement of the form widget within the form
+  @param is_required A flag indicating whether the value of the form widget
+         param is mandatory
 
-proc widget::create_param_value { form order default is_required } {
+} {
 
     if { ![template::util::is_nil is_required] } {
 	template::element create $form param_value_$order \
@@ -126,21 +136,24 @@ proc widget::create_param_value { form order default is_required } {
     }
 }
 
-# @private create_text_param
 
-# Create default text param form widget for adding/editing metadata form
-# widgets
+ad_proc -private widget::create_text_param { form order default is_required param_source} {
 
-# @author Michael Pih
+  @private create_text_param
 
-# @param form The name of the form
-# @param default The default value for the form widget param value
-# @param is_required A flag indicating whether the value of the form widget
-#        param is mandatory
-# @param param_source The deafult param source for the form widget param 
-#         value (literal, query, eval)
+  Create default text param form widget for adding/editing metadata form
+  widgets
 
-proc widget::create_text_param { form order default is_required param_source} {
+  @author Michael Pih
+
+  @param form The name of the form
+  @param default The default value for the form widget param value
+  @param is_required A flag indicating whether the value of the form widget
+         param is mandatory
+  @param param_source The deafult param source for the form widget param 
+          value (literal, query, eval)
+
+} {
     template::element create $form param_type_$order \
 	    -datatype keyword \
 	    -widget hidden \
@@ -153,23 +166,26 @@ proc widget::create_text_param { form order default is_required param_source} {
 
 
 
-# @private create_options_param
 
-# Create the options param form widget for adding/editing metadata form
-# widgets
-
-# @author Michael Pih
-
-# @param form The name of the form
-# @param order The order of placement of the form widget within the form
-# @param default The default value of the form widget param value
-# @param is_required A flag indicating whether the form widget param
-#        value is mandatory
-# @param param_source The default param source for the form widget param 
-#         value (literal, query, eval)
-
-proc widget::create_options_param { form order default is_required \
+ad_proc -private widget::create_options_param { form order default is_required \
 	param_source} {
+
+  @private create_options_param
+
+  Create the options param form widget for adding/editing metadata form
+  widgets
+
+  @author Michael Pih
+
+  @param form The name of the form
+  @param order The order of placement of the form widget within the form
+  @param default The default value of the form widget param value
+  @param is_required A flag indicating whether the form widget param
+         value is mandatory
+  @param param_source The default param source for the form widget param 
+          value (literal, query, eval)
+
+} {
     
     template::element create $form param_type_$order \
 	    -datatype keyword \
@@ -181,22 +197,25 @@ proc widget::create_options_param { form order default is_required \
 }
 
 
-# @private create_values_param
 
-# Create the values param form widget for adding/editing metadata widgets
+ad_proc -private widget::create_values_param { form order default is_required param_source} {
 
-# @author Michael Pih
+  @private create_values_param
 
-# @param form The name of the form
-# @param order The order of placement of the form widget within the 
-#        metadata form
-# @param default The default value of the form widget param value
-# @param is_required A flag indicating whether the form widget param value
-#        is mandatory
-# @param param_source The default param_source for the form widget param 
-#        value (literal, query, eval)
+  Create the values param form widget for adding/editing metadata widgets
 
-proc widget::create_values_param { form order default is_required param_source} {
+  @author Michael Pih
+
+  @param form The name of the form
+  @param order The order of placement of the form widget within the 
+         metadata form
+  @param default The default value of the form widget param value
+  @param is_required A flag indicating whether the form widget param value
+         is mandatory
+  @param param_source The default param_source for the form widget param 
+         value (literal, query, eval)
+
+} {
     
     template::element create $form param_type_$order \
 	    -datatype keyword \
@@ -210,26 +229,28 @@ proc widget::create_values_param { form order default is_required param_source} 
 
 
 
-# @private process_param
 
-# Edits a metadata form widget parameter from the form
+ad_proc -private widget::process_param { form order content_type attribute_name } {    
 
-# @author Michael Pih
+  @private process_param
 
-# @param db A database handle
-# @param form The name of the form
-# @param order The order of placement of the param form widgets within the form
-# @param content_type The content type to which the attribute belongs
-# @param attribute_name The name of the attribute
+  Edits a metadata form widget parameter from the form
 
-ad_proc widget::process_param { form order content_type attribute_name } {    
+  @author Michael Pih
+
+  @param db A database handle
+  @param form The name of the form
+  @param order The order of placement of the param form widgets within the form
+  @param content_type The content type to which the attribute belongs
+  @param attribute_name The name of the attribute
+
+} {
     template::form get_values $form \
 	    param_$order param_type_$order \
 	    param_source_$order param_value_$order
  
-    set sql 
 
-    db_dml pp_proces_param "
+    db_exec_plsql pp_proces_param "
       begin
       cm_form_widget.set_attribute_param_value (
           content_type   => :content_type,
@@ -264,15 +285,18 @@ ad_proc widget::process_param { form order content_type attribute_name } {
 namespace eval cm_widget {}
 
 
-# @private validate_description
 
-# Make sure that description <= 4000 bytes
+ad_proc -private cm_widget::validate_description { value } {
 
-# @author Michael Pih
+  @private validate_description
 
-# @param value The submitted value of the description form element
+  Make sure that description <= 4000 bytes
 
-proc cm_widget::validate_description { value } {
+  @author Michael Pih
+
+  @param value The submitted value of the description form element
+
+} {
 
     set result 1
     if { [string bytelength $value] > 4000 } {

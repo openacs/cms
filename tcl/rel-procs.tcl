@@ -6,17 +6,20 @@
 namespace eval cms_rel {}
 
 
-# @public sort_related_item_order
 
-# Resort the related items order for a given content item, ensuring that
-#  order_n is unique for an item_id.  Chooses new order based on the old
-#  order_n and then rel_id (the order the item was related)
+ad_proc -public cms_rel::sort_related_item_order { item_id } {
 
-# @author Michael Pih
+ @public sort_related_item_order
 
-# @param item_id The item for which to resort related items
+ Resort the related items order for a given content item, ensuring that
+  order_n is unique for an item_id.  Chooses new order based on the old
+  order_n and then rel_id (the order the item was related)
 
-ad_proc cms_rel::sort_related_item_order { item_id } {
+ @author Michael Pih
+
+ @param item_id The item for which to resort related items
+
+} {
 
     db_transaction {
 
@@ -48,18 +51,19 @@ ad_proc cms_rel::sort_related_item_order { item_id } {
 }
 
 
+ad_proc -public cms_rel::sort_child_item_order { item_id } {
 
-# @public sort_child_item_order
+ @public sort_child_item_order
 
-# Resort the child items order for a given content item, ensuring that
-#  order_n is unique for an item_id.  Chooses new order based on the old
-#  order_n and then rel_id (the order the item was related)
+ Resort the child items order for a given content item, ensuring that
+  order_n is unique for an item_id.  Chooses new order based on the old
+  order_n and then rel_id (the order the item was related)
 
-# @author Michael Pih
+ @author Michael Pih
 
-# @param item_id The item for which to resort child items
+ @param item_id The item for which to resort child items
 
-ad_proc cms_rel::sort_child_item_order { item_id } {
+} {
 
     db_transaction {
 

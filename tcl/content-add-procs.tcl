@@ -19,7 +19,20 @@ namespace eval content_add {}
 # @param content_type The content type of the item
 # @param item_id The item id
 
-ad_proc content_add::content_method_html { content_type item_id } {
+ad_proc -public content_add::content_method_html { content_type item_id } {
+
+
+  @public content_method_html
+
+  Generates HTML stub for revision content method choices for a content item
+
+  @author Michael Pih
+
+  @param db A database handle
+  @param content_type The content type of the item
+  @param item_id The item id
+
+} {
     
     set content_method_html ""
 

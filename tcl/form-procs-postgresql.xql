@@ -13,19 +13,19 @@
       widget, param,
       coalesce( (select param_type from cm_attribute_widget_params
                  where attribute_id = attributes.attribute_id
-                 and param_id = params.param_id), 'literal' ) param_type, 
+                 and param_id = params.param_id), 'literal' ) as param_type, 
       coalesce( (select param_source from cm_attribute_widget_params
                  where attribute_id = attributes.attribute_id
-                 and param_id = params.param_id), 'onevalue' ) param_source, 
+                 and param_id = params.param_id), 'onevalue' ) as param_source, 
       coalesce( (select value from cm_attribute_widget_params
                  where attribute_id = attributes.attribute_id
                  and param_id = params.param_id), 
-                 params.default_value ) value
+                 params.default_value ) as value
     from
       (
         select
           aw.attribute_id, fwp.param,
-          aw.widget, decode(aw.is_required,'t','t',fwp.is_required) is_required,
+          aw.widget, case when aw.is_required = 't' then 't' else fwp.is_required end as is_required,
           fwp.param_id, fwp.default_value, fwp.is_html
         from
           cm_form_widget_params fwp, cm_attribute_widgets aw
@@ -39,7 +39,7 @@
           types.object_type, types.pretty_name as type_label, 
           tree_level, types.table_name
         from
-          acs_attributes attr RIGHT OUTER JOIN,
+          acs_attributes attr join
           (
             select 
               o2.object_type, o2.pretty_name, tree_level(o2.tree_sortkey) as tree_level,
@@ -138,7 +138,7 @@
             types.table_name, types.id_column, attr.attribute_name,
             attr.datatype
           from 
-            acs_attributes attr,
+            acs_attributes attr right outer join
             ( select 
                 o2.object_type, o2.table_name, o2.id_column,
 		tree_level(o2.tree_sortkey) as inherit_level
@@ -182,16 +182,44 @@
                      
       </querytext>
 </fullquery>
+ 
+<fullquery name="content::upload_content.upload_revision">      
+      <querytext>
 
-<fullquery name="content::upload_content.update_cr_revisions">
-	<querytext>
 
-      update cr_revisions 
-      set content = [set __lob_id [db_string get_id "select empty_lob()"]]
-      where revision_id = :revision_id
+        update cr_revisions 
+        set content = '[read [set __f [open $tmpfile r]]] [close $__f]',
+        content_length = '[file size $tmpfile]'
+        where revision_id = :revision_id
 
-	</querytext>
+      </querytext>
 </fullquery>
+
+<fullquery name="content::upload_content.upload_text_revision">      
+      <querytext>
+
+        update 
+          cr_revisions 
+        set 
+          content = '[DoubleApos [read [set __f [open $tmpfile r]]]][close $__f]',
+          content_length = [file size $tmpfile]
+        where 
+          revision_id = :revision_id
+      
+      </querytext>
+</fullquery>
+
+
+<fullquery name="content::upload_content.upload_revision">      
+      <querytext>
+
+             update cr_revisions 
+             set content = [set __lob_id [db_string new_lob "select empty_lob()"]]
+             where revision_id = :revision_id
+      
+      </querytext>
+</fullquery>
+
 
 <partialquery name="content::get_sql_value.string_to_timestamp">
 	<querytext>
@@ -221,7 +249,7 @@
 <fullquery name="content::add_child_relation_element.get_parent_title">
 	<querytext>
 
-      select content_item__get_title(:parent_id)
+      select content_item__get_title(:parent_id, 'f')
 
 	</querytext>
 </fullquery>
@@ -237,9 +265,22 @@
 <fullquery name="content::get_content_value.gcv_get_revision_id">
 	<querytext>
 
-	    select content_revision__to_temporary_clob(:revision_id) as revision_id;
+        select 1
 
 	</querytext>
+</fullquery>
+
+<fullquery name="content::get_content_value.gcv_get_previous_content">      
+      <querytext>
+      
+    select 
+      content
+    from 
+      cr_revisions
+    where 
+      revision_id = :revision_id
+  
+      </querytext>
 </fullquery>
 
 <fullquery name="content::get_attributes.ga_get_attributes">
@@ -297,79 +338,25 @@
 	</querytext>
 </fullquery>
 
-<partialquery name="content::add_basic_revision.abr_new_revision_title">
-	<querytext>
+<fullquery name="content::add_basic_revision.basic_get_revision_id">      
+      <querytext>
 
-   select content_revision__new(:title
+        select content_revision__new(
+               :title,
+               :description,
+               now(),
+               :mime_type,
+               null,
+               :text,
+               content_symlink__resolve(:item_id),
+               :revision_id,
+               now(),
+               :creation_user,
+               :creation_ip)
 
-	</querytext>
-</partialquery>
+      </querytext>
+</fullquery>
 
-<partialquery name="content::add_basic_revision.abr_new_revision_description">
-	<querytext>
-         , :description
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_publish_date">
-	<querytext>
-         , :publish_date
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_mime_type">
-	<querytext>
-         , :mime_type
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_nls_language">
-	<querytext>
-         , :nls_language
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_text">
-	<querytext>
-         , :text
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_description_ne">
-	<querytext>
-         , null
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_publish_date_ne">
-	<querytext>
-         , now()
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_mime_type_ne">
-	<querytext>
-         , 'text/plain'
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_nls_language_ne">
-	<querytext>
-         , null
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_text_ne">
-	<querytext>
-         , ' '
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_end_items">
-	<querytext>
-         , content_symlink__resolve(:item_id), :revision_id, now(), :creation_ip, :creation_user) as revision_id
-	</querytext>
-</partialquery>
 
 <fullquery name="content::update_content_from_file.upcff_update_cr_revisions">
 	<querytext>

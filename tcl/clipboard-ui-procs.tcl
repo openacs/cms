@@ -2,16 +2,19 @@
 # Procedures to manipulate clipped items
 #########################################
 
-# Create a form for representing clipped items,
-# also start a multirow datasource for the items
-# The columns created for the multirow datasource by default are
-# mount_point, item_id, title, checked, html
-#
-# row_code is the code to execute for each row that is added;
-#   will usually create
-# element_names are the names of all the extra elements that will
-#   be created for each row of the form
-proc clipboard::ui::form_create { form_name args } {
+ad_proc -public clipboard::ui::form_create { form_name args } {
+
+  Create a form for representing clipped items,
+  also start a multirow datasource for the items
+  The columns created for the multirow datasource by default are
+  mount_point, item_id, title, checked, html
+ 
+  row_code is the code to execute for each row that is added;
+    will usually create
+  element_names are the names of all the extra elements that will
+    be created for each row of the form
+
+} {
   
   set default_columns [list mount_point item_id title checked]
 
@@ -36,10 +39,13 @@ proc clipboard::ui::form_create { form_name args } {
   set form_properties(row_elements) $elements
 }
 
-# Append a row to the multirow datasource
-# If the -checked switch is specified, checks the box by default
-# If the -eval switch is specified, executes the passed-in code
-proc clipboard::ui::add_row { form_name mount_point item_id title args} {
+ad_proc -public clipboard::ui::add_row { form_name mount_point item_id title args} {
+
+  Append a row to the multirow datasource
+  If the -checked switch is specified, checks the box by default
+  If the -eval switch is specified, executes the passed-in code
+
+} {
 
   template::util::get_opts $args
 
@@ -99,11 +105,14 @@ proc clipboard::ui::add_row { form_name mount_point item_id title args} {
 
 }
 
-# A wrapper for element create which maintains the naming convention
-# for the element. Appends the element to the multirow datasource
-# and instantly renders the element, storing it in the html field
-# of the datasource
-proc clipboard::ui::element_create { form_name element_name args } {
+ad_proc -public clipboard::ui::element_create { form_name element_name args } {
+
+  A wrapper for element create which maintains the naming convention
+  for the element. Appends the element to the multirow datasource
+  and instantly renders the element, storing it in the html field
+  of the datasource
+
+} {
  
   # Get the variables
   set data_name "${form_name}_data"
@@ -131,12 +140,15 @@ proc clipboard::ui::element_create { form_name element_name args } {
   lappend row(elements) $element_name
 }
 
-# Process a row of the table, executing whatever TCL code
-# the user has passed in.
-# Bind each element to its value (singular);
-# Bind "${element}_values" to the values (plural).
 
-proc clipboard::ui::process_row { form_name row_index row_dml } {
+ad_proc -public clipboard::ui::process_row { form_name row_index row_dml } {
+
+  Process a row of the table, executing whatever TCL code
+  the user has passed in.
+  Bind each element to its value (singular);
+  Bind "${element}_values" to the values (plural).
+
+} {
 
   # Bind variable names to values
   set code "upvar 0 \"${form_name}_data:${row_index}\" row\n" 
@@ -158,8 +170,11 @@ proc clipboard::ui::process_row { form_name row_index row_dml } {
   uplevel $code
 }
  
-# Assemble the entire datasource based on all items under some mount point
-proc clipboard::ui::generate_form { form_name clip mount_point } {
+ad_proc -public clipboard::ui::generate_form { form_name clip mount_point } {
+
+  Assemble the entire datasource based on all items under some mount point
+
+} {
 
   uplevel "
     set __form_name $form_name
@@ -185,8 +200,11 @@ proc clipboard::ui::generate_form { form_name clip mount_point } {
   }
 }
 
-# Generate the extra <th>...</th> tags based on the elements in some row
-proc clipboard::ui::generate_form_header { form_name {row_index 1}} {
+ad_proc -public clipboard::ui::generate_form_header { form_name {row_index 1}} {
+
+  Generate the extra <th>...</th> tags based on the elements in some row
+
+} {
   
   upvar "${form_name}_header" header
   upvar "${form_name}_data:${row_index}" row
@@ -205,9 +223,12 @@ proc clipboard::ui::generate_form_header { form_name {row_index 1}} {
   }
 }
 
-# Process the entire form, executing the same DML for each row
-# If no DML is specified, uses the global dml
-proc clipboard::ui::process_form { form_name row_dml } {
+ad_proc -public clipboard::ui::process_form { form_name row_dml } {
+
+  Process the entire form, executing the same DML for each row
+  If no DML is specified, uses the global dml
+
+} {
   
   upvar "${form_name}_data:rowcount" rowcount
   for {set i 1} {$i <= $rowcount} {incr i} {

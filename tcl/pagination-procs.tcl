@@ -6,16 +6,19 @@
 namespace eval pagination {}
 
 
-# @public paginate_query
 
-# Paginates a query
+ad_proc -public pagination::paginate_query { sql page } {
 
-# @author Michael Pih
+  @public paginate_query
 
-# @param sql The sql query to paginate
-# @param page The current page number
+  Paginates a query
 
-ad_proc pagination::paginate_query { sql page } {
+  @author Michael Pih
+
+  @param sql The sql query to paginate
+  @param page The current page number
+
+} {
 
     set rows_per_page [pagination::get_rows_per_page]
     set start_row [expr $rows_per_page*[expr $page-1]+1]
@@ -26,49 +29,57 @@ ad_proc pagination::paginate_query { sql page } {
 }
 
 
-# @private get_rows_per_page
 
-# Returns the number of rows per page
+ad_proc -private pagination::get_rows_per_page {} {
 
-proc pagination::get_rows_per_page {} {
+  @private get_rows_per_page
+
+  Returns the number of rows per page
+
+} {
     return 10
 }
 
 
 
-# @public get_total_pages
 
-# Gets the number of pages returned by a query
-# PRE: requires $sql
+ad_proc -public pagination::get_total_pages { sql } {
 
-# @author Michael Pih
+  @public get_total_pages
 
-# @param db A database handle
+  Gets the number of pages returned by a query
+  PRE: requires $sql
 
-ad_proc pagination::get_total_pages { sql } {
-   
-	template::query gtp_get_total_pages total_pages onevalue "
+  @author Michael Pih
+
+  @param db A database handle
+
+} {
+
+    template::query gtp_get_total_pages total_pages onevalue "
 	  select 
 	    ceil(count(*) / [pagination::get_rows_per_page] )
 	  from
             ($sql) x
 	"
 
-	return $total_pages
-   
+    return $total_pages
 }
 
 
-# @public page_number_links
 
-# Generate HTML for navigating pages of a datasource
+ad_proc -public pagination::page_number_links { page total_pages } {
 
-# @author Michael Pih
+  @public page_number_links
 
-# @param page The current page number
-# @param total_pages The total pages returned by the query
+  Generate HTML for navigating pages of a datasource
 
-ad_proc pagination::page_number_links { page total_pages } {
+  @author Michael Pih
+
+  @param page The current page number
+  @param total_pages The total pages returned by the query
+
+} {
 
     if { $total_pages == 1 } {
 	return ""
@@ -126,15 +137,18 @@ ad_proc pagination::page_number_links { page total_pages } {
 }
 
 
-# @private ns_set_to_url_vars
 
-# Converts an ns_set into a list of url variables
+ad_proc -private pagination::ns_set_to_url_vars { set_id } {
 
-# @author Michael Pih
+  @private ns_set_to_url_vars
 
-# @param set_id The set id
+  Converts an ns_set into a list of url variables
 
-ad_proc pagination::ns_set_to_url_vars { set_id } {
+  @author Michael Pih
+
+  @param set_id The set id
+
+} {
     set url_vars ""
     set size [ns_set size $set_id]
     for { set i 0 } { $i < $size } { incr i } {

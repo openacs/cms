@@ -6,7 +6,7 @@
 <fullquery name="User::cms_admin_exists.cae_admin_exists">      
       <querytext>
       
-      select content_permission__cm_admin_exists 
+      select content_permission__cm_admin_exists () 
       </querytext>
 </fullquery>
 

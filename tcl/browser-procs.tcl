@@ -16,11 +16,13 @@
 #
 #################################################
 
-# Initialize the workspace for the first time,
-# by building a state consisting only of the top-level mount points
-# Return the state
+ad_proc -public initFolderTree { user_id } {
 
-proc initFolderTree { user_id } {
+ Initialize the workspace for the first time,
+ by building a state consisting only of the top-level mount points
+ Return the state
+
+} {
 
   set state [list]
   foreach mount_point [buildMountPoints $user_id] {
@@ -30,14 +32,16 @@ proc initFolderTree { user_id } {
 
 }
 
-# Recursively rebuild the tree state based on the requested expand or collapse action
-# Rebuild the children of each folder and return them
-# Payload is any extra data that needs to be passed in
-
-proc updateTreeStateChildren { 
+ad_proc -public updateTreeStateChildren { 
   user_id children 
   mount_point target_mount_point target_id 
   action level stateRef update_time payload
+} {
+
+ Recursively rebuild the tree state based on the requested expand or collapse 
+ action. Rebuild the children of each folder and return them
+ Payload is any extra data that needs to be passed in
+
 } {
  
   set new_children [list]
@@ -195,19 +199,25 @@ proc updateTreeStateChildren {
 
 }
 
-# Rebuild the tree state based on user's action and return the new state
 
-proc updateTreeState { 
+ad_proc -public updateTreeState { 
   user_id state target_mount_point 
   target_id action update_time {payload ""}
+} {
+
+ Rebuild the tree state based on user's action and return the new state
+
 } {
   return [updateTreeStateChildren $user_id $state "" $target_mount_point \
             $target_id $action 0 state $update_time $payload]
 }
 
-# Get a linear rendition of the folder tree suitable for presentation
 
-proc fetchStateFolders { user_id stateRef } {
+ad_proc -public fetchStateFolders { user_id stateRef } {
+
+ Get a linear rendition of the folder tree suitable for presentation
+
+} {
 
   # Reference the state
   upvar $stateRef state
@@ -234,10 +244,12 @@ proc fetchStateFolders { user_id stateRef } {
   return $folderList
 }
 
-# Recursive procedure to fetch a folder's children and add them to the linear list
-# of folders 
+ad_proc -public fetchStateChildFolders { user_id mount_point children folderListRef stateRef level parent_id } { 
 
-proc fetchStateChildFolders { user_id mount_point children folderListRef stateRef level parent_id } {
+ Recursive procedure to fetch a folder's children and add them to the linear 
+ list of folders 
+
+} {
 
   # access the growing folder list by reference
   upvar $folderListRef folderList
@@ -271,32 +283,41 @@ proc fetchStateChildFolders { user_id mount_point children folderListRef stateRe
   }
 }
 
-# Retreive a "path" to the particular folder - in fact, this is a unique hash key
-# used to reference the folder in the AOLServer cache
+ad_proc -public folderPath { user_id mount_point folder_id } {
 
-proc folderPath { user_id mount_point folder_id } {
+ Retreive a "path" to the particular folder - in fact, this is a unique hash 
+ key used to reference the folder in the AOLServer cache
+
+} {
   return "${user_id}.${mount_point}.$folder_id"
 }
 
-# Hit the database to retreive the list of children for the folder
-# Recache the child folders if specified
+ad_proc -public folderChildrenDB { mount_point folder_id } {
 
-proc folderChildrenDB { mount_point folder_id } {
+ Hit the database to retreive the list of children for the folder
+ Recache the child folders if specified
+
+} {
   ns_log notice "DATABASE HIT: $mount_point.$folder_id"
   return [cm::modules::${mount_point}::getChildFolders $folder_id]
 }   
 
-# A constructtor procedure to implement the folder abstraction
-
-proc folderCreate {
+ad_proc -public folderCreate {
    mount_point name id child_ids 
    expandable {symlink f} {update_time 0}} {
+
+ A constructtor procedure to implement the folder abstraction
+
+   } {
   return [list $mount_point $name $id $child_ids $expandable $symlink $update_time]
 }
 
-# An accessor procedure to implement the folder abstraction
 
-proc folderAccess { op folder {user_id {}} } {
+ad_proc -public folderAccess { op folder {user_id {}} } {
+
+ An accessor procedure to implement the folder abstraction
+
+} {
   
   switch $op {
     mount_point { return [lindex $folder 0] }
@@ -319,9 +340,11 @@ proc folderAccess { op folder {user_id {}} } {
   }
 }
 
-# A "mutator" procedure for folders; actually, just returns the new folder
+ad_proc -public folderMutate { op folder new_value } {
 
-proc folderMutate { op folder new_value } {
+ A "mutator" procedure for folders; actually, just returns the new folder
+
+} {
   
   switch $op {
     mount_point { return [lreplace $folder 0 0 $new_value] }
@@ -337,10 +360,12 @@ proc folderMutate { op folder new_value } {
   }
 }
 
-# Convert a list of folders into a list of folder IDs, caching
-# the folders in the process
+ad_proc -public folderChildIDs { subfolder_list { user_id {}}} {
 
-proc folderChildIDs { subfolder_list { user_id {}}} {
+ Convert a list of folders into a list of folder IDs, caching
+ the folders in the process
+
+} {
   set child_ids [list]
   foreach subfolder $subfolder_list {
     if { ![template::util::is_nil user_id] } {
@@ -352,9 +377,12 @@ proc folderChildIDs { subfolder_list { user_id {}}} {
   return $child_ids
 }
 
-# A constructor procedure to implement the state node abstraction
 
-proc stateNodeCreate { id children {selected ""}} {   
+ad_proc -public stateNodeCreate { id children {selected ""}} {   
+
+ A constructor procedure to implement the state node abstraction
+
+} {
   
   set ret [list $id $children]
 
@@ -366,9 +394,12 @@ proc stateNodeCreate { id children {selected ""}} {
   return $ret
 }
 
-# An accessor procedure to implement the state node abstraction
 
-proc stateNodeAccess { op node } {
+ad_proc -public stateNodeAccess { op node } {
+
+ An accessor procedure to implement the state node abstraction
+
+} {
   switch $op {
     id         { return [lindex $node 0] }
     children   { return [lindex $node 1] }
@@ -376,10 +407,14 @@ proc stateNodeAccess { op node } {
   }
 } 
 
-# Retreive folder information for a particular id. If that id does not exist in the cache, cache it.
-# if id is the empty string, retreives the top-level mount point
 
-proc getFolder { user_id mount_point folder_id stateRef } {
+ad_proc -public getFolder { user_id mount_point folder_id stateRef } {
+
+ Retreive folder information for a particular id. If that id does not exist 
+ in the cache, cache it. if id is the empty string, retreives the top-level 
+ mount point
+
+} {
 
   set folder_path [folderPath $user_id $mount_point $folder_id]
 
@@ -414,9 +449,12 @@ proc getFolder { user_id mount_point folder_id stateRef } {
   return [nsv_get browser_state $folder_path]
 } 
 
-# Build a list of all the top-level mount points, caching them in the process
 
-proc buildMountPoints { user_id } {
+ad_proc -public buildMountPoints { user_id } {
+
+ Build a list of all the top-level mount points, caching them in the process
+
+} {
   
    set mount_point_list [cm::modules::getMountPoints] 
 
@@ -433,9 +471,12 @@ proc buildMountPoints { user_id } {
    return $mount_point_list
 }
 
-# Cache an individual folder
 
-proc cacheOneFolder { user_id folder { override 0 }} {
+ad_proc -public cacheOneFolder { user_id folder { override 0 }} {
+
+ Cache an individual folder
+
+} {
   set path [folderAccess path $folder $user_id]
   if { $override || ![nsv_exists browser_state $path] } {
     ns_log notice "CACHING: $path $folder , override = $override"
@@ -443,9 +484,12 @@ proc cacheOneFolder { user_id folder { override 0 }} {
   }
 }
 
-# Change the cached update time in a folder
-# If thr folder is not cached, do nothing
-proc refreshCachedFolder { user_id mount_point folder_id } {
+ad_proc -public refreshCachedFolder { user_id mount_point folder_id } {
+
+ Change the cached update time in a folder
+ If thr folder is not cached, do nothing
+
+} {
   
   if { [folderIsCached $user_id $mount_point $folder_id] } {
     cacheOneFolder $user_id [folderMutate update_time \
@@ -454,25 +498,34 @@ proc refreshCachedFolder { user_id mount_point folder_id } {
   }
 } 
 
-# Return 1 if the folder is in the cache, 0 otherwise
-proc folderIsCached { user_id mount_point folder_id } {
+ad_proc -public folderIsCached { user_id mount_point folder_id } {
+
+ Return 1 if the folder is in the cache, 0 otherwise
+
+} {
   return [nsv_exists browser_state [folderPath $user_id $mount_point $folder_id]]
 }
 
-# Uncache a folder so that it will be reloaded from the db
-proc uncacheFolder { user_id mount_point folder_id } {
+ad_proc -public uncacheFolder { user_id mount_point folder_id } {
+
+ Uncache a folder so that it will be reloaded from the db
+
+} {
   set path [folderPath $user_id $mount_point $folder_id]
   # Catch in case the cached state does not exist (which could happen if
   # the server was restarted)
   catch " nsv_unset browser_state $path " dummy
 }
 
-# Recursively traverse the path to some folder in a particular mount
-# point, which is in the form
-# mount_point_id parent_id_1 parent_id_2 ... folder_id
-# Return the new path if the folder was found, an empty string otherwise
+ad_proc -public getStateFolderPath { user_id folder_id children target_folder_id } {
 
-proc getStateFolderPath { user_id folder_id children target_folder_id } {
+
+ Recursively traverse the path to some folder in a particular mount
+ point, which is in the form
+ mount_point_id parent_id_1 parent_id_2 ... folder_id
+ Return the new path if the folder was found, an empty string otherwise
+
+} {
 
   # if the folder is found, return it as the last element of the path  
   if { [string equal $folder_id $target_folder_id] } {
@@ -491,10 +544,13 @@ proc getStateFolderPath { user_id folder_id children target_folder_id } {
   return ""
 }
 
-# Traverse the state tree to discover the path to a particular folder. Then, 
-# cache all the folders on the path
 
-proc cacheStateFolders { user_id target_mount_point target_folder_id stateRef } {
+ad_proc -public cacheStateFolders { user_id target_mount_point target_folder_id stateRef } {
+
+ Traverse the state tree to discover the path to a particular folder. Then, 
+ cache all the folders on the path
+
+} {
   
   upvar $stateRef state
 
@@ -525,11 +581,15 @@ proc cacheStateFolders { user_id target_mount_point target_folder_id stateRef } 
   }
 }
 
-# Go through ALL children of the mount point and cache them, one by one, until the target
-# folder is found. This will do a lot of redundant work, so be careful.
-# This procedure will execute breadth-first search, in hope of finding the target folder quicker.
 
-proc cacheMountPointFolders { user_id mount_point target_folder_id } {
+ad_proc -public cacheMountPointFolders { user_id mount_point target_folder_id } {
+
+ Go through ALL children of the mount point and cache them, one by one, 
+ until the target folder is found. This will do a lot of redundant work, 
+ so be careful. This procedure will execute breadth-first search, in hope of 
+ finding the target folder quicker.
+
+} {
 
   ns_log notice "CRITICAL MISS: [folderPath $user_id $mount_point $target_folder_id]"
 

@@ -8,24 +8,25 @@
 namespace eval content_method {}
 
 
-
-# @public get_content_methods
-
-# Returns a list of content_methods that are associated with 
-# a content type, first checking for a default method, then for registered
-# content methods, and then for all content methods
-
-# @author Michael Pih
-
-# @param  content_type The content type
-# @option get_labels   Instead of a list of content methods, return
-#   a list of label-value pairs of associated content methods.
-# @return A list of content methods or a list of label-value pairs of 
-#   content methods if the "-get_labels" option is specified
-# @see {content_method::get_content_method_options, 
-#       content_method::text_entry_filter_sql }
-
 ad_proc content_method::get_content_methods { content_type args } {
+
+  @public get_content_methods
+
+  Returns a list of content_methods that are associated with 
+  a content type, first checking for a default method, then for registered
+  content methods, and then for all content methods
+
+  @author Michael Pih
+
+  @param  content_type The content type
+  @option get_labels   Instead of a list of content methods, return
+    a list of label-value pairs of associated content methods.
+  @return A list of content methods or a list of label-value pairs of 
+    content methods if the "-get_labels" option is specified
+  @see {content_method::get_content_method_options, 
+        content_method::text_entry_filter_sql }
+
+} {
     template::util::get_opts $args
 
     if { [info exists opts(get_labels)] } {
@@ -83,20 +84,21 @@ ad_proc content_method::get_content_methods { content_type args } {
 }
 
 
-
-# @private get_content_method_options
-
-# Returns a list of label, content_method pairs that are associated with 
-# a content type, first checking for a default method, then for registered
-# content methods, and then for all content methods
-
-# @author Michael Pih
-# @param content_type The content type
-# @return A list of label, value pairs of content methods
-# @see {content_method::get_content_methods,
-#       content_method::text_entry_filter_sql }
-
 ad_proc content_method::get_content_method_options { content_type } {
+
+  @private get_content_method_options
+
+  Returns a list of label, content_method pairs that are associated with 
+  a content type, first checking for a default method, then for registered
+  content methods, and then for all content methods
+
+  @author Michael Pih
+  @param content_type The content type
+  @return A list of label, value pairs of content methods
+  @see {content_method::get_content_methods,
+        content_method::text_entry_filter_sql }
+
+} {
     
     set text_entry_filter [text_entry_filter_sql $content_type]
 
@@ -148,17 +150,17 @@ ad_proc content_method::get_content_method_options { content_type } {
 }
 
 
-
-
-# @private text_entry_filter_sql
-
-# Generate a SQL stub that filters out the text_entry content method
-
-# @author Michael Pih
-# @param  content_type
-# @return SQL stub that possibly filters out the text_entry content method
-
 ad_proc content_method::text_entry_filter_sql { content_type } {
+
+  @private text_entry_filter_sql
+
+  Generate a SQL stub that filters out the text_entry content method
+
+  @author Michael Pih
+  @param  content_type
+  @return SQL stub that possibly filters out the text_entry content method
+
+} {
     
     set text_entry_filter_sql ""
 
@@ -183,18 +185,18 @@ ad_proc content_method::text_entry_filter_sql { content_type } {
 
 
 
-
-
-# @public flush_content_method_cache
-
-# Flushes the cache for content_method_types for a given content type.  If no
-# content type is specified, the entire content_method_types cache is
-# flushed
-
-# @author Michael Pih
-# @param content_type The content type, default null
-
 ad_proc content_method::flush_content_methods_cache { {content_type ""} } {
+
+  @public flush_content_method_cache
+
+  Flushes the cache for content_method_types for a given content type.  If no
+  content type is specified, the entire content_method_types cache is
+  flushed
+
+  @author Michael Pih
+  @param content_type The content type, default null
+
+} {
 
     if { [template::util::is_nil content_type] } {
 

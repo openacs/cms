@@ -19,43 +19,62 @@
  
 
 namespace eval cm {
+    namespace eval modules {     
+        namespace eval workspace  { }
+        namespace eval templates  { }
+        namespace eval workflow   { }
+        namespace eval sitemap    { }
+        namespace eval types      { }
+        namespace eval search     { }
+        namespace eval categories { }
+        namespace eval users      { }
+        namespace eval clipboard  { }
+    }
+}
 
-  namespace eval modules {
 
-    # Get the id of some module, return empty string on failure
-    ad_proc get_module_id { module_name } {
-      template::query gmi_get_module_id id onevalue "
+ad_proc -public cm::modules::get_module_id { module_name } {
+
+ Get the id of some module, return empty string on failure
+
+} {
+    template::query module_get_id id onevalue "
         select module_id from cm_modules
           where key = :module_name
       " -cache "get_module_name $module_name" -persistent
 
-      return $id
-    }
+    return $id
+}
 
-    # Get a list of all the mount points
-    ad_proc getMountPoints {} {
+ad_proc -public cm::modules::getMountPoints {} {
 
-      template::query gmp_get_mount_points mount_point_list multilist "
-       select 
+  Get a list of all the mount points
+
+} {
+
+    template::query get_list mount_point_list multilist "select 
          key, name, '' as id, 
          '' as children, 't' as expandable, 'f' as symlink,
          0 as update_time
        from cm_modules 
-       order by sort_key" 
- 
-      # Append clipboard
-      lappend mount_point_list [folderCreate "clipboard" "Clipboard" "" [list] t f 0]
+       order by sort_key"
+    
+    # Append clipboard
+    lappend mount_point_list [folderCreate "clipboard" "Clipboard" "" [list] t f 0]
 
-      return $mount_point_list
-    }
+    return $mount_point_list
+}
 
-    # Generic getCHildFolders procedure for sitemap and templates
-    ad_proc getChildFolders { mount_point id } {
+ad_proc -public cm::modules::getChildFolders { mount_point id } {
 
-      # query for child site nodes
-      set module_name [namespace tail [namespace current]]
+  Generic getCHildFolders procedure for sitemap and templates
 
-      template::query gcf_get_child_folders result multilist "
+} {
+
+    # query for child site nodes
+    set module_name [namespace tail [namespace current]]
+
+    template::query module_get_result result multilist "
         select
 	  :mount_point as mount_point,
 	  r.name, 
@@ -76,109 +95,120 @@ namespace eval cm {
 	order by
 	  name"
 
-      return $result
-    }
+    return $result
+}
 
-    namespace eval workspace {
+ad_proc -public cm::modules::workspace::getRootFolderID {} { return 0 } 
 
-     ad_proc getRootFolderID {} { return 0 } 
+ad_proc -public cm::modules::workspace::getChildFolders { id } {
+    return [list]
+}
 
-      ad_proc getChildFolders { id } {
-        return [list]
-      }
-    }
 
-    namespace eval templates {
 
-      # Retreive the id of the root folder
-      ad_proc getRootFolderID {} {
-        if { ![nsv_exists browser_state template_root] } {
-          template::query grfi_get_root_id root_id onevalue "
+ad_proc -public cm::modules::templates::getRootFolderID {} {
+
+  Retreive the id of the root folder
+
+} {
+    if { ![nsv_exists browser_state template_root] } {
+        template::query template_get_root_id root_id onevalue "
             select content_template.get_root_folder() from dual"
-          nsv_set browser_state template_root $root_id
-          return $root_id
-        } else {
-          return [nsv_get browser_state template_root]
-        }
-      }
+        nsv_set browser_state template_root $root_id
+        return $root_id
+    } else {
+        return [nsv_get browser_state template_root]
+    }
+}
 
-      ad_proc getChildFolders { id } {
-        if { [string equal $id {}] } {
-          set id [getRootFolderID]
-        }
+ad_proc -public cm::modules::templates::getChildFolders { id } {
 
-        # query for child site nodes
-        set module_name [namespace tail [namespace current]]
 
-        return [cm::modules::getChildFolders $module_name $id]
-      }
+} {
+    if { [string equal $id {}] } {
+        set id [getRootFolderID]
+    }
 
-      ad_proc getSortedPaths { name id_list {root_id 0} {eval_code {}}} {
-        uplevel "
+    # query for child site nodes
+    set module_name [namespace tail [namespace current]]
+
+    return [cm::modules::getChildFolders $module_name $id]
+}
+
+ad_proc -public cm::modules::templates::getSortedPaths { name id_list {root_id 0} {eval_code {}}} {
+
+
+} {
+    uplevel "
           cm::modules::sitemap::getSortedPaths $name \{$id_list\} $root_id \{$eval_code\}
         "
-      }
-    }
+}
 
-    namespace eval workflow {
-      ad_proc getRootFolderID {} { return 0 } 
+ad_proc -public cm::modules::workflow::getRootFolderID {} { return 0 } 
 
-      ad_proc getChildFolders { id } {
-        return [list]
-      }
-    }
+ad_proc -public cm::modules::workflow::getChildFolders { id } {
+    return [list]
+}
 
-    namespace eval sitemap {
 
-      # Retreive the id of the root folder
-      ad_proc getRootFolderID {} {
-        if { ![nsv_exists browser_state sitemap_root] } {
-          template::query grfi_get_root_id root_id onevalue "
+
+ad_proc -public cm::modules::sitemap::getRootFolderID {} {
+
+  Retreive the id of the root folder
+
+} {
+    if { ![nsv_exists browser_state sitemap_root] } {
+        template::query sitemap_get_root_id root_id onevalue "
             select content_item.get_root_folder() from dual"
-          nsv_set browser_state sitemap_root $root_id
-          return $root_id
-        } else {
-          return [nsv_get browser_state sitemap_root]
-        }
-      }
-
-      ad_proc getChildFolders { id } {
-        if { [string equal $id {}] } {
-          set id [getRootFolderID]
-        }
-
-        # query for child site nodes
-        set module_name [namespace tail [namespace current]]
-        
-        return [cm::modules::getChildFolders $module_name $id]
-      }
-
-      ad_proc getSortedPaths { name id_list {root_id 0} {eval_code {}}} {
-
-        set sql_id_list "'"
-        append sql_id_list [join $id_list "','"]
-        append sql_id_list "'"
-
-        set sql_query [db_map gsp_get_sorted_paths]
-
-	upvar sql_query __sql
-        upvar sorted_paths_root_id _root_id
-        set _root_id $root_id
-        uplevel "
-          template::query gsp_get_paths  multirow \{$__sql\} -eval \{$eval_code\}
-        "
-      } 
-  
+        nsv_set browser_state sitemap_root $root_id
+        return $root_id
+    } else {
+        return [nsv_get browser_state sitemap_root]
     }
-    # end of sitemap namespace
+}
 
-    namespace eval types {
+ad_proc -public cm::modules::sitemap::getChildFolders { id } {
 
-      # Return a multilist representing the types tree,
-      # for use in a select widget
-      ad_proc getTypesTree { } {
 
-        template::query gtt_get_tree_types result multilist "
+} {
+    if { [string equal $id {}] } {
+        set id [getRootFolderID]
+    }
+
+    # query for child site nodes
+    set module_name [namespace tail [namespace current]]
+    
+    return [cm::modules::getChildFolders $module_name $id]
+}
+
+ad_proc -public cm::modules::sitemap::getSortedPaths { name id_list {root_id 0} {eval_code {}}} {
+
+
+} {
+
+    set sql_id_list "'"
+    append sql_id_list [join $id_list "','"]
+    append sql_id_list "'"
+
+    upvar sorted_paths_root_id _root_id
+    set _root_id $root_id
+    set sql [db_map sitemap_get_name]
+    uplevel "
+          template::query sitemap_get_name $name multirow \{$sql\} -eval \{$eval_code\}
+        "
+} 
+
+
+
+
+ad_proc -public cm::modules::types::getTypesTree { } {
+
+  Return a multilist representing the types tree,
+  for use in a select widget
+
+} {
+
+    template::query types_get_result result multilist "
           select
             lpad(' ', level, '-') || pretty_name as label,
             object_type as value
@@ -190,25 +220,28 @@ namespace eval cm {
             object_type = 'content_revision'
         "
 
-        set result [concat [list [list "--" ""]] $result]
+    set result [concat [list [list "--" ""]] $result]
 
-        return $result
-      }
+    return $result
+}
 
-      ad_proc getRootFolderID {} { return "content_revision" } 
+ad_proc -public cm::modules::types::getRootFolderID {} { return "content_revision" } 
 
-      ad_proc getChildFolders { id } {
+ad_proc -public cm::modules::types::getChildFolders { id } {
 
-        set children [list]
 
-        if { [string equal $id {}] } {
-          set id [getRootFolderID]
-        }
+} {
 
-        # query for message categories
-        set module_name [namespace tail [namespace current]]
+    set children [list]
 
-        template::query gcf_get_child_folders result multilist "select
+    if { [string equal $id {}] } {
+        set id [getRootFolderID]
+    }
+
+    # query for message categories
+    set module_name [namespace tail [namespace current]]
+
+    template::query get_result result multilist "select
                      :module_name as mount_point,
                      t.pretty_name, 
                      t.object_type,
@@ -227,40 +260,39 @@ namespace eval cm {
                      supertype = :id
                    order by 
                      t.pretty_name"
-	
-        return $result
-      }
+
+    return $result
+}
+
+# end of types namespace
+
+ad_proc -public cm::modules::search::getRootFolderID {} { return 0 } 
+
+ad_proc -public cm::modules::search::getChildFolders { id } {
+    return [list]
+}
+
+
+ad_proc -public cm::modules::categories::getRootFolderID {} { return 0 } 
+
+ad_proc -public cm::modules::categories::getChildFolders { id } {
+
+
+} {
+
+    set children [list]
+
+    if { [string equal $id {}] } {
+        set where_clause "k.parent_id is null"
+    } else {
+        set where_clause "k.parent_id = :id"
     }
-    # end of types namespace
 
-    namespace eval search {
-      ad_proc getRootFolderID {} { return 0 } 
+    set module_name [namespace tail [namespace current]]
 
-      ad_proc getChildFolders { id } {
-        return [list]
-      }
-    }
+    # query for keyword categories
 
-    namespace eval categories {
-
-      ad_proc getRootFolderID {} { return 0 } 
-
-      ad_proc getChildFolders { id } {
-
-        set children [list]
-
-        if { [string equal $id {}] } {
-          set where_clause "k.parent_id is null"
-        } else {
-          set where_clause "k.parent_id = :id"
-	}
-
-        set module_name [namespace tail [namespace current]]
-
-        # query for keyword categories
-
-        template::query gcf_get_child_folders children multilist "
-                     select 
+    template::query category_get_children children multilist "select 
                      :module_name as mount_point,
                      content_keyword.get_heading(keyword_id) as name, 
                      keyword_id, 
@@ -282,43 +314,45 @@ namespace eval cm {
                    order by 
                      name"
 
-        return $children
-      }
+    return $children
+}
 
-      ad_proc getSortedPaths { name id_list {root_id 0} {eval_code {}}} {
+ad_proc -public cm::modules::categories::getSortedPaths { name id_list {root_id 0} {eval_code {}}} {
 
-        set sql_id_list "'"
-        append sql_id_list [join $id_list "','"]
-        append sql_id_list "'"
 
-        set sql_query [db_map gsp_get_query]
+} {
 
-	upvar __sql sql_query
-        uplevel "
-          template::query $name multirow \{$__sql\} -eval \{$eval_code\}
-        "
-      }
+    set sql_id_list "'"
+    append sql_id_list [join $id_list "','"]
+    append sql_id_list "'"
 
-    }
-    # end of categories namespace
+    set sql  [db_map get_paths]
+    uplevel "template::query get_paths $name multirow \{$sql\} -eval \{$eval_code\}"
+}
 
-    namespace eval users {
-     ad_proc getRootFolderID {} { return 0 }  
 
-     ad_proc getChildFolders { id } {
-      
-        if { [string equal $id {}] } {
-          set where_clause "not exists (select 1 from group_component_map m
+# end of categories namespace
+
+ad_proc -public cm::modules::users::getRootFolderID {} { return 0 }  
+
+ad_proc -public cm::modules::users::getChildFolders { id } {
+
+
+} {
+    
+    if { [string equal $id {}] } {
+        set where_clause "not exists (select 1 from group_component_map m
                                           where m.component_id = g.group_id)"
-          set map_table ""
-        } else {
-          set where_clause "m.group_id = :id and m.component_id = g.group_id"
-          set map_table ", group_component_map m"
-        }
+        set map_table ""
+    } else {
+        set where_clause "m.group_id = :id and m.component_id = g.group_id"
+        set map_table ", group_component_map m"
+    }
 
-        set module_name [namespace tail [namespace current]]
+    set module_name [namespace tail [namespace current]]
 
-        template::query gcf_get_child_folders result multilist "select
+
+    template::query users_get_result result multilist "select
                      :module_name as mount_point,
                      g.group_name as name, 
                      g.group_id, '' as children,
@@ -337,54 +371,51 @@ namespace eval cm {
                      $where_clause
                    order by 
                      name"
-        return $result
-      }
+    return $result
+}
 
-      ad_proc getSortedPaths { name id_list {root_id 0} {eval_code {}}} {
+ad_proc -public cm::modules::users::getSortedPaths { name id_list {root_id 0} {eval_code {}}} {
 
-        set sql_id_list "'"
-        append sql_id_list [join $id_list "','"]
-        append sql_id_list "'"
 
-        set sql_query [db_map gsp_get_sort_paths]
+} {
 
-	upvar __sql sql_query
-        uplevel "template::query $name multirow \{$__sql\} -eval \{$eval_code\}"
-      }
-         
+    set sql_id_list "'"
+    append sql_id_list [join $id_list "','"]
+    append sql_id_list "'"
+
+    set sql [db_map users_get_paths]
+    
+    uplevel "template::query users_get_paths $name multirow \{$sql\} -eval \{$eval_code\}"
+}
+
+
+
+ad_proc -public cm::modules::clipboard::getRootFolderID {} { return 0 } 
+
+ad_proc -public cm::modules::clipboard::getChildFolders { id } {
+
+
+} {
+
+    # Only the mount point is expandable
+    if { ![template::util::is_nil id] } {
+        return [list]
     }
 
-    namespace eval clipboard {
+    set children [list]
+    
+    set module_name [namespace tail [namespace current]] 
 
-      ad_proc getRootFolderID {} { return 0 } 
-
-      ad_proc getChildFolders { id } {
-
-        # Only the mount point is expandable
-        if { ![template::util::is_nil id] } {
-          return [list]
-        }
-
-        set children [list]
- 
-        set module_name [namespace tail [namespace current]] 
-
-        template::query gcf_get_child_folders result multilist "
-                     select
+    template::query clip_get_result result multilist "select
                      :module_name as mount_point,
                      name, key, '' as children,
                      'f' as expandable,
                      'f' as symlink,
                      0 as update_type
                    from cm_modules order by sort_key"
-        return $result
-      }
-    }
-    # end of clipboard namespace
-  }  
-  # end of modules namespace
-} 
-# end of cm namespace
+    return $result
+}
 
+# end of clipboard namespace
 
 

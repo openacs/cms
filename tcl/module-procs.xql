@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <queryset>
 
-<fullquery name="cm::modules::get_module_id.gmi_get_module_id">      
+<fullquery name="cm::modules::get_module_id.module_get_id">      
       <querytext>
       
         select module_id from cm_modules
@@ -11,10 +11,9 @@
 </fullquery>
 
  
-<fullquery name="cm::modules::getMountPoints.gmp_get_mount_points">      
+<fullquery name="cm::modules::getMountPoints.get_list">      
       <querytext>
-      
-       select 
+      select 
          key, name, '' as id, 
          '' as children, 't' as expandable, 'f' as symlink,
          0 as update_time
@@ -24,10 +23,9 @@
 </fullquery>
 
  
-<fullquery name="cm::modules::clipboard::getChildFolders.gcf_get_child_folders">      
+<fullquery name="cm::modules::clipboard::getChildFolders.clip_get_result">      
       <querytext>
-      
-                     select
+      select
                      :module_name as mount_point,
                      name, key, '' as children,
                      'f' as expandable,

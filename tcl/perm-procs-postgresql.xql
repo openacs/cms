@@ -34,22 +34,17 @@
 <partialquery name="content::perm_form_generate.pfg_get_permission_boxes">
 	<querytext>
 
--- RBM: I thought about using Dan's simpler suggestion as per his comments in 
--- acs-kernel/sql/postgresql/acs-permissions-create.sql but the query does some
--- indenting with the tree_level.
-
       select 
 	t.child_privilege as privilege, 
 	lpad(' ', t.tree_level * 24, '&nbsp;') || coalesce(p.pretty_name, t.child_privilege) as label,
 	cms_permission__permission_p(:object_id, :grantee_id, t.child_privilege) as permission_p,
         cms_permission__permission_p (:object_id, :grantee_id, t.privilege) as parent_permission_p
-      from (
-	select h2.privilege, h2.child_privilege, tree_level(h2.tree_sortkey) as tree_level
-	  from acs_privilege_hierarchy_index h1,
-               acs_privilege_hierarchy_index h2	
-	  where h1.child_privilege = 'cm_root'
-               and h1.tree_sortkey like (h2.tree_sortkey || '%')
-               and h2.tree_sortkey < h1.tree_sortkey 
+      from (select privilege, child_privilege, 
+                tree_level(tree_sortkey) as tree_level
+	   from acs_privilege_hierarchy_index
+          where tree_sortkey like (select tree_sortkey || '%'
+                                   from acs_privilege_hierarchy_index 
+                                  where privilege = 'cm_root')
 	) t, acs_privileges p
       where
 	p.privilege = t.child_privilege

@@ -8,9 +8,9 @@
       
       select
         transition_name, party_id, 
-        content_item__get_title(i.item_id) title,
-        to_char(cd.deadline,'Month DD, YYYY') deadline_pretty,
-        coalesce(party__name(party_id),person__name(party_id)) name
+        content_item__get_title(i.item_id, 'f') as title,
+        to_char(cd.deadline,'Month DD, YYYY') as deadline_pretty,
+        coalesce(party__name(party_id), person__name(party_id)) as name
       from
         wf_transitions t, cr_items i,
         wf_cases c, wf_case_assignments ca, wf_case_deadlines cd
@@ -42,10 +42,10 @@
       
       select
         o.creation_user as admin_id, transition_name, party_id, 
-        content_item__get_title(i.item_id) title,
-        to_char(deadline,'Month DD, YYYY') deadline_pretty,
-        coalesce(party__name(party_id),person__name(party_id)) name,
-        coalesce(party__name(admin_id),person__name(admin_id)) admin_name
+        content_item__get_title(i.item_id, 'f') as title,
+        to_char(deadline,'Month DD, YYYY') as deadline_pretty,
+        coalesce(party__name(party_id),person__name(party_id)) as name,
+        coalesce(party__name(admin_id),person__name(admin_id)) as admin_name
       from
         wf_cases c, wf_case_assignments ca, wf_case_deadlines cd,
         wf_transitions t, cr_items i, acs_objects o
@@ -90,7 +90,7 @@
       
       select
         transition_name, 
-        content_item__get_title(i.item_id) as title,
+        content_item__get_title(i.item_id,'f') as title,
         o.creation_user as admin_id,
         person__name( o.creation_user ) as admin_name,
         to_char(current_timestamp,'Mon DD, YYYY') as today

@@ -4,16 +4,19 @@
 
 namespace eval workflow {}
 
-# @public notify_of_assignments
+ad_proc -public workflow::notify_of_assignments { case_id user_id } {
 
-# Emails assigned users of new publishing workflow tasks
+  @public notify_of_assignments
 
-# @author Michael Pih
+  Emails assigned users of new publishing workflow tasks
 
-# @param case_id The publishing workflow
-# @param user_id The From: user when sending the email
+  @author Michael Pih
 
-ad_proc workflow::notify_of_assignments { case_id user_id } {
+  @param db A database handle
+  @param case_id The publishing workflow
+  @param user_id The From: user when sending the email
+
+} {
 
     template::query noa_get_assignments assignments multilist "
       select
@@ -60,9 +63,9 @@ Dear $name,
 This task is due on $deadline_pretty.
 "
 
-	db_exec_plsql "
+	set request_id [db_exec_plsql notify "
 	  begin
-	  :request_id := nt.post_request(
+	  :1 := nt.post_request(
 	      party_from   => :user_id,
 	      party_to     => :party_id,
 	      expand_group => 'f',
@@ -70,24 +73,28 @@ This task is due on $deadline_pretty.
 	      message      => :message
 	  );
           end;
-        " -bind request_id
+        "]
     }
 
 }
 
 
 
-# @public notify_admin_of_new_tasks
+ad_proc -public workflow::notify_admin_of_new_tasks { case_id transition_key } {
 
-# Sends email notification to the creator of an item who has been assigned
-#   to a specific task (author/edit/approve that item)
+  @public notify_admin_of_new_tasks
 
-# @author Michael Pih
+  Sends email notification to the creator of an item who has been assigned
+    to a specific task (author/edit/approve that item)
 
-# @param case_id The workflow of an item
-# @param transition_key The name of the task
+  @author Michael Pih
 
-ad_proc workflow::notify_admin_of_new_tasks { case_id transition_key } {
+  @param db A database handle
+  @param case_id The workflow of an item
+  @param transition_key The name of the task
+
+
+} {
 
     template::query naont_get_assignments assignments multilist "
       select
@@ -140,9 +147,9 @@ Dear $admin_name,
 This task is due on $deadline_pretty.
 "
 
-	db_exec_plsql "
+	set request_id [db_exec_plsql notify "
 	  begin
-	  request_id := nt.post_request(
+	  :1 := nt.post_request(
 	      party_from   => -1,
 	      party_to     => :admin_id,
 	      expand_group => 'f',
@@ -150,22 +157,24 @@ This task is due on $deadline_pretty.
 	      message      => :message
 	  );
           end;
-        " -bind request_id
+        "]
     }
-
 }
 
 
+ad_proc -public workflow::notify_admin_of_finished_task { task_id } {
 
-# @public notify_admin_of_finished_tasks
+  @public notify_admin_of_finished_tasks
 
-# Notify that the admin of when a workflow task has been completed
+  Notify that the admin of when a workflow task has been completed
 
-# @author Michael Pih
+  @author Michael Pih
 
-# @param task_id The task
+  @param db A database handle
+  @param task_id The task
 
-ad_proc workflow::notify_admin_of_finished_task { task_id } {
+
+} {
 
     # the user who finished the task
     set user_id [User::getID]
@@ -207,9 +216,9 @@ ad_proc workflow::notify_admin_of_finished_task { task_id } {
     set message "Dear $admin_name,
     $name has completed the task: $transition_name of $title on $today."
 
-    db_exec_plsql $db "
+    set request_id [db_exec_plsql notify "
       begin
-      :request_id := nt.post_request(
+      :1 := nt.post_request(
           party_from   => -1,
 	  party_to     => :admin_id,
 	  expand_group => 'f',
@@ -217,28 +226,28 @@ ad_proc workflow::notify_admin_of_finished_task { task_id } {
 	  message      => :message
       );
       end;
-    " -bind request_id
+    "]
 }
 
 
+ad_proc -public workflow::check_wf_permission { item_id {show_error t}} {
 
+  @public check_wf_permission
 
-# @public check_wf_permission
+  A permission check that Integrates user permissions with workflow tasks
 
-# A permission check that Integrates user permissions with workflow tasks
+  @author Michael Pih
 
-# @author Michael Pih
+  @param db A database handle
+  @param item_id The item on which to check permissions
+  @param show_error t Flag indicating whether to display an error message
+                      or return t
 
-# @param item_id The item on which to check permissions
-# @param show_error t Flag indicating whether to display an error message
-#                     or return t
+  @return Redirects to an error page if show_error is t. If show_error is f,
+  then returns t if the current user has permission to access the item, f 
+  if not
 
-# @return Redirects to an error page if show_error is t. If show_error is f,
-# then returns t if the current user has permission to access the item, f 
-# if not
-
-ad_proc workflow::check_wf_permission { item_id {show_error t}} {
-
+} {
     set user_id [User::getID]
 
     template::query cwp_touch_info can_touch onevalue "
@@ -259,15 +268,15 @@ ad_proc workflow::check_wf_permission { item_id {show_error t}} {
     }
 }
 
+proc -private workflow::mail_notifications {} {
 
+  @private mail_notifications
 
-# @private mail_notifications
+  Schedules procedure for mailing notifications
 
-# Schedules procedure for mailing notifications
+  @author Michael Pih
 
-# @author Michael Pih
-
-proc workflow::mail_notifications {} {
+} {
     ns_log Notice "Running Scheduled Notifications Proc"
 
     set mail_server [template::util::get_param mail_server "ns/server/[ns_info server]/cms" OutgoingMailServer]
@@ -282,16 +291,13 @@ proc workflow::mail_notifications {} {
     if { [template::util::is_nil mail_port] } {
 	set mail_port 25
     }
-	
-    set db [template::begin_db_transaction]
-
-    template::query process_queue dml "
-      begin
-        nt.process_queue( :mail_server, :mail_port );
-      end;
-    "
-
-    template::end_db_transaction
+    db_transaction {
+        db_exec_plsql process_queue "
+            begin
+                nt.process_queue( :mail_server, :mail_port );
+            end;
+            "
+    }
 }
 
 ns_schedule_proc -thread 300 workflow::mail_notifications

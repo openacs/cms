@@ -28,24 +28,27 @@ namespace eval publish {
 # Procs to maintain the item_id stack
 # main_item_id is always the id at the top of the stack
 
-# @private push_id
-# 
-# Push an item id on top of stack. This proc is used
-# to store state between <tt>child</tt>, <tt>relation</tt>
-# and <tt>content</tt> tags.
-#
-# @param item_id      
-#   The id to be put on stack
-#
-# @param revision_id  {default ""} 
-#    The id of the revision to use. If missing, live
-#    revision will most likely be used
-#
-# @see proc publish::pop_id 
-# @see proc publish::get_main_item_id
-# @see proc publish::get_main_revision_id
 
-proc publish::push_id { item_id {revision_id ""}} {
+ad_proc -private publish::push_id { item_id {revision_id ""}} {
+
+  @private push_id
+  
+  Push an item id on top of stack. This proc is used
+  to store state between <tt>child</tt>, <tt>relation</tt>
+  and <tt>content</tt> tags.
+ 
+  @param item_id      
+    The id to be put on stack
+ 
+  @param revision_id  {default ""} 
+     The id of the revision to use. If missing, live
+     revision will most likely be used
+ 
+  @see proc publish::pop_id 
+  @see proc publish::get_main_item_id
+  @see proc publish::get_main_revision_id
+
+} {
   variable item_id_stack 
   variable revision_html 
 
@@ -86,19 +89,22 @@ proc publish::push_id { item_id {revision_id ""}} {
   set ::content::revision_id $revision_id
 }
 
-# @private pop_id
-#
-# Pop the item_id and the revision_id off the top of the stack.
-# Clear the temporary item cache if the stack becomes empty.
-#
-# @return The popped item id, or the empty string if the string is
-#   already empty
-#
-# @see proc publish::push_id 
-# @see proc publish::get_main_item_id
-# @see proc publish::get_main_revision_id
 
-proc publish::pop_id {} {
+ad_proc -private publish::pop_id {} {
+
+  @private pop_id
+ 
+  Pop the item_id and the revision_id off the top of the stack.
+  Clear the temporary item cache if the stack becomes empty.
+ 
+  @return The popped item id, or the empty string if the string is
+    already empty
+ 
+  @see proc publish::push_id 
+  @see proc publish::get_main_item_id
+  @see proc publish::get_main_revision_id
+
+} {
   variable item_id_stack 
 
   set pair [lindex $item_id_stack 0]
@@ -119,17 +125,19 @@ proc publish::pop_id {} {
   return $::content::item_id
 }
 
-# @private get_main_item_id
-#
-# Get the main item id from the top of the stack
-#
-# @return the main item id
-#
-# @see proc publish::pop_id 
-# @see proc publish::push_id 
-# @see proc publish::get_main_revision_id
+ad_proc -private publish::get_main_item_id {} {
 
-proc publish::get_main_item_id {} {
+  @private get_main_item_id
+ 
+  Get the main item id from the top of the stack
+ 
+  @return the main item id
+ 
+  @see proc publish::pop_id 
+  @see proc publish::push_id 
+  @see proc publish::get_main_revision_id
+
+} {
 
   if { ![template::util::is_nil ::content::item_id] } {
     set ret $::content::item_id
@@ -140,17 +148,20 @@ proc publish::get_main_item_id {} {
   return $ret
 }
 
-# @private get_main_revision_id
-#
-# Get the main item revision from the top of the stack
-#
-# @return the main item id
-#
-# @see proc publish::pop_id 
-# @see proc publish::push_id 
-# @see proc publish::get_main_item_id
 
-proc publish::get_main_revision_id {} {
+ad_proc -private publish::get_main_revision_id {} {
+
+  @private get_main_revision_id
+ 
+  Get the main item revision from the top of the stack
+ 
+  @return the main item id
+ 
+  @see proc publish::pop_id 
+  @see proc publish::push_id 
+  @see proc publish::get_main_item_id
+
+} {
 
   if { [template::util::is_nil ::content::revision_id] } {
     set item_id [get_main_item_id]
@@ -166,20 +177,22 @@ proc publish::get_main_revision_id {} {
 #
 # Publish procs
 
-# @public get_page_root
-#
-# Get the page root. All items will be published to the 
-# filesystem with their URLs relative to this root.
-# The page root is controlled by the PageRoot parameter in CMS.
-# A relative path is relative to [ns_info pageroot]
-# The default is [ns_info pageroot]
-#
-# @return The page root
-#
-# @see proc publish::get_template_root
-# @see proc publish::get_publish_roots
+ad_proc -public publish::get_page_root {} {
 
-proc publish::get_page_root {} {
+  @public get_page_root
+ 
+  Get the page root. All items will be published to the 
+  filesystem with their URLs relative to this root.
+  The page root is controlled by the PageRoot parameter in CMS.
+  A relative path is relative to [ns_info pageroot]
+  The default is [ns_info pageroot]
+ 
+  @return The page root
+ 
+  @see proc publish::get_template_root
+  @see proc publish::get_publish_roots
+
+} {
 
   set root_path [ad_parameter -package_id [ad_conn package_id] \
       PageRoot dummy ""]
@@ -193,19 +206,22 @@ proc publish::get_page_root {} {
 
 }
 
-# @public get_publish_roots
-#
-# Get a list of all page roots to which files may be published.
-# The publish roots are controlled by the PublishRoots parameter in CMS,
-# which should be a space-separated list of all the roots. Relative paths
-# are relative to publish::get_page_root.
-# The default is [list [publish::get_page_root]]
-#
-# @return A list of all the publish roots
-#
-# @see proc publish::get_template_root
-# @see proc publish::get_page_root
-proc publish::get_publish_roots {} {
+ad_proc -public publish::get_publish_roots {} {
+
+  @public get_publish_roots
+ 
+  Get a list of all page roots to which files may be published.
+  The publish roots are controlled by the PublishRoots parameter in CMS,
+  which should be a space-separated list of all the roots. Relative paths
+  are relative to publish::get_page_root.
+  The default is [list [publish::get_page_root]]
+ 
+  @return A list of all the publish roots
+ 
+  @see proc publish::get_template_root
+  @see proc publish::get_page_root
+
+} {
 
   set root_paths [ad_parameter -package_id [ad_conn package_id] \
       PublishRoots dummy]
@@ -229,36 +245,45 @@ proc publish::get_publish_roots {} {
 }
 
 
-# @public get_template_root
-#
-# Get the template root. All templates are assumed to exist
-# in the filesystem with their URLs relative to this root.
-# The page root is controlled by the TemplateRoot parameter in CMS.
-# The default is /web/yourserver/templates
-#
-# @return The template root
-#
-# @see proc content::get_template_root, proc publish::get_page_root
 
-proc publish::get_template_root {} {
+ad_proc -public publish::get_template_root {} {
+
+  @public get_template_root
+ 
+  Get the template root. All templates are assumed to exist
+  in the filesystem with their URLs relative to this root.
+  The page root is controlled by the TemplateRoot parameter in CMS.
+  The default is /web/yourserver/templates
+ 
+  @return The template root
+ 
+  @see proc content::get_template_root, proc publish::get_page_root
+
+} {
   return [content::get_template_root]
 }
 
-# Legacy compatibility
 
-proc content::get_template_path {} {
+ad_proc -public content::get_template_path {} {
+
+  Legacy compatibility
+
+} {
   return [publish::get_template_root]
 }
 
-# @public mkdirs
-#
-# Create all the directories neccessary to save the specified file
-#
-# @param path 
-#    The path to the file that is about to be saved
-#
 
-proc publish::mkdirs { path } {
+ad_proc -public publish::mkdirs { path } {
+
+  @public mkdirs
+ 
+  Create all the directories neccessary to save the specified file
+ 
+  @param path 
+     The path to the file that is about to be saved
+ 
+
+} {
 
   set index [string last "/" $path]
   if { $index != -1 } {
@@ -266,20 +291,23 @@ proc publish::mkdirs { path } {
   } 
 }
 
-# @private foreach_publish_path
-#
-# Execute some TCL code for each root path in the PublishRoots
-# parameter
-#
-# @param url       Relative URL to append to the roots
-# @param code      Execute this code
-# @param root_path {default The empty string}
-#    Use this root path instead of the paths specified in the INI
-#    file
-# 
-# @see proc publish::get_publish_roots
 
-proc publish::foreach_publish_path { url code {root_path ""} } {
+ad_proc -private publish::foreach_publish_path { url code {root_path ""} } {
+
+  @private foreach_publish_path
+ 
+  Execute some TCL code for each root path in the PublishRoots
+  parameter
+ 
+  @param url       Relative URL to append to the roots
+  @param code      Execute this code
+  @param root_path {default The empty string}
+     Use this root path instead of the paths specified in the INI
+     file
+  
+  @see proc publish::get_publish_roots
+
+} {
   if { ![template::util::is_nil root_path] } {
     set paths [list $root_path]
   } else {
@@ -297,18 +325,20 @@ proc publish::foreach_publish_path { url code {root_path ""} } {
 }
     
 
-# @private write_multiple_files 
-#
-# Write a relative URL to the multiple publishing roots.
-#
-# @param url   Relative URL of the file to write
-# @param text  A string of text to be written to the URL
-#
-# @see proc template::util::write_file
-# @see proc publish::get_publish_roots
-# @see proc publish::write_multiple_blobs
+ad_proc -private publish::write_multiple_files { url text {root_path ""}} {
 
-proc publish::write_multiple_files { url text {root_path ""}} {
+  @private write_multiple_files 
+ 
+  Write a relative URL to the multiple publishing roots.
+ 
+  @param url   Relative URL of the file to write
+  @param text  A string of text to be written to the URL
+ 
+  @see proc template::util::write_file
+  @see proc publish::get_publish_roots
+  @see proc publish::write_multiple_blobs
+
+} {
   foreach_publish_path $url {
     mkdirs $filename
     template::util::write_file $filename $text
@@ -317,81 +347,90 @@ proc publish::write_multiple_files { url text {root_path ""}} {
   } $root_path
 }
 
-# @private write_multiple_blobs
-#
-# Write the content of some revision to multiple publishing roots.
-# 
-# @param db           A valid database handle
-# @param url          Relative URL of the file to write
-# @param revision_id  Write the blob for this revision 
-#
-# @see proc publish::get_publish_roots
-# @see proc publish::write_multiple_files
 
-ad_proc publish::write_multiple_blobs { 
+ad_proc -private publish::write_multiple_blobs { 
   url revision_id {root_path ""} 
+} {
+
+  @private write_multiple_blobs
+ 
+  Write the content of some revision to multiple publishing roots.
+  
+  @param db           A valid database handle
+  @param url          Relative URL of the file to write
+  @param revision_id  Write the blob for this revision 
+ 
+  @see proc publish::get_publish_roots
+  @see proc publish::write_multiple_files
+
 } {
   foreach_publish_path $url {
     mkdirs $filename
       
     db_blob_get_file wmb_get_blob_file "
       select content from cr_revisions where revision_id = $revision_id
-    " $filename
+    " -file $filename
       
     ns_chmod $filename 0764
     ns_log notice "PUBLISH: Wrote revision $revision_id to $filename"
   } $root_path
 }
 
-# @private delete_multiple_files
-#
-# Delete the specified URL from the filesystem, for all revisions
-# 
-# @param url          Relative URL of the file to write
-#
-# @see proc publish::get_publish_roots
-# @see proc publish::write_multiple_files
-# @see proc publish::write_multiple_blobs
-proc publish::delete_multiple_files { url {root_path ""}} {
+ad_proc -private publish::delete_multiple_files { url {root_path ""}} {
+
+  @private delete_multiple_files
+ 
+  Delete the specified URL from the filesystem, for all revisions
+  
+  @param url          Relative URL of the file to write
+ 
+  @see proc publish::get_publish_roots
+  @see proc publish::write_multiple_files
+  @see proc publish::write_multiple_blobs
+
+} {
   foreach_publish_path $url {
     ns_unlink -nocomplain $filename 
     ns_log notice "PUBLISH: Delete file $filename"
   } $root_path
 }
 
-# @public write_content
-#
-# Write the content (blob) of a revision into a binary file in the 
-# filesystem. The file will be published at the relative URL under
-# each publish root listed under the PublishRoots parameter in the 
-# server's INI file (the value returnded by publish::get_page_root is
-# used as the default). The file extension will be based on the
-# revision's mime-type. <br>
-# For example, an revision whose mime-type is "image/jpeg" 
-# for an item at "Sitemap/foo/bar" may be written as 
-# /web/your_server_name/www/foo/bar.jpg
-#
-# @param revision_id 
-#   The id of the revision to write
-#
-# @option item_id   {default The item_id of the revision} 
-#   Specifies the item  to which this revision belongs (mereley
-#   for optimization purposes)
-#
-# @option text     
-#   If specified, indicates that the content of the
-#   revision is readable text (clob), not a binary file
-#
-# @option root_path {default All paths in the PublishPaths parameter}
-#   Write the content to this path only.
-#
-# @return The relative URL of the file that was written, or an empty
-#         string on failure
-#
-# @see proc content::get_content_value
-# @see proc publish::get_publish_roots
 
-ad_proc publish::write_content { revision_id args } {
+ad_proc -public publish::write_content { revision_id args } {
+
+  @public write_content
+ 
+  Write the content (blob) of a revision into a binary file in the 
+  filesystem. The file will be published at the relative URL under
+  each publish root listed under the PublishRoots parameter in the 
+  server's INI file (the value returnded by publish::get_page_root is
+  used as the default). The file extension will be based on the
+  revision's mime-type. <br>
+  For example, an revision whose mime-type is "image/jpeg" 
+  for an item at "Sitemap/foo/bar" may be written as 
+  /web/your_server_name/www/foo/bar.jpg
+ 
+  @param revision_id 
+    The id of the revision to write
+ 
+  @option item_id   {default The item_id of the revision} 
+    Specifies the item  to which this revision belongs (mereley
+    for optimization purposes)
+ 
+  @option text     
+    If specified, indicates that the content of the
+    revision is readable text (clob), not a binary file
+ 
+  @option root_path {default All paths in the PublishPaths parameter}
+    Write the content to this path only.
+ 
+  @return The relative URL of the file that was written, or an empty
+          string on failure
+ 
+  @see proc content::get_content_value
+  @see proc publish::get_publish_roots
+
+} {
 
   template::util::get_opts $args
 
@@ -415,11 +454,10 @@ ad_proc publish::write_content { revision_id args } {
       } else {
 	  set item_id $opts(item_id)
       }
-  }
+ 
   
-  set file_url [item::get_extended_url $item_id -revision_id $revision_id]
+      set file_url [item::get_extended_url $item_id -revision_id $revision_id]
 
-  db_transaction {
       # Write blob/text to file
       ns_log notice "Writing item $item_id to $file_url"
 
@@ -446,20 +484,20 @@ ad_proc publish::write_content { revision_id args } {
 }
 
 
-# @public get_html_body
-#
-# Strip the &lt;body&gt; tags from the HTML, leaving just the body itself.
-# Useful for including templates in each other.
-#
-# @param html 
-#   The html to be processed
-#
-# @return Everything between the &lt;body&gt; and the &lt;/body&gt; tags
-#    if they exist; the unchanged HTML if they do not
-#
-# FIX ME: This approach is not really flexible, as HTML 4 accepts tags broken in lines
+ad_proc -public publish::get_html_body { html } {
 
-proc publish::get_html_body { html } {
+  @public get_html_body
+ 
+  Strip the &lt;body&gt; tags from the HTML, leaving just the body itself.
+  Useful for including templates in each other.
+ 
+  @param html 
+    The html to be processed
+ 
+  @return Everything between the &lt;body&gt; and the &lt;/body&gt; tags
+     if they exist; the unchanged HTML if they do not
+
+} {
   
   if { [regexp -nocase {<body[^>]*>(.*)</body>} $html match body_text] } {
     return $body_text
@@ -468,48 +506,51 @@ proc publish::get_html_body { html } {
   }
 }
 
-# @private render_subitem
-#
-# Render a child/related item and return the resulting HTML, stripping
-# off the headers.
-#
-# @param main_item_id  The id of the parent item
-#
-# @param relation_type 
-#   Either <tt>child</tt> or <tt>relation</tt>. 
-#   Determines which tables are searched for subitems.
-#
-# @param relation_tag  
-#  The relation tag to look for
-#
-# @param index         
-#   The relative index of the subitem. The subitem with
-#   lowest <tt>order_n</tt> has index 1, the second lowest <tt>order_n</tt>
-#   has index 2, and so on.
-#
-# @param is_embed      
-#   If "t", the child item may be embedded directly
-#   in the HTML. Otherwise, it may be dynamically included. The proc
-#   does not process this parameter directly, but passes it to
-#   <tt>handle_item</tt>
-#
-# @param extra_args    
-#   Any additional HTML arguments to be used when
-#   rendering the item, in form {name value name value ...}
-#
-# @param is_merge {default t} 
-#   If "t", <tt>merge_with_template</tt> may
-#   be used to render the subitem. Otherwise, <tt>merge_with_template</tt>
-#   should not be used, in order to prevent infinite recursion.
-#
-# @return The rendered HTML for the child item
-#
-# @see proc publish::merge_with_template
-# @see proc publish::handle_item
 
-ad_proc publish::render_subitem { 
+ad_proc -public publish::render_subitem { 
   main_item_id relation_type relation_tag \
   index is_embed extra_args {is_merge t}
+} {
+
+  @private render_subitem
+ 
+  Render a child/related item and return the resulting HTML, stripping
+  off the headers.
+ 
+  @param main_item_id  The id of the parent item
+ 
+  @param relation_type 
+    Either <tt>child</tt> or <tt>relation</tt>. 
+    Determines which tables are searched for subitems.
+ 
+  @param relation_tag  
+   The relation tag to look for
+ 
+  @param index         
+    The relative index of the subitem. The subitem with
+    lowest <tt>order_n</tt> has index 1, the second lowest <tt>order_n</tt>
+    has index 2, and so on.
+ 
+  @param is_embed      
+    If "t", the child item may be embedded directly
+    in the HTML. Otherwise, it may be dynamically included. The proc
+    does not process this parameter directly, but passes it to
+    <tt>handle_item</tt>
+ 
+  @param extra_args    
+    Any additional HTML arguments to be used when
+    rendering the item, in form {name value name value ...}
+ 
+  @param is_merge {default t} 
+    If "t", <tt>merge_with_template</tt> may
+    be used to render the subitem. Otherwise, <tt>merge_with_template</tt>
+    should not be used, in order to prevent infinite recursion.
+ 
+  @return The rendered HTML for the child item
+ 
+  @see proc publish::merge_with_template
+  @see proc publish::handle_item
+
 } {
 
   # Get the child item
@@ -562,53 +603,58 @@ ad_proc publish::render_subitem {
 }
 
 
-# @public proc_exists
-#
-# Determine if a procedure exists in the given namespace
-#
-# @param namespace_name    The fully qualified namespace name,
-#  such as "template::util"
-#
-# @param proc_name         The proc name, such as "is_nil"
-#
-# @return 1 if the proc exists in the given namespace, 0 otherwise
+ad_proc -public publish::proc_exists { namespace_name proc_name } {
 
-proc publish::proc_exists { namespace_name proc_name } {
+  @public proc_exists
+ 
+  Determine if a procedure exists in the given namespace
+ 
+  @param namespace_name    The fully qualified namespace name,
+   such as "template::util"
+ 
+  @param proc_name         The proc name, such as "is_nil"
+ 
+  @return 1 if the proc exists in the given namespace, 0 otherwise
+
+} {
 
   return [expr ![string equal \
                   [namespace eval $namespace_name \
                     "info procs $proc_name"] {}]]
 }
 
-# @public get_mime_handler
-#
-# Return the name of a proc that should be used to render items with
-# the given mime-type.
-# The mime type handlers should all follow the naming convention
-#
-# <blockquote>
-# <tt>proc publish::handle::<i>mime_prefix</i>::<i>mime_suffix</i></tt>
-# </blockquote>
-#
-# If the specific mime handler could not be found, <tt>get_mime_handler</tt>
-# looks for a generic procedure with the name
-#
-# <blockquote>
-# <tt>proc publish::handle::<i>mime_prefix</i></tt>
-# </blockquote>
-#
-# If the generic mime handler does not exist either, 
-# <tt>get_mime_handler</tt> returns ""
-#
-# @param mime_type 
-#   The full mime type, such as "text/html" or "image/jpg"
-#
-# @return The name of the proc which should be used to handle the mime-type,
-#  or an empty string on failure.
-#
-# @see proc publish::handle_item
 
-proc publish::get_mime_handler { mime_type } {
+ad_proc -public publish::get_mime_handler { mime_type } {
+
+  @public get_mime_handler
+ 
+  Return the name of a proc that should be used to render items with
+  the given mime-type.
+  The mime type handlers should all follow the naming convention
+ 
+  <blockquote>
+  <tt>proc publish::handle::<i>mime_prefix</i>::<i>mime_suffix</i></tt>
+  </blockquote>
+ 
+  If the specific mime handler could not be found, <tt>get_mime_handler</tt>
+  looks for a generic procedure with the name
+ 
+  <blockquote>
+  <tt>proc publish::handle::<i>mime_prefix</i></tt>
+  </blockquote>
+ 
+  If the generic mime handler does not exist either, 
+  <tt>get_mime_handler</tt> returns ""
+ 
+  @param mime_type 
+    The full mime type, such as "text/html" or "image/jpg"
+ 
+  @return The name of the proc which should be used to handle the mime-type,
+   or an empty string on failure.
+ 
+  @see proc publish::handle_item
+
+} {
   set mime_pair [split $mime_type "/"]
   set mime_prefix [lindex $mime_pair 0]
   set mime_suffix [lindex $mime_pair 1]
@@ -628,46 +674,49 @@ proc publish::get_mime_handler { mime_type } {
 }
 
 
-# @private handle_item
-#
-# Render an item either by looking it up in the the temporary cache,
-# or by using the appropriate mime handler. Once the item is rendered, it 
-# is stored in the temporary cache under a key which combines the item_id,
-# any extra HTML parameters, and a flag which specifies whether the item
-# was merged with its template. <br>
-# This proc takes the same arguments as the individual mime handlers.
-#
-# @param item_id  The id of the item to be rendered
-#
-# @option revision_id {default The live revision}  
-#   The revision which is to be used when rendering the item
-#
-# @option no_merge    
-#   Indicates that the item should NOT be merged with its
-#   template. This option is used to avoid infinite recursion.
-#
-# @option refresh     
-#   Re-render the item even if it exists in the cache.
-#   Use with caution - circular dependencies may cause infinite recursion
-#   if this option is specified
-#
-# @option embed    
-#    Signifies that the content should be statically embedded directly in
-#    the HTML. If this option is not specified, the item may
-#    be dynamically referenced, f.ex. using the <tt>&lt;include&gt;</tt>
-#    tag
-#
-# @option html
-#    Extra HTML parameters to be passed to the item handler, in format
-#    {name value name value ...}
-#
-# @return The rendered HTML for the item, or an empty string on failure
-#
-# @see proc publish::handle_binary_file
-# @see proc publish::handle::text
-# @see proc publish::handle::image
 
-proc publish::handle_item { item_id args } {
+ad_proc -private publish::handle_item { item_id args } {
+
+  @private handle_item
+ 
+  Render an item either by looking it up in the the temporary cache,
+  or by using the appropriate mime handler. Once the item is rendered, it 
+  is stored in the temporary cache under a key which combines the item_id,
+  any extra HTML parameters, and a flag which specifies whether the item
+  was merged with its template. <br>
+  This proc takes the same arguments as the individual mime handlers.
+ 
+  @param item_id  The id of the item to be rendered
+ 
+  @option revision_id {default The live revision}  
+    The revision which is to be used when rendering the item
+ 
+  @option no_merge    
+    Indicates that the item should NOT be merged with its
+    template. This option is used to avoid infinite recursion.
+ 
+  @option refresh     
+    Re-render the item even if it exists in the cache.
+    Use with caution - circular dependencies may cause infinite recursion
+    if this option is specified
+ 
+  @option embed    
+     Signifies that the content should be statically embedded directly in
+     the HTML. If this option is not specified, the item may
+     be dynamically referenced, f.ex. using the <tt>&lt;include&gt;</tt>
+     tag
+ 
+  @option html
+     Extra HTML parameters to be passed to the item handler, in format
+     {name value name value ...}
+ 
+  @return The rendered HTML for the item, or an empty string on failure
+ 
+  @see proc publish::handle_binary_file
+  @see proc publish::handle::text
+  @see proc publish::handle::image
+
+} {
 
   template::util::get_opts $args
 
@@ -734,22 +783,25 @@ proc publish::handle_item { item_id args } {
 }
 
 
-# @public publish_revision
-#
-# Render a revision for an item and write it to the filesystem. The
-# revision is always rendered with the <tt>-embed</tt> option turned 
-# on.
-#
-# @param revision_id  The revision id
-#
-# @option root_path {default All paths in the PublishPaths parameter}
-#   Write the content to this path only.
-#
-# @see proc item::get_extended_url
-# @see proc publish::get_publish_paths
-# @see proc publish::handle_item
 
-proc publish::publish_revision { revision_id args} {
+ad_proc -public publish::publish_revision { revision_id args} {
+
+  @public publish_revision
+ 
+  Render a revision for an item and write it to the filesystem. The
+  revision is always rendered with the <tt>-embed</tt> option turned 
+  on.
+ 
+  @param revision_id  The revision id
+ 
+  @option root_path {default All paths in the PublishPaths parameter}
+    Write the content to this path only.
+ 
+  @see proc item::get_extended_url
+  @see proc publish::get_publish_paths
+  @see proc publish::handle_item
+
+} {
 
   template::util::get_opts $args
 
@@ -773,21 +825,24 @@ proc publish::publish_revision { revision_id args} {
 
 }
 
-# @public unpublish_item
-#
-# Delete files which were created by <tt>publish_revision</tt>
-#
-# @param item_id   The item id
-#
-# @option revision_id {default The live revision}  
-#   The revision which is to be used for determining the item filename
-#
-# @option root_path {default All paths in the PublishPaths parameter}
-#   Write the content to this path only.
-#
-# @see proc publish::publish_revision
 
-proc publish::unpublish_item { item_id args } {
+ad_proc -public publish::unpublish_item { item_id args } {
+
+  @public unpublish_item
+ 
+  Delete files which were created by <tt>publish_revision</tt>
+ 
+  @param item_id   The item id
+ 
+  @option revision_id {default The live revision}  
+    The revision which is to be used for determining the item filename
+ 
+  @option root_path {default All paths in the PublishPaths parameter}
+    Write the content to this path only.
+ 
+  @see proc publish::publish_revision
+
+} {
   
   template::util::get_opts $args
 
@@ -834,25 +889,28 @@ proc publish::unpublish_item { item_id args } {
 
 }
 
-# @private merge_with_template
-#
-# Merge the item with its template and return the resulting HTML. This proc
-# is simlar to <tt>content::init</tt>
-#
-# @param item_id   The item id
-#
-# @option revision_id {default The live revision}  
-#   The revision which is to be used when rendering the item
-#
-# @option html
-#   Extra HTML parameters to be passed to the ADP parser, in format
-#   {name value name value ...}
-#
-# @return The rendered HTML, or the empty string on failure
-#
-# @see proc publish::handle_item
 
-proc publish::merge_with_template { item_id args } { 
+ad_proc -private publish::merge_with_template { item_id args } { 
+
+  @private merge_with_template
+ 
+  Merge the item with its template and return the resulting HTML. This proc
+  is simlar to <tt>content::init</tt>
+ 
+  @param item_id   The item id
+ 
+  @option revision_id {default The live revision}  
+    The revision which is to be used when rendering the item
+ 
+  @option html
+    Extra HTML parameters to be passed to the ADP parser, in format
+    {name value name value ...}
+ 
+  @return The rendered HTML, or the empty string on failure
+ 
+  @see proc publish::handle_item
+
+} {
   #set ::content::item_id $item_id
   set ::content::item_url [item::get_url $item_id]
 
@@ -895,18 +953,21 @@ proc publish::merge_with_template { item_id args } {
   return $html
 }
   
-# @private set_to_pairs
-#
-# Convert an ns_set into a list of name-value pairs, in form
-# {name value name value ...}
-#
-# @param params   The ns_set id
-# @param exclusion_list {}
-#    A list of keys to be ignored
-#
-# @return A list of name-value pairs representing the data in the ns_set
 
-proc publish::set_to_pairs { params {exclusion_list ""} } {
+ad_proc -private publish::set_to_pairs { params {exclusion_list ""} } {
+
+  @private set_to_pairs
+ 
+  Convert an ns_set into a list of name-value pairs, in form
+  {name value name value ...}
+ 
+  @param params   The ns_set id
+  @param exclusion_list {}
+     A list of keys to be ignored
+ 
+  @return A list of name-value pairs representing the data in the ns_set
+
+} {
 
   set extra_args [list]
   for { set i 0 } { $i < [ns_set size $params] } { incr i } {
@@ -924,18 +985,21 @@ proc publish::set_to_pairs { params {exclusion_list ""} } {
 #
 # The content tags
 
-# @private process_tag
-#
-# Process a <tt>child</tt> or <tt>relation</tt> tag. This is
-# a helper proc for the tags, which acts as a wrapper for
-# <tt>render_subitem</tt>.
-#
-# @param relation_type  Either <tt>child</tt> or <tt>relation</tt>
-# @param params         The ns_set id for extra HTML parameters
-#
-# @see proc publish::render_subitem
 
-proc publish::process_tag { relation_type params } {
+ad_proc -private publish::process_tag { relation_type params } {
+
+  @private process_tag
+ 
+  Process a <tt>child</tt> or <tt>relation</tt> tag. This is
+  a helper proc for the tags, which acts as a wrapper for
+  <tt>render_subitem</tt>.
+ 
+  @param relation_type  Either <tt>child</tt> or <tt>relation</tt>
+  @param params         The ns_set id for extra HTML parameters
+ 
+  @see proc publish::render_subitem
+
+} {
 
   set tag   [template::get_attribute content $params tag]
   set index [template::get_attribute content $params index 1]
@@ -1021,19 +1085,21 @@ template_tag content { params } {
   template::adp_append_code "append __adp_output \[$command\]" 
 }
 
-
-# @private html_args
-#
-# Concatenate a list of name-value pairs as returned by
-# <tt>set_to_pairs</tt> into a list of "name=value" pairs
-# 
-# @param argv   The list of name-value pairs
-#
-# @return An HTML string in format "name=value name=value ..."
-#
-# @see proc publish::set_to_pairs
  
-proc publish::html_args { argv } {
+ad_proc -private publish::html_args { argv } {
+
+  @private html_args
+ 
+  Concatenate a list of name-value pairs as returned by
+  <tt>set_to_pairs</tt> into a list of "name=value" pairs
+  
+  @param argv   The list of name-value pairs
+ 
+  @return An HTML string in format "name=value name=value ..."
+ 
+  @see proc publish::set_to_pairs
+
+} {
   set extra_html ""
   if { ![template::util::is_nil argv] } {
     foreach { name value } $argv {
@@ -1044,26 +1110,28 @@ proc publish::html_args { argv } {
   return $extra_html
 }
 
-# @public item_include_tag
-#
-# Create an include tag to include an item, in the form
-# <blockquote><tt>
-# include src=/foo/bar/baz item_id=<i>item_id</i> 
-#   param=value param=value ...
-# </tt></blockquote>
-#
-# @param item_id  The item id
-#
-# @param extra_args {}
-#   A list of extra parameters to be passed to the <tt>include</tt>
-#   tag, in form {name value name value ...}
-#
-# @return The HTML for the include tag
-#
-# @see proc item::item_url
-# @see proc publish::html_args
+ad_proc -public publish::item_include_tag { item_id {extra_args {}} } {
 
-proc publish::item_include_tag { item_id {extra_args {}} } {
+  @public item_include_tag
+ 
+  Create an include tag to include an item, in the form
+  <blockquote><tt>
+  include src=/foo/bar/baz item_id=<i>item_id</i> 
+    param=value param=value ...
+  </tt></blockquote>
+ 
+  @param item_id  The item id
+ 
+  @param extra_args {}
+    A list of extra parameters to be passed to the <tt>include</tt>
+    tag, in form {name value name value ...}
+ 
+  @return The HTML for the include tag
+ 
+  @see proc item::item_url
+  @see proc publish::html_args
+
+} {
 
   # Concatenate all the extra html arguments into a string
   set extra_html [publish::html_args $extra_args]""
@@ -1076,54 +1144,57 @@ proc publish::item_include_tag { item_id {extra_args {}} } {
 # Procs for handling mime types
 #
 
-# @public handle_binary_file
-#
-# Helper procedure for writing handlers for binary files.
-# It will write the blob of the item to the filesystem,
-# but only if -embed is specified. Then, it will attempt to
-# merge the image with its template. <br>
-# This proc accepts exactly the same options a typical handler.
-#
-# @param item_id   
-#    The id of the item to handle
-#
-# @param revision_id_ref {<i>required</i>} 
-#    The name of the variable in the calling frame that will
-#    recieve the revision_id whose content blob was written
-#    to the filesystem. 
-#
-# @param url_ref   
-#    The name of the variable in the calling frame that will
-#    recieve the relative URL of the file in the file system
-#    which contains the content blob
-#   
-# @param error_ref 
-#    The name of the variable in the calling frame that will
-#    recieve an error message. If no error has ocurred, this
-#    variable will be set to the empty string ""
-# 
-# @option embed    
-#    Signifies that the content should be embedded directly in
-#    the parent item. <tt>-embed</tt> is <b>required</b> for this 
-#    proc, since it makes no sense to handle the binary file
-#    in any other way.
-#
-# @option revision_id {default The live revision for the item}
-#    The revision whose content is to be used
-#
-# @option no_merge 
-#    If present, do NOT merge with the template, in order to
-#    prevent infinite recursion in the &lt;content&gt tag. In 
-#    this case, the proc will return the empty string ""
-#  
-# @return The HTML resulting from merging the item with its 
-#    template, or "" if no template exists or the <tt>-no_merge</tt>
-#    flag was specified
-#
-# @see proc publish::handle::image 
 
-proc publish::handle_binary_file { 
+ad_proc -public publish::handle_binary_file { 
   item_id revision_id_ref url_ref error_ref args 
+} {
+
+  @public handle_binary_file
+ 
+  Helper procedure for writing handlers for binary files.
+  It will write the blob of the item to the filesystem,
+  but only if -embed is specified. Then, it will attempt to
+  merge the image with its template. <br>
+  This proc accepts exactly the same options a typical handler.
+ 
+  @param item_id   
+     The id of the item to handle
+ 
+  @param revision_id_ref {<i>required</i>} 
+     The name of the variable in the calling frame that will
+     recieve the revision_id whose content blob was written
+     to the filesystem. 
+ 
+  @param url_ref   
+     The name of the variable in the calling frame that will
+     recieve the relative URL of the file in the file system
+     which contains the content blob
+    
+  @param error_ref 
+     The name of the variable in the calling frame that will
+     recieve an error message. If no error has ocurred, this
+     variable will be set to the empty string ""
+  
+  @option embed    
+     Signifies that the content should be embedded directly in
+     the parent item. <tt>-embed</tt> is <b>required</b> for this 
+     proc, since it makes no sense to handle the binary file
+     in any other way.
+ 
+  @option revision_id {default The live revision for the item}
+     The revision whose content is to be used
+ 
+  @option no_merge 
+     If present, do NOT merge with the template, in order to
+     prevent infinite recursion in the &lt;content&gt tag. In 
+     this case, the proc will return the empty string ""
+   
+  @return The HTML resulting from merging the item with its 
+     template, or "" if no template exists or the <tt>-no_merge</tt>
+     flag was specified
+ 
+  @see proc publish::handle::image 
+
 } {
 
   template::util::get_opts $args
@@ -1170,12 +1241,15 @@ proc publish::handle_binary_file {
 }
 
 
-# The basic image handler. Writes the image blob to the filesystem,
-# then either merges with the template or provides a default <img>
-# tag. Uses the title for alt text if no alt text is specified 
-# externally.
 
-ad_proc publish::handle::image { item_id args } {
+ad_proc -public publish::handle::image { item_id args } {
+
+  The basic image handler. Writes the image blob to the filesystem,
+  then either merges with the template or provides a default <img>
+  tag. Uses the title for alt text if no alt text is specified 
+  externally.
+
+} {
 
   template::util::get_opts $args
 
@@ -1239,9 +1313,11 @@ ad_proc publish::handle::image { item_id args } {
 
 }
 
-# Return the text body of the item
+ad_proc -public publish::handle::text { item_id args } {
 
-proc publish::handle::text { item_id args } {
+  Return the text body of the item
+
+} {
 
   template::util::get_opts $args
 
@@ -1281,24 +1357,27 @@ proc publish::handle::text { item_id args } {
 #
 # Scheduled proc stuff
 
-# @public set_publish_status
-#
-# Set the publish status of the item. If the status is live, publish the
-# live revision of the item to the filesystem. Otherwise, unpublish
-# the item from the filesystem.
-#
-# @param db          The database handle
-# @param item_id     The item id
-# @param new_status
-#   The new publish status. Must be "production", "expired", "ready" or
-#   "live"
-# @param revision_id {default The live revision}
-#   The revision id to be used when publishing the item to the filesystem.
-# 
-# @see proc publish::publish_revision
-# @see proc publish::unpublish_item
 
-ad_proc publish::set_publish_status { item_id new_status {revision_id ""} } {
+ad_proc -public publish::set_publish_status { item_id new_status {revision_id ""} } {
+
+  @public set_publish_status
+ 
+  Set the publish status of the item. If the status is live, publish the
+  live revision of the item to the filesystem. Otherwise, unpublish
+  the item from the filesystem.
+ 
+  @param db          The database handle
+  @param item_id     The item id
+  @param new_status
+    The new publish status. Must be "production", "expired", "ready" or
+    "live"
+  @param revision_id {default The live revision}
+    The revision id to be used when publishing the item to the filesystem.
+  
+  @see proc publish::publish_revision
+  @see proc publish::unpublish_item
+
+} {
 
 
   switch $new_status {
@@ -1349,14 +1428,16 @@ ad_proc publish::set_publish_status { item_id new_status {revision_id ""} } {
 
 }
      
-
-# @private track_publish_status
-#
-# Scheduled proc which keeps the publish status updated
-#
-# @see proc publish::schedule_status_sweep
  
-ad_proc publish::track_publish_status {} {
+ad_proc -private publish::track_publish_status {} {
+
+  @private track_publish_status
+ 
+  Scheduled proc which keeps the publish status updated
+ 
+  @see proc publish::schedule_status_sweep
+
+} {
   
   ns_log notice "PUBLISH: Tracking publish status"
 
@@ -1419,27 +1500,30 @@ ad_proc publish::track_publish_status {} {
   }
 }
 
-# @public schedule_status_sweep
-#
-# Schedule a proc to keep track of the publish status. Resets
-# the publish status to "expired" if the expiration date has passed.
-# Publishes the item and sets the publish status to "live" if 
-# the current status is "ready" and the scheduled publication time
-# has passed.
-#
-# @param interval {default 3600}
-#   The interval, in seconds, between the sweeps of all items in
-#   the content repository. Lower values increase the precision
-#   of the publishing/expiration dates but decrease performance.
-#   If this parameter is not specified, the value of the 
-#   StatusSweepInterval parameter in the server's INI file is used 
-#   (if it exists).
-#   
-# @see proc publish::set_publish_status
-# @see proc publish::unschedule_status_sweep
-# @see proc publish::track_publish_status
 
-proc publish::schedule_status_sweep { {interval ""} } {
+ad_proc -public publish::schedule_status_sweep { {interval ""} } {
+
+  @public schedule_status_sweep
+ 
+  Schedule a proc to keep track of the publish status. Resets
+  the publish status to "expired" if the expiration date has passed.
+  Publishes the item and sets the publish status to "live" if 
+  the current status is "ready" and the scheduled publication time
+  has passed.
+ 
+  @param interval {default 3600}
+    The interval, in seconds, between the sweeps of all items in
+    the content repository. Lower values increase the precision
+    of the publishing/expiration dates but decrease performance.
+    If this parameter is not specified, the value of the 
+    StatusSweepInterval parameter in the server's INI file is used 
+    (if it exists).
+    
+  @see proc publish::set_publish_status
+  @see proc publish::unschedule_status_sweep
+  @see proc publish::track_publish_status
+
+} {
 
   if { [template::util::is_nil interval] } {
     # Kludge: relies on that CMS is a singleton package
@@ -1453,14 +1537,15 @@ proc publish::schedule_status_sweep { {interval ""} } {
   
 }
 
+ad_proc -public publish::unschedule_status_sweep {} {
 
-# @public unschedule_status_sweep
-#
-# Unschedule the proc which keeps track of the publish status. 
-#
-# @see proc publish::schedule_status_sweep
+  @public unschedule_status_sweep
+ 
+  Unschedule the proc which keeps track of the publish status. 
+ 
+  @see proc publish::schedule_status_sweep
 
-proc publish::unschedule_status_sweep {} {
+} {
   
   set proc_id [cache get status_sweep_proc_id]
   if { ![template::util::is_nil proc_id] } {

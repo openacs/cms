@@ -163,16 +163,35 @@
         </querytext>
 </fullquery>
 
-<fullquery name="content::upload_content.update_cr_revisions">
-	<querytext>
 
+<fullquery name="content::upload_content.upload_revision">      
+      <querytext>
       update cr_revisions 
       set content = empty_blob() where revision_id = :revision_id
       returning content into :1
-
-	</querytext>
+      </querytext>
 </fullquery>
 
+<fullquery name="content::upload_content.upload_text_revision">      
+      <querytext>
+
+             update cr_revisions 
+             set content = empty_blob() where revision_id = :revision_id
+             returning content into :1
+      
+      </querytext>
+</fullquery>
+
+<fullquery name="content::upload_content.upload_revision">      
+      <querytext>
+
+             update cr_revisions 
+             set content = empty_blob() where revision_id = :revision_id
+             returning content into :1
+      
+      </querytext>
+</fullquery>
+ 
 <partialquery name="content::get_sql_value.string_to_timestamp">
 	<querytext>
 
@@ -274,84 +293,17 @@
 	</querytext>
 </fullquery>
 
-<partialquery name="content::add_basic_revision.abr_new_revision_title">
-	<querytext>
+<fullquery name="content::add_basic_revision.basic_get_revision_id">      
+      <querytext>
+      begin :1 := content_revision.new(
+               item_id       => content_symlink.resolve(:item_id),
+               revision_id   => :revision_id,
+               title         => :title,
+               creation_ip   => :creation_ip,
+               creation_user => :creation_user $param_sql); end;
+      </querytext>
+</fullquery>
 
-begin :revision_id := content_revision.new(
-         title         => :title
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_description">
-	<querytext>
-         , description         => :description
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_publish_date">
-	<querytext>
-         , publish_date         => :publish_date
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_mime_type">
-	<querytext>
-         , mime_type         => :mime_type
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_nls_language">
-	<querytext>
-         , nls_language         => :nls_language
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_text">
-	<querytext>
-         , text         => :text
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_description_ne">
-	<querytext>
-         , description         => null
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_publish_date_ne">
-	<querytext>
-         , publish_date         => sysdate
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_mime_type_ne">
-	<querytext>
-         , mime_type         => 'text/plain'
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_nls_language_ne">
-	<querytext>
-         , nls_language         => null
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_text_ne">
-	<querytext>
-         , text         => ' '
-	</querytext>
-</partialquery>
-
-<partialquery name="content::add_basic_revision.abr_new_revision_end_items">
-	<querytext>
-       , item_id       => content_symlink.resolve(:item_id),
-         revision_id   => :revision_id,
-         creation_date  => sysdate,
-         creation_ip   => :creation_ip,
-         creation_user => :creation_user
-      ); end;
-	</querytext>
-</partialquery>
 
 <fullquery name="content::update_content_from_file.upcff_update_cr_revisions">
 	<querytext>

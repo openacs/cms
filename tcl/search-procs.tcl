@@ -2,12 +2,15 @@
 
 namespace eval search {}
 
-# Convert a list of keywords, such as "rat fish bird"
-# into an Intermedia search clause of the form
-# %rat%, %fish%, %bird%
-# If the -within varname option is specified, use the within clause
-# In the future, do something so that the scoring is consistent
-proc search::intermedia_keywords { keywords args } {
+ad_proc -public search::intermedia_keywords { keywords args } {
+
+    Convert a list of keywords, such as "rat fish bird"
+    into an Intermedia search clause of the form
+    %rat%, %fish%, %bird%
+    If the -within varname option is specified, use the within clause
+    In the future, do something so that the scoring is consistent
+
+} {
 
   template::util::get_opts args
 

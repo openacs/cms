@@ -4,15 +4,18 @@
 #
 ##############################################
 
-# Redirect the user to an error message
-# In the future, have this procedure produce a custom, internationalized
-# error message, or something
-
-# Will pick up mount_point, id, parent_id if they exist in the calling
-# frame
-
-ad_proc content::show_error { 
+ad_proc -public content::show_error { 
   message {return_url {}} {passthrough {}}
+} {
+
+  Redirect the user to an error message
+  In the future, have this procedure produce a custom, internationalized
+  error message, or something
+
+  Will pick up mount_point, id, parent_id if they exist in the calling
+  frame
+
+
 } {
   
   if { [template::util::is_nil return_url] } {
@@ -29,20 +32,24 @@ ad_proc content::show_error {
   template::forward "[ad_conn package_url]error?[export_vars { message return_url passthrough}]"
 }
   
-# Query the datatbase for access, show the error page if
-# no sufficient access is found. Set up an array
-# called "user_permissions" in the calling frame, where the keys
-# are permissions and the values are "t" or "f"
-# Flags:
-# -user_id <user_id>
-# -mount_point <mount_point>
-# -parent_id <parent_id>
-# -return_url <return_url>
-# -passthrough < { {name value} {name value} ... }
-# -request_error: if present, use request error as opposed to error box
-# -refresh: if present, update query cache
 
-ad_proc content::check_access { object_id privilege args } { 
+ad_proc -public content::check_access { object_id privilege args } { 
+
+  Query the datatbase for access, show the error page if
+  no sufficient access is found. Set up an array
+  called "user_permissions" in the calling frame, where the keys
+  are permissions and the values are "t" or "f"
+  Flags:
+  -user_id <user_id>
+  -mount_point <mount_point>
+  -parent_id <parent_id>
+  -return_url <return_url>
+  -passthrough < { {name value} {name value} ... }
+  -request_error: if present, use request error as opposed to error box
+  -refresh: if present, update query cache
+
+
+} {
 
   # Set up the default options
   foreach varname { mount_point return_url parent_id passthrough } {
@@ -62,20 +69,21 @@ ad_proc content::check_access { object_id privilege args } {
   # Query the database, set up the array
   upvar user_permissions user_permissions
 
-  set code [list template::query ca_get_perm_list perm_list multilist "
+  if { [info exists opts(refresh)] } {
+    set switches "-refresh"
+  } else {
+    set switches ""
+  }
+
+  template::query ca_get_perm_list perm_list multilist "
     select 
       p.privilege,
       cms_permission.permission_p (
         :object_id, :user_id, p.privilege
       ) as is_granted
     from 
-      acs_privileges p" \
-      -cache "content::check_access $object_id $user_id" -persistent \
-      -timeout 300]
-  if { [info exists opts(refresh)] } {
-    lappend code "-refresh"
-  }
-  eval $code
+      acs_privileges p
+   " -cache "content::check_access $object_id $user_id" -persistent -timeout 300 $switches 
     
   template::util::list_of_lists_to_array $perm_list user_permissions
 
@@ -129,21 +137,26 @@ ad_proc content::check_access { object_id privilege args } {
 
 }
 
-# Flush the cache used by check_access
-ad_proc content::flush_access_cache { {object_id {}} } {
+ad_proc -public content::flush_access_cache { {object_id {}} } {
+
+  Flush the cache used by check_access
+
+} {
   template::query::flush_cache "content::check_access ${object_id}*"
 }
 
-# Generate a form for modifying permissions
-# Requires object_id, grantee_id, user_id to be set in calling frame
+ad_proc -public content::perm_form_generate { form_name_in {passthrough "" } } {
 
-ad_proc content::perm_form_generate { form_name_in {passthrough "" } } {
+  Generate a form for modifying permissions
+  Requires object_id, grantee_id, user_id to be set in calling frame
+
+} {
 
   upvar perm_form_name form_name
   set form_name $form_name_in
 
-  set sql [db_map pfg_get_permission_boxes]
   upvar __sql sql
+  set sql [db_map pfg_get_permission_boxes]
   
   uplevel {
     set is_request [form is_request $perm_form_name]
@@ -190,17 +203,19 @@ ad_proc content::perm_form_generate { form_name_in {passthrough "" } } {
 }
 
 
-# Process the permission form
+ad_proc -public content::perm_form_process { form_name_in } {
 
-ad_proc content::perm_form_process { form_name_in } {
+  Process the permission form
+
+} {
 
   upvar perm_form_name form_name
   set form_name $form_name_in
 
-  set sql_grant [db_map pfp_grant_permission_1]
-  set sql_revoke [db_map pfp_revoke_permission_1]
   upvar __sql_grant sql_grant
   upvar __sql_revoke sql_revoke
+  set sql_grant [db_map pfp_grant_permission_1]
+  set sql_revoke [db_map pfp_revoke_permission_1]
   
   uplevel {
 
