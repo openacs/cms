@@ -32,9 +32,9 @@ ad_proc -public workflow::notify_of_assignments { case_id user_id } {
       and
         c.workflow_key = t.workflow_key
       and
-        ca.transition_key = t.transition_key
+        ca.role_key = t.role_key
       and
-        ca.transition_key = cd.transition_key
+        t.transition_key = cd.transition_key
       and
         c.case_id = ca.case_id
       and
@@ -117,9 +117,9 @@ ad_proc -public workflow::notify_admin_of_new_tasks { case_id transition_key } {
       and
         c.case_id = :case_id
       and
-        ca.transition_key = t.transition_key
+        ca.role_key = t.role_key
       and
-        ca.transition_key = cd.transition_key
+        t.transition_key = cd.transition_key
       and
         t.transition_key = :transition_key
       and
