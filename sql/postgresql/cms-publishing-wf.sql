@@ -6,70 +6,77 @@ create table cr_workflows (
                  references wf_cases
 );
 
+create function inline_0 ()
+returns integer as '
 declare
   v_workflow_key varchar(100);
 
 begin
 
-  v_workflow_key := workflow.create_workflow (
-      workflow_key  => 'publishing',
-      pretty_name   => 'Simple Publishing Workflow',
-      pretty_plural => 'Simple Publishing Workflows',
-      description   =>   'A simple linear workflow for authoring, 
-                          editing and scheduling content items.',
-      table_name    => 'cr_workflows');
+   v_workflow_key := workflow__create_workflow(
+      ''publishing'',
+      ''Simple Publishing Workflow'',
+      ''Simple Publishing Workflows'',
+      ''A simple linear workflow for authoring, 
+        editing and scheduling content items.'',
+      ''cr_workflows'',
+      ''case_id''
+      );
 
-end;
-/ 
-show errors
+   return 0;
+end;' language 'plpgsql';
 
-create or replace package publishing_wf as
+select inline_0 ();
 
-  -- simply check the 'next_place' attribute and return true if
-  -- it matches the submitted place_key
+drop function inline_0 ();
 
-  function is_next (
-    case_id           in number, 
-    workflow_key      in varchar, 
-    transition_key    in varchar, 
-    place_key         in varchar, 
-    direction	      in varchar, 
-    custom_arg	      in varchar
-  ) return char;
+ 
+-- show errors
 
-end publishing_wf;
-/
-show errors
+-- create or replace package publishing_wf as
+-- 
+--   -- simply check the 'next_place' attribute and return true if
+--   -- it matches the submitted place_key
+-- 
+--   function is_next (
+--     case_id           in number, 
+--     workflow_key      in varchar, 
+--     transition_key    in varchar, 
+--     place_key         in varchar, 
+--     direction	      in varchar, 
+--     custom_arg	      in varchar
+--   ) return char;
+-- 
+-- end publishing_wf;
 
-create or replace package body publishing_wf as
+-- show errors
 
-  function is_next (
-    case_id           in number, 
-    workflow_key      in varchar, 
-    transition_key    in varchar, 
-    place_key         in varchar, 
-    direction	      in varchar, 
-    custom_arg	      in varchar
-  ) return char is
+-- create or replace package body publishing_wf as
+-- function is_next
+create function publishing_wf__is_next (integer,varchar,varchar,varchar,varchar,varchar)
+returns char as '
+declare
+  p_case_id                        alias for $1;  
+  p_workflow_key                   alias for $2;  
+  p_transition_key                 alias for $3;  
+  p_place_key                      alias for $4;  
+  p_direction                      alias for $5;  
+  p_custom_arg                     alias for $6;  
+  v_next_place                     varchar(100);  
+  v_result                         boolean;
+begin
 
-    v_next_place varchar(100);
-    v_result char(1) := 'f';
+    v_next_place := workflow_case__get_attribute_value(case_id,''next_place'');
 
-  begin
-
-    v_next_place := workflow_case.get_attribute_value(case_id, 'next_place');
-
-    if v_next_place = place_key then
-      v_result := 't';
+    if v_next_place = p_place_key then
+      v_result := ''t'';
     end if;
      
     return v_result;
+   
+end;' language 'plpgsql';
 
-  end is_next;
-  
-end publishing_wf;
-/
-show errors
+-- show errors
 
 insert into wf_places (
   place_key, workflow_key, place_name, sort_order
@@ -95,7 +102,7 @@ insert into wf_places (
   'end', 'publishing_wf', 'Approved', 4
 );
 
-/*
+*
  * The next step is to define the valid transitions from one place in the 
  * workflow to another.  Transitions are where actions occur, either on the
  * part of users or machines.
@@ -119,7 +126,7 @@ insert into wf_transitions (
   'approval', 'Approval', 'publishing_wf', 3, 'user'
 );
 
-/* 
+* 
  * The next step is connect transitions to places.  This is analogous
  * to adding arrows or arcs to the workflow diagram, pointing from places
  * to transitions and from transitions to other places.
@@ -210,34 +217,49 @@ insert into wf_arcs (
 );
 
 
+create function inline_1 ()
+returns integer as '
 declare
     v_attribute_id acs_attributes.attribute_id%TYPE;
 begin
-    v_attribute_id := workflow.create_attribute(
-	workflow_key   => 'publishing_wf',
-	attribute_name => 'next_place',
-	datatype       => 'string',
-	wf_datatype    => 'none',
-	pretty_name    => 'Next Place',
-	default_value  => 'start'
+    v_attribute_id := workflow__create_attribute(
+	''publishing_wf'',
+	''next_place'',
+	''string'',
+	''Next Place'',
+        null,
+        null,
+        null,
+	''start'',
+        1,
+        1,
+        null,
+        ''generic'',
+	''none''
     );
 
     insert into wf_transition_attribute_map
         (workflow_key, transition_key, attribute_id, sort_order) 
     values
-        ('publishing_wf', 'authoring', v_attribute_id, 1);
+        (''publishing_wf'', ''authoring'', v_attribute_id, 1);
 
     insert into wf_transition_attribute_map
         (workflow_key, transition_key, attribute_id, sort_order) 
     values
-        ('publishing_wf', 'editing', v_attribute_id, 1);
+        (''publishing_wf'', ''editing'', v_attribute_id, 1);
 
     insert into wf_transition_attribute_map
         (workflow_key, transition_key, attribute_id, sort_order) 
     values
-        ('publishing_wf', 'approval', v_attribute_id, 1);
+        (''publishing_wf'', ''approval'', v_attribute_id, 1);
 
-end;
-/
-show errors;
+    return 0;
+end;' language 'plpgsql';
+
+select inline_1 ();
+
+drop function inline_1 ();
+
+
+-- show errors
 

@@ -1,502 +1,504 @@
 -- This file will eventually replace content-perms.sql
 -- Implements the CMS permission
 
-declare 
-  v_perms varchar2(1) := 'f';
+create function inline_0 ()
+returns integer as '
+declare
+  v_perms varchar2(1) := ''f'';
 begin
-  
-  begin
-    select 't' into v_perms from dual 
-    where exists (select 1 from acs_privileges 
-                  where privilege = 'cm_root');
-  exception when no_data_found then
-    v_perms := 'f';
-  end;
+    
+  select ''t'' into v_perms from dual 
+  where exists (select 1 from acs_privileges 
+                 where privilege = ''cm_root'');
 
-  if v_perms <> 't' then
+  if NOT FOUND then
+     v_perms := ''f'';
+  end if;
+
+  if v_perms <> ''t'' then
 
     -- Dummy root privilege
-    acs_privilege.create_privilege('cm_root', 'Root', 'Root');
+    PERFORM acs_privilege__create_privilege('cm_root', 'Root', 'Root');
     -- He can do everything
-    acs_privilege.create_privilege('cm_admin', 'Administrator', 'Administrators');
-    acs_privilege.create_privilege('cm_relate', 'Relate Items', 'Relate Items');
-    acs_privilege.create_privilege('cm_write', 'Write', 'Write');    
-    acs_privilege.create_privilege('cm_new', 'Create New Item', 'Create New Item');    
-    acs_privilege.create_privilege('cm_examine', 'Admin-level Read', 'Admin-level Read');    
-    acs_privilege.create_privilege('cm_read', 'User-level Read', 'User-level Read');    
-    acs_privilege.create_privilege('cm_item_workflow', 'Modify Workflow', 'Modify Workflow');    
-    acs_privilege.create_privilege('cm_perm_admin', 'Modify Any Permissions', 'Modify Any Permissions');    
-    acs_privilege.create_privilege('cm_perm', 'Donate Permissions', 'Donate Permissions');    
+    PERFORM acs_privilege__create_privilege('cm_admin', 'Administrator', 'Administrators');
+    PERFORM acs_privilege__create_privilege('cm_relate', 'Relate Items', 'Relate Items');
+    PERFORM acs_privilege__create_privilege('cm_write', 'Write', 'Write');    
+    PERFORM acs_privilege__create_privilege('cm_new', 'Create New Item', 'Create New Item');    
+    PERFORM acs_privilege__create_privilege('cm_examine', 'Admin-level Read', 'Admin-level Read');    
+    PERFORM acs_privilege__create_privilege('cm_read', 'User-level Read', 'User-level Read');    
+    PERFORM acs_privilege__create_privilege('cm_item_workflow', 'Modify Workflow', 'Modify Workflow');    
+    PERFORM acs_privilege__create_privilege('cm_perm_admin', 'Modify Any Permissions', 'Modify Any Permissions');
+    
+    PERFORM acs_privilege__create_privilege('cm_perm', 'Donate Permissions', 'Donate Permissions');    
 
-    acs_privilege.add_child('cm_root', 'cm_admin');           -- Do anything
-    acs_privilege.add_child('cm_admin', 'cm_relate');         -- Related/Child items
-    acs_privilege.add_child('cm_relate', 'cm_write');         -- Modify the item
-    acs_privilege.add_child('cm_write', 'cm_new');            -- Create subitems
-    acs_privilege.add_child('cm_new', 'cm_examine');          -- View in admin mode 
-    acs_privilege.add_child('cm_examine', 'cm_read');         -- View in user mode
-    acs_privilege.add_child('cm_admin', 'cm_item_workflow');  -- Change item workflow
+    PERFORM acs_privilege__add_child('cm_root', 'cm_admin');           -- Do anything
+    PERFORM acs_privilege__add_child('cm_admin', 'cm_relate');         -- Related/Child items
+    PERFORM acs_privilege__add_child('cm_relate', 'cm_write');         -- Modify the item
+    PERFORM acs_privilege__add_child('cm_write', 'cm_new');            -- Create subitems
+    PERFORM acs_privilege__add_child('cm_new', 'cm_examine');          -- View in admin mode 
+    PERFORM acs_privilege__add_child('cm_examine', 'cm_read');         -- View in user mode
+    PERFORM acs_privilege__add_child('cm_admin', 'cm_item_workflow');  -- Change item workflow
 
-    acs_privilege.add_child('cm_admin', 'cm_perm_admin');     -- Modify any permissions
-    acs_privilege.add_child('cm_perm_admin', 'cm_perm');      -- Modify any permissions on an item
+    PERFORM acs_privilege__add_child('cm_admin', 'cm_perm_admin');     -- Modify any permissions
+    PERFORM acs_privilege__add_child('cm_perm_admin', 'cm_perm');      -- Modify any permissions on an item
 
     -- Proper inheritance
-    acs_privilege.add_child('admin', 'cm_root');
+    PERFORM acs_privilege__add_child('admin', 'cm_root');
 
   end if;
   
-end;
-/
-show errors
+  return 0;
+end;' language 'plpgsql';
 
-create or replace package cms_permission 
-is
-  procedure update_permissions (
-    --/** Make the child item inherit all of the permissions of the parent
-    --    item. Typically, this function is called whenever permissions on
-    --    an item are changed for the first time.
-    --    @author Stanislav Freidin
-    --    @param item_id      The item_id
-    --    @param is_recursive If 'f', update child items as well, otherwise
-    --        update only the item itself (note: this is the opposite of
-    --        is_recursive in grant_permission and revoke_permission)
-    --    @see {cms_permission.grant_permission}, {cms_permission.copy_permissions}
-    --*/  
-    item_id           in cr_items.item_id%TYPE,
-    is_recursive      in varchar2 default 't'
-  );
+select inline_0 ();
 
-  function has_grant_authority (
-    --/** Determine if the user may grant a certain permission to another
-    --    user. The permission may only be granted if the user has 
-    --    the permission himself and posesses the cm_perm access, or if the
-    --    user posesses the cm_perm_admin access.
-    --    @author Stanislav Freidin
-    --    @param item_id     The item whose permissions are to be changed
-    --    @param holder_id   The person who is attempting to grant the permissions
-    --    @param privilege   The privilege to be granted
-    --    @return 't' if the donation is possible, 'f' otherwise
-    --    @see {cms_permission.grant_permission}, 
-    --         {cms_permission.is_has_revoke_authority},
-    --         {acs_permission.grant_permission}
-    --*/
-    item_id           in cr_items.item_id%TYPE,
-    holder_id         in parties.party_id%TYPE, 
-    privilege         in acs_privileges.privilege%TYPE
-  ) return varchar2;
-   
-  procedure grant_permission (
-    --/** Grant the specified privilege to another user. If the donation is
-    --    not possible, the procedure does nothing.
-    --    @author Stanislav Freidin
-    --    @param item_id       The item whose permissions are to be changed
-    --    @param holder_id     The person who is attempting to grant the permissions
-    --    @param privilege     The privilege to be granted
-    --    @param recepient_id  The person who will gain the privilege 
-    --    @param is_recursive  If 't', applies the donation recursively to
-    --      all child items of the item (equivalent to UNIX's <tt>chmod -r</tt>).
-    --      If 'f', only affects the item itself.
-    --    @see {cms_permission.has_grant_authority}, 
-   --          {cms_permission.revoke_permission},
-    --         {acs_permission.grant_permission}
-    --*/
-    item_id           in cr_items.item_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE,
-    recepient_id      in parties.party_id%TYPE,
-    is_recursive      in varchar2 default 'f'
-  );
-
-  function has_revoke_authority (
-    --/** Determine if the user may take a certain permission away from another
-    --    user. The permission may only be revoked if the user has 
-    --    the permission himself and posesses the cm_perm access, while the
-    --    other user does not, or if the user posesses the cm_perm_admin access.
-    --    @author Stanislav Freidin
-    --    @param item_id     The item whose permissions are to be changed
-    --    @param holder_id   The person who is attempting to revoke the permissions
-    --    @param privilege   The privilege to be revoked
-    --    @param revokee_id  The user from whom the privilege is to be taken away
-    --    @return 't' if it is possible to revoke the privilege, 'f' otherwise
-    --    @see {cms_permission.has_grant_authority}, 
-    --         {cms_permission.revoke_permission},
-    --         {acs_permission.revoke_permission}
-    --*/
-    item_id           in cr_items.item_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE,
-    revokee_id        in parties.party_id%TYPE
-  ) return varchar2;
-
-  procedure revoke_permission (
-    --/** Take the specified privilege away from another user. If the operation is
-    --    not possible, the procedure does nothing.
-    --    @author Stanislav Freidin
-    --    @param item_id       The item whose permissions are to be changed
-    --    @param holder_id     The person who is attempting to revoke the permissions
-    --    @param privilege     The privilege to be revoked 
-    --    @param recepient_id  The person who will lose the privilege 
-    --    @param is_recursive  If 't', applies the operation recursively to
-    --      all child items of the item (equivalent to UNIX's <tt>chmod -r</tt>).
-    --      If 'f', only affects the iten itself.
-    --    @see {cms_permission.grant_permission}, 
-    --         {cms_permission.has_revoke_authority},
-    --         {acs_permission.revoke_permission}
-    --*/
-    item_id           in cr_items.item_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE,
-    revokee_id        in parties.party_id%TYPE,
-    is_recursive      in varchar2 default 'f'
-  );
-
-  function permission_p (
-    --/** Determine if the user has the specified permission on the specified 
-    --    object. Does NOT check objects recursively: that is, if the user has
-    --    the permission on the parent object, he does not automatically gain 
-    --    the permission on all the child objects.<p>
-    --    In addition, checks if the Publishing workflow has been assigned to
-    --    the item. If it has, then the user must be assigned to the current 
-    --    workflow task in order to utilize his cm_relate, cm_write or cm_new
-    --    permission.
-    --    @author Stanislav Freidin
-    --    @param item_id       The object whose permissions are to be checked
-    --    @param holder_id     The person whose permissions are to be examined
-    --    @param privilege     The privilege to be checked
-    --    @return 't' if the user has the specified permission on the item, 
-    --                'f' otherwise
-    --    @see {cms_permission.grant_permission}, {cms_permission.revoke_permission},
-    --         {acs_permission.permission_p}
-    --*/
-    item_id           in cr_items.item_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE
-  ) return varchar2;
-
-  function cm_admin_exists 
-    --/** Determine if there exists a user who has administrative 
-    --     privileges on the entire content repository.
-    --     @author Stanislav Freidin
-    --     @return 't' if an administrator exists, 'f' otherwise
-    --     @see {cms_permission.grant_permission}
-    --*/
-  return varchar2;
-
-end cms_permission;
-/
-show errors
+drop function inline_0 ();
 
 
-create or replace package body cms_permission
-is
+-- show errors
 
-  procedure update_permissions (
-    item_id           in cr_items.item_id%TYPE,
-    is_recursive      in varchar2 default 'f'
-  )
-  is
-    v_grantee_id   parties.party_id%TYPE;
-    v_privilege    acs_privileges.privilege%TYPE;
-    v_inherit_p    varchar2(1);
-    v_context_id   acs_objects.context_id%TYPE;
-  
-    cursor c_child_cur is
-      select item_id from cr_items 
-        where parent_id = update_permissions.item_id;
-  begin
+-- create or replace package cms_permission 
+-- is
+--   procedure update_permissions (
+--     --/** Make the child item inherit all of the permissions of the parent
+--     --    item. Typically, this function is called whenever permissions on
+--     --    an item are changed for the first time.
+--     --    @author Stanislav Freidin
+--     --    @param item_id      The item_id
+--     --    @param is_recursive If 'f', update child items as well, otherwise
+--     --        update only the item itself (note: this is the opposite of
+--     --        is_recursive in grant_permission and revoke_permission)
+--     --    @see {cms_permission.grant_permission}, {cms_permission.copy_permissions}
+--     --*/  
+--     item_id           in cr_items.item_id%TYPE,
+--     is_recursive      in varchar2 default 't'
+--   );
+-- 
+--   function has_grant_authority (
+--     --/** Determine if the user may grant a certain permission to another
+--     --    user. The permission may only be granted if the user has 
+--     --    the permission himself and posesses the cm_perm access, or if the
+--     --    user posesses the cm_perm_admin access.
+--     --    @author Stanislav Freidin
+--     --    @param item_id     The item whose permissions are to be changed
+--     --    @param holder_id   The person who is attempting to grant the permissions
+--     --    @param privilege   The privilege to be granted
+--     --    @return 't' if the donation is possible, 'f' otherwise
+--     --    @see {cms_permission.grant_permission}, 
+--     --         {cms_permission.is_has_revoke_authority},
+--     --         {acs_permission.grant_permission}
+--     --*/
+--     item_id           in cr_items.item_id%TYPE,
+--     holder_id         in parties.party_id%TYPE, 
+--     privilege         in acs_privileges.privilege%TYPE
+--   ) return varchar2;
+--    
+--   procedure grant_permission (
+--     --/** Grant the specified privilege to another user. If the donation is
+--     --    not possible, the procedure does nothing.
+--     --    @author Stanislav Freidin
+--     --    @param item_id       The item whose permissions are to be changed
+--     --    @param holder_id     The person who is attempting to grant the permissions
+--     --    @param privilege     The privilege to be granted
+--     --    @param recepient_id  The person who will gain the privilege 
+--     --    @param is_recursive  If 't', applies the donation recursively to
+--     --      all child items of the item (equivalent to UNIX's <tt>chmod -r</tt>).
+--     --      If 'f', only affects the item itself.
+--     --    @see {cms_permission.has_grant_authority}, 
+--    --          {cms_permission.revoke_permission},
+--     --         {acs_permission.grant_permission}
+--     --*/
+--     item_id           in cr_items.item_id%TYPE,
+--     holder_id         in parties.party_id%TYPE,
+--     privilege         in acs_privileges.privilege%TYPE,
+--     recepient_id      in parties.party_id%TYPE,
+--     is_recursive      in varchar2 default 'f'
+--   );
+-- 
+--   function has_revoke_authority (
+--     --/** Determine if the user may take a certain permission away from another
+--     --    user. The permission may only be revoked if the user has 
+--     --    the permission himself and posesses the cm_perm access, while the
+--     --    other user does not, or if the user posesses the cm_perm_admin access.
+--     --    @author Stanislav Freidin
+--     --    @param item_id     The item whose permissions are to be changed
+--     --    @param holder_id   The person who is attempting to revoke the permissions
+--     --    @param privilege   The privilege to be revoked
+--     --    @param revokee_id  The user from whom the privilege is to be taken away
+--     --    @return 't' if it is possible to revoke the privilege, 'f' otherwise
+--     --    @see {cms_permission.has_grant_authority}, 
+--     --         {cms_permission.revoke_permission},
+--     --         {acs_permission.revoke_permission}
+--     --*/
+--     item_id           in cr_items.item_id%TYPE,
+--     holder_id         in parties.party_id%TYPE,
+--     privilege         in acs_privileges.privilege%TYPE,
+--     revokee_id        in parties.party_id%TYPE
+--   ) return varchar2;
+-- 
+--   procedure revoke_permission (
+--     --/** Take the specified privilege away from another user. If the operation is
+--     --    not possible, the procedure does nothing.
+--     --    @author Stanislav Freidin
+--     --    @param item_id       The item whose permissions are to be changed
+--     --    @param holder_id     The person who is attempting to revoke the permissions
+--     --    @param privilege     The privilege to be revoked 
+--     --    @param recepient_id  The person who will lose the privilege 
+--     --    @param is_recursive  If 't', applies the operation recursively to
+--     --      all child items of the item (equivalent to UNIX's <tt>chmod -r</tt>).
+--     --      If 'f', only affects the iten itself.
+--     --    @see {cms_permission.grant_permission}, 
+--     --         {cms_permission.has_revoke_authority},
+--     --         {acs_permission.revoke_permission}
+--     --*/
+--     item_id           in cr_items.item_id%TYPE,
+--     holder_id         in parties.party_id%TYPE,
+--     privilege         in acs_privileges.privilege%TYPE,
+--     revokee_id        in parties.party_id%TYPE,
+--     is_recursive      in varchar2 default 'f'
+--   );
+-- 
+--   function permission_p (
+--     --/** Determine if the user has the specified permission on the specified 
+--     --    object. Does NOT check objects recursively: that is, if the user has
+--     --    the permission on the parent object, he does not automatically gain 
+--     --    the permission on all the child objects.<p>
+--     --    In addition, checks if the Publishing workflow has been assigned to
+--     --    the item. If it has, then the user must be assigned to the current 
+--     --    workflow task in order to utilize his cm_relate, cm_write or cm_new
+--     --    permission.
+--     --    @author Stanislav Freidin
+--     --    @param item_id       The object whose permissions are to be checked
+--     --    @param holder_id     The person whose permissions are to be examined
+--     --    @param privilege     The privilege to be checked
+--     --    @return 't' if the user has the specified permission on the item, 
+--     --                'f' otherwise
+--     --    @see {cms_permission.grant_permission}, {cms_permission.revoke_permission},
+--     --         {acs_permission.permission_p}
+--     --*/
+--     item_id           in cr_items.item_id%TYPE,
+--     holder_id         in parties.party_id%TYPE,
+--     privilege         in acs_privileges.privilege%TYPE
+--   ) return varchar2;
+-- 
+--   function cm_admin_exists 
+--     --/** Determine if there exists a user who has administrative 
+--     --     privileges on the entire content repository.
+--     --     @author Stanislav Freidin
+--     --     @return 't' if an administrator exists, 'f' otherwise
+--     --     @see {cms_permission.grant_permission}
+--     --*/
+--   return varchar2;
+-- 
+-- end cms_permission;
+
+-- show errors
+
+-- FIXME: several routines in this file use custom types that need to be 
+-- fixed.
+
+
+-- create or replace package body cms_permission
+-- procedure update_permissions
+create function cms_permission__update_permissions (integer,varchar)
+returns integer as '
+declare
+  p_item_id                        alias for $1;  
+  p_is_recursive                   alias for $2;  -- default ''f''  
+  v_grantee_id                     parties.party_id%TYPE;
+  v_privilege                      acs_privileges.privilege%TYPE;
+  v_inherit_p                      varchar(1);    
+  v_context_id                     acs_objects.context_id%TYPE;
+  c_perm_cur                       record;
+begin
      
     -- If there is no inheritance, nothing to do
     select security_inherit_p, context_id 
      into v_inherit_p, v_context_id
      from acs_objects
-    where object_id = update_permissions.item_id;
+    where object_id = p_item_id;
   
-    if v_inherit_p = 'f' or v_context_id is null then
-      return;
+    if v_inherit_p = ''f'' or v_context_id is null then
+      return null;
     end if; 
 
     -- Remove inheritance on the item
-    update acs_objects set security_inherit_p = 'f' 
-      where object_id = update_permissions.item_id;
+    update acs_objects set security_inherit_p = ''f'' 
+      where object_id = p_item_id;
 
     -- If not recursive, turn off inheritance for children of
     -- this item
-    if is_recursive = 'f' then
+    if p_is_recursive = ''f'' then
       update 
         acs_objects 
       set
-        security_inherit_p = 'f'
+        security_inherit_p = ''f''
       where 
         object_id in (
           select item_id from cr_items 
-            where parent_id = update_permissions.item_id
+            where parent_id = p_item_id
         )
       and
-        security_inherit_p = 't';
+        security_inherit_p = ''t'';
     end if;
 
     -- Get permissions assigned to the parent(s), copy them into child
-    declare
-      cursor c_perm_cur is
+    for c_perm_cur in 
         select 
           p.grantee_id, p.privilege
         from 
           acs_permissions p,
-          (select object_id from acs_objects 
-            connect by prior context_id = object_id 
-                   and security_inherit_p = 't'
-            start with object_id = v_context_id) o
+          (select o2.object_id
+             from (select * 
+                     from acs_objects 
+                    where object_id = v_context_id) o1,
+                  acs_objects o2,
+                  (select case when max(ob2.tree_sortkey) is null 
+                                    then ''/'' 
+                                    else max(ob2.tree_sortkey) 
+                                end as tree_sortkey
+                     from (select * 
+                             from acs_objects 
+                            where object_id = v_context_id) ob1, 
+                          acs_objects ob2
+                    where ob2.tree_sortkey <= ob1.tree_sortkey
+                      and ob1.tree_sortkey like (ob2.tree_sortkey || ''%'')
+                      and ob2.inherit_p = ''f'') o3        
+            where o2.tree_sortkey <= o1.tree_sortkey
+              and o1.tree_sortkey like (o2.tree_sortkey || ''%'')
+              and o2.tree_sortkey > o3.tree_sortkey
+            order by o2.tree_sortkey desc) o
         where  
-          p.object_id = o.object_id;
-    begin
-      open c_perm_cur;
-      loop
-        fetch c_perm_cur into v_grantee_id, v_privilege; 
-        exit when c_perm_cur%NOTFOUND;
-        if acs_permission.permission_p (
-             item_id, v_grantee_id, v_privilege
-           ) = 'f' 
+          p.object_id = o.object_id
+    LOOP
+        v_grantee_id := c_perm_cur.grantee_id;
+        v_privilege := c_perm_cur.privilege; 
+        if acs_permission__permission_p (
+             p_item_id, v_grantee_id, v_privilege
+           ) = ''f'' 
         then
-          acs_permission.grant_permission (
-            item_id, v_grantee_id, v_privilege
+          PERFORM acs_permission__grant_permission (
+            p_item_id, v_grantee_id, v_privilege
           );
         end if;
-      end loop;
-      close c_perm_cur;
-    end;
-   
-  end update_permissions;
+    end loop;
+       
+   return 0; 
+end;' language 'plpgsql';
 
-  function has_grant_authority ( 
-    item_id           in cr_items.item_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE
-  ) return varchar2
-  is
-  begin
+
+-- function has_grant_authority
+create function cms_permission__has_grant_authority (integer,integer,varchar)
+returns boolean as '
+declare
+  p_item_id                        alias for $1;  
+  p_holder_id                      alias for $2;  
+  p_privilege                      alias for $3;  
+begin
     -- Can donate permission only if you already have it and you have cm_perm,
     -- OR you have cm_perm_admin
-    if acs_permission.permission_p (item_id, holder_id, 'cm_perm_admin')= 't' 
+    if acs_permission__permission_p (p_item_id, p_holder_id, ''cm_perm_admin'') = ''t'' 
        or (
-         acs_permission.permission_p (item_id, holder_id, 'cm_perm') = 't' and
-         acs_permission.permission_p (item_id, holder_id, privilege) = 't'
+         acs_permission__permission_p (p_item_id, p_holder_id, ''cm_perm'') = ''t'' and
+         acs_permission__permission_p (p_item_id, p_holder_id, privilege) = ''t''
        ) 
     then
-      return 't';
+      return ''t'';
     else
-      return 'f';
+      return ''f'';
     end if;
-  end has_grant_authority;
+   
+end;' language 'plpgsql';
 
-  function has_revoke_authority (
-    item_id           in cr_items.item_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE,
-    revokee_id        in parties.party_id%TYPE
-  ) return varchar2
-  is
-    cursor c_perm_cur is
-      select 
-        't' 
+
+-- function has_revoke_authority
+create function cms_permission__has_revoke_authority (integer,integer,varchar,integer)
+returns boolean as '
+declare
+  p_item_id                        alias for $1;  
+  p_holder_id                      alias for $2;  
+  p_privilege                      alias for $3;  
+  p_revokee_id                     alias for $4;  
+begin
+      return  
+        count(h2.*) > 0
       from 
-        acs_privilege_hierarchy
+        acs_privilege_hierarchy_index h1, 
+        acs_privilege_hierarchy_index h2
       where
-        acs_permission.permission_p(
-          has_revoke_authority.item_id, 
-          has_revoke_authority.holder_id, 
-          child_privilege
-        ) = 't'
+        acs_permission__permission_p(
+          p_item_id, 
+          p_holder_id, 
+          h2.child_privilege
+        ) = ''t''
       and
-        acs_permission.permission_p(
-          has_revoke_authority.item_id, 
-          has_revoke_authority.revokee_id,
-          privilege
-        ) = 'f'
-      connect by 
-        prior privilege = child_privilege
-      start with 
-        child_privilege = 'cm_perm';
+        acs_permission__permission_p(
+          p_item_id, 
+          p_revokee_id,
+          h2.privilege
+        ) = ''f''
+      and h1.child_privilege = ''cm_perm''
+      and h1.tree_sortkey like (h2.tree_sortkey || ''%'')
+      and h2.tree_sortkey < h1.tree_sortkey
+      limit 1;
+   
+end;' language 'plpgsql';
 
-    v_ret varchar2(1);   
-  begin
-    open c_perm_cur;
-    fetch c_perm_cur into v_ret;
-    if c_perm_cur%NOTFOUND then
-      v_ret := 'f';
-    end if;
-    return v_ret;
-  end has_revoke_authority;
 
-  procedure grant_permission (
-    item_id           in cr_items.item_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE,
-    recepient_id      in parties.party_id%TYPE,
-    is_recursive      in varchar2 default 'f'
-  )
-  is
-    cursor c_item_cur is
+-- procedure grant_permission
+-- FIXME: need to fix problem with defined types
+
+create function cms_permission__grant_permission (integer,integer,varchar,integer,varchar)
+returns integer as '
+declare
+  p_item_id                        alias for $1;  
+  p_holder_id                      alias for $2;  
+  p_privilege                      alias for $3;  
+  p_recepient_id                   alias for $4;  
+  p_is_recursive                   alias for $5;  
+  v_item_id                        cr_items.item_id%TYPE;
+  v_items                          item_array_type;
+  v_idx                            integer;       
+  v_count                          integer;       
+  v_perms                          perm_array_type;
+  v_perm                           acs_privileges.privilege%TYPE;
+  v_perm_idx                       integer;       
+  v_perm_count                     integer;       
+  c_item_cur                       record;
+  c_perm_cur                       record;
+begin
+
+    PERFORM cms_permissions__update_permissions(p_item_id, p_is_recursive);
+  
+    -- Select all child items
+    v_count := 0;
+
+    for c_item_cur in 
       select 
         item_id 
       from 
         (select item_id from cr_items 
-           connect by parent_id = prior item_id
-           start with item_id = grant_permission.item_id) i
+          where tree_sortkey like (select tree_sortkey || ''%''
+                                    from cr_items
+                                   where item_id = p_item_id)
+       order by tree_sortkey) i
       where
-        has_grant_authority (
-          i.item_id, grant_permission.holder_id, grant_permission.privilege
-        ) = 't'
+        cms_permission__has_grant_authority (
+          i.item_id, p_holder_id, p_privilege
+        ) = ''t''
       and 
-        acs_permission.permission_p (
-          i.item_id, grant_permission.recepient_id, grant_permission.privilege
-        ) = 'f';
- 
-    v_item_id    cr_items.item_id%TYPE;
-
-    type item_array_type is table of cr_items.item_id%TYPE 
-      index by binary_integer;
-    v_items      item_array_type;
-    v_idx        integer;
-    v_count      integer;
-
-    cursor c_perm_cur is
-      select descendant from acs_privilege_descendant_map
-      where privilege = grant_permission.privilege
-      and   descendant <> grant_permission.privilege;
-
-    type perm_array_type is table of acs_privileges.privilege%TYPE 
-      index by binary_integer;
-
-    v_perms      perm_array_type;
-    v_perm       acs_privileges.privilege%TYPE;
-    v_perm_idx   integer;
-    v_perm_count integer;
-  begin
-
-    update_permissions(item_id, is_recursive);
-  
-    -- Select all child items
-    open c_item_cur;
-    v_count := 0;
-    loop
-      fetch c_item_cur into v_item_id;
-      exit when c_item_cur%NOTFOUND; 
+        acs_permission__permission_p (
+          i.item_id, p_recepient_id, p_privilege
+        ) = ''f''
+    LOOP
+      v_item_id := c_item_cur.item_id;
       v_count := v_count + 1;
       v_items(v_count) := v_item_id;
-      exit when is_recursive = 'f';
+      exit when p_is_recursive = ''f'';
     end loop;
-    close c_item_cur;   
 
     if v_count < 1 then 
-      return;
+      return null;
     end if;
 
     -- Grant parent permission
     for v_idx in 1..v_count loop
-      acs_permission.grant_permission (
-        v_items(v_idx), recepient_id, privilege
+      PERFORM acs_permission__grant_permission (
+        v_items(v_idx), p_recepient_id, p_privilege
       );
     end loop;  
 
     -- Select the child permissions
     v_perm_count := 0;
-    open c_perm_cur;
+    for c_perm_cur in 
+      select descendant from acs_privilege_descendant_map
+      where privilege = p_privilege
+      and   descendant <> p_privilege
     loop
-      fetch c_perm_cur into v_perm;
-      exit when c_perm_cur%NOTFOUND;
+      v_perm := c_perm_cur.descendant;
       v_perm_count := v_perm_count + 1;
       v_perms(v_perm_count) := v_perm;
     end loop;
-    close c_perm_cur;    
 
     -- Revoke child permissions
     for v_idx in 1..v_count loop
       for v_perm_idx in 1..v_perm_count loop
-        acs_permission.revoke_permission (
-          v_items(v_idx), recepient_id, v_perms(v_perm_idx)
+        PERFORM acs_permission__revoke_permission (
+          v_items(v_idx), p_recepient_id, v_perms(v_perm_idx)
         );
        end loop;
     end loop;
   
-  end grant_permission;
-         
+    return 0; 
+end;' language 'plpgsql';
 
-  procedure revoke_permission (
-    item_id           in cr_items.item_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE,
-    revokee_id        in parties.party_id%TYPE,
-    is_recursive      in varchar2 default 'f'
-  )
-  is
- 
-    cursor c_item_cur is
-      select item_id from cr_items
-        connect by parent_id = prior item_id
-        start with item_id = revoke_permission.item_id
-      where
-        has_revoke_authority (
-          item_id, 
-          cms_permission.revoke_permission.holder_id,
-          cms_permission.revoke_permission.privilege,
-          cms_permission.revoke_permission.revokee_id
-        ) = 't'
-      and
-        acs_permission.permission_p (
-          item_id,
-          cms_permission.revoke_permission.revokee_id,
-          cms_permission.revoke_permission.privilege
-        ) = 't';
 
-    cursor c_perm_cur is
-      select
+-- procedure revoke_permission
+create function cms_permission__revoke_permission (integer,integer,varchar,integer,varchar)
+returns integer as '
+declare
+  p_item_id                        alias for $1;  
+  p_holder_id                      alias for $2;  
+  p_privilege                      alias for $3;  
+  p_revokee_id                     alias for $4;  
+  p_is_recursive                   alias for $5;  
+  v_items                          item_array_type;
+  v_item_id                        cr_items.item_id%TYPE;
+  v_idx                            integer;       
+  v_count                          integer;       
+  v_perms                          perm_array_type;
+  v_perm                           acs_privileges.privilege%TYPE;
+  v_perm_idx                       integer;       
+  v_perm_count                     integer;       
+  c_perm_cur                       record;
+  c_item_cur                       record;
+begin
+  
+    PERFORM update_permissions(p_item_id, p_is_recursive);
+
+    -- Select the child permissions
+    v_perm_count := 0;
+    for c_perm_cur in 
+     select
         child_privilege
       from 
         acs_privilege_hierarchy
       where 
-        privilege = revoke_permission.privilege
+        privilege = p_privilege
       and 
-        child_privilege <> revoke_permission.privilege;
-
-    type item_array_type is table of cr_items.item_id%TYPE 
-      index by binary_integer;
-    v_items      item_array_type;
-    v_item_id    cr_items.item_id%TYPE;
-    v_idx        integer;
-    v_count      integer;
-
-    type perm_array_type is table of acs_privileges.privilege%TYPE 
-      index by binary_integer;
-
-    v_perms      perm_array_type;
-    v_perm       acs_privileges.privilege%TYPE;
-    v_perm_idx   integer;
-    v_perm_count integer;
-  begin
-  
-    update_permissions(item_id, is_recursive);
-
-    -- Select the child permissions
-    v_perm_count := 0;
-    open c_perm_cur;
-    loop
-      fetch c_perm_cur into v_perm;
-      exit when c_perm_cur%NOTFOUND;
+        child_privilege <> p_privilege
+    LOOP
+      v_perm := c_perm_cur.child_privilege;
       v_perm_count := v_perm_count + 1;
       v_perms(v_perm_count) := v_perm;
-    end loop;
-    close c_perm_cur;
+    end LOOP;
 
     -- Select child items 
     v_count := 0;
-    open c_item_cur;
-    loop
-      fetch c_item_cur into v_item_id;
-      exit when c_item_cur%NOTFOUND; 
+    for c_item_cur in
+     select item_id from cr_items
+     where tree_sortkey like (select tree_sortkey || ''%''
+                                from cr_items
+                               where item_id = p_item_id)
+      where
+        cms_permission__has_revoke_authority (
+          item_id, 
+          p_holder_id,
+          p_privilege,
+          p_revokee_id
+        ) = ''t''
+      and
+        acs_permission__permission_p (
+          item_id,
+          p_revokee_id,
+          p_privilege
+        ) = ''t''
+    LOOP
+      v_item_id := c_item_cur.item_id;
       v_count := v_count + 1;
       v_items(v_count) := v_item_id;
-      exit when is_recursive = 'f';
+      exit when p_is_recursive = ''f'';
     end loop;
-    close c_item_cur;   
 
     if v_count < 1 then 
       return;
@@ -505,46 +507,49 @@ is
     -- Grant child permissions
     for v_idx in 1..v_count loop
       for v_perm_idx in 1..v_perm_count loop
-        acs_permission.grant_permission (
-          v_items(v_idx), revokee_id, v_perms(v_perm_idx)
+        PERFORM acs_permission__grant_permission (
+          v_items(v_idx), p_revokee_id, v_perms(v_perm_idx)
         );
        end loop;
     end loop;  
 
     -- Revoke the parent permission
     for v_idx in 1..v_count loop
-      acs_permission.revoke_permission (
+      acs_permission__revoke_permission (
         v_items(v_idx), 
-        revoke_permission.revokee_id, 
-        revoke_permission.privilege
+        p_revokee_id, 
+        p_privilege
       );
     end loop;  
 
-  end revoke_permission;  
+    return 0; 
+end;' language 'plpgsql';
 
-  function permission_p (
-    item_id           in cr_items.item_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE
-  ) return varchar2
-  is
-    v_workflow_count integer;
-    v_task_count     integer;
-  begin
+
+-- function permission_p
+create function cms_permission__permission_p (integer,integer,varchar)
+returns varchar as '
+declare
+  p_item_id                        alias for $1;  
+  p_holder_id                      alias for $2;  
+  p_privilege                      alias for $3;  
+  v_workflow_count                 integer;       
+  v_task_count                     integer;       
+begin
       
     -- Check permission the old-fashioned way first
-    if acs_permission.permission_p (
-         item_id, holder_id, privilege
-       ) = 'f' 
+    if acs_permission__permission_p (
+         p_item_id, p_holder_id, p_privilege
+       ) = ''f'' 
     then
-      return 'f';
+      return ''f'';
     end if;
   
     -- Special case for workflow
 
-    if privilege = 'cm_relate' or 
-       privilege = 'cm_write' or 
-       privilege = 'cm_new' 
+    if p_privilege = ''cm_relate'' or 
+       p_privilege = ''cm_write'' or 
+       p_privilege = ''cm_new'' 
     then
 
       -- Check if the publishing workflow exists, and if it
@@ -554,26 +559,26 @@ is
       from
         wf_cases
       where
-        object_id = permission_p.item_id;
+        object_id = p_item_id;
 
       -- If there are multiple workflows / no workflows, do nothing
       -- special
       if v_workflow_count <> 1 then
-        return 't';
+        return ''t'';
       end if;       
         
       -- Even if there is a workflow, the user can touch the item if he
       -- has cm_item_workflow
-      if acs_permission.permission_p (
-         item_id, holder_id, 'cm_item_workflow'
-       ) = 't' 
+      if acs_permission__permission_p (
+         p_item_id, p_holder_id, ''cm_item_workflow''
+       ) = ''t'' 
       then
-        return 't';
+        return ''t'';
       end if;
 
       -- Check if the user holds the current task
       if v_workflow_count = 0 then
-	return 'f';
+	return ''f'';
       end if;
 
       select
@@ -583,35 +588,33 @@ is
       where
 	t.case_id = c.case_id
       and
-	c.workflow_key = 'publishing_wf'
+	c.workflow_key = ''publishing_wf''
       and
-	c.state = 'active'
+	c.state = ''active''
       and
-	c.object_id = permission_p.item_id
+	c.object_id = p_item_id
       and
-	( t.state = 'enabled' 
+	( t.state = ''enabled'' 
 	  or 
-	    ( t.state = 'started' and t.holding_user = permission_p.holder_id ))
+	    ( t.state = ''started'' and t.holding_user = p_holder_id ))
       and
-	t.user_id = permission_p.holder_id;
+	t.user_id = p_holder_id;
 
       -- is the user assigned a current task on this item
       if v_task_count = 0 then
-	return 'f';
+	return ''f'';
       end if;      
 
     end if;
 
-    return 't';
- 
-  end permission_p;
+    return ''t'';
+    
+end;' language 'plpgsql';
 
-  -- Determine if the CMS admin exists
-  function cm_admin_exists 
-  return varchar2
-  is
-    v_exists varchar2(1);
-  begin
+create function cms_permission__cm_admin_exists() returns boolean as '
+declare
+    v_exists    boolean;
+begin
     
     select 't' into v_exists from dual 
      where exists (
@@ -619,234 +622,258 @@ is
        where privilege in ('cm_admin', 'cm_root')
      );
 
-    return v_exists;
+     if NOT FOUND then 
+        return ''f'';
+     else 
+        return ''t'';
+     end if;
 
-  exception when no_data_found then
-    return 'f';
-  end cm_admin_exists;
+end;' language 'plpgsql';
 
-end cms_permission;
-/
-show errors
+
+-- show errors
 
 -- A trigger to automatically grant item creators the cm_write and cm_perm
 -- permissions
 
-create or replace trigger cr_items_permission_tr
-after insert on cr_items for each row
+create function cr_items_permission_tr () returns opaque as '
 declare
   v_user_id parties.party_id%TYPE;
 begin
   
   select creation_user into v_user_id from acs_objects
-    where object_id = :new.item_id;
+    where object_id = new.item_id;
+
+  -- FIXME: check to see if this is correct.
+
+  if NOT FOUND then 
+     return null;
+  end if;
 
   if v_user_id is not null then
 
-    if acs_permission.permission_p (
-        :new.item_id, v_user_id, 'cm_write'
-       ) = 'f' 
+    if acs_permission__permission_p (
+        new.item_id, v_user_id, ''cm_write''
+       ) = ''f'' 
     then
-      acs_permission.grant_permission (
-        :new.item_id, v_user_id, 'cm_write'
+      acs_permission__grant_permission (
+        new.item_id, v_user_id, ''cm_write''
       );
     end if;
   
-    if acs_permission.permission_p (
-        :new.item_id, v_user_id, 'cm_perm'
-       ) = 'f' 
+    if acs_permission__permission_p (
+        new.item_id, v_user_id, ''cm_perm''
+       ) = ''f'' 
     then
-      acs_permission.grant_permission (
-        :new.item_id, v_user_id, 'cm_perm'
+      acs_permission__grant_permission (
+        new.item_id, v_user_id, ''cm_perm''
       );
     end if; 
   end if;
 
-exception when no_data_found then null;
+-- exception when no_data_found then null;
    
-end cr_items_permission_tr;
-/
-show errors
+  return new;
+end;' language 'plpgsql';
+
+create trigger cr_items_permission_tr after insert on cr_items
+for each row execute procedure cr_items_permission_tr ();
+
+-- show errors
          
         
 -- A simple wrapper for acs-content-repository procs   
     
-create or replace package content_permission 
-is
+-- create or replace package content_permission 
+-- is
+-- 
+--   procedure inherit_permissions (
+--     parent_object_id  in acs_objects.object_id%TYPE,
+--     child_object_id   in acs_objects.object_id%TYPE,
+--     child_creator_id  in parties.party_id%TYPE default null
+--   );
+-- 
+--   function has_grant_authority (
+--     object_id         in acs_objects.object_id%TYPE,
+--     holder_id         in parties.party_id%TYPE, 
+--     privilege         in acs_privileges.privilege%TYPE
+--   ) return varchar2;
+--    
+--   procedure grant_permission_h (
+--     object_id         in acs_objects.object_id%TYPE,
+--     grantee_id        in parties.party_id%TYPE,
+--     privilege         in acs_privileges.privilege%TYPE
+--   );
+-- 
+--   procedure grant_permission (
+--     object_id         in acs_objects.object_id%TYPE,
+--     holder_id         in parties.party_id%TYPE,
+--     privilege         in acs_privileges.privilege%TYPE,
+--     recepient_id      in parties.party_id%TYPE,
+--     is_recursive      in varchar2 default 'f',
+--     object_type       in acs_objects.object_type%TYPE default 'content_item'
+--   );
+-- 
+--   function has_revoke_authority (
+--     object_id         in acs_objects.object_id%TYPE,
+--     holder_id         in parties.party_id%TYPE,
+--     privilege         in acs_privileges.privilege%TYPE,
+--     revokee_id        in parties.party_id%TYPE
+--   ) return varchar2;
+-- 
+--   procedure revoke_permission_h (
+--     object_id         in acs_objects.object_id%TYPE,
+--     revokee_id        in parties.party_id%TYPE,
+--     privilege         in acs_privileges.privilege%TYPE
+--   );
+-- 
+--   procedure revoke_permission (
+--     object_id         in acs_objects.object_id%TYPE,
+--     holder_id         in parties.party_id%TYPE,
+--     privilege         in acs_privileges.privilege%TYPE,
+--     revokee_id        in parties.party_id%TYPE,
+--     is_recursive      in varchar2 default 'f',
+--     object_type       in acs_objects.object_type%TYPE default 'content_item'
+--   );
+-- 
+--   function permission_p (
+--     object_id         in acs_objects.object_id%TYPE,
+--     holder_id         in parties.party_id%TYPE,
+--     privilege         in acs_privileges.privilege%TYPE
+--   ) return varchar2;
+-- 
+--   function cm_admin_exists 
+--   return varchar2;
+-- 
+-- end content_permission;
 
-  procedure inherit_permissions (
-    parent_object_id  in acs_objects.object_id%TYPE,
-    child_object_id   in acs_objects.object_id%TYPE,
-    child_creator_id  in parties.party_id%TYPE default null
-  );
+-- show errors
 
-  function has_grant_authority (
-    object_id         in acs_objects.object_id%TYPE,
-    holder_id         in parties.party_id%TYPE, 
-    privilege         in acs_privileges.privilege%TYPE
-  ) return varchar2;
+
+-- create or replace package body content_permission 
+-- procedure inherit_permissions
+create function content_permission__inherit_permissions (integer,integer,integer)
+returns integer as '
+declare
+  p_parent_object_id               alias for $1;  
+  p_child_object_id                alias for $2;  
+  p_child_creator_id               alias for $3;  
+begin
+    PERFORM cms_permission__update_permissions(p_child_object_id);
+    return 0; 
+end;' language 'plpgsql';
+
+
+-- function has_grant_authority
+create function content_permission__has_grant_authority (integer,integer,varchar)
+returns boolean as '
+declare
+  p_object_id                      alias for $1;  
+  p_holder_id                      alias for $2;  
+  p_privilege                      alias for $3;  
+begin
+    return cms_permission__has_grant_authority (
+      p_object_id, p_holder_id, p_privilege
+    );
    
-  procedure grant_permission_h (
-    object_id         in acs_objects.object_id%TYPE,
-    grantee_id        in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE
-  );
-
-  procedure grant_permission (
-    object_id         in acs_objects.object_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE,
-    recepient_id      in parties.party_id%TYPE,
-    is_recursive      in varchar2 default 'f',
-    object_type       in acs_objects.object_type%TYPE default 'content_item'
-  );
-
-  function has_revoke_authority (
-    object_id         in acs_objects.object_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE,
-    revokee_id        in parties.party_id%TYPE
-  ) return varchar2;
-
-  procedure revoke_permission_h (
-    object_id         in acs_objects.object_id%TYPE,
-    revokee_id        in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE
-  );
-
-  procedure revoke_permission (
-    object_id         in acs_objects.object_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE,
-    revokee_id        in parties.party_id%TYPE,
-    is_recursive      in varchar2 default 'f',
-    object_type       in acs_objects.object_type%TYPE default 'content_item'
-  );
-
-  function permission_p (
-    object_id         in acs_objects.object_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE
-  ) return varchar2;
-
-  function cm_admin_exists 
-  return varchar2;
-
-end content_permission;
-/
-show errors
+end;' language 'plpgsql';
 
 
-create or replace package body content_permission 
-is
+-- procedure grant_permission_h
+create function content_permission__grant_permission_h (integer,integer,varchar)
+returns integer as '
+declare
+  p_object_id                      alias for $1;  
+  p_grantee_id                     alias for $2;  
+  p_privilege                      alias for $3;  
+begin
+  return 0; 
+end;' language 'plpgsql';
 
-  procedure inherit_permissions (
-    parent_object_id  in acs_objects.object_id%TYPE,
-    child_object_id   in acs_objects.object_id%TYPE,
-    child_creator_id  in parties.party_id%TYPE default null
-  )
-  is
-  begin
-    cms_permission.update_permissions(child_object_id);
-  end inherit_permissions;
 
-  function has_grant_authority (
-    object_id         in acs_objects.object_id%TYPE,
-    holder_id         in parties.party_id%TYPE, 
-    privilege         in acs_privileges.privilege%TYPE
-  ) return varchar2
-  is
-  begin
-    return cms_permission.has_grant_authority (
-      object_id, holder_id, privilege
+-- procedure grant_permission
+create function content_permission__grant_permission (integer,integer,varchar,integer,varchar,varchar)
+returns integer as '
+declare
+  p_object_id                      alias for $1;  
+  p_holder_id                      alias for $2;  
+  p_privilege                      alias for $3;  
+  p_recepient_id                   alias for $4;  
+  p_is_recursive                   alias for $5;  
+  p_object_type                    alias for $6;  
+begin
+    PERFORM cms_permission__grant_permission (
+      p_object_id, p_holder_id, p_privilege, p_recepient_id, p_is_recursive
     );
-  end has_grant_authority;
+
+    return 0; 
+end;' language 'plpgsql';
+
+
+-- function has_revoke_authority
+create function content_permission__has_revoke_authority (integer,integer,varchar,integer)
+returns varchar as '
+declare
+  p_object_id                      alias for $1;  
+  p_holder_id                      alias for $2;  
+  p_privilege                      alias for $3;  
+  p_revokee_id                     alias for $4;  
+begin
+    return cms_permission__has_revoke_authority (
+      p_object_id, p_holder_id, p_privilege, p_revokee_id
+    );
    
-  procedure grant_permission_h (
-    object_id         in acs_objects.object_id%TYPE,
-    grantee_id        in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE
-  )
-  is
-  begin
-    return;
-  end;
+end;' language 'plpgsql';
 
-  procedure grant_permission (
-    object_id         in acs_objects.object_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE,
-    recepient_id      in parties.party_id%TYPE,
-    is_recursive      in varchar2 default 'f',
-    object_type       in acs_objects.object_type%TYPE default 'content_item'
-  ) 
-  is
-  begin
-    cms_permission.grant_permission (
-      object_id, holder_id, privilege, recepient_id, is_recursive
+
+-- procedure revoke_permission_h
+create function content_permission__revoke_permission_h (integer,integer,varchar)
+returns integer as '
+declare
+  p_object_id                      alias for $1;  
+  p_revokee_id                     alias for $2;  
+  p_privilege                      alias for $3;  
+begin
+  return 0; 
+end;' language 'plpgsql';
+
+
+-- procedure revoke_permission
+create function content_permission__revoke_permission (integer,integer,varchar,integer,varchar,varchar)
+returns integer as '
+declare
+  p_object_id                      alias for $1;  
+  p_holder_id                      alias for $2;  
+  p_privilege                      alias for $3;  
+  p_revokee_id                     alias for $4;  
+  p_is_recursive                   alias for $5;  
+  p_object_type                    alias for $6;  
+begin
+    PERFORM cms_permission__revoke_permission (
+      p_object_id, p_holder_id, p_privilege, p_revokee_id, p_is_recursive
     );
-  end grant_permission;
 
-  function has_revoke_authority (
-    object_id         in acs_objects.object_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE,
-    revokee_id        in parties.party_id%TYPE
-  ) return varchar2
-  is
-  begin
-    return cms_permission.has_revoke_authority (
-      object_id, holder_id, privilege, revokee_id
+    return 0; 
+end;' language 'plpgsql';
+
+
+-- function permission_p
+create function content_permission__permission_p (integer,integer,varchar)
+returns varchar as '
+declare
+  p_object_id                      alias for $1;  
+  p_holder_id                      alias for $2;  
+  p_privilege                      alias for $3;  
+begin
+    return cms_permission__permission_p (
+      p_object_id, p_holder_id, p_privilege
     );
-  end has_revoke_authority;
+   
+end;' language 'plpgsql';
 
-  procedure revoke_permission_h (
-    object_id         in acs_objects.object_id%TYPE,
-    revokee_id        in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE
-  )
-  is
-  begin
-    return;
-  end revoke_permission_h;
 
-  procedure revoke_permission (
-    object_id         in acs_objects.object_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE,
-    revokee_id        in parties.party_id%TYPE,
-    is_recursive      in varchar2 default 'f',
-    object_type       in acs_objects.object_type%TYPE default 'content_item'
-  )
-  is
-  begin
-    cms_permission.revoke_permission (
-      object_id, holder_id, privilege, revokee_id, is_recursive
-    );
-  end revoke_permission;
 
-  function permission_p (
-    object_id         in acs_objects.object_id%TYPE,
-    holder_id         in parties.party_id%TYPE,
-    privilege         in acs_privileges.privilege%TYPE
-  ) return varchar2
-  is
-  begin
-    return cms_permission.permission_p (
-      object_id, holder_id, privilege
-    );
-  end permission_p;
-
-  function cm_admin_exists 
-  return varchar2
-  is
-  begin
-    return cms_permission.cm_admin_exists;
-  end cm_admin_exists;
-
-end content_permission;
-/
-show errors
+-- show errors
       
 
 
