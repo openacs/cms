@@ -607,7 +607,7 @@ ad_proc content::assemble_url { base_url args } {
 
 # @see add_revision
 
-ad_proc content::new_item { form_name { tmpfile "" } } {
+ad_proc content::new_item { form_name { storage_type text } { tmpfile "" } } {
 
   array set defaults [list item_id "" locale "" parent_id "" content_type "content_revision"]
 
@@ -797,7 +797,7 @@ ad_proc content::add_revision_dml { statement bind_vars tmpfile filename } {
 
   db_transaction {
 
-      db_dml $statement -bind $bind_vars
+      db_dml add_revision $statement -bind $bind_vars 
 
       if { ![string equal $tmpfile {}] } {
 

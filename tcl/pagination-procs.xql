@@ -7,7 +7,7 @@
 	  select 
 	    ceil(count(*) / [pagination::get_rows_per_page] )
 	  from
-            ($sql)
+            ($sql) x
 	
       </querytext>
 </fullquery>

@@ -72,7 +72,7 @@
 
 <fullquery name="content::add_revision.addrev_get_content_type">
 	<querytext>
-    select object_type content_type, table_name
+    select object_type as content_type, table_name
     from acs_object_types
     where object_type = (select content_type from cr_items 
                          where item_id = :item_id)

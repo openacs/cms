@@ -87,7 +87,7 @@ element create create_item storage_type \
 	-widget radio \
 	-label "Content Storage Type" \
         -options { {{Lob Storage} lob } {{File Storage} file} {{Text Storage} text}} \
-	-values [list "file"]
+	-values [list "text"]
 
 if { [wizard exists] } {
   set is_wizard t
