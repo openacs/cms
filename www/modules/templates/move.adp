@@ -64,7 +64,7 @@
 <!-- begin listing -->
 <tr><td align=left>
 
-<include src=clipboard folder_id=@folder_id@ action=move submit=Move
+<include src=clipboard folder_id=@folder_id;noquote@ action=move submit=Move
          prompt="Check the items you wish to move to the current folder.">
 
 </td></tr>

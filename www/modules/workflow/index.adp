@@ -1,5 +1,5 @@
 <master src="../../master">
-<property name="title">@page_title@</property>
+<property name="title">@page_title;noquote@</property>
 
 <script language=javascript>
   top.treeFrame.setCurrentFolder('@mount_point@', '@id@', '@parent_id@');

@@ -46,8 +46,8 @@
 
       <td nowrap height=12>
         <include src="../../bookmark" 
-                 mount_point="@mount_point@" 
-                 id="@related.item_id@">
+                 mount_point="@mount_point;noquote@" 
+                 id="@related.item_id;noquote@">
       </td>    
       <td>&nbsp;&nbsp;&nbsp;</td> 
       <td>@related.content_type@</td>

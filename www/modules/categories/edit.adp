@@ -1,5 +1,5 @@
 <master src="../../master">
-<property name="title">Edit a @info.what@</property>
+<property name="title">Edit a @info.what;noquote@</property>
 
 <h3>Edit @info.what@</h3>
 

@@ -16,8 +16,8 @@
 </td>
 <td align=right class=small>
   <include src="../../bookmark" 
-           mount_point="@mount_point@" 
-           id="@id@">&nbsp;<tt><b>@info.path@</b></tt></td>
+           mount_point="@mount_point;noquote@" 
+           id="@id;noquote@">&nbsp;<tt><b>@info.path;noquote@</b></tt></td>
 </tr>
 </table>
 <br>
@@ -55,8 +55,8 @@
 
     <td nowrap height=12>
       <include src="../../bookmark" 
-               mount_point="@mount_point@" 
-               id="@items.keyword_id@">
+               mount_point="@mount_point;noquote@" 
+               id="@items.keyword_id;noquote@">
     </td>
     <td>
       <a href="index?id=@items.keyword_id@&mount_point=@mount_point@&parent_id=@id@">

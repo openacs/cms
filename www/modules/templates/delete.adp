@@ -64,7 +64,7 @@
 <!-- begin listing -->
 <tr><td align=left>
 
-<include src=clipboard folder_id=@folder_id@ action=delete submit=Delete
+<include src=clipboard folder_id=@folder_id;noquote@ action=delete submit=Delete
          prompt="Check the items you wish to delete.">
 
 </td></tr>

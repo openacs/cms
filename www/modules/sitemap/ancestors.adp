@@ -29,8 +29,8 @@
   <td align=right valign=center nowrap>
     
     <include src="../../bookmark" 
-             mount_point="@mount_point@" 
-             id="@item_id@">
+             mount_point="@mount_point;noquote@" 
+             id="@item_id;noquote@">
     &nbsp;
     <b><tt>
     <if @preview_p@ eq t>

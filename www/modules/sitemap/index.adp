@@ -6,9 +6,9 @@
 </script> 
 
 <include src="ancestors" 
-  item_id=@id@ 
-  index_page_id=@index_page_id@ 
-  mount_point=@mount_point@>
+  item_id=@id;noquote@ 
+  index_page_id=@index_page_id;noquote@ 
+  mount_point=@mount_point;noquote@>
 
 <table width="95%" cellspacing=0 cellpadding=4>
 <tr>
@@ -124,8 +124,8 @@
 
       <td nowrap height=12>
         <include src="../../bookmark" 
-                 mount_point="@mount_point@" 
-                 id="@items.item_id@">&nbsp;
+                 mount_point="@mount_point;noquote@" 
+                 id="@items.item_id;noquote@">&nbsp;
       </td>
       <td>
 	<img width=24 height=24 

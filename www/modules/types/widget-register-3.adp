@@ -1,7 +1,7 @@
 <master src="../../master">
 <property name="title">Preview Attribute Widget</property>
 
-<if @widget@ nil>
+<if @notification_chunk;noquote@ nil>
   <h3>You must select a widget for this attribute!</h3>
   <a href="widget-register?attribute_id=@attribute_id@">
     Select a widget</a>

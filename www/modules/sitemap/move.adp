@@ -8,7 +8,7 @@
      your choices and return to this form.</p>
 </if>
 <else>
-<property name="title">Move Items to @path@</property>
+<property name="title">Move Items to @path;noquote@</property>
 <h2>Move Items to @path@</h2>
 <formtemplate id="move">
 <formwidget id="id">

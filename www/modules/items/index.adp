@@ -1,7 +1,7 @@
 <master src="../../master">
 <property name="title">Content Item</property>
 
-<include src="../sitemap/ancestors" item_id=@item_id@>
+<include src="../sitemap/ancestors" item_id=@item_id;noquote@>
 
 <p>
 
@@ -27,23 +27,23 @@
 
 <if @item_props.tab@ eq editing>
   <tr><td>
-  <include src="attributes" revision_id="@info.latest_revision@">
+  <include src="attributes" revision_id="@info.latest_revision;noquote@">
   <p>
 
-  <include src="revisions" item_id="@item_id@" page="@page@">
+  <include src="revisions" item_id="@item_id;noquote@" page="@page;noquote@">
   <p>
 
-  <include src="keywords" item_id="@item_id@" mount_point="@mount_point@">  
+  <include src="keywords" item_id="@item_id;noquote@" mount_point="@mount_point;noquote@">  
   <p>
   </td></tr>
 </if>
 
 <if @item_props.tab@ eq children>
   <tr><td>
-  <include src="children" item_id="@item_id@">
+  <include src="children" item_id="@item_id;noquote@">
   <p>
 
-  <include src="related-items" item_id="@item_id@">
+  <include src="related-items" item_id="@item_id;noquote@">
   <p>
   </td></tr>
 
@@ -58,27 +58,27 @@
 <if @item_props.tab@ eq publishing>
   <tr><td>
 
-  <include src="publish-status" item_id="@item_id@">
+  <include src="publish-status" item_id="@item_id;noquote@">
   <p>
 
 
-  <include src="templates" item_id="@item_id@">
+  <include src="templates" item_id="@item_id;noquote@">
   <p>
 
   <if @user_permissions.cm_item_workflow@ eq t>
-    <include src="../workflow/case-status" item_id="@item_id@">
+    <include src="../workflow/case-status" item_id="@item_id;noquote@">
     <p>
   </if>
 
-  <include src="comments" item_id="@item_id@">
+  <include src="comments" item_id="@item_id;noquote@">
   <p>
   </td></tr>
 </if>
 
 <if @item_props.tab@ eq permissions>
   <tr><td>
-  <include src="../permissions/index" object_id="@item_id@" 
-    mount_point="@mount_point@" return_url="@return_url@" passthrough="@passthrough@">
+  <include src="../permissions/index" object_id="@item_id;noquote@" 
+    mount_point="@mount_point;noquote@" return_url="@return_url;noquote@" passthrough="@passthrough;noquote@">
   <p>
   </td></tr>
 </if>

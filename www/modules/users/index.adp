@@ -9,8 +9,8 @@
 <tr>
   <td class=large>
     <include src="../../bookmark" 
-             mount_point="@mount_point@" 
-             id="@info.group_id@">&nbsp;
+             mount_point="@mount_point;noquote@" 
+             id="@info.group_id;noquote@">&nbsp;
     <b>@info.group_name@</b>
   </td>
 </tr>
@@ -45,8 +45,8 @@
   <else><tr bgcolor="#EEEEEE"></else>
     <td nowrap height=12>
       <include src="../../bookmark" 
-               mount_point="@mount_point@" 
-               id="@subgroups.group_id@">
+               mount_point="@mount_point;noquote@" 
+               id="@subgroups.group_id;noquote@">
     </td>
     <td>
       <a href="index?id=@subgroups.group_id@&mount_point=@mount_point@&parent_id=@id@">
@@ -93,8 +93,8 @@
   <else><tr bgcolor="#EEEEEE"></else>
     <td nowrap height=12>
       <include src="../../bookmark" 
-               mount_point="@mount_point@" 
-               id="@users.user_id@">
+               mount_point="@mount_point;noquote@" 
+               id="@users.user_id;noquote@">
     </td>
     <td>
       <a href="one-user?id=@users.user_id@&mount_point=@mount_point@&parent_id=@id@">
@@ -108,7 +108,7 @@
     </td>
     <td>@users.screen_name@</td>
     <td>@users.email@</td>
-    <if @id@ not nil><td>@users.state_html@</td></if>
+    <if @id@ not nil><td>@users.state_html;noquote@</td></if>
     <if @admin_p@ eq t>
       <td><a href="@admin_url@@users.user_id@">Make Admin</a></td>
     </if>
@@ -130,9 +130,9 @@
 
 <if @perm_p@ eq t and @id@ nil>
   <include src="../permissions/index" 
-    object_id="@current_id@" 
-    mount_point="@mount_point@" 
-    return_url="@return_url@&mount_point=@mount_point@&id=@id@&parent_id=@parent_id@"
+    object_id="@current_id;noquote@" 
+    mount_point="@mount_point;noquote@" 
+    return_url="@return_url;noquote@&mount_point=@mount_point;noquote@&id=@id;noquote@&parent_id=@parent_id;noquote@"
   > 
 </if>
 

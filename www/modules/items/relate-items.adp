@@ -1,5 +1,5 @@
 <master src="../../master">
-<property name="title">@page_title@</property>
+<property name="title">@page_title;noquote@</property>
 
 <h2>@page_title@ (Step 1)</h2>
 <a href="index?item_id=@item_id@">@item_title@</a>

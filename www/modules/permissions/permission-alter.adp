@@ -1,5 +1,5 @@
 <master src="../../master">
-<property name="title">Permissions on @info.object_name@ for @info.grantee_name@ </property>
+<property name="title">Permissions on @info.object_name;noquote@ for @info.grantee_name;noquote@ </property>
 
 <if @info.user_cm_perm@ eq t>
 

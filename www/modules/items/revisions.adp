@@ -5,8 +5,8 @@
     <if @user_permissions.cm_write@ eq t>
       Add revised content via 
       <include src="content-method-links" 
-	item_id=@item_id@ 
-	content_type=@content_type@>
+	item_id=@item_id;noquote@ 
+	content_type=@content_type;noquote@>
     </if>
     <else>&nbsp;</else>
   </td>
@@ -83,5 +83,5 @@
 </td></tr>
 </table>
 
-@pagination_html@
+@pagination_html;noquote@
 

@@ -48,8 +48,8 @@
 
       <td height=12>
         <include src="../../bookmark" 
-                 mount_point="@mount_point@" 
-                 id="@children.item_id@">&nbsp;
+                 mount_point="@mount_point;noquote@" 
+                 id="@children.item_id;noquote@">&nbsp;
       </td>
 
       <td>@children.content_type@</td>

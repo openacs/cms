@@ -7,7 +7,7 @@
      your choices and return to this form.</p>
 </if>
 <else>
-<property name="title">Copy Items to @path@</property>
+<property name="title">Copy Items to @path;noquote@</property>
 <h2>Copy Items to @path@</h2>
 <formtemplate id="copy">
 <formwidget id="id">

@@ -4,7 +4,7 @@
 
 <include src="../../table-header" 
   title="Permissions"
-  header="@header@">
+  header="@header;noquote@">
 
 
 <table bgcolor=#99CCFF cellspacing=0 cellpadding=2 border=0 width="100%">

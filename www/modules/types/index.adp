@@ -1,5 +1,5 @@
 <master src="../../master">
-<property name="title">@page_title@</property>
+<property name="title">@page_title;noquote@</property>
 
 <if @refresh_tree@ eq t>
   <script language=javascript>
@@ -34,8 +34,8 @@
   </td>
   <td align=right>
     <include src="../../bookmark" 
-             mount_point="@mount_point@" 
-            id="@content_type@">&nbsp;
+             mount_point="@mount_point;noquote@" 
+            id="@content_type;noquote@">&nbsp;
     <font size=-1>Add this content type to the clipboard.</font>
   </td>
 </tr>
@@ -121,16 +121,16 @@
     <include src="../../table-footer">
     <p>
 
-    <include src="mime-types" content_type="@content_type@">
+    <include src="mime-types" content_type="@content_type;noquote@">
     <p>
 
-    <include src="content-method" content_type="@content_type@">
+    <include src="content-method" content_type="@content_type;noquote@">
   </td></tr>
 </if>
 
 <if @type_props.tab@ eq relations>
   <tr><td>
-    <include src="relations" type=@content_type@>
+    <include src="relations" type=@content_type;noquote@>
   </td></tr>
 </if>
 
@@ -184,17 +184,17 @@
       </multiple>
     </else>
     </table>
-    <include src="../../table-footer" footer="@footer@">
+    <include src="../../table-footer" footer="@footer;noquote@">
   </td></tr>
 </if>
 
 <if @type_props.tab@ eq permissions>
   <tr><td>
     <include src="../permissions/index" 
-      object_id=@module_id@ 
+      object_id=@module_id;noquote@ 
       mount_point="types" 
-      return_url="@return_url@" 
-      passthrough="@passthrough@">
+      return_url="@return_url;noquote@" 
+      passthrough="@passthrough;noquote@">
   </td></tr>
 </if>
 

@@ -64,7 +64,7 @@
 <!-- begin listing -->
 <tr><td align=left>
 
-<include src=clipboard folder_id=@folder_id@ action=copy submit=Copy
+<include src=clipboard folder_id=@folder_id;noquote@ action=copy submit=Copy
          prompt="Check the items you wish to copy to the current folder.">
 
 </td></tr>

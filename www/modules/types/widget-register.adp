@@ -15,5 +15,5 @@
 </multiple>
 
 <hr>
-<include src="@wizard:current_url@">
+<include src="@wizard:current_url;noquote@">
 

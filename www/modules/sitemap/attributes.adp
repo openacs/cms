@@ -1,5 +1,5 @@
 <master src="../../master">
-<property name="title">@page_title@</property>
+<property name="title">@page_title;noquote@</property>
 <h2>@page_title@</h2>
 
 
@@ -36,7 +36,7 @@
 </table>
 
 <if @user_permissions.cm_write@ eq t>
-  <include src="../../table-footer" footer="@register_marked_content_types@">
+  <include src="../../table-footer" footer="@register_marked_content_types;noquote@">
 </if>
 <else>
   <include src="../../table-footer">
@@ -67,6 +67,6 @@
 
 
 
-<include src="../permissions/index" object_id="@folder_id@" 
-  mount_point="@mount_point@" return_url="@return_url@" passthrough="@passthrough@">
+<include src="../permissions/index" object_id="@folder_id;noquote@" 
+  mount_point="@mount_point;noquote@" return_url="@return_url;noquote@" passthrough="@passthrough;noquote@">
 

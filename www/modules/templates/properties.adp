@@ -116,7 +116,7 @@
 <td bgcolor=#FFFFFF>&nbsp;&nbsp;</td>
 <td bgcolor=#FFFFFF>
 
-  <include src=@tab@ template_id=@id@>
+  <include src=@tab;noquote@ template_id=@id;noquote@>
 
 </td>
 <td bgcolor=#FFFFFF>&nbsp;&nbsp;</td>
