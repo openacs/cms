@@ -65,7 +65,7 @@ This task is due on $deadline_pretty.
 
 	set request_id [db_exec_plsql notify "
 	  begin
-	  :1 := nt.post_request(
+	  :1 := acs_mail_nt.post_request(
 	      party_from   => :user_id,
 	      party_to     => :party_id,
 	      expand_group => 'f',
@@ -149,7 +149,7 @@ This task is due on $deadline_pretty.
 
 	set request_id [db_exec_plsql notify "
 	  begin
-	  :1 := nt.post_request(
+	  :1 := acs_mail_nt.post_request(
 	      party_from   => -1,
 	      party_to     => :admin_id,
 	      expand_group => 'f',
@@ -218,7 +218,7 @@ ad_proc -public workflow::notify_admin_of_finished_task { task_id } {
 
     set request_id [db_exec_plsql notify "
       begin
-      :1 := nt.post_request(
+      :1 := acs_mail_nt.post_request(
           party_from   => -1,
 	  party_to     => :admin_id,
 	  expand_group => 'f',

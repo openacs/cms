@@ -37,6 +37,24 @@
 </fullquery>
 
  
+<fullquery name="workflow::notify_of_assignments.notify">      
+      <querytext>
+
+	  begin
+	    return acs_mail_nt__post_request(
+	        :user_id,     -- party_from
+	        :party_id,    -- party_to
+	        'f',          -- expand_group
+	        :subject,     -- subject
+	        :message,     -- message
+	        0             -- max_retries            
+	    );
+      end;
+
+      </querytext>
+</fullquery>
+
+
 <fullquery name="workflow::notify_admin_of_new_tasks.naont_get_assignments">      
       <querytext>
       
@@ -76,6 +94,24 @@
 </fullquery>
 
  
+<fullquery name="workflow::notify_admin_of_new_tasks.notify">      
+      <querytext>
+
+	  begin
+	    return acs_mail_nt__post_request(
+	        -1,           -- party_from
+	        :admin_id,    -- party_to
+	        'f',          -- expand_group
+	        :subject,     -- subject
+	        :message,     -- message
+	        0             -- max_retries            
+	    );
+      end;
+
+      </querytext>
+</fullquery>
+
+
 <fullquery name="workflow::notify_admin_of_finished_task.naoft_get_name">      
       <querytext>
       
@@ -114,6 +150,24 @@
 </fullquery>
 
  
+<fullquery name="workflow::notify_admin_of_finished_task.notify">      
+      <querytext>
+
+	  begin
+	    return acs_mail_nt__post_request(
+	        -1,           -- party_from
+	        :admin_id,    -- party_to
+	        'f',          -- expand_group
+	        :subject,     -- subject
+	        :message,     -- message
+	        0             -- max_retries            
+	    );
+      end;
+
+      </querytext>
+</fullquery>
+
+
 <fullquery name="workflow::check_wf_permission.cwp_touch_info">      
       <querytext>
       
