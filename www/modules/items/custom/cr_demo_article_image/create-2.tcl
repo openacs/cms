@@ -134,14 +134,7 @@ if { [form is_valid captioned_image] } {
 	  - $errmsg"
 
             # check for double click
-            template::query get_clicks clicks onevalue "
-	  select
-	    count(1)
-	  from
-	    cr_items
-	  where
-	    item_id = :item_id
-	" 
+            set clicks [db_string get_clicks ""]
 
             db_abort_transaction
 

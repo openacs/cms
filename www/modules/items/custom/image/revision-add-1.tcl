@@ -15,22 +15,7 @@ form create image -html { enctype "multipart/form-data" } -elements {
     item_id      -datatype integer -widget hidden -param
 }
 
-template::query get_item_info item_info onerow "
-  select 
-    i.name, i.latest_revision, r.title 
-  from 
-    cr_items i, cr_revisions r
-  where 
-    i.item_id = :item_id
-  and
-    i.item_id = r.item_id
-  and
-    i.latest_revision = r.revision_id
-" 
-
-template::util::array_to_vars item_info
-
-
+db_1row get_item_info ""
 
 content::add_attribute_elements image image $latest_revision
 

@@ -12,21 +12,7 @@ form create image -html { enctype "multipart/form-data" } -elements {
     revision_id  -datatype integer -widget hidden
 }
 
-template::query get_item_info item_info onerow "
-  select 
-    i.name, i.latest_revision, r.title 
-  from 
-    cr_items i, cr_revisions r
-  where 
-    i.item_id = :item_id
-  and
-    i.item_id = r.item_id
-  and
-    i.latest_revision = r.revision_id
-"
-
-template::util::array_to_vars item_info
-
+db_1row get_item_info ""
 
 content::add_attribute_elements image image $latest_revision
 
@@ -51,14 +37,7 @@ if { [form is_valid image] } {
     set ip_address [ns_conn peeraddr]
 
     db_transaction {
-        template::query get_latest latest_revision onevalue "
-      select
-        latest_revision
-      from
-        cr_items
-      where
-        item_id = :item_id
-    " 
+        set latest_revision [db_string get_latest ""]
 
         # create the revision
         if { [catch {db_exec_plsql "
@@ -73,14 +52,7 @@ if { [form is_valid image] } {
       end;"  } revision_id] } {
 
             # check for dupe submit
-            template::query get_clicks clicks onevalue "
-	  select
-	    count(1)
-	  from
-	    cr_revisions
-	  where
-	    revision_id = :revision_id
-	" 
+            set clicks [db_string get_clicks ""]
 
             db_abort_transaction
 

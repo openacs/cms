@@ -4,15 +4,7 @@ request create
 request set_param revision_id -datatype integer
 
 
-
-template::query get_item_id item_id onevalue "
-  select
-    item_id
-  from
-    cr_revisions
-  where
-    revision_id = :revision_id
-"
+set item_id [db_string get_item_id ""]
 
 # permissions check - need cm_new on parent_id to create new image
 content::check_access $item_id cm_write -user_id [User::getID]

@@ -6,18 +6,7 @@ request set_param item_id -datatype integer
 # check permissions - user must have cm_write on the item
 content::check_access $item_id cm_write -user_id [User::getID]
 
-template::query get_item one_item onerow "
-  select 
-    i.content_type, i.name, nvl(r.title, i.name) title, i.latest_revision
-  from
-    cr_items i, cr_revisions r
-  where
-   i.item_id = :item_id
-  and
-   i.latest_revision = r.revision_id (+)
-"
-
-template::util::array_to_vars one_item
+db_1row get_item_info ""
 
 # flush the sitemap folder listing cache in anticipation 
 # of the new item

@@ -19,15 +19,7 @@ if { [template::util::is_nil parent_id] } {
 content::check_access $parent_id cm_new -user_id [User::getID]
 
 
-template::query get_content_type content_type_name onevalue "
-  select
-    pretty_name
-  from
-    acs_object_types
-  where
-    object_type = :content_type
-" 
-
+set content_type_name [db_string get_content_type ""]
 
 if { [template::util::is_nil content_type_name] } {
     ns_log Notice "ERROR: create-1.tcl - BAD CONTENT_TYPE - $content_type"
