@@ -6,72 +6,21 @@ namespace eval content {
 # Helper proc: query out all the information neccessary to create
 # a custom form element based on stored metadata
 # Requires the variable content_type to be set in the calling frame
-proc content::query_form_metadata { 
-  db {datasource_name rows} {datasource_type multirow} \
+
+# RBM: FIX ME! See comment on line 197
+ad_proc content::query_form_metadata { 
+  {datasource_name rows} {datasource_type multirow} \
   {extra_where {}} {extra_orderby {}}
 } {
 
   # query for all attribute widget param values associated with a content 
   #   the 3 nvl subqueries are necessary because we cannot outer join
   #   to more than one table without doing multiple subqueries (which is
-  #   even less efficient than this way)  
-  set query "
-    select
-      attributes.attribute_id, attribute_name, 
-      attributes.table_name,
-      attribute_label, type_label, object_type as subtype, datatype, 
-      params.is_html, params.is_required,
-      widget, param,
-      nvl( (select param_type from cm_attribute_widget_params
-            where attribute_id = attributes.attribute_id
-            and param_id = params.param_id), 'literal' ) param_type, 
-      nvl( (select param_source from cm_attribute_widget_params
-            where attribute_id = attributes.attribute_id
-            and param_id = params.param_id), 
-           'onevalue' ) param_source, 
-      nvl( (select value from cm_attribute_widget_params
-            where attribute_id = attributes.attribute_id
-            and param_id = params.param_id), 
-           params.default_value ) value
-    from
-      (
-        select
-          aw.attribute_id, fwp.param,
-          aw.widget, decode(aw.is_required,'t','t',fwp.is_required) is_required,
-          fwp.param_id, fwp.default_value, fwp.is_html
-        from
-          cm_form_widget_params fwp, cm_attribute_widgets aw
-        where
-          fwp.widget = aw.widget
-      ) params,
-      (
-        select
-          attr.attribute_id, attribute_name, sort_order, 
-          attr.pretty_name as attribute_label, attr.datatype, 
-          types.object_type, types.pretty_name as type_label, 
-          tree_level, types.table_name
-        from
-          acs_attributes attr,
-          (
-            select 
-              object_type, pretty_name, level as tree_level,
-              table_name
-            from 
-              acs_object_types
-            where 
-              object_type ^= 'acs_object'
-            connect by 
-              prior supertype = object_type
-            start with 
-              object_type = :content_type
-          ) types
-        where
-          attr.object_type = types.object_type
-      ) attributes
-    where
-      attributes.attribute_id = params.attribute_id"
+  #   even less efficient than this way)
+    
+  set attributes_query [db_map attributes_query_1] 
  
-  if { ![template::util::is_nil extra_where] } {
+  if { ![template::util::is_nil extra_where] } {      
     append query "\n   and\n      $extra_where"
   }
 
@@ -85,7 +34,7 @@ proc content::query_form_metadata {
   }  
 
   uplevel "
-    template::query $datasource_name $datasource_type \{$query\} -db $db 
+    template::query $datasource_name $datasource_type \{$query\}
   "
 
 }
@@ -94,7 +43,7 @@ proc content::query_form_metadata {
 # PRE:  uber-query has been run
 # POST: html_params, code_params set; returns the index of the next
 # available row
-proc content::assemble_form_element { datasource_ref the_attribute_name start_row {db {}}} {
+ad_proc content::assemble_form_element { datasource_ref the_attribute_name start_row {db {}}} {
 
   upvar "${datasource_ref}:rowcount" rowcount
   upvar code_params code_params
@@ -157,8 +106,8 @@ proc content::assemble_form_element { datasource_ref the_attribute_name start_ro
 #   of the image type, with the textbox size set to 10 characters,
 #   and query the current value of the attribute out of the database.
 
-proc content::create_form_element {
-  db form_name attribute_name args
+ad_proc content::create_form_element {
+    form_name attribute_name args
 } {
   template::util::get_opts $args
 
@@ -166,11 +115,13 @@ proc content::create_form_element {
   # it is passed in directly
   if { ![template::util::is_nil opts(revision_id)] } {
     set revision_id $opts(revision_id)
+      
   } elseif { ![template::util::is_nil opts(item_id)] } {
+      
     set item_id $opts(item_id)
-    template::query revision_id onevalue "
+    template::query get_revision_id revision_id onevalue "
       select content_item.get_latest_revision(:item_id) from dual
-    " -db $db
+    "
   }
 
   if { [info exists opts(content_type)] } {
@@ -186,16 +137,16 @@ proc content::create_form_element {
       return
     }
    
-    template::query content_type onevalue "
+    template::query get_content_type content_type onevalue "
        select content_type from cr_items i, cr_revisions r
        where r.item_id = i.item_id
-       and   r.revision_id = :revision_id" -db $db
+       and   r.revision_id = :revision_id"
   }
 
   # Run the gigantic uber-query. This is somewhat wasteful; should
   # be replaced by 2 smaller queries: one for the attribute_id, one
   # for parameter types and values.
-  query_form_metadata $db params multirow "attribute_name = :attribute_name"
+  query_form_metadata params multirow "attribute_name = :attribute_name"
   
   if { ${params:rowcount} < 1} {
     error "No widgets are registered for ${content_type}.${attribute_name}"
@@ -211,6 +162,9 @@ proc content::create_form_element {
     # Handle custom datatypes... Basically, this is done so that
     # the date widget will work :-/
     # In the future, upgrade the date widget and use acs_object.get_attribute
+
+    # RBM: FIXME.
+      
     switch $datatype {
       date { 
         set what "to_char($attribute_name, 'YYYY MM DD HH24 MI SS') 
@@ -221,10 +175,10 @@ proc content::create_form_element {
         set what "$attribute_name"
       }
     }
- 
-    template::query element_value onevalue "
+    
+    template::query get_element_value element_value onevalue "
       select $what from ${table_name}x where revision_id = :revision_id
-    " -db $db
+    "
 
     lappend code_params -value $element_value -values [list $element_value]
   }
@@ -240,7 +194,7 @@ proc content::create_form_element {
 # generate a form based on metadata
 
 proc content::get_revision_form { 
-  db content_type item_id form_name {show_sections t} {element_override {}}
+  content_type item_id form_name {show_sections t} {element_override {}}
 } {
 
     # Convert overrides to an array
@@ -355,7 +309,7 @@ proc content::get_element_default_params {} {
 #     attribute_id, attribute_name, datatype, is_html,
 #     param_source, param_type, value
 # POST: adds params to the 'element create' command
-proc content::get_revision_create_element {} {
+ad_proc content::get_revision_create_element {} {
     uplevel {
         if { ![string equal $attribute_name {}] } {
             
@@ -367,27 +321,20 @@ proc content::get_revision_create_element {} {
                 # build the option list
                 if { [string equal $datatype "enumeration"] } {
                     
-                    set sql "select
-                               nvl(pretty_name,enum_value), 
-                               enum_value
-                             from
-                               acs_enum_values
-                             where
-                               attribute_id = :attribute_id
-                             order by
-                               sort_order"
+                    set sql [db_map get_enum_1]
             
-                    template::query options multilist $sql -db $db
+                    template::query get_enum_values options multilist $sql
                     lappend code_params -options $options
                 }
                 
                 # if param_source is not 'literal' then 
                 # eval or query for the parameter value(s)
+		#RBM: FIXME! What should it be done with uplevel'd queries??
                 if { ![string equal $param_source ""] } {
                     if { [string equal $param_source "eval"] } {
                         set source [eval $value]
                     } elseif { [string equal $param_source "query"] } {
-                        template::query source $param_type $value -db $db
+                        template::query get_value source $param_type $value
                     } else {
                         set source $value
                     }
@@ -401,13 +348,15 @@ proc content::get_revision_create_element {} {
 
 # perform the appropriate DML based on metadata
 
-proc content::process_revision_form { form_name content_type item_id db } {
+ad_proc content::process_revision_form { form_name content_type item_id {db{}} } {
 
     template::form get_values $form_name title description mime_type
 
 
     # create the basic revision
-    set sql "begin :revision_id := content_revision.new(
+    db_exec_plsql new_content_revision {
+             begin
+	     :revision_id := content_revision.new(
                  title         => :title,
                  description   => :description,
                  mime_type     => :mime_type,
@@ -416,9 +365,10 @@ proc content::process_revision_form { form_name content_type item_id db } {
                  creation_ip   => '[ns_conn peeraddr]',
                  creation_user => [User::getID]
              );
-             end;"
+             end;
+    }
 
-    ns_ora exec_plsql_bind $db $sql revision_id
+    #ns_ora exec_plsql_bind $db $sql revision_id
 
     # query for extended attribute tables
     set query "
