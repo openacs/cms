@@ -616,7 +616,6 @@ ad_proc -public content::assemble_url { base_url args } {
 
 ad_proc -public content::new_item { form_name { storage_type text } { tmpfile "" } } {
 
-  @public new_item
   Create a new item, including the initial revision, based on a valid
   form submission.
 
@@ -631,7 +630,7 @@ ad_proc -public content::new_item { form_name { storage_type text } { tmpfile ""
   @param tmpfile Name of the temporary file containing the content to
   upload for the initial revision.
 
-  @see add_revision
+  @see content::add_revision
 
 } {
 
@@ -687,8 +686,6 @@ ad_proc -public content::new_item { form_name { storage_type text } { tmpfile ""
 
 ad_proc -public content::add_revision { form_name { tmpfile "" } } {
 
-  @public add_revision
-
   Create a new revision for an existing item based on a valid form
   submission.  Queries for attribute names and inserts a row into the
   attribute input view for the appropriate content type.  Inserts the
@@ -738,10 +735,9 @@ ad_proc -public content::add_revision { form_name { tmpfile "" } } {
 }
 
 
-ad_proc -public content::attribute_insert_statement { 
-  content_type table_name bind_vars form_name } {
+ad_proc -private content::attribute_insert_statement { 
 
-  @private attribute_insert_statement 
+  content_type table_name bind_vars form_name } {
 
   Prepare the insert statement into the attribute input view for a new
   revision (see the content repository documentation for details about
@@ -807,8 +803,6 @@ ad_proc -public content::attribute_insert_statement {
 
 ad_proc -private content::add_revision_dml { statement bind_vars tmpfile filename } {
 
-  @private add_revision_dml 
-
   Perform the DML to insert a revision into the appropriate input view.
 
   @param statement The DML for the insert statement, specifying a bind
@@ -822,7 +816,7 @@ ad_proc -private content::add_revision_dml { statement bind_vars tmpfile filenam
   @param filename The client-side name of the file containing the body of 
   the revision to upload into the content BLOB column of cr_revisions
 
-  @see add_revision
+  @see content::add_revision
 
 } {
 
@@ -926,8 +920,6 @@ ad_proc -public content::upload_content { revision_id tmpfile filename } {
 
 ad_proc -private content::get_sql_value { name datatype } {
 
-  @private get_sql_value
-
   Return the sql statement for a column value in an insert or update
   statement, using a bind variable for the actual value and wrapping it
   in a conversion function where appropriate.  
@@ -950,8 +942,6 @@ ad_proc -private content::get_sql_value { name datatype } {
 
 
 ad_proc -private content::prepare_content_file { form_name } {
-
-  @private prepare_content_file
 
   Looks for an element named "content" in a form and prepares a
   temporarily file in UTF-8 for uploading to the content repository.
@@ -1001,8 +991,6 @@ ad_proc -private content::prepare_content_file { form_name } {
 
 ad_proc -private content::string_to_file { s } {
 
-  @private string_to_file
-
   Write a string in UTF-8 encoding to of temp file so it can be
   uploaded into a BLOB (which is blind to character encodings).
   Returns the name of the temp file.
@@ -1037,8 +1025,6 @@ namespace eval content {
 
 
 ad_proc -public content::new_item_form { args } {
-
-  @public new_item_form
 
   Adds elements to an ATS form object for creating an item and its
   initial revision.  If the form does not already exist, creates the
@@ -1122,8 +1108,6 @@ ad_proc -public content::new_item_form { args } {
 
 
 ad_proc -public content::add_revision_form { args } {
-
-  @public add_revision_form
 
   Adds elements to an ATS form object for adding a revision to an
   existing item.  If the item already exists, element values default a
@@ -1213,8 +1197,6 @@ ad_proc -public content::add_revision_form { args } {
 ad_proc -public content::add_attribute_elements { form_name content_type \
   { revision_id "" } } {
 
-  @public add_attribute_elements
-
   Add form elements to an ATS form object for all attributes of a
   content type.
 
@@ -1275,8 +1257,6 @@ ad_proc -public content::add_attribute_elements { form_name content_type \
 
 ad_proc -public content::add_attribute_element { 
   form_name content_type attribute { attribute_data "" } } {
-
-  @public add_attribute_element
 
   Add a form element (possibly a compound widget) to an ATS form object.
   for entering or editing an attribute value.
@@ -1359,8 +1339,6 @@ ad_proc -public content::add_attribute_element {
 ad_proc -public content::add_content_element { 
   form_name content_method { section_name "Content" } } {
 
-  @public add_content_element
-
   Adds a content input element to an ATS form object.
 
   @param form_name      The name of the form to which the object should be
@@ -1413,8 +1391,6 @@ ad_proc -public content::add_content_element {
 
 ad_proc content::add_child_relation_element { form_name args } {
 
-  @public add_child_relation_element
- 
   Add a select box listing all valid child relation tags.
   The form must contain a parent_id element and a content_type element.
   If the elements do not exist, or if there are no valid relation tags,
@@ -1489,8 +1465,6 @@ ad_proc -private content::get_widget_param_value {
   array_ref {content_type content_revision}
 } {
 
-  @private get_widget_param_value
-
   Utility procedure to return the value of a widget parameter
 
   @param array_ref     The name of an array in the calling frame
@@ -1547,8 +1521,6 @@ ad_proc -private content::get_widget_param_value {
 
 ad_proc -private content::get_type_attribute_params { args } {
 
-  @private get_type_attribute_params
-
   Query for attribute form metadata
 
   @param args Any number of object types
@@ -1581,8 +1553,6 @@ ad_proc -private content::get_type_attribute_params { args } {
 
 ad_proc -private content::get_attribute_params { content_type attribute_name } {
 
-  @private get_attribute_params
-
   Query for parameters associated with a particular attribute
 
   @param content_type      The content type keyword to which this attribute
@@ -1611,8 +1581,6 @@ ad_proc -private content::get_attribute_params { content_type attribute_name } {
 
 ad_proc -private content::set_attribute_values { form_name content_type revision_id \
     attributes } {
-
-  @private set_attribute_values
 
   Set the default values for attribute elements in ATS form object
   based on a previous revision
@@ -1675,8 +1643,6 @@ ad_proc -private content::set_attribute_values { form_name content_type revision
 
 ad_proc -private content::set_content_value { form_name revision_id } {
 
-  @private set_content_value
-
   Set the default value for the content text area in an ATS form object
   based on a previous revision
 
@@ -1693,8 +1659,6 @@ ad_proc -private content::set_content_value { form_name revision_id } {
 
 
 ad_proc -private content::get_default_content_method { content_type } {
-
-  @private get_default_content_method
 
   Gets the content input method most appropriate for an content type,
   based on the MIME types that are registered for that content type.
@@ -1721,8 +1685,6 @@ ad_proc -private content::get_default_content_method { content_type } {
 
 ad_proc -private content::get_type_info { object_type ref args } {
 
-  @private get_type_info
-
   Return specified columns from the acs_object_types table.
 
   @param object_type Object type key for which info is required.
@@ -1747,8 +1709,6 @@ ad_proc -private content::get_type_info { object_type ref args } {
 
 ad_proc -public content::get_object_id {} {
 
-  @public get_object_id
-
   Grab an object ID for creating a new ACS object.
 
 } {
@@ -1758,8 +1718,6 @@ ad_proc -public content::get_object_id {} {
 
 
 ad_proc -private content::get_attributes { content_type args } {
-
-  @private get_attributes
 
   Returns columns from the acs_attributes table for all attributes
   associated with a content type.
@@ -1792,8 +1750,6 @@ ad_proc -private content::get_attributes { content_type args } {
 
 ad_proc -public content::get_attribute_enum_values { attribute_id } {
 
-  @public get_attribute_enum_values
-
   Returns a list of { pretty_name enum_value } for an attribute of
   datatype enumeration.
 
@@ -1809,8 +1765,6 @@ ad_proc -public content::get_attribute_enum_values { attribute_id } {
 
 ad_proc -public content::get_latest_revision { item_id } {
 
-  @public get_latest_revision
-
   Get the ID of the latest revision for the specified content item.
 
   @param item_id  The ID of the content item.
@@ -1824,8 +1778,6 @@ ad_proc -public content::get_latest_revision { item_id } {
 
 
 ad_proc -public content::add_basic_revision { item_id revision_id title args } {
-
-  @public add_basic_revision
 
   Create a basic new revision using the content_revision PL/SQL API.
 
@@ -1875,8 +1827,6 @@ ad_proc -public content::add_basic_revision { item_id revision_id title args } {
 
 
 ad_proc -private content::update_content_from_file { revision_id tmpfile } {
-
-  @private update_content_from_file
 
   Update the BLOB column of a revision with the contents of a file
 
@@ -1928,8 +1878,6 @@ ad_proc -private content::update_content_from_file { revision_id tmpfile } {
 
 ad_proc -public content::copy_content { revision_id_src revision_id_dest } {
 
-  @public copy_latest_content
-
   Update the BLOB column of one revision with the content of another revision
 
   @param revision_id_src  The object ID of the revision with the content to be 
@@ -1964,8 +1912,6 @@ ad_proc -public content::copy_content { revision_id_src revision_id_dest } {
 
 ad_proc -public content::add_content { form_name revision_id } {
 
-  @public add_content
-
   Update the BLOB column of a revision with content submitted in a form
 
   @param revision_id  The object ID of the revision to be updated.
@@ -1989,8 +1935,6 @@ ad_proc -public content::add_content { form_name revision_id } {
 }
 
 ad_proc -public content::validate_name { form_name } {
-
-  @public validate_name
 
   Make sure that name is unique for the folder
 

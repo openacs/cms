@@ -8,9 +8,7 @@
 namespace eval content_method {}
 
 
-ad_proc content_method::get_content_methods { content_type args } {
-
-  @public get_content_methods
+ad_proc -public content_method::get_content_methods { content_type args } {
 
   Returns a list of content_methods that are associated with 
   a content type, first checking for a default method, then for registered
@@ -23,8 +21,9 @@ ad_proc content_method::get_content_methods { content_type args } {
     a list of label-value pairs of associated content methods.
   @return A list of content methods or a list of label-value pairs of 
     content methods if the "-get_labels" option is specified
-  @see {content_method::get_content_method_options, 
-        content_method::text_entry_filter_sql }
+
+  @see content_method::get_content_method_options
+  @see content_method::text_entry_filter_sql
 
 } {
     template::util::get_opts $args
@@ -59,9 +58,7 @@ ad_proc content_method::get_content_methods { content_type args } {
 }
 
 
-ad_proc content_method::get_content_method_options { content_type } {
-
-  @private get_content_method_options
+ad_proc -private content_method::get_content_method_options { content_type } {
 
   Returns a list of label, content_method pairs that are associated with 
   a content type, first checking for a default method, then for registered
@@ -70,8 +67,9 @@ ad_proc content_method::get_content_method_options { content_type } {
   @author Michael Pih
   @param content_type The content type
   @return A list of label, value pairs of content methods
-  @see {content_method::get_content_methods,
-        content_method::text_entry_filter_sql }
+
+  @see content_method::get_content_methods
+  @see content_method::text_entry_filter_sql
 
 } {
     
@@ -96,14 +94,13 @@ ad_proc content_method::get_content_method_options { content_type } {
 }
 
 
-ad_proc content_method::text_entry_filter_sql { content_type } {
-
-  @private text_entry_filter_sql
+ad_proc -private content_method::text_entry_filter_sql { content_type } {
 
   Generate a SQL stub that filters out the text_entry content method
 
   @author Michael Pih
-  @param  content_type
+  @param  content_type mime type 
+
   @return SQL stub that possibly filters out the text_entry content method
 
 } {
@@ -122,9 +119,7 @@ ad_proc content_method::text_entry_filter_sql { content_type } {
 
 
 
-ad_proc content_method::flush_content_methods_cache { {content_type ""} } {
-
-  @public flush_content_method_cache
+ad_proc -public content_method::flush_content_methods_cache { {content_type ""} } {
 
   Flushes the cache for content_method_types for a given content type.  If no
   content type is specified, the entire content_method_types cache is

@@ -36,8 +36,8 @@ ad_proc -public publish::get_page_root {} {
  
   @return The page root
  
-  @see proc publish::get_template_root
-  @see proc publish::get_publish_roots
+  @see publish::get_template_root
+  @see publish::get_publish_roots
 
 } {
 
@@ -65,8 +65,8 @@ ad_proc -public publish::get_publish_roots {} {
  
   @return A list of all the publish roots
  
-  @see proc publish::get_template_root
-  @see proc publish::get_page_root
+  @see publish::get_template_root
+  @see publish::get_page_root
 
 } {
 
@@ -104,7 +104,8 @@ ad_proc -public publish::get_template_root {} {
  
   @return The template root
  
-  @see proc content::get_template_root, proc publish::get_page_root
+  @see content::get_template_root
+  @see publish::get_page_root
 
 } {
   return [content::get_template_root]
@@ -148,9 +149,9 @@ ad_proc -private publish::delete_multiple_files { url {root_path ""}} {
   
   @param url          Relative URL of the file to write
  
-  @see proc publish::get_publish_roots
-  @see proc publish::write_multiple_files
-  @see proc publish::write_multiple_blobs
+  @see publish::get_publish_roots
+  @see publish::write_multiple_files
+  @see publish::write_multiple_blobs
 
 } {
   foreach_publish_path $url {
@@ -173,9 +174,9 @@ ad_proc -public publish::publish_revision { revision_id args} {
   @option root_path {default All paths in the PublishPaths parameter}
     Write the content to this path only.
  
-  @see proc item::get_extended_url
-  @see proc publish::get_publish_paths
-  @see proc publish::handle_item
+  @see item::get_extended_url
+  @see publish::get_publish_roots
+  @see publish::handle_item
 
 } {
 
@@ -216,7 +217,7 @@ ad_proc -public publish::unpublish_item { item_id args } {
   @option root_path {default All paths in the PublishPaths parameter}
     Write the content to this path only.
  
-  @see proc publish::publish_revision
+  @see publish::publish_revision
 
 } {
   
@@ -292,8 +293,8 @@ ad_proc -public publish::set_publish_status { item_id new_status {revision_id ""
   @param revision_id {default The live revision}
     The revision id to be used when publishing the item to the filesystem.
   
-  @see proc publish::publish_revision
-  @see proc publish::unpublish_item
+  @see publish::publish_revision
+  @see publish::unpublish_item
 
 } {
 
@@ -353,7 +354,7 @@ ad_proc -private publish::track_publish_status {} {
  
   Scheduled proc which keeps the publish status updated
  
-  @see proc publish::schedule_status_sweep
+  @see publish::schedule_status_sweep
 
 } {
   
@@ -408,9 +409,9 @@ ad_proc -public publish::schedule_status_sweep { {interval ""} } {
     StatusSweepInterval parameter in the server's INI file is used 
     (if it exists).
     
-  @see proc publish::set_publish_status
-  @see proc publish::unschedule_status_sweep
-  @see proc publish::track_publish_status
+  @see publish::set_publish_status
+  @see publish::unschedule_status_sweep
+  @see publish::track_publish_status
 
 } {
 
@@ -432,7 +433,7 @@ ad_proc -public publish::unschedule_status_sweep {} {
  
   Unschedule the proc which keeps track of the publish status. 
  
-  @see proc publish::schedule_status_sweep
+  @see publish::schedule_status_sweep
 
 } {
   
