@@ -25,7 +25,7 @@
 
         select workflow_case__add_manual_assignment(
 		      :case_id,
-		      'author',
+		      'authoring',
 		      :value
 		  );
 		 

@@ -27,7 +27,7 @@
   and
     msg is not null
   and
-    rowid < 11
+    rownum < 11
   order by
     o.creation_date desc
   

@@ -24,7 +24,7 @@
 		  begin
 		  workflow_case.add_manual_assignment(
 		      case_id        => :case_id,
-		      role_key 	     => 'author',
+		      role_key 	     => 'authoring',
 		      party_id       => :value
 		  );
 		  end;
