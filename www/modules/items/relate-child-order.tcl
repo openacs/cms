@@ -9,7 +9,7 @@ request set_param passthrough -datatype text -optional -value [content::assemble
 
 db_transaction {
     # Get the irelated items
-    template::query get_rel_info onerow "
+    template::query get_rel_info rel_info onerow "
   select parent_id as item_id, order_n from cr_child_rels 
   where rel_id = :rel_id" 
 

@@ -8,7 +8,7 @@ request set_param parent_id -datatype keyword -optional
 request set_param mount_point -datatype keyword -optional -value users
 
 db_transaction {
-    template::query change_member_state dml "
+    db_dml change_member_state "
  update membership_rels set
    member_state=:new_state 
  where 

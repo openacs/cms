@@ -3,6 +3,15 @@
 <queryset>
    <rdbms><type>postgresql</type><version>7.1</version></rdbms>
 
+<partialquery name="index_page_p">      
+      <querytext>
+
+      case when coalesce( 
+        content_folder__get_index_page( :item_id ),0) =  0 then 'f' else 't' end as has_index_page,
+
+      </querytext>
+</partialquery>
+
 <fullquery name="get_context">      
       <querytext>
 

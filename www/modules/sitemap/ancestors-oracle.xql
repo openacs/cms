@@ -3,6 +3,17 @@
 <queryset>
    <rdbms><type>oracle</type><version>8.1.6</version></rdbms>
 
+
+<partialquery name="index_page_p">      
+      <querytext>
+
+      decode( nvl( 
+        content_folder.get_index_page( :item_id ),0)
+        ,0,'f','t') has_index_page,
+
+      </querytext>
+</partialquery>
+
 <fullquery name="get_context">      
       <querytext>
       

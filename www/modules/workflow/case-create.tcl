@@ -36,7 +36,7 @@ template::query get_users users multilist "
 # Prepare the form elements
 
 set transition_list [list]
-template::query get_name_key iterate "
+template::query::iterate get_name_key  "
   select 
     transition_name, transition_key 
   from 
@@ -93,7 +93,7 @@ if { [form is_request case_create] } {
 	# Get existing case assignments
 	set case_id [element get_value case_create case_id]
  
-	template::query get_key_id iterate "
+	template::query::iterate get_key_id "
 	  select 
             transition_key, party_id
 	  from 
@@ -116,7 +116,7 @@ if { [form is_request case_create] } {
 
 	# Get existing deadlines
 
-	template::query get_key_deadline iterate "
+	template::query::iterate get_key_deadline "
 	  select 
             transition_key, 
             to_char(deadline, 'YYYY MM DD HH24 MI SS') as deadline

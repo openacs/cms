@@ -23,7 +23,7 @@ template::query get_item_info item_info onerow "
     i.item_id = r.item_id
   and
     i.latest_revision = r.revision_id
-" -db $db
+"
 
 template::util::array_to_vars item_info
 

@@ -41,7 +41,7 @@ template::query check_status has_text_mime_type onevalue "
 " 
 
 if { $has_text_mime_type == 0 } {
-    set text_entry_filter_sql "and content_method ^= 'text_entry'"
+    set text_entry_filter_sql "and content_method != 'text_entry'"
 } else {
     set text_entry_filter_sql ""
 }
@@ -99,7 +99,6 @@ if { [form is_valid register] } {
 
     form get_values register content_type content_method
     
-    set db [template::begin_db_transaction]
     db_transaction {
 
         template::query add_method content_method_add dml "
@@ -111,7 +110,7 @@ if { [form is_valid register] } {
       );
       end;
     "
-}
+    }
 
     content_method::flush_content_methods_cache $content_type
 
