@@ -6,9 +6,7 @@ template::request set_param parent_id -datatype keyword -optional
 request set_param mount_point -datatype keyword -optional -value categories
 
 # Determine if the folder is empty
-template::query get_empty_status is_empty onevalue "
-  select content_keyword.is_leaf(:id) from dual
-"
+set is_empty [db_string get_empty_status ""]
 
 # If nonempty, show error
 if { [string equal $is_empty "f"] } {

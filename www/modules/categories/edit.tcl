@@ -6,13 +6,7 @@ template::request set_param parent_id -datatype keyword -optional
 request set_param mount_point -datatype keyword -optional -value categories
 
 # Get existing data
-template::query get_info info onerow "
-  select
-    content_keyword.get_heading(:id) heading,
-    content_keyword.get_description(:id) description,
-    decode(content_keyword.is_leaf(:id), 't', 'keyword', 'category') what
-  from
-    dual"
+db_1row get_info "" -column_array info
 
 form create edit_keyword
 

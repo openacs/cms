@@ -18,10 +18,8 @@ element create add_keyword description -optional \
   -label "Description" -datatype text -widget textarea -html { rows 5 cols 60 }
 
 if { [form is_request add_keyword] } {
-  template::query get_keyword_id keyword_id onevalue "
-    select acs_object_id_seq.nextval from dual
-  "
-  element set_properties add_keyword keyword_id -value $keyword_id
+    set keyword_id [db_string get_keyword_id ""]
+    element set_properties add_keyword keyword_id -value $keyword_id
 }
 
 if { [form is_valid add_keyword] } {

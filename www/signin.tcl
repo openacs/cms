@@ -23,8 +23,7 @@ if { [form is_valid sign_in_user] } {
 
   db_transaction {
 
-      template::query get_info info onerow "select user_id, salt, password from users 
-             where screen_name = :screen_name"
+      db_0or1row get_info "" -column_array info
 
       set is_valid_login 0
 
