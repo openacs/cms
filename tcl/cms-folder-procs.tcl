@@ -40,11 +40,12 @@ proc cms_folder::flush { {mount_point "sitemap"} {id ""} } {
 #
 # @see proc cms_folder::flush_registered_types
 
-proc cms_folder::get_registered_types {
+ad_proc cms_folder::get_registered_types {
   folder_id {datasource multilist} {name registered_types}
 } {
 
-  set sql "
+  set code [list \
+    template::query get_name_type $name $datasource "
     select
       o.pretty_name,
       m.content_type
@@ -57,11 +58,7 @@ proc cms_folder::get_registered_types {
     and
       content_item.is_subclass(o.object_type, 'content_revision') = 't'
     order by
-      decode(o.object_type, 'content_revision', '----', o.pretty_name)
-  " 
-
-  set code [list \
-    template::query $name $datasource $sql \
+      decode(o.object_type, 'content_revision', '----', o.pretty_name)" \
     -cache "folder_registered_types $folder_id $datasource" -persistent \
     -timeout 3600]
 
