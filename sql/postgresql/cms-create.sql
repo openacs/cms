@@ -179,7 +179,7 @@ begin
 end;' language 'plpgsql';
 
 -- function new
-create or replace function content_module__new (varchar,varchar,varchar,integer,integer,integer,timestamp with time zone,integer,varchar,varchar)
+create or replace function content_module__new (varchar,varchar,varchar,integer,integer,integer,timestamptz,integer,varchar,varchar)
 returns integer as '
 declare
   p_name                        alias for $1;  
