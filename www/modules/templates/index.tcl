@@ -46,7 +46,7 @@ if { [string equal $type content_template] } {
 # Query for the parent
 
 if { ! [string equal $path /] } {
-    db_1row get_parent "" -column_array parent
+    db_0or1row get_parent "" -column_array parent
 }
 
 # Query folders first

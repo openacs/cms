@@ -76,6 +76,6 @@ if { ![util::is_nil id] } {
 
 # Select subgroups, users
 db_multirow subgroups get_subgroups $groups_query
-db_multrow users get_users $user_query $users_eval
+db_multirow users get_users $users_query $users_eval
 
 set return_url [ns_conn url]
