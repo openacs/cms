@@ -323,6 +323,7 @@ is
     if c_perm_cur%NOTFOUND then
       v_ret := 'f';
     end if;
+    close c_perm_cur;
     return v_ret;
   end has_revoke_authority;
 
