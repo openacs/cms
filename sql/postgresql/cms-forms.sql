@@ -231,7 +231,7 @@ begin
 
     if NOT FOUND then
 
-        raise EXCEPTION ''-20000: Attribute %: % does not exist in cm_form_widget.register_attribute_widget'', content_type, attribute_name;
+        raise EXCEPTION ''-20000: Attribute %: % does not exist in cm_form_widget.register_attribute_widget'', p_content_type, p_attribute_name;
     end if;
 
     -- Determine if a previous value exists
@@ -263,7 +263,7 @@ begin
       insert into cm_attribute_widgets
 	(attribute_id, widget, is_required)
       values
-	(v_attr_id, widget, is_required);
+	(v_attr_id, p_widget, p_is_required);
     end if;
 
     return 0; 
@@ -274,9 +274,9 @@ end;' language 'plpgsql';
 create function cm_form_widget__set_attribute_order (varchar,varchar,integer)
 returns integer as '
 declare
-  p_content_type   alias for $1;  
-  p_attribute_name   alias for $2;  
-  p_sort_order   alias for $3;  
+  p_content_type        alias for $1;  
+  p_attribute_name      alias for $2;  
+  p_sort_order          alias for $3;  
                                         
 begin
 
@@ -310,7 +310,7 @@ begin
        and object_type = p_content_type;
 
     if NOT FOUND then
-        raise EXCEPTION ''-20000: Attribute %: % does not exist in cm_form_widget.unregister_attribute_widget'', content_type, attribute_name;
+        raise EXCEPTION ''-20000: Attribute %: % does not exist in cm_form_widget.unregister_attribute_widget'', p_content_type, p_attribute_name;
     end if;   
 
     -- Look for the widget; if no widget is registered, just return
@@ -359,12 +359,12 @@ begin
     where 
 	a.attribute_name = p_attribute_name
     and 
-	a.object_type=p_content_type
+	a.object_type = p_content_type
     and
 	aw.attribute_id = a.attribute_id;
 
     if NOT FOUND then
-      raise EXCEPTION ''-20000: No widget is registered for attribute %''.% in cm_form_widget.set_attribute_param_value'', content_type, attribute_name;
+      raise EXCEPTION ''-20000: No widget is registered for attribute %''.% in cm_form_widget.set_attribute_param_value'', p_content_type, p_attribute_name;
     end;
 
     -- Get the param id
@@ -373,7 +373,7 @@ begin
        and param = p_param;
 
     if NOT FOUND then
-      raise EXCEPTION ''-20000: No parameter named % exists for the widget % in cm_form_widget.set_attribute_param_value'',param, v_widget;
+      raise EXCEPTION ''-20000: No parameter named % exists for the widget % in cm_form_widget.set_attribute_param_value'', p_param, v_widget;
     end if;  
 
     -- Check if an old value exists
@@ -398,7 +398,7 @@ begin
       insert into cm_attribute_widget_params
         (attribute_id, param_id, param_type, param_source, value)
       values
-        (v_attr_id, v_param_id, param_type, param_source, value);
+        (v_attr_id, v_param_id, p_param_type, p_param_source, p_value);
     end if;
 
     return 0; 

@@ -20,7 +20,7 @@ declare
  attr_id	acs_attributes.attribute_id%TYPE;
 begin
 
- select acs_object_type__create_type (
+ PERFORM acs_object_type__create_type (
    ''content_module'',
    ''Content Module'',
    ''Content Modules'',
@@ -216,7 +216,7 @@ begin
 end;' language 'plpgsql';
 
 
-create function get_label (integer) returns varchar as '
+create function content_module__get_label (integer) returns varchar as '
 declare
         p_module_id     alias for $1;
         v_name          cm_modules.name%TYPE;

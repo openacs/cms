@@ -339,7 +339,7 @@ begin
         ) = ''f''
       and h1.child_privilege = ''cm_perm''
       and h1.tree_sortkey like (h2.tree_sortkey || ''%'')
-      and h2.tree_sortkey < h1.tree_sortkey
+      and h2.tree_sortkey <= h1.tree_sortkey
       limit 1;
    
 end;' language 'plpgsql';
@@ -515,7 +515,7 @@ begin
 
     -- Revoke the parent permission
     for v_idx in 1..v_count loop
-      acs_permission__revoke_permission (
+      PERFORM acs_permission__revoke_permission (
         v_items(v_idx), 
         p_revokee_id, 
         p_privilege
@@ -528,7 +528,7 @@ end;' language 'plpgsql';
 
 -- function permission_p
 create function cms_permission__permission_p (integer,integer,varchar)
-returns varchar as '
+returns boolean as '
 declare
   p_item_id                        alias for $1;  
   p_holder_id                      alias for $2;  
@@ -812,7 +812,7 @@ end;' language 'plpgsql';
 
 -- function has_revoke_authority
 create function content_permission__has_revoke_authority (integer,integer,varchar,integer)
-returns varchar as '
+returns boolean as '
 declare
   p_object_id                      alias for $1;  
   p_holder_id                      alias for $2;  
@@ -859,7 +859,7 @@ end;' language 'plpgsql';
 
 -- function permission_p
 create function content_permission__permission_p (integer,integer,varchar)
-returns varchar as '
+returns boolean as '
 declare
   p_object_id                      alias for $1;  
   p_holder_id                      alias for $2;  
