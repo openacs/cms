@@ -5,7 +5,7 @@
   <tr bgcolor="#FFFFFF">
     <th align=left>@title@</th>
     <td align=right>
-      <if @header@ not nil>@header@</if>
+      <if @header@ not nil>@header;noquote@</if>
       <else>&nbsp;</else>
     </td>
   </tr>

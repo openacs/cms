@@ -4,7 +4,7 @@
 
 <if @footer@ not nil>
   <tr bgcolor="#FFFFFF">
-    <td colspan=2>@footer@</td>
+    <td colspan=2>@footer;noquote@</td>
   </tr>
 </if>
 </table>

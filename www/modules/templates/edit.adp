@@ -51,7 +51,7 @@
 
       <th nowrap align=left>Edit Template:</th>
       <td>&nbsp;</td>
-      <td nowrap align=left>@path@</td>
+      <td nowrap align=left>@path;noquote@</td>
 
   </tr>
   </table>
@@ -77,7 +77,7 @@
 </td></tr>
 <tr><td bgcolor=#DDDDDD nowrap>&nbsp;&nbsp;Create new revision: 
 <formgroup id="is_update">
-  @formgroup.widget@ @formgroup.label@
+  @formgroup.widget;noquote@ @formgroup.label;noquote@
 </formgroup>
 </td></tr>
 <tr bgcolor=#DDDDDD align=center><td nowrap>
