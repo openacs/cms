@@ -57,7 +57,7 @@ if { [template::util::is_nil id] } {
   set parent_var :id
 
   # Resolve the symlink, if any
-  set_resolved_id [db_string get_resolved_id ""]
+  set resolved_id [db_string get_resolved_id ""]
 
   if { $resolved_id != $id } {
     set is_symlink t
@@ -79,7 +79,7 @@ if { [template::util::is_nil id] } {
 
   # get all the content types registered to this folder
   # check whether this folder allows subfolders, symlinks, and templates
-  set_registered_types [db_list get_types ""]
+  set registered_types [db_list get_types ""]
 
   set subfolders_allowed f
   set symlinks_allowed f
