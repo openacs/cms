@@ -6,12 +6,7 @@ template::request set_param parent_id -datatype keyword -optional
 request set_param mount_point -datatype keyword -optional -value users
 
 # Determine if the group is empty
-template::query get_status is_empty onevalue "
-  select NVL((select 'f' from dual where exists (
-            select 1 from acs_rels 
-              where object_id_one = :id 
-              and rel_type in ('composition_rel', 'membership_rel'))),
-          't') as is_empty from dual"
+set is_empty [db_string get_status ""]
 
 # If nonempty, show error
 if { [string equal $is_empty "f"] } {

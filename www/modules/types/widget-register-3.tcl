@@ -20,39 +20,12 @@ wizard submit widget_preview -buttons { back finish }
 
 if { [form is_request widget_preview] } {
 
-    template::query get_outstanding outstanding_params_list onelist "
-      select
-        distinct param
-      from
-        cm_form_widget_params f
-      where
-        is_required = 't'
-      and
-        widget = :widget
-      and
-        not exists (
-          select 1
-          from
-            cm_attribute_widget_params
-          where
-            attribute_id = :attribute_id
-          and
-            param_id = f.param_id )
-    "
+    set outstanding_params_list [db_list get_outstanding ""]
  
     # the number of required widget params that are missing
     set outstanding_params [llength $outstanding_params_list]
 
-    template::query get_names attribute_names onerow "
-      select
-        pretty_name, attribute_name, object_type
-      from
-        acs_attributes
-      where
-        attribute_id = :attribute_id
-    "
-
-    template::util::array_to_vars attribute_names
+    db_1row get_name ""
     content::add_attribute_element widget_preview $object_type $attribute_name
 }
 

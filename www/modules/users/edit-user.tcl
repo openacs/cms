@@ -50,23 +50,9 @@ element create edit_user password2 \
 if { [form is_request edit_user] } {
 
   # Find basic user params
-  template::query get_user_info info onerow "
-    select
-      p.first_names, p.last_name, 
-      pp.email, pp.url, 
-      u.screen_name,
-      to_char(u.no_alerts_until, 'YYYY/MM/DD') as no_alerts_until
-    from
-      persons p, parties pp, users u
-    where
-      p.person_id = :id
-    and
-      pp.party_id = :id
-    and
-      u.user_id = :id
-  "
+    db_1row get_user_info "" -column_array info
 
-  form set_values edit_user info
+    form set_values edit_user info
 }
 
 if { [form is_valid edit_user] } {

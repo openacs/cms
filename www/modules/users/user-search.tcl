@@ -37,10 +37,10 @@ set form_title [element get_value user_search form_title]
 
 if { [util::is_nil form_title] } {
   if { ![util::is_nil group_id] } {
-    template::query get_who who onevalue "select acs_object.name(:group_id) from dual"
-    set form_title "Search members of $who"
+      set who [db_string get_who ""]
+      set form_title "Search members of $who"
   } else {
-    set form_title "Search All Users"
+      set form_title "Search All Users"
   }
   element set_properties user_search form_title -value $form_title
 }
@@ -81,21 +81,8 @@ if { [form is_valid user_search] } {
   }
 
   set clauses [join $clauses " or "]
-                           
-  template::query get_results results multirow "
-    select 
-      distinct u.user_id, u.screen_name,
-      p.first_names || ' ' || p.last_name as name,
-      pp.email
-    from
-      users u, persons p, parties pp $extra_table
-    where 
-      ($clauses)
-    and
-      p.person_id = u.user_id
-    and
-      pp.party_id = u.user_id
-      $where_clause"
+             
+  db_multirow results get_results ""              
 
   template::set_file "[file dir $__adp_stub]/search-results"
 }

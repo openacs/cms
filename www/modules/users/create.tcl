@@ -29,6 +29,7 @@ element create add_group url \
 if { [form is_request add_group] } {
   
   # Get the next folder id
+    set group_id [db_string get_group_id ""]
   template::query get_group_id group_id onevalue "
     select acs_object_id_seq.nextval from dual
   "

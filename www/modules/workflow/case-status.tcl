@@ -23,8 +23,7 @@ content::check_access $item_id cm_item_workflow \
 #set query "select case_id, initcap(toplevel_state) state
 #           from wf_cases where object_id = :item_id"
 
-template::query get_caseinfo caseinfo onerow "select case_id, initcap(state) state
-           from wf_cases where object_id = :item_id"
+db_0or1row get_caseinfo "" -column_array caseinfo
 
 # Look up the enabled or started transition for this workflow, if any: 
 
