@@ -40,7 +40,7 @@ db_multirow content_type_tree get_content_type ""
 db_multirow attribute_types get_attr_types ""
 
 # get template information
-db_multirow types_templates get_type_templates ""
+db_multirow type_templates get_type_templates ""
 
 set page_title "Content Type - $object_type_pretty"
 
