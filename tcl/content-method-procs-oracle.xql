@@ -22,13 +22,11 @@
       <querytext>
       
       select
-        label, map.content_method
+        label, content_method
       from
-        cm_content_type_method_map map, cm_content_methods m
+        cm_content_methods m
       where
-        map.content_method = m.content_method
-      and
-        map.content_method = content_method.get_method( :content_type )
+        m.content_method = content_method.get_method( :content_type )
       $text_entry_filter
     
       </querytext>
