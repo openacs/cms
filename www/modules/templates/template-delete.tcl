@@ -8,7 +8,7 @@ template::request set_param parent_id -datatype keyword -optional
 
 
 # Determine if the item has subitems is empty
-query empty_p onevalue "
+template::query get_status empty_p onevalue "
   select 't' from dual 
     where not exists (
       select 

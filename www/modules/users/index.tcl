@@ -54,8 +54,8 @@ if { ![util::is_nil id] } {
     and
       p.party_id = :id"
 
-  set groups_query [db_map get_groups_2] 
-  set users_query [db_map get_users_2] 
+  set groups_query [db_map get_groups_1] 
+  set users_query [db_map get_users_1] 
 
   set users_eval  {
       set state_html ""
@@ -101,7 +101,7 @@ if { ![util::is_nil id] } {
   set groups_query [db_map get_groups_2] 
   set users_query [db_map get_users_2] 
 
-   set users_eval {} 
+  set users_eval {} 
 }
 
 # Select subgroups, users

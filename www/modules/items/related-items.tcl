@@ -8,7 +8,7 @@ content::check_access $item_id cm_examine \
   -return_url "modules/sitemap/index" \
   -request_error
 
-set query "
+template::query get_related related multirow "
   select
     r.rel_id,
     r.related_object_id item_id,
@@ -32,6 +32,4 @@ set query "
   order by 
     order_n, title
 " 
-
-query related multirow $query
 

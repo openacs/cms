@@ -12,7 +12,7 @@
                         'group',
                         now(),
                         :user_id, 
-                        :ip
+                        :ip,
                         :email,
                         :url,
                         :group_name, 
@@ -28,11 +28,11 @@
 
         select composition_rel__new(
                         null,
-                        ''composition_rel'',
+                        'composition_rel',
                         :parent_id,
                         :group_id,
                         :user_id, 
-                        :ip ); end;
+                        :ip )
       </querytext>
 </fullquery>
 

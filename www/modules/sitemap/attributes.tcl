@@ -114,8 +114,8 @@ if { [form is_valid register_types] } {
 
         db_exec_plsql content "
              begin
-               content_folder.${subfolder_method}(:folder_resolved_id,'content_folder');
-               content_folder.${symlink_method}(:folder_resolved_id,'content_symlink');
+               content_folder.${subfolder_method}(:folder_resolved_id,'content_folder','f');
+               content_folder.${symlink_method}(:folder_resolved_id,'content_symlink','f');
              end;"
     }
 

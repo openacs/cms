@@ -16,4 +16,13 @@
 </fullquery>
 
  
+<fullquery name="get_path">      
+      <querytext>
+
+        select content_item.get_path(:folder_id) from dual
+
+      </querytext>
+</fullquery>
+
+
 </queryset>

@@ -38,7 +38,7 @@ db_transaction {
     } else {
         set code {
             if { [catch { 
-                db_exec_plsql user_assoc_root2 "
+                set rel_id [db_exec_plsql user_assoc_root2 "
         declare
           v_group_id groups.group_id%TYPE;
           v_user_id users.user_id%TYPE;
@@ -52,7 +52,7 @@ db_transaction {
           creation_user => :user_id, creation_ip => :ip); 
 
           exception when no_data_found then null;
-        end;" [list 1] rel_id
+        end;"]
             } errmsg] } {
             }
         }   

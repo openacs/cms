@@ -2,7 +2,7 @@ request create -params {
   parent_id -datatype integer
 }
 
-query path onevalue "
+template::query get_path path onevalue "
   select content_item.get_path(:parent_id) from dual"
 
 form create new_folder -elements "
@@ -41,7 +41,7 @@ if { [form is_valid new_folder] } {
 
   db_transaction {
 
-      set folder_id [db_exec_plsql "begin :1 := content_folder.new(
+      set folder_id [db_exec_plsql new_folder "begin :1 := content_folder.new(
          folder_id => :folder_id,
          name => :name,
          label => :label,

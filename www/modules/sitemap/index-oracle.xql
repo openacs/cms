@@ -36,7 +36,7 @@
       </querytext>
 </fullquery>
 
-<fullquery name="display_data">      
+<partialquery name="display_data_partial">      
       <querytext>
 
   select
@@ -78,7 +78,7 @@
     is_index_page desc $orderby_clause
   
       </querytext>
-</fullquery>
+</partialquery>
 
 <fullquery name="get_resolved_id">      
       <querytext>

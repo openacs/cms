@@ -30,7 +30,7 @@
                                         acs_objects ob2
                                   where ob2.tree_sortkey <= ob1.tree_sortkey
                                     and ob1.tree_sortkey like (ob2.tree_sortkey || '%')
-                                    and ob2.security_inherit = 'f')) o
+                                    and ob2.security_inherit_p = 'f')) o
     where
       per.privilege = p.privilege
     and
@@ -53,7 +53,8 @@
       per.privilege = p.privilege
     and
       per.grantee_id = u.party_id
-  ) order by
+  ) tmp 
+  order by
     grantee_name, privilege
   
       </querytext>

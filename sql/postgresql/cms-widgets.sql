@@ -251,7 +251,7 @@ begin
 	from
 	  cr_revisions
 	where
-	  revision_id = content_item.get_latest_revision(:item_id)'',
+	  revision_id = content_item__get_latest_revision(:item_id)'',
       ''onevalue'', 
       ''query''
   );

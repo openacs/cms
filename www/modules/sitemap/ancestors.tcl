@@ -59,7 +59,7 @@ if { ![template::util::is_nil index_page_id] } {
     set has_index_page t
 
 } else {
-    set_index_page_sql [db_map index_page_p]
+    set index_page_sql [db_map index_page_p]
 }
 
 # get the path of the item

@@ -17,11 +17,11 @@
     end loop;
 
     PERFORM cms_permission__grant_permission (
-      content_item.get_root_folder, :user_id, 'cm_admin', :target_user_id, 't'
+      content_item__get_root_folder(null), :user_id, 'cm_admin', :target_user_id, 't'
     );
 
     PERFORM cms_permission__grant_permission (
-      content_template.get_root_folder, :user_id, 'cm_admin', :target_user_id, 't'
+      content_template__get_root_folder(), :user_id, 'cm_admin', :target_user_id, 't'
     );
 
     return null;

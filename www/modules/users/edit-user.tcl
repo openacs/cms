@@ -50,7 +50,7 @@ element create edit_user password2 \
 if { [form is_request edit_user] } {
 
   # Find basic user params
-  query info onerow "
+  template::query get_user_info info onerow "
     select
       p.first_names, p.last_name, 
       pp.email, pp.url, 

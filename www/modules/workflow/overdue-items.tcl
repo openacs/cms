@@ -3,7 +3,7 @@ request set_param transition -datatype keyword -value "all"
 
 
 if { ![string equal $transition "all"] } {
-    query transition_name onevalue "
+    template::query get_transitoin_name transition_name onevalue "
       select transition_name
         from wf_transitions
         where transition_key = :transition
@@ -19,7 +19,7 @@ if { ![string equal $transition "all"] } {
 
 set date_format "'Mon. DD, YYYY HH24:MI:SS'"
 
-query overdue_tasks multirow "
+template::query get_overdue_tasks overdue_tasks multirow "
   select
     ca.transition_key, transition_name, ca.party_id, 
     item_id, content_item.get_title(item_id) as title,

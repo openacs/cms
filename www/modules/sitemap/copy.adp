@@ -1,13 +1,14 @@
 <master src="../../master">
-<property name="title">Copy Items to @path@</property>
-<h2>Copy Items to @path@</h2>
-
 
 <if @no_items_on_clipboard@ eq "t">
-  <p>No items are currently available for linking. Please mark
+<property name="title">Copy Items</property>
+<h2>Copy Items to:</h2>
+  <p>No items are currently available for copying. Please mark
      your choices and return to this form.</p>
 </if>
 <else>
+<property name="title">Copy Items to @path@</property>
+<h2>Copy Items to @path@</h2>
 <formtemplate id="copy">
 <formwidget id="id">
 

@@ -15,7 +15,7 @@
             from 
               acs_rels r, membership_rels m
             where 
-              r.object_id_two=$item_id
+              r.object_id_two = $item_id
             and 
               m.rel_id = r.rel_id
           loop
@@ -48,10 +48,12 @@
                         'membership_rel',
                         :id, 
                         :item_id,
-                        'approved'
+                        'approved',
                         :user_id, 
                         :ip); 
           end if;
+
+          return null;
         end;
       </querytext>
 </fullquery>

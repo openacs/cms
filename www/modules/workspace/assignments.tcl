@@ -6,7 +6,7 @@
 
 set user_id [User::getID]
 
-query locked_tasks multirow "
+template::query get_locked_tasks locked_tasks multirow "
   select
     types.pretty_name, 
     obj.object_id item_id, 

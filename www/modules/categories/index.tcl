@@ -62,7 +62,7 @@ template::query get_items items multirow "
   order by
     is_leaf, heading
 " 
-
+ns_log Notice "id = $id"
 # Get the parent id if it is missing
 if { [util::is_nil parent_id] && ![util::is_nil id] } {
   template::query get_parent_id parent_id onevalue "

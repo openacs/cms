@@ -6,7 +6,7 @@ request create -params {
 
 if { ! [string equal $path {}] } {
 
-  query id onevalue "
+  template::query get_id id onevalue "
     select 
       content_item.get_id(:path, content_template.get_root_folder) 
     from dual"
@@ -20,17 +20,17 @@ if { ! [string equal $path {}] } {
 } else {
 
   if { [string equal $id {}] } {
-    query id onevalue "
+    template::query get_root_id onevalue "
       select content_template.get_root_folder from dual"
   }
 
-  query path onevalue "
+  template::query get_path path onevalue "
     select content_item.get_path(:id) from dual"
 }
 
 # query for the content type and redirect if a folder
 
-query type onevalue "
+template::query get_type type onevalue "
   select content_type from cr_items where item_id = :id"
 
 if { [string equal $type content_folder] } {

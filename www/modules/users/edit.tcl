@@ -31,7 +31,7 @@ element create edit_group url \
 
 if { [form is_request edit_group] } {
 
-  query info onerow "
+  template::query get_group_info info onerow "
     select
       g.group_name, p.url, p.email
     from

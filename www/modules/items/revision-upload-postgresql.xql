@@ -61,5 +61,12 @@ insert into cr_xml_docs
       </querytext>
 </fullquery>
 
+<fullquery name="get_revision_id">      
+      <querytext>
+
+        select acs_object_id_seq.nextval
+      
+      </querytext>
+</fullquery>
  
 </queryset>

@@ -38,7 +38,7 @@
 </fullquery>
 
 
-<fullquery name="display_data">      
+<partialquery name="display_data_partial">      
       <querytext>
 
   select
@@ -47,7 +47,7 @@
     r.item_id, r.resolved_id, r.is_symlink, r.name,
     coalesce(trim(
       case when o.object_type = 'content_symlink' then r.label
-           when o.object_type = 'content_folder' then f.label,
+           when o.object_type = 'content_folder' then f.label
 	   else coalesce(v.title, i.name) end),'-') as title,
     case when i.publish_status = 'live' then to_char(u.publish_date, 'MM/DD/YYYY') else '-' end as publish_date,
     o.object_type, t.pretty_name as content_type,
@@ -78,7 +78,7 @@
     is_index_page desc $orderby_clause
   
       </querytext>
-</fullquery>
+</partialquery>
 
 <fullquery name="get_resolved_id">      
       <querytext>
@@ -102,7 +102,7 @@
       <querytext>
       
   select
-    i.item_id id,
+    i.item_id as id,
     content_item__get_path(i.item_id, null) as path
   from 
     cr_items i, cr_symlinks s
@@ -118,7 +118,7 @@
       <querytext>
       
     select
-      parent_id, coalesce(label, name) label, description
+      parent_id, coalesce(label, name) as label, description
     from
       cr_items i, cr_folders f
     where

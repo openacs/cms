@@ -20,5 +20,19 @@
       </querytext>
 </fullquery>
 
+<fullquery name="get_group_info">      
+      <querytext>
+
+    select
+      g.group_name, p.url, p.email
+    from
+      groups g, parties p
+    where
+      g.group_id = :id
+    and
+      p.party_id = :id
+
+     </querytext>
+</fullquery>
  
 </queryset>

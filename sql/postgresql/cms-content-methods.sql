@@ -193,7 +193,7 @@ end;' language 'plpgsql';
 
 
 -- procedure add_method
-create function content_method__add_method (varchar,varchar,char)
+create function content_method__add_method (varchar,varchar,boolean)
 returns integer as '
 declare
   p_content_type                alias for $1;  

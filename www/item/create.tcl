@@ -14,7 +14,7 @@ element create create_item description -datatype text -widget textarea \
 
 element create create_item publish_date -datatype date -widget date
 
-query mime_types multilist "
+template::query get_mime_types mime_types multilist "
   select label, mime_type from cr_mime_types order by label"
 
 element create create_item mime_type -datatype text -widget select \
@@ -25,10 +25,10 @@ element create create_item text -datatype text -widget textarea \
 
 if { [form is_request create_item] } {
 
-  query item_id onevalue "select acs_object_id_seq.nextval from dual"
+  template::query get_item_id item_id onevalue "select acs_object_id_seq.nextval from dual"
   element set_properties create_item item_id -value $item_id
 
-  query revision_id onevalue "select acs_object_id_seq.nextval from dual"
+  template::query get_revision_id revision_id onevalue "select acs_object_id_seq.nextval from dual"
   element set_properties create_item revision_id -value $revision_id
 }
 

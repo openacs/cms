@@ -4,7 +4,7 @@ request create -params {
 
 ns_log Notice "folder_id is $folder_id"
 
-query path onevalue "
+template::query get_path path onevalue "
   select content_item.get_path(:folder_id) from dual"
 
 form create new_template -elements "
@@ -14,7 +14,7 @@ form create new_template -elements "
   name -datatype filename -html { size 40 }
 "
 
-query mime_types multilist "
+template::query get_mime_types mime_types multilist "
   select label, m.mime_type from cr_mime_types m, cr_content_mime_type_map t
   where t.content_type = 'content_template' and t.mime_type = m.mime_type"
 

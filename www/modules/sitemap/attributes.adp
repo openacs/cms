@@ -5,7 +5,7 @@
 
 
 <include src="../../table-header" title="Registered Content Types">
-<table cellspacing=0 cellpadding=4 border=0 width=100%>
+<table cellspacing=0 cellpadding=4 border=0 width="100%">
 
 <if @content_types:rowcount@ eq 0>
   <tr bgcolor="#99CCFF">
@@ -48,9 +48,9 @@
 
 <!-- FOLDER OPTIONS TABLE -->
 
-<table cellspacing=0 cellpadding=0 border=0 width=100%>
+<table cellspacing=0 cellpadding=0 border=0 width="100%">
 <tr bgcolor="#FFFFFF"><td>
-  <table cellspacing=0 cellpadding=4 border=0 width=100%>
+  <table cellspacing=0 cellpadding=4 border=0 width="100%">
   <tr bgcolor="#FFFFFF">
     <th align=left>Folder Options</th>
   </tr>

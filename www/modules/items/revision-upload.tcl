@@ -77,7 +77,7 @@ element create upload xml_file \
 
 if { [form is_request upload] } { 
  
-  query revision_id onevalue "select acs_object_id_seq.nextval from dual"
+  template::query get_revision_id revision_id onevalue "select acs_object_id_seq.nextval from dual"
   element set_properties upload revision_id -value $revision_id
 }
 

@@ -19,7 +19,7 @@ if { $id == [cm::modules::templates::getRootFolderID] } {
 
 if { ! [string equal $path {}] } {
 
-  query id onevalue "
+  template::query get_id id onevalue "
     select 
       content_item.get_id(:path, content_template.get_root_folder) 
     from dual"
@@ -32,17 +32,17 @@ if { ! [string equal $path {}] } {
 } else {
 
   if { [string equal $id {}] } {
-    query id onevalue "
+    template::query get_root_folder_id id onevalue "
       select content_template.get_root_folder from dual"
   }
 
-  query path onevalue "
+  template::query get_path path onevalue "
     select content_item.get_path(:id) from dual"
 }
 
 # query for the content type and redirect if a folder
 
-query type onevalue "
+template::query get_type type onevalue "
   select content_type from cr_items where item_id = :id"
 
 if { [string equal $type content_template] } {
@@ -52,7 +52,7 @@ if { [string equal $type content_template] } {
 # Query for the parent
 
 if { ! [string equal $path /] } {
-query parent onerow "
+template::query get_parent parent onerow "
   select
     f.folder_id, f.label, i.name, 
     to_char(o.last_modified, 'MM/DD/YY HH:MI AM') modified
@@ -68,7 +68,7 @@ query parent onerow "
 
 # Query folders first
 
-query folders multirow "
+template::query get_folders folders multirow "
   select
     f.folder_id, f.label, i.name, 
     to_char(o.last_modified, 'MM/DD/YY HH:MI AM') modified
@@ -85,7 +85,7 @@ query folders multirow "
 
 # items in the folder
 
-query items multirow "
+template::query get_items items multirow "
   select
     t.template_id, i.name, 
     to_char(o.last_modified, 'MM/DD/YY HH:MI AM') modified,

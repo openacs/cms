@@ -107,7 +107,7 @@
       <querytext>
       
     select
-      party_id group_id, 'All Users' as group_name, 
+      party_id as group_id, 'All Users' as group_name, 
       email, url, 'f' as is_empty
     from
       parties

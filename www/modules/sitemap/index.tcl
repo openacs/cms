@@ -171,10 +171,10 @@ switch -exact -- $orderby {
     set orderby_clause ", o.object_type, last_modified desc"
   }
   object_type {
-    set orderby_clause ", o.object_type, content_type, upper(title)"
+    set orderby_clause ", o.object_type, content_type, upper(v.title)"
   }  
   default {
-    set orderby_clause ", o.object_type, upper(title)"
+    set orderby_clause ", o.object_type, upper(v.title)"
   }
 }
 

@@ -283,7 +283,7 @@ begin
                           acs_objects ob2
                     where ob2.tree_sortkey <= ob1.tree_sortkey
                       and ob1.tree_sortkey like (ob2.tree_sortkey || ''%'')
-                      and ob2.inherit_p = ''f'') o3        
+                      and ob2.security_inherit_p = ''f'') o3        
             where o2.tree_sortkey <= o1.tree_sortkey
               and o1.tree_sortkey like (o2.tree_sortkey || ''%'')
               and o2.tree_sortkey > o3.tree_sortkey
@@ -320,7 +320,7 @@ begin
     if acs_permission__permission_p (p_item_id, p_holder_id, ''cm_perm_admin'') = ''t'' 
        or (
          acs_permission__permission_p (p_item_id, p_holder_id, ''cm_perm'') = ''t'' and
-         acs_permission__permission_p (p_item_id, p_holder_id, privilege) = ''t''
+         acs_permission__permission_p (p_item_id, p_holder_id, p_privilege) = ''t''
        ) 
     then
       return ''t'';
@@ -416,7 +416,7 @@ declare
   c_perm_cur                       record;
 begin
 
-    PERFORM cms_permissions__update_permissions(p_item_id, p_is_recursive);
+    PERFORM cms_permission__update_permissions(p_item_id, p_is_recursive);
   
     -- Select all child items
     v_count := 0;

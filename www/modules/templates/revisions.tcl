@@ -1,11 +1,11 @@
 # template ID is passed to included template
 
-query live_revision onevalue "
+template::query get_live_revision live_revision onevalue "
   select live_revision from cr_items where item_id = :template_id"
 
 # first count all revisions
 
-set query "
+template::query get_revision_count revision_count onevalue "
   select
     count(*) 
   from 
@@ -13,11 +13,9 @@ set query "
   where
     item_id = :template_id"
 
-query revision_count onevalue $query
-
 set counter $revision_count
 
-set query "
+template::query get_revisions revisions multirow "
   select
     revision_id,
     to_char(o.creation_date, 'MM/DD/YY HH:MI AM') modified,
@@ -37,10 +35,7 @@ set query "
   and
     o.object_id = j.journal_id (+)
   order by
-    o.creation_date desc"
-
-
-query revisions multirow $query -maxrows 12 -eval {
+    o.creation_date desc" -maxrows 12 -eval {
   set row(revision_number) $counter
   incr counter -1
 }

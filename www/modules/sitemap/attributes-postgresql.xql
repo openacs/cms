@@ -7,8 +7,8 @@
       <querytext>
 
              begin
-               PERFORM content_folder__${subfolder_method}(:folder_resolved_id,'content_folder');
-               PERFORM content_folder__${symlink_method}(:folder_resolved_id,'content_symlink');
+               PERFORM content_folder__${subfolder_method}(:folder_resolved_id,'content_folder','f');
+               PERFORM content_folder__${symlink_method}(:folder_resolved_id,'content_symlink','f');
 
                return null;
              end;

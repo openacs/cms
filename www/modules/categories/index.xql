@@ -10,6 +10,7 @@
       acs_objects
     where
       object_id = :id
+
       </querytext>
 </fullquery>
 

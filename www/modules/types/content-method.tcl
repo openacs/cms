@@ -101,7 +101,7 @@ if { [form is_valid register] } {
     
     db_transaction {
 
-        template::query add_method content_method_add dml "
+        db_exec_plsql add_method "
       begin
       content_method.add_method (
           content_type   => :content_type,

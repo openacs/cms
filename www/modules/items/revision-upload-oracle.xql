@@ -49,5 +49,12 @@
       </querytext>
 </fullquery>
 
+<fullquery name="get_revision_id">      
+      <querytext>
+
+        select acs_object_id_seq.nextval from dual
+      
+      </querytext>
+</fullquery>
  
 </queryset>

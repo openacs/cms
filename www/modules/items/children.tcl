@@ -13,7 +13,8 @@ content::check_access $item_id cm_examine \
   -request_error
 
 # create a form to add child items
-set query "
+
+template::query get_child_types child_types multilist "
   select
     t.pretty_name, c.child_type
   from
@@ -22,8 +23,6 @@ set query "
     c.parent_type = content_item.get_content_type(:item_id)
   and
     c.child_type = t.object_type"
-
-query child_types multilist $query
 
 # do not display template if this content type does not allow children
 if { [llength $child_types] == 0 } { adp_abort }
@@ -59,10 +58,12 @@ set query "
   order by
     t.pretty_name, title"
 
-#query children multirow $query
+#template::query children multirow $query
 
 
-set query "
+
+
+template::query get_children children multirow "
   select
     r.rel_id,
     r.child_id item_id,
@@ -86,5 +87,3 @@ set query "
   order by 
     order_n, title
 " 
-
-query children multirow $query

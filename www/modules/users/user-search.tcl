@@ -82,7 +82,7 @@ if { [form is_valid user_search] } {
 
   set clauses [join $clauses " or "]
                            
-  set sql_query "
+  template::query get_results results multirow "
     select 
       distinct u.user_id, u.screen_name,
       p.first_names || ' ' || p.last_name as name,
@@ -96,10 +96,6 @@ if { [form is_valid user_search] } {
     and
       pp.party_id = u.user_id
       $where_clause"
-
-  ns_log notice "$sql_query\n$keyword"
-
-  query results multirow $sql_query
 
   template::set_file "[file dir $__adp_stub]/search-results"
 }

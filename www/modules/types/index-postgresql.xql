@@ -9,7 +9,7 @@
   select 
     case when ot2.supertype = 'acs_object' then '' else ot2.supertype end as parent_type,   
     case when ot2.object_type = 'content_revision' then '' else ot2.object_type end as object_type,
-    pretty_name
+    ot2.pretty_name
   from 
     (select * from acs_object_types where object_type = :content_type) ot1,
     acs_object_types ot2
@@ -36,7 +36,7 @@
     description, widget
   from 
     acs_attributes attr left outer join cm_attribute_widgets w using (attribute_id)
-    left outer join acs_attribute_descriptions d using (attribute_name)
+    left outer join acs_attribute_descriptions d using (attribute_name),
     ( select 
         o2.object_type, o2.pretty_name
       from 

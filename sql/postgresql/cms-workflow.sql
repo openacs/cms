@@ -462,7 +462,7 @@ begin
     
 
     if NOT FOUND then
-        raise EXCEPTION ''-20000, ''Bad transition key %'', p_transition_key;
+        raise EXCEPTION ''-20000:  Bad transition key %'', p_transition_key;
     end if;
 
     return v_this_place;
@@ -721,7 +721,7 @@ begin
 
     if v_task_state = ''started'' and v_holding_user != p_user_id then
 
-      raise EXCEPTION '' -20000:content_workflow.approve - Could not approve task because this task is checked out by someone else %'', v_holding_user;
+      raise EXCEPTION '' -20000: content_workflow.approve - Could not approve task because this task is checked out by someone else %'', v_holding_user;
 
     else if v_task_state != ''started'' and v_task_state != ''enabled'' then
       raise EXCEPTION '' -20000: content_workflow.approve - Could not approve task because this task is in an invalid state %'', v_task_state;

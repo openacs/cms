@@ -1,13 +1,15 @@
 <master src="../../master">
-<property name="title">Move Items to @path@</property>
-<h2>Move Items to @path@</h2>
 
 
 <if @no_items_on_clipboard@ eq "t">
-  <p>No items are currently available for linking. Please mark
+<property name="title">Move Items to:</property>
+<h2>Move Items to:</h2>
+  <p>No items are currently available for moving. Please mark
      your choices and return to this form.</p>
 </if>
 <else>
+<property name="title">Move Items to @path@</property>
+<h2>Move Items to @path@</h2>
 <formtemplate id="move">
 <formwidget id="id">
 
@@ -17,12 +19,12 @@
   </formerror>
 </p>
 
-<table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width=95%>
+<table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width="95%">
 
 <tr>
 <td>
 
-<table bgcolor=#99CCFF cellspacing=0 cellpadding=2 border=0 width=100%>
+<table bgcolor=#99CCFF cellspacing=0 cellpadding=2 border=0 width="100%">
 
   <tr><td>&nbsp;</td>
       <th align=left>Name</th>

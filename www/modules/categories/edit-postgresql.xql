@@ -22,8 +22,8 @@
       <querytext>
       
   select
-    content_keyword__get_heading(:id) heading,
-    content_keyword__get_description(:id) description,
+    content_keyword__get_heading(:id) as heading,
+    content_keyword__get_description(:id) as description,
     case when content_keyword__is_leaf(:id) = 't' then 'keyword' else 'category' end as what
   from
     dual

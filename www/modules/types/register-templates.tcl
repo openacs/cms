@@ -6,7 +6,7 @@ request set_param content_type -datatype keyword
 
 
 # get the content type pretty name
-query object_type_pretty onevalue "
+template::query get_pretty_type object_type_pretty onevalue "
   select 
     pretty_name
   from
@@ -47,7 +47,7 @@ if { [llength $marked_templates] == 0 } {
 
 # make sure we only get content templates (not folders, symlinks,
 #   etc.) that aren't already registered to this content type
-query only_marked_templates multilist "
+template::query get_content_templates only_marked_templates multilist "
   select 
     template_id, 
     content_item.get_path( template_id, content_template.get_root_folder ) 
@@ -79,7 +79,7 @@ element create register_templates template_count \
 if { $template_count > 0 } {
 
     # for the context pick list(s)
-    query cr_use_contexts multilist "
+    template::query get_use_contexts cr_use_contexts multilist "
       select use_context, use_context 
         from cr_template_use_contexts
         order by 1"

@@ -14,8 +14,16 @@
                 :creation_user,
                 :creation_ip
         );
+
       </querytext>
 </fullquery>
 
+<fullquery name="get_path">      
+      <querytext>
+
+        select content_item__get_path(:folder_id, null)
+
+      </querytext>
+</fullquery>
  
 </queryset>

@@ -10,7 +10,9 @@ set user_id [User::getID]
 
 # first part of the where clause gets all assignments for the individual
 # and for any groups to which the individual belongs.
-set query "
+
+
+template::query get_workspace_items items multirow "
   select
     types.pretty_name, 
     obj.object_id item_id, 
@@ -54,8 +56,6 @@ set query "
     types.object_type = content_item.get_content_type(obj.object_id)
   order by
     dead.deadline"
-
-query items multirow $query
 
 
 # don't cache this page

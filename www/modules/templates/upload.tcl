@@ -4,7 +4,7 @@ request create -params {
 
 if { ! [request is_valid] } { return }
 
-query path onevalue "
+template::query get_path path onevalue "
   select content_item.get_path(:template_id) from dual"
 
 form create edit_template -html { enctype multipart/form-data }

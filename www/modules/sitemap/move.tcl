@@ -12,6 +12,7 @@ if { [template::util::is_nil id] } {
   set folder_id $id
 }
 
+
 # permission check - must have cm_write on the current folder
 set user_id [User::getID]
 content::check_access $folder_id cm_new -user_id $user_id
@@ -32,6 +33,8 @@ template::query get_path path onevalue "
   from 
     dual
 " 
+
+ns_log Notice "path = $path"
 
 # get relevant marked items
 template::query get_marked marked_items multirow "

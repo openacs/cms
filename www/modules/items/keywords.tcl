@@ -12,11 +12,10 @@ content::check_access $item_id cm_examine \
   -return_url "modules/sitemap/index" \
   -request_error
 
-set query "select name from cr_items where item_id = :item_id"
 
-query name onevalue $query
+template::query get_name name onevalue "select name from cr_items where item_id = :item_id"
 
-set query "select
+template::query get_keywords keywords multirow "select
              keyword_id,
              content_keyword.get_heading(keyword_id) heading,
              NVL(content_keyword.get_description(keyword_id),
@@ -27,7 +26,5 @@ set query "select
              item_id = :item_id
            order by
              heading"
-
-query keywords multirow $query
 
 set page_title "Content Keywords for $name"
