@@ -22,7 +22,6 @@ db_transaction {
     template::util::array_to_vars iteminfo
     # item_id, publish_p
 
-
     if { [string equal $publish_p t] } {
 
         # publish::publish_revision $revision_id
