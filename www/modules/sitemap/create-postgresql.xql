@@ -5,7 +5,6 @@
 
 <fullquery name="new_folder">      
       <querytext>
-
     
     select content_folder__new (
         :name, 
@@ -18,7 +17,6 @@
         :user_id, 
         :ip ); 
     
-
       </querytext>
 </fullquery>
 

@@ -33,8 +33,6 @@
  
 <fullquery name="get_rel_attrs">      
       <querytext>
-      FIX ME CONNECT BY
-FIX ME OUTER JOIN
          
   select 
     types.table_name, types.id_column, attr.attribute_name,

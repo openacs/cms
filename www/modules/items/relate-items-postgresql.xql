@@ -22,7 +22,7 @@
       <querytext>
 
     select 
-      lpad(' ', level, '-') || pretty_name as pretty_name, 
+      lpad(' ', tree_level(tree_sortkey), '-') || pretty_name as pretty_name, 
       object_type
     from
       acs_object_types

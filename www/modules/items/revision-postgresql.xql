@@ -49,7 +49,7 @@
         acs_object_types
       where 
         object_type = cr_items.content_type
-    ) content_type,
+    ) as content_type,
     content_item__get_path(item_id,null) as path
   from 
     cr_items

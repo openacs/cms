@@ -5,6 +5,7 @@
 
 <fullquery name="set_release_period">      
       <querytext>
+
                 select content_item__set_release_period(
                       :item_id,
                       $start_when,

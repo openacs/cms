@@ -7,6 +7,7 @@
       <querytext>
 
         select content_folder__delete(:id)
+
       </querytext>
 </fullquery>
 

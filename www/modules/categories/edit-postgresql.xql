@@ -8,8 +8,8 @@
 
 
     begin 
-      content_keyword__set_heading(:keyword_id, :heading);
-      content_keyword__set_description(:keyword_id, :description);
+      PERFORM content_keyword__set_heading(:keyword_id, :heading);
+      PERFORM content_keyword__set_description(:keyword_id, :description);
 
       return null;
     end;

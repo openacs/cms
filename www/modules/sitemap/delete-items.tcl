@@ -18,7 +18,8 @@ if { $clip_length == 0 } {
 set user_id [User::getID]
 
 # get title, content_type, path, item_id of each marked item
-set query "
+
+template::query get_marked_items marked_items multirow "
   select
     item_id,
     nvl(content_item.get_title(item_id),name) title, 
@@ -40,7 +41,6 @@ set query "
     -- this way parents are deleted after their children
     item_id desc
 "
-query marked_items multirow $query
 
 
 
@@ -127,7 +127,7 @@ if { [form is_valid delete] } {
             #   something_id => :del_item_id
             # );
 
-            if { [catch { db_dml delete_items "
+            if { [catch { db_exec_plsql delete_items "
 	  begin
 	  $delete_proc (
 	    $delete_key => :del_item_id

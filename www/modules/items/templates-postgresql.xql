@@ -67,7 +67,7 @@
      and 
        itmap.use_context = t.use_context
      and 
-       itmap.item_id = :item_id) already_registered_p
+       itmap.item_id = :item_id) as already_registered_p
   from 
     cr_type_template_map t
   where 

@@ -5,8 +5,6 @@
 
 <fullquery name="get_content_type">      
       <querytext>
-      FIX ME CONNECT BY
-FIX ME ROWNUM
 
   select 
     case when ot2.supertype = 'acs_object' then '' else ot2.supertype end as parent_type,   
@@ -21,7 +19,7 @@ FIX ME ROWNUM
     ot2.tree_sortkey <= ot1.tree_sortkey
   and 
     ot1.tree_sortkey like (ot2.tree_sortkey || '%')
-  order by ot2.tree_sortkey desc
+  order by ot2.tree_sortkey asc
 
       </querytext>
 </fullquery>
@@ -29,8 +27,6 @@ FIX ME ROWNUM
  
 <fullquery name="get_attr_types">      
       <querytext>
-      FIX ME CONNECT BY
-FIX ME OUTER JOIN
 
   select 
     attr.attribute_id, attr.attribute_name, attr.object_type,
@@ -71,7 +67,7 @@ FIX ME OUTER JOIN
       template_id,:root_id) as path,
     (select pretty_name 
        from acs_object_types 
-       where object_type = :content_type) pretty_name
+       where object_type = :content_type) as pretty_name
   from 
     cr_type_template_map ttmap, cr_items i 
   where 

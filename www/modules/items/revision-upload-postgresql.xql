@@ -7,15 +7,15 @@
       <querytext>
 
         select content_item__new(
-          name          => :name, 
-          parent_id     => :parent_id, 
+          :name, 
+          :parent_id, 
           null,
           now(),
-          creation_user => [User::getID],
+          [User::getID],
           null,          
-          creation_ip   => '[ns_conn peeraddr]',
+          '[ns_conn peeraddr]',
           'content_item',
-          content_type  => :content_type,
+          :content_type,
           null,
           null,
           'text/plain',

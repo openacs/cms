@@ -6,8 +6,6 @@
 <fullquery name="copy_item">      
       <querytext>
 
-
-
         select content_item__copy(
                 :cp_item_id,
                 :folder_id,
