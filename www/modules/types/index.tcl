@@ -17,9 +17,7 @@ set content_type $id
 set user_id [User::getID]
 set root_id [cm::modules::templates::getRootFolderID]
 
-template::query get_module_id module_id onevalue "
-  select module_id from cm_modules where key = 'types'
-" 
+set module_id [db_string get_module_id ""]
 
 content::check_access $module_id cm_examine -user_id $user_id
 
@@ -27,15 +25,7 @@ set can_edit_widgets $user_permissions(cm_write)
 
 
 # get the content type pretty name
-template::query get_object_type object_type_pretty onevalue "
-  select 
-    pretty_name
-  from
-    acs_object_types
-  where
-    object_type = :content_type
-" 
-
+set object_type_pretty [db_string get_object_type ""]
 
 if { [string equal $object_type_pretty ""] } {
     # error - invalid content_type
@@ -44,73 +34,13 @@ if { [string equal $object_type_pretty ""] } {
 
 
 # get all the content types that this content type inherits from
-template::query get_content_type content_type_tree multirow "
-  select 
-    decode (supertype, 'acs_object', '', supertype) as parent_type,   
-    decode (object_type, 'content_revision', '', object_type) as object_type,
-    pretty_name
-  from 
-    acs_object_types
-  where
-    object_type ^= 'acs_object'
-  connect by 
-    object_type = prior supertype
-  start with 
-    object_type = :content_type
-  order by 
-    rownum desc
-" 
+db_multirow content_type_tree get_content_type ""
 
 # get all the attribute properties for this object_type
-template::query get_attr_types attribute_types multirow "
-  select 
-    attr.attribute_id, attr.attribute_name, attr.object_type,
-    attr.pretty_name as attribute_name_pretty,
-    datatype, types.pretty_name as pretty_name,
-    nvl(description_key,'&nbsp') as description_key, 
-    description, widget
-  from 
-    acs_attributes attr, acs_attribute_descriptions d,
-    cm_attribute_widgets w,
-    ( select 
-        object_type, pretty_name
-      from 
-        acs_object_types
-      where 
-        object_type ^= 'acs_object'
-      connect by 
-        prior supertype = object_type
-      start with 
-        object_type = :content_type
-    ) types        
-  where 
-    attr.object_type = types.object_type
-  and
-    attr.attribute_id = w.attribute_id(+)
-  and 
-    attr.attribute_name = d.attribute_name(+)
-  order by 
-    types.object_type, sort_order, attr.attribute_name
-" 
+db_multirow attribute_types get_attr_types ""
 
 # get template information
-template::query get_type_templates type_templates multirow "
-  select 
-    template_id, ttmap.content_type, use_context, is_default, name, 
-    content_item.get_path(
-      template_id,:root_id) as path,
-    (select pretty_name 
-       from acs_object_types 
-       where object_type = :content_type) pretty_name
-  from 
-    cr_type_template_map ttmap, cr_items i 
-  where 
-    i.item_id = ttmap.template_id
-  and 
-    ttmap.content_type = :content_type
-  order by 
-    upper(name)
-" 
+db_multirow types_templates get_type_templates ""
 
 set page_title "Content Type - $object_type_pretty"
 

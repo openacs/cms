@@ -13,32 +13,12 @@ if { [template::util::is_nil return_url] } {
 
 
 # fetch the content methods registered to this content type
-template::query get_methods content_methods multirow "
-  select
-    m.content_method, label, is_default, description
-  from
-    cm_content_type_method_map map, cm_content_methods m
-  where
-    m.content_method = map.content_method
-  and
-    map.content_type = :content_type
-  order by
-    is_default desc, label
-" 
+db_multirow content_methods get_methods ""
 
 
 # text_entry content method filter
 # don't show text entry if a text mime type is not registered to the item
-template::query check_status has_text_mime_type onevalue "
-  select
-    count( mime_type )
-  from
-    cr_content_mime_type_map
-  where
-    mime_type like ('%text/%')
-  and
-    content_type = :content_type
-" 
+set has_text_mime_type [db_string check_status ""]
 
 if { $has_text_mime_type == 0 } {
     set text_entry_filter_sql "and content_method != 'text_entry'"
@@ -48,24 +28,7 @@ if { $has_text_mime_type == 0 } {
 
 
 # fetch the content methods not register to this content type
-template::query get_unregistered_methods unregistered_content_methods multilist "
-  select
-    label, m.content_method
-  from
-    cm_content_methods m
-  where
-    not exists ( 
-      select 1
-      from
-        cm_content_type_method_map
-      where
-        content_method = m.content_method
-      and
-        content_type = :content_type )
-  $text_entry_filter_sql
-  order by 
-    label
-" 
+set unregistered_content_methods [db_list_of_lists get_unregistered_methods ""]
 
 set unregistered_method_count [llength $unregistered_content_methods]
 

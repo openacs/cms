@@ -9,9 +9,7 @@ request set_param mime_type -datatype text
 
 db_transaction {
 
-    template::query get_module_id module_id onevalue "
-  select module_id from cm_modules where key = 'types'
-" 
+    set module_id [db_string get_module_id ""]
 
     # permissions check - must have cm_write to unregister mime type
     content::check_access $module_id cm_write -user_id [User::getID]

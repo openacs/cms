@@ -3,9 +3,7 @@ request set_param rel_type     -datatype keyword
 request set_param content_type -datatype keyword -value content_revision
 
 
-template::query get_module_id module_id onevalue "
-  select module_id from cm_modules where key = 'types'
-" 
+set module_id [db_string get_module_id ""]
 
 # permissions check - must have cm_write on the types module
 content::check_access $module_id cm_write -user_id [User::getID]
@@ -27,25 +25,9 @@ if { [string equal $rel_type item_rel] } {
     template::forward index?id=$content_type
 }
 
-template::query get_pretty_name pretty_name onevalue "
-  select
-    pretty_name
-  from
-    acs_object_types
-  where
-    object_type = :content_type
-" 
+set pretty_name [db_string get_pretty_name ""]
 
-template::query get_target_types target_types multilist "
-  select
-    lpad(' ', level, '-') || pretty_name, object_type
-  from
-    acs_object_types
-  connect by
-    prior object_type = supertype
-  start with
-    object_type = 'content_revision'
-" 
+set target_types [db_list_of_lists get_target_types ""]
 
 element create relation target_type \
 	-datatype keyword \

@@ -55,26 +55,7 @@ template::query get_context context multirow "select
 
 
 # find out which items this template is registered to
-template::query get_items items multirow "
-  select
-    content_item.get_title(item_id) title, item_id, use_context
-  from
-    cr_item_template_map
-  where
-    template_id = :template_id
-  order by
-    use_context"
-
+db_multirow items get_items ""
 
 # find out which types this template is registered to
-template::query get_types types multirow "
-  select
-    pretty_name, content_type, use_context
-  from
-    acs_object_types types, cr_type_template_map map
-  where
-    map.template_id = :template_id
-  and
-    types.object_type = map.content_type
-  order by
-    types.pretty_name"
+db_multirow types get_types ""

@@ -8,9 +8,7 @@ request set_param content_type -datatype keyword
 request set_param target_type -datatype keyword
 request set_param relation_tag -datatype text -value ""
 
-template::query get_module_id module_id onevalue "
-  select module_id from cm_modules where key = 'types'
-"
+set module_id [db_string get_module_id ""]
 
 # permissions check - must have cm_write on the types module
 content::check_access $module_id cm_write -user_id [User::getID]
