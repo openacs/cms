@@ -7,18 +7,7 @@ request create -params {
 
 # query the content type and table so we know which view to examine
 
-
-template::query get_type_info type_info onerow "
-  select 
-    o.object_type, t.table_name 
-  from 
-    acs_objects o, acs_object_types t
-  where 
-    o.object_id = :revision_id
-  and
-    o.object_type = t.object_type
-" -cache "revision_type_table $revision_id" \
-  -persistent -timeout 86400
+db_0or1row get_type_info "" -column_array type_info
 
 if { ! [info exists type_info(table_name)] } {
   adp_abort
@@ -28,16 +17,7 @@ if { ! [info exists type_info(table_name)] } {
 
 #  query the row from the standard view
 
-template::query get_info info onerow  "
-  select
-    content_item.get_revision_count(x.item_id) revision_count, 
-    content_revision.get_number(:revision_id) revision_number, 
-    content_item.get_live_revision(x.item_id) live_revision, 
-    x.*
-  from
-    $type_info(table_name)x x
-  where
-    object_id = :revision_id"
+db_0or1row get_info "" -column_array info
 
 if { ! [info exists info(item_id)] } {
 
@@ -59,38 +39,16 @@ content::check_access $info(item_id) cm_examine \
 
 set content_type $type_info(object_type)
 
-template::query get_attributes attributes multirow "
-  select 
-    types.pretty_name object_label, 
-    types.table_name, 
-    types.id_column, 
-    attr.attribute_name, 
-    attr.pretty_name attribute_label
-  from 
-    acs_attributes attr,
-    ( select 
-        object_type, pretty_name, table_name, id_column, 
-        level as inherit_level
-      from 
-        acs_object_types
-      where 
-        object_type ^= 'acs_object'
-      connect by 
-        prior supertype = object_type
-      start with 
-        object_type = :content_type) types        
-  where 
-    attr.object_type = types.object_type
-  order by 
-    types.inherit_level desc" -eval {
+db_multirow attributes get_attributes ""
+template::query get_attributes attributes multirow ""  {
   
-    if { [catch { set value $info($row(attribute_name)) } errmsg] } {
+    if { [catch { set value $info($attribute_name) } errmsg] } {
 	# catch - value doesn't exist
 	set value "-"
     } 
 
     if { [string equal $value {}] } { set value "-" } 
 
-    set row(attribute_value) $value
+    set attribute_value $value
 }
 
