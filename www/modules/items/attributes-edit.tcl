@@ -3,12 +3,10 @@
 request create
 request set_param item_id -datatype integer
 
-set db [template::get_db_handle]
-
 # check permissions - user must have cm_write on the item
 content::check_access $item_id cm_write -user_id [User::getID]
 
-template::query one_item onerow "
+template::query get_item one_item onerow "
   select 
     i.content_type, i.name, nvl(r.title, i.name) title, i.latest_revision
   from
@@ -20,8 +18,6 @@ template::query one_item onerow "
 "
 
 template::util::array_to_vars one_item
-
-template::release_db_handle
 
 # flush the sitemap folder listing cache in anticipation 
 # of the new item

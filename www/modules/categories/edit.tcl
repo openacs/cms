@@ -6,7 +6,7 @@ template::request set_param parent_id -datatype keyword -optional
 request set_param mount_point -datatype keyword -optional -value categories
 
 # Get existing data
-template::query info onerow "
+template::query get_info info onerow "
   select
     content_keyword.get_heading(:id) heading,
     content_keyword.get_description(:id) description,
@@ -31,15 +31,14 @@ if { [form is_valid edit_keyword] } {
 
   form get_values edit_keyword keyword_id heading description
 
-  set db [template::begin_db_transaction]
-  template::query edit_keyword dml "
+  db_transaction {
+      db_exec_plsql edit_keyword {
     begin 
       content_keyword.set_heading(:keyword_id, :heading);
       content_keyword.set_description(:keyword_id, :description);
     end;
-  " 
-  template::end_db_transaction
-  template::release_db_handle
+      }
+  }
 
   template::forward "refresh-tree?id=$keyword_id&goto_id=$parent_id&mount_point=$mount_point"
 }

@@ -4,9 +4,7 @@ request create
 request set_param content_method -datatype keyword
 request set_param revision_id -datatype integer
 
-set db [template::get_db_handle]
-
-template::query one_revision onerow "
+template::query get_revision one_revision onerow "
   select
     item_id, title as name
   from
@@ -20,7 +18,6 @@ template::util::array_to_vars one_revision
 # permissions check - must have cm_write on the item
 content::check_access $item_id cm_write -user_id [User::getID]
 
-template::release_db_handle
 
 # if we have an invalid revision_id, then redirect
 if { [template::util::is_nil name] } {

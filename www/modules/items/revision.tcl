@@ -8,9 +8,8 @@ request create -params {
 # flag indicating this is the live revision
 set live_revision_p 0
 
-set db [template::get_db_handle]
 
-query one_revision onerow "
+template::query get_revision one_revision onerow "
   select 
     revision_id, title, description, item_id, mime_type, 
     content_revision.get_number( revision_id ) revision_number,
@@ -41,7 +40,6 @@ content::check_access $item_id cm_examine \
 
 # validate revision
 if { [template::util::is_nil item_id] } {
-    template::release_db_handle
     template::request::error invalid_revision \
       "revision - Invalid revision - $revision_id"
     return
@@ -49,13 +47,13 @@ if { [template::util::is_nil item_id] } {
 
 
 # check if the item is publishable (but does not need live revision)
-template::query is_publishable onevalue "
+template::query get_status is_publishable onevalue "
   select content_item.is_publishable( :item_id ) from dual
 "
 
 
 # get total number of revision for this item
-template::query revision_count onevalue "
+template::query get_count revision_count onevalue "
   select count(*) from cr_revisions where item_id = :item_id
 "
 
@@ -66,7 +64,7 @@ set is_text_mime_type f
 set is_image_mime_type f
 if { [regexp {text/} $mime_type] } {
     set is_text_mime_type t
-    template::query content onevalue "
+    template::query get_content content onevalue "
       select 
         blob_to_string(content)
       from
@@ -88,7 +86,7 @@ if { [regexp {text/} $mime_type] } {
 
 
 # get item info
-query one_content_item onerow "
+template::query get_one_item one_content_item onerow "
   select 
     name, locale, live_revision as live_revision_id,
     (
@@ -121,7 +119,7 @@ if { $live_revision_id == $revision_id } {
 # if column_name is null, then use the attribute_name
 # if id_column is null, then use 'attribute_id' and 'acs_attribute_values'
 
-template::query meta_attributes multilist "
+template::query get_meta_attrs meta_attributes multilist "
   select 
     attribute_id, pretty_name, 
     (select pretty_name from acs_object_types
@@ -194,16 +192,13 @@ foreach meta $meta_attributes {
 
 if { ![string equal $attr_columns ""] } {
 
-    set sql "
+    template::query get_attr_values attribute_values multilist "
       select 
         [join $attr_columns ", "]
       from
         [join $attr_tables ", "]
       where
         [join $column_id_cons " and "]"
-
-    #ns_log Notice "Mike's Dynamic SQL = $sql"
-    template::query attribute_values multilist $sql
 
 
     # write the body of the attribute display table to $revision_attr_html

@@ -33,9 +33,8 @@ element create rel_form_2 page_title -label "Page Title" \
 upvar 0 "rel_attrs:rowcount" index
 set index 0
 
-set db [template::get_db_handle]
 
-template::query item_title onevalue "
+template::query get_title item_title onevalue "
   select content_item.get_title(:item_id) from dual"
 
 # Create the main multirow datasource
@@ -60,8 +59,9 @@ foreach rel $rel_list {
   set row(dmls) [list]
 
   # Get all elements, if any
+  # FIXME: 
   set content_type $relation_type
-  content::query_form_metadata $db params multirow {
+  content::query_form_metadata params multirow {
     object_type <> 'cr_item_rel'
   }  
 
@@ -70,7 +70,7 @@ foreach rel $rel_list {
     set form_complete 0
 
     # Get the header
-    template::query rel_info onerow "
+    template::query get_rel_info onerow "
       select 
 	content_item.get_title(:item_id) as item_title,
 	content_item.get_title(:related_id) as related_title,
@@ -131,7 +131,7 @@ if { [form is_valid rel_form_2] || $form_complete } {
     
     # Insert at the end if no order
     if { [template::util::is_nil order_n] } {
-      template::query order_n onevalue "
+      template::query get_order order_n onevalue "
         select 
 	  NVL(max(order_n) + 1, 1) 
 	from 
@@ -142,7 +142,7 @@ if { [form is_valid rel_form_2] || $form_complete } {
     }
 
     # Perform the insertion
-    ns_ora exec_plsql_bind $db "begin 
+    db_exec_plsql "begin 
       :rel_id := content_item.relate (
           item_id       => :item_id,
           object_id     => :related_id,

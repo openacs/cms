@@ -10,9 +10,7 @@ template::request set_param revision_id -datatype integer
 
 set user_id [User::getID]
 
-set db [template::get_db_handle]
-
-template::query iteminfo onerow "
+template::query get_iteminfo iteminfo onerow "
   select
     item_id, mime_type, content_revision.is_live( revision_id ) is_live
   from
@@ -29,7 +27,7 @@ if { ![string equal $is_live t] } {
   content::check_access $item_id cm_read -user_id $user_id
 }
 
-template::query file_name onevalue "
+template::query get_filename file_name onevalue "
   select
     name
   from
@@ -43,7 +41,6 @@ template::query file_name onevalue "
                   revision_id = :revision_id )
 "
 
-template::release_db_handle
 
 
 set headers_so_far "HTTP/1.0 200 OK
@@ -60,9 +57,7 @@ while {$set_headers_i < $set_headers_limit} {
 append entire_string_to_write $headers_so_far "\n"
 ns_write $entire_string_to_write
 
-set db [template::get_db_handle]
-
-ns_ora write_blob $db "
+db_write_blob write_content "
   select
     content 
   from 
@@ -71,6 +66,5 @@ ns_ora write_blob $db "
     revision_id = $revision_id
 "
 
-template::release_db_handle
 
 

@@ -4,14 +4,12 @@
 request create
 request set_param item_id -datatype integer
 
-set db [template::get_db_handle]
-
 # permissions check - requires cm_item_workflow
 content::check_access $item_id cm_examine -user_id [User::getID] 
 
 # Query for publish status and release schedule, if any
 
-set query "
+template::query get_info info onerow "
   select
     NVL(initcap(publish_status), 'Production') publish_status, 
     NVL(to_char(start_when, 'MM/DD/YY HH:MI AM'), 'Immediate') start_when,
@@ -24,8 +22,6 @@ set query "
     i.item_id = :item_id
   and
     i.item_id = r.item_id (+)"
-
-template::query info onerow $query
 
 # Build a sentence describing the publishing status
 
@@ -64,7 +60,7 @@ switch $info(publish_status) {
 
 # determine whether the item is publishable or not
 
-template::query publish_info onerow "
+template::query get_publish_info publish_info onerow "
   select 
     content_item.is_publishable( item_id ) is_publishable, 
     live_revision
@@ -84,7 +80,7 @@ if { [template::util::is_nil live_revision] } {
 
 # determine if there is an unfinished workflow
 
-template::query unfinished_workflow_exists onevalue "
+template::query unfinished_exists unfinished_workflow_exists onevalue "
   select content_workflow.unfinished_workflow_exists( :item_id ) from dual
 " 
 
@@ -92,7 +88,7 @@ template::query unfinished_workflow_exists onevalue "
 
 set unpublishable_child_types 0
 
-template::query child_types multirow "
+template::query get_child_types child_types multirow "
   select
     child_type, relation_tag, min_n, 
     o.pretty_name as child_type_pretty, 
@@ -152,7 +148,7 @@ template::query child_types multirow "
 
 set unpublishable_rel_types 0
 
-template::query rel_types multirow "
+template::query get_rel_types rel_types multirow "
   select
     target_type, relation_tag, min_n, 
     o.pretty_name as target_type_pretty,
@@ -205,7 +201,5 @@ template::query rel_types multirow "
     }
 
 }
-
-template::release_db_handle
 
 

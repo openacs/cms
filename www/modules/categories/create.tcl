@@ -18,7 +18,7 @@ element create add_keyword description -optional \
   -label "Description" -datatype text -widget textarea -html { rows 5 cols 60 }
 
 if { [form is_request add_keyword] } {
-  template::query keyword_id onevalue "
+  template::query get_keyword_id keyword_id onevalue "
     select acs_object_id_seq.nextval from dual
   "
   element set_properties add_keyword keyword_id -value $keyword_id
@@ -30,26 +30,23 @@ if { [form is_valid add_keyword] } {
   set user_id [User::getID]
   set ip [ns_conn peeraddr]
 
-  set db [template::begin_db_transaction]
+  db_transaction {
 
-  set sql "
+      if { ![template::util::is_nil parent_id] } {
+          set pid ",
+          parent_id => :parent_id"
+      } else {
+          set pid ""
+      }
+
+      set keyword_id [db_exec_plsql new_keyword "
     begin :1 := content_keyword.new(
       heading => :heading, 
       description => :description, 
       keyword_id => :keyword_id,
       creation_user => :user_id,
-      creation_ip => :ip"
-
-  if { ![template::util::is_nil parent_id] } {
-    append sql ",
-      parent_id => :parent_id"
+      creation_ip => :ip$pid); end;"]
   }
-
-  append sql "); end;"
-
-  ns_ora exec_plsql_bind $db $sql [list 1] keyword_id
-  template::end_db_transaction
-  template::release_db_handle
 
   template::forward "refresh-tree?id=_all_&goto_id=$parent_id&mount_point=$mount_point"
 }

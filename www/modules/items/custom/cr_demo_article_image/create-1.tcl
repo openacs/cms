@@ -14,28 +14,20 @@ if { [template::util::is_nil parent_id] } {
 }
 
 
-set db [ns_db gethandle]
 
 # permissions check - need cm_new on the parent item
-content::check_access $parent_id cm_new -user_id [User::getID] -db $db
-ns_db releasehandle $db
+content::check_access $parent_id cm_new -user_id [User::getID]
 
 
-
-
-
-set db [ns_db gethandle]
-
-template::query content_type_name onevalue "
+template::query get_content_type content_type_name onevalue "
   select
     pretty_name
   from
     acs_object_types
   where
     object_type = :content_type
-" -db $db
+" 
 
-ns_db releasehandle $db
 
 if { [template::util::is_nil content_type_name] } {
     ns_log Notice "ERROR: create-1.tcl - BAD CONTENT_TYPE - $content_type"

@@ -25,7 +25,7 @@ template::query can_set_default_template onevalue "
      key = 'types'
 " 
 
-template::query iteminfo onerow "
+template::query get_iteminfo iteminfo onerow "
   select 
     object_type, pretty_name,
     content_item.get_title(:item_id) name
@@ -39,7 +39,7 @@ set content_type $iteminfo(object_type)
 
 
 # templates registered to this item
-template::query registered_templates multirow "
+template::query get_reg_templates registered_templates multirow "
   select 
     template_id, use_context, 
     content_item.get_path( template_id ) path,
@@ -54,7 +54,7 @@ template::query registered_templates multirow "
 "
 
 # templates registered to this content type
-template::query type_templates multirow "
+template::query get_type_templates type_templates multirow "
   select 
     template_id, use_context, is_default,
     content_item.get_path( template_id ) path,
@@ -76,7 +76,5 @@ template::query type_templates multirow "
   order by 
     path, use_context
 " 
-
-template::release_db_handle
 
 set return_url "index?item_id=$item_id&mount_point=sitemap"

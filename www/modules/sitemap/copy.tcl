@@ -12,9 +12,6 @@ if { [template::util::is_nil id] } {
   set folder_id $id
 }
 
-
-set db [template::get_db_handle]
-
 # permission check - must have cm_new on the current folder
 set user_id [User::getID]
 content::check_access $folder_id cm_new -user_id $user_id 
@@ -29,7 +26,7 @@ if { $clip_length == 0 } {
     set no_items_on_clipboard "f"
 }
 
-template::query path onevalue "
+template::query get_path path onevalue "
   select
     content_item.get_path( :folder_id )
   from 
@@ -37,7 +34,7 @@ template::query path onevalue "
 " 
 
 # get relevant marked items
-template::query marked_items multirow "
+template::query get_marked marked_items multirow "
   select
     content_item.get_title(item_id) title, 
     content_item.get_path(item_id,:root_id) name, 
@@ -50,9 +47,6 @@ template::query marked_items multirow "
     -- only for those items which user has cm_examine
     cms_permission.permission_p(item_id, :user_id, 'cm_examine') = 't'
 "
-
-template::release_db_handle
-
 
 form create copy
 element create copy mount_point \
@@ -104,7 +98,9 @@ if { [form is_valid copy] } {
     foreach cp_item_id $copied_items {
 	set parent_id [element get_values copy "parent_id_$cp_item_id"]
 
-	set sql "
+	set sql 
+
+	if { [catch {db_exec_plsql copy_item "
 	    begin
             content_item.copy(
                 item_id          => :cp_item_id,
@@ -112,9 +108,7 @@ if { [form is_valid copy] } {
 	        creation_user    => :user_id,
 	        creation_ip      => :ip
             ); 
-            end;"
-
-	if { [catch {template::query copy_item dml $sql} errmsg] } {
+            end;"} errmsg] } {
 	    # possibly a duplicate name
 	    ns_log notice "ERROR: copy.tcl - while copying $errmsg"
 	}

@@ -17,25 +17,24 @@ if { [template::util::is_nil target_id] } {
 
 set clip [clipboard::parse_cookie]
 
-set db [template::begin_db_transaction]
+db_transaction {
 
-clipboard::map_code $clip $mount_point {
-  if { [catch { 
-     template::query move_keyword_item dml "
+    clipboard::map_code $clip $mount_point {
+        if { [catch { 
+            db_dml move_keyword_item "
        update cr_items set parent_id = $update_value
          where item_id = $item_id
          and exists (
            select 1 from cr_keywords where keyword_id = item_id
          )" 
-     template::query move_keyword_keyword dml "
+
+            db_dml move_keyword_keyword "
        update cr_keywords set parent_id = $update_value
          where keyword_id = $item_id" 
-  } errmsg] } {
-  }    
+        } errmsg] } {
+        }    
+    }
 }
-
-template::end_db_transaction
-template::release_db_handle
 
 clipboard::free $clip
 

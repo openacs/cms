@@ -5,12 +5,11 @@ request create
 request set_param item_id -datatype integer
 request set_param mount_point -datatype keyword -value sitemap
 
-set db [template::get_db_handle]
 
 # permissions check - cm_write required to rename an item
 content::check_access $item_id cm_write -user_id [User::getID]
 
-template::query item_name onevalue "
+template::query get_item_name item_name onevalue "
   select 
     name
   from 
@@ -18,12 +17,6 @@ template::query item_name onevalue "
   where 
     item_id = :item_id
 "
-
-template::query item_name onevalue "
-  select name from cr_items where item_id = :item_id
-"
-
-template::release_db_handle
 
 set page_title "Rename $item_name"
 
@@ -56,7 +49,8 @@ if { [form is_valid rename_item] } {
 	  mount_point item_id name
 
   set db [template::begin_db_transaction]
-  template::query rename_item dml "
+  db_transaction {
+      db_exec_plsql rename_item "
     begin 
     content_item.rename (
         item_id => :item_id, 
@@ -64,17 +58,14 @@ if { [form is_valid rename_item] } {
     ); 
     end;"
 
-  template::query parent_id onevalue "
+      template::query get_parent_id parent_id onevalue "
     select
       parent_id
     from
       cr_items
     where
-      item_id = :item_id
-  " 
-
-  template::end_db_transaction
-  template::release_db_handle
+      item_id = :item_id" 
+  }
 
   # flush cache
   cms_folder::flush $mount_point $parent_id

@@ -4,7 +4,7 @@ set user_id [User::getID]
 
 if { ! $user_id } { template::forward "signin" }
 
-template::query name onevalue "
+template::query get_name name onevalue "
   select 
     first_names || ' ' || last_name 
   from 

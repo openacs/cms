@@ -23,15 +23,11 @@ form create register_user -elements {
 
 if { [form is_request register_user] } {
     
-    set db [template::get_db_handle]
-
-    template::query user_id onevalue "
+    template::query get_user_id user_id onevalue "
       select acs_object_id_seq.nextval from dual
-    " -db $db
+    "
 
-    set cms_admin_exists [User::cms_admin_exists $db]
-
-    template::release_db_handle
+    set cms_admin_exists [User::cms_admin_exists]
 
     if { $cms_admin_exists == 0 } {
 	set is_admin t

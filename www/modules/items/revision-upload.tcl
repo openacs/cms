@@ -26,8 +26,7 @@ if { [template::util::is_nil item_id] } {
 	template::forward "../sitemap/index"
     }
 
-    set db [template::get_db_handle]
-    template::query new_item onerow "
+    template::query get_new_item new_item onerow "
       select 
         NVL(content_item.get_path(:parent_id), '/') as item_path,
         pretty_name as content_type_name
@@ -36,8 +35,6 @@ if { [template::util::is_nil item_id] } {
       where
         object_type = :content_type
     " 
-    template::release_db_handle
-
 
     if { [template::util::is_nil new_item] } {
 	ns_log Notice "revision-upload.tcl - ERROR: BAD PARENT_ID OR CONTENT_TYPE - $parent_id, $content_type"

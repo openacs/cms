@@ -9,8 +9,6 @@ template::request create -params {
 # pagination vars
 template::request set_param page -datatype integer -value 1
 
-set db [template::get_db_handle]
-
 # Check permissions
 content::check_access $item_id cm_examine \
   -mount_point $mount_point \
@@ -18,7 +16,7 @@ content::check_access $item_id cm_examine \
   -request_error
 
 # add content html
-template::query content_type onevalue "
+template::query get_content_type content_type onevalue "
   select
     content_item.get_content_type( :item_id )
   from
@@ -27,7 +25,8 @@ template::query content_type onevalue "
 
 
 # get item info
-set query "
+
+template::query get_iteminfo iteminfo onerow "
   select 
     item_id, name, locale, live_revision, publish_status,
     content_item.is_publishable(item_id) as is_publishable
@@ -35,13 +34,12 @@ set query "
     cr_items
   where 
     item_id = :item_id"
-
-template::query iteminfo onerow $query -db $db
 template::util::array_to_vars iteminfo
 
 
 # get all revisions
-set sql "
+
+template::query get_revisions revisions multirow [pagination::paginate_query "
   select 
     revision_id, 
     trim(title) as title, 
@@ -52,12 +50,8 @@ set sql "
   where 
     r.item_id = :item_id
   order by
-    revision_number desc"
-
-template::query revisions multirow [pagination::paginate_query $sql $page]
+    revision_number desc" $page]
 
 set total_pages [pagination::get_total_pages $db]
-
-template::release_db_handle
 
 set pagination_html [pagination::page_number_links $page $total_pages]

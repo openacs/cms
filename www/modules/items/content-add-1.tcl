@@ -4,9 +4,8 @@
 request create
 request set_param revision_id -datatype integer
 
-set db [template::get_db_handle]
 
-template::query one_revision onerow "
+template::query get_revision one_revision onerow "
   select
     i.item_id, content_type, title as name, mime_type
   from
@@ -15,22 +14,17 @@ template::query one_revision onerow "
     i.item_id = r.item_id
   and
     r.revision_id = :revision_id
-" -db $db
+" 
 
 template::util::array_to_vars one_revision
 
 # permissions check - must have cm_write on the item
 content::check_access $item_id cm_write -user_id [User::getID] -db $db
 
-template::release_db_handle
-
-
-
 
 # check for custom content-add-1 form
 if { [file exists [ns_url2file \
 	"custom/$content_type/content-add-1.tcl"]] } {
-    template::release_db_handle
     template::forward "custom/$content_type/content-add-1?revision_id=$revision_id"
 }
 

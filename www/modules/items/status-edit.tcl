@@ -17,7 +17,7 @@ element create publish_status is_live \
 if { [form is_request publish_status] } {
 
   # Determine whether the item has a live revision
-  template::query live_revision onevalue "
+  template::query get_live_rewision live_revision onevalue "
     select live_revision from cr_items where item_id = :item_id
   "
 

@@ -25,10 +25,9 @@ if { [template::util::is_nil item_id] } {
 # sets this_item(bookmark) as the icon
 #set bookmark [clipboard::get_bookmark_icon $clip $mount_point $item_id]
 
-set db [template::get_db_handle]
-
 # get the context bar info
-set query "
+
+template::query get_context context multirow "
   select
     t.tree_level, t.parent_id, 
     content_folder.is_folder(i.item_id) is_folder,
@@ -52,8 +51,6 @@ set query "
   order by
     tree_level desc"
 
-template::query context multirow $query
-
 
 # pass in index_page_id to improve efficiency
 if { ![template::util::is_nil index_page_id] } {
@@ -70,7 +67,8 @@ if { ![template::util::is_nil index_page_id] } {
 }
 
 # get the path of the item
-set query "
+
+template::query get_preview_info preview_info onerow "
   select
     $index_page_sql 
     -- does it have a template
@@ -85,8 +83,6 @@ set query "
     cr_items
   where 
     item_id = :item_id" 
-
-template::query preview_info onerow $query 
 
 template::util::array_to_vars preview_info
 
@@ -128,7 +124,7 @@ if { [string equal $mount_point sitemap] } {
 }
 # an item cannot be previewed if it has no associated template
 if { [string equal $has_index_page t] } {
-    template::query template_id onevalue "
+    template::query get_template_id template_id onevalue "
       select 
         content_item.get_template( 
           nvl( content_folder.get_index_page( :item_id ), 0), 'public' )
@@ -141,4 +137,3 @@ if { [template::util::is_nil template_id] } {
     set preview_p f
 }
 
-template::release_db_handle

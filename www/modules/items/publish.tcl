@@ -7,8 +7,9 @@ request set_param revision_id -datatype integer
 set root_path [ns_info pageroot]
 
 set db [template::begin_db_transaction]
+db_transaction {
 
-template::query iteminfo onerow "
+    template::query get_iteminfo iteminfo onerow "
   select
     item_id,
     content_item.is_publishable( item_id ) as publish_p
@@ -19,36 +20,33 @@ template::query iteminfo onerow "
 " 
 
 
-template::util::array_to_vars iteminfo
-# item_id, publish_p
+    template::util::array_to_vars iteminfo
+    # item_id, publish_p
 
 
-if { [string equal $publish_p t] } {
+    if { [string equal $publish_p t] } {
 
-   # publish::publish_revision $revision_id
+        # publish::publish_revision $revision_id
 
-   template::query set_live_revision dml "
+        db_exec_plsql set_live_revision "
      begin 
        content_item.set_live_revision( 
          revision_id => :revision_id 
        );
      end;" 
 
-   publish::unpublish_item $item_id
-     
-} else {
+        publish::unpublish_item $item_id
+        
+    } else {
 
-    ns_ora dml $db "abort transaction"
-    template::release_db_handle
+        db_dml abort "abort transaction"
 
-    set msg "This item is not in a publishable state" 
-    set return_url "index?item_id=$item_id"
-    set passthrough { { item_id $item_id } }
+        set msg "This item is not in a publishable state" 
+        set return_url "index?item_id=$item_id"
+        set passthrough { { item_id $item_id } }
 
-    content::show_error $msg $return_url $passthrough
+        content::show_error $msg $return_url $passthrough
+    }
 }
-
-template::end_db_transaction
-template::release_db_handle
 
 template::forward "index?item_id=$item_id"

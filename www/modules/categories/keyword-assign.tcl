@@ -17,16 +17,18 @@ set saved_item_id $item_id
 set clip [clipboard::parse_cookie]
 
 set db [template::begin_db_transaction]
-clipboard::map_code $clip categories {
-  if { [catch { 
-     template::query assign_keyword dml "
+db_transaction {
+    clipboard::map_code $clip categories {
+        if { [catch { 
+            db_exec_plsql assign_keyword {
+
        begin content_keyword.item_assign(:resolved_id, :item_id); end;
-     "
-  } errmsg] } {
-  }    
+
+            }
+        } errmsg] } {
+        }    
+    }
 }
-template::end_db_transaction
-template::release_db_handle
 
 clipboard::free $clip
 

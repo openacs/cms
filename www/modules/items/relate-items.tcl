@@ -55,7 +55,10 @@ content::check_access $item_id cm_relate \
   append sql_items [join $items "','"]
   append sql_items "')"
 
-  set query "
+  
+
+
+  template::query get_clip_items clip_items multirow "
     select
       i.item_id as related_id, 
       content_item.get_title(i.item_id) as title,
@@ -80,9 +83,6 @@ content::check_access $item_id cm_relate \
       i.item_id ^= :item_id
     order by
       path, i.item_id, tr.relation_tag"
-
-
-  template::query clip_items multirow $query 
 
   if { ${clip_items:rowcount} < 1} {
     set no_valid_items t

@@ -13,7 +13,8 @@ content::check_access $item_id cm_read \
 
 # The creation_user may be null, in which case 'System' is substituted
 
-set query "
+
+template::query get_comments comments multirow "
   select
     journal_id, action_pretty, msg, 
     decode(NVL(p.person_id, 0),
@@ -36,6 +37,4 @@ set query "
     msg is not null
   order by
     o.creation_date desc
-"
-
-template::query comments multirow $query -maxrows 10
+" -maxrows 10

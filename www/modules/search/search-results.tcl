@@ -29,7 +29,7 @@ if { ![util::is_nil sql_query] } {
   set rows_per_page 10
 
   # Perform the query, get results
-  template::query results multirow "
+  template::query get_results results multirow "
     select * from ($sql_query) 
     where row_index >= :start_row and row_index < (:start_row + :rows_per_page)
     order by search_score desc, title

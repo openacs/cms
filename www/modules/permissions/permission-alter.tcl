@@ -7,9 +7,7 @@ request set_param ext_passthrough -datatype text -optional -value $passthrough
 
 set user_id [User::getID]
 
-set db [template::get_db_handle]
-
-template::query info onerow "
+template::query get_info info onerow "
   select 
     acs_object.name(:object_id) as object_name, 
     acs_object.name(:grantee_id) as grantee_name,
@@ -26,9 +24,7 @@ if { [string equal $info(user_cm_perm) t] } {
 
   if { [form is_valid own_permissions] && ![util::is_nil return_url] } {
     template::query::flush_cache "content::check_access ${grantee_id}*"
-    template::release_db_handle
     template::forward "$return_url?[content::url_passthrough $ext_passthrough]"
   }
 }
 
-template::release_db_handle

@@ -5,17 +5,15 @@
 request create
 request set_param item_id -datatype integer
 
-set db [template::get_db_handle]
-
 # check permissions
 content::check_access $item_id cm_write -user_id [User::getID] -db $db
 
-template::query content_type onevalue "
+template::query get_content_type content_type onevalue "
   select
     content_item.get_content_type( :item_id )
   from
     dual
-" -db $db
+" 
 
 
 # flush the sitemap folder listing cache in anticipation 
@@ -26,22 +24,17 @@ cms_folder::flush sitemap $item_id
 if { [file exists [ns_url2file \
 	"custom/$content_type/revision-add-1.tcl"]] } {
 
-    template::release_db_handle
     template::forward "custom/$content_type/revision-add-1?item_id=$item_id"
 }
 
 
-template::query name onevalue "
+template::query get_name name onevalue "
   select
     name
   from
     cr_items
   where
-    item_id = :item_id" -db $db
-
-template::release_db_handle
-
-
+    item_id = :item_id"
 
 
 # if we have an invalid item_id, then throw error

@@ -13,8 +13,8 @@ if { [template::util::is_nil item_id] } {
   set resolved_id $item_id
 }
 
-template::query unassign_keyword dml "
+db_exec_plsql unassign_keyword {
   begin content_keyword.item_unassign(:resolved_id, :keyword_id); end;
-"
+}
 
 template::forward "../items/index?item_id=$item_id&mount_point=$mount_point"

@@ -23,10 +23,10 @@ if { [string equal $relation_type child] } {
 }
 
 
-set db [template::begin_db_transaction]
+db_transaction {
 
-# Get item_id the related/child item
-template::query item_id onevalue "
+    # Get item_id the related/child item
+    template::query get_item_id item_id onevalue "
   select 
     $rel_parent_column
   from 
@@ -34,33 +34,32 @@ template::query item_id onevalue "
   where 
     rel_id = :rel_id" 
 
-if { [template::util::is_nil item_id] } {
-    ns_db dml $db "abort transaction"
-    template::release_db_handle
-    request::error no_such_rel "The relationship $rel_id does not exist."
-    return
-}
+    if { [template::util::is_nil item_id] } {
+        db_dml abort "abort transaction"
+        request::error no_such_rel "The relationship $rel_id does not exist."
+        return
+    }
 
-template::util::array_to_vars rel_info
-lappend passthrough [list item_id $item_id]
-
+    template::util::array_to_vars rel_info
+    lappend passthrough [list item_id $item_id]
 
 
-# Check permissions - must have cm_relate on the item
-content::check_access $item_id cm_relate \
-  -mount_point $mount_point \
-  -return_url "modules/sitemap/index"
+
+    # Check permissions - must have cm_relate on the item
+    content::check_access $item_id cm_relate \
+        -mount_point $mount_point \
+        -return_url "modules/sitemap/index"
 
 
-# Sort the related/child items order to ensure unique order_n
-if { [string equal $relation_type child] } {
-    cms_rel::sort_child_item_order $item_id
-} else {
-    cms_rel::sort_related_item_order $item_id
-}
+    # Sort the related/child items order to ensure unique order_n
+    if { [string equal $relation_type child] } {
+        cms_rel::sort_child_item_order $item_id
+    } else {
+        cms_rel::sort_related_item_order $item_id
+    }
 
-# grab the (sorted) order of the original related/child item
-template::query order_n onevalue "
+    # grab the (sorted) order of the original related/child item
+    template::query get_order order_n onevalue "
   select
     order_n
   from
@@ -69,11 +68,11 @@ template::query order_n onevalue "
     rel_id = :rel_id"
 
 
-# Move the relation up or down
-if { [string equal $order "up"] } {
+    # Move the relation up or down
+    if { [string equal $order "up"] } {
 
-    # Get the previous related/child
-    template::query swap_rel onerow "
+        # Get the previous related/child
+        template::query get_prev_swap_rel swap_rel onerow "
       select 
         rel_id, order_n 
       from 
@@ -83,10 +82,10 @@ if { [string equal $order "up"] } {
       and 
         order_n = :order_n - 1"
 
-} else {
+    } else {
 
-    # Get the next related/child item
-    template::query swap_rel onerow "
+        # Get the next related/child item
+        template::query get_next_swap_rel swap_rel onerow "
       select 
         rel_id, order_n 
       from 
@@ -96,29 +95,27 @@ if { [string equal $order "up"] } {
       and 
         order_n = :order_n + 1"
 
-}
+    }
 
 
-# Only need to perform DML if the rel is not already at the top/bottom
-if { ![template::util::is_nil swap_rel] } {
-    set swap_id $swap_rel(rel_id)
-    set swap_order $swap_rel(order_n)
+    # Only need to perform DML if the rel is not already at the top/bottom
+    if { ![template::util::is_nil swap_rel] } {
+        set swap_id $swap_rel(rel_id)
+        set swap_order $swap_rel(order_n)
 
-    template::query relate_swap_1 dml "
+        db_dml relate_swap_1 "
       update $rel_table 
         set order_n = :swap_order 
         where rel_id = :rel_id"
 
-    template::query relate_swap_2 dml "
+        db_dml relate_swap_2 "
       update $rel_table 
         set order_n = :order_n 
         where rel_id = :swap_id"
 
-} else {
-  ns_log notice "relate-order.tcl: $relation_type cannot be moved further"
+    } else {
+        ns_log notice "relate-order.tcl: $relation_type cannot be moved further"
+    }
 }
-
-template::end_db_transaction
-template::release_db_handle
 
 template::forward "$return_url?[content::url_passthrough $passthrough]"

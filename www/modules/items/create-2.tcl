@@ -22,12 +22,10 @@ request set_param return_url -datatype text -value "index"
 request set_param page_title -datatype text -optional
 request set_param is_wizard -datatype keyword -value f
 
-set db [template::get_db_handle]
-
 # permissions check - need cm_new on the parent item
 content::check_access $parent_id cm_new -user_id [User::getID]
 
-template::query new_item onerow "
+template::query get_item new_item onerow "
   select 
     NVL(content_item.get_path(:parent_id), '/') as item_path,
     pretty_name as content_type_name
@@ -36,8 +34,6 @@ template::query new_item onerow "
   where
     object_type = :content_type
 "
-
-template::release_db_handle
 
 # validate content_type and parent_id
 if { [template::util::is_nil new_item] } {

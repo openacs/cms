@@ -6,7 +6,7 @@ template::request set_param parent_id -datatype keyword -optional
 request set_param mount_point -datatype keyword -optional -value categories
 
 # Determine if the folder is empty
-template::query is_empty onevalue "
+template::query get_empty_status is_empty onevalue "
   select content_keyword.is_leaf(:id) from dual
 "
 
@@ -20,13 +20,10 @@ if { [string equal $is_empty "f"] } {
 
 } else {
 
-  # Otherwise, delete the folder
-  set db [template::begin_db_transaction]
-  template::query delete_keyword dml "
-    begin content_keyword.delete(:id); end;
-  "
-  template::end_db_transaction
-  template::release_db_handle
+  db_transaction {
+      # Otherwise, delete the folder
+      set delete_keyword [db_exec_plsql delete_keyword "begin content_keyword.delete(:id); end;"]
+  }
 
   # Remove it from the clipboard, if it exists
   set clip [clipboard::parse_cookie]

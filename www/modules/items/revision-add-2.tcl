@@ -4,14 +4,11 @@ request create
 request set_param item_id -datatype integer
 request set_param content_method -datatype keyword -value no_content
 
-
-set db [template::get_db_handle]
-
 # check permissions - user must have cm_write on the item
 content::check_access $item_id cm_write -user_id [User::getID]
 
 # get content_type and name of item
-template::query one_item onerow "
+template::query get_one_item one_item onerow "
   select 
     content_type, name
   from
@@ -19,8 +16,6 @@ template::query one_item onerow "
   where
    item_id = :item_id
 "
-
-template::release_db_handle
 
 template::util::array_to_vars one_item
 

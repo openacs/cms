@@ -7,7 +7,7 @@ request create -params {
 
 # Get misc info
 
-template::query rel_info onerow "
+template::query get_rel_info rel_info onerow "
   select
     t.pretty_name as type_name, t.object_type, 
     r.item_id, r.related_object_id,\
@@ -34,7 +34,7 @@ template::util::array_to_vars rel_info
 
 # Get extra attributes
 
-template::query rel_attrs multirow "         
+template::query get_rel_attrs rel_attrs multirow "         
   select 
     types.table_name, types.id_column, attr.attribute_name,
     attr.pretty_name as attribute_label, attr.datatype,
@@ -69,7 +69,7 @@ for { set i 1 } { $i <= ${rel_attrs:rowcount} } { incr i } {
     set what "$a_row(attribute_name) as value"
   }
 
-  template::query value onevalue "
+  template::query get_value value onevalue "
     select $what from $a_row(table_name) 
       where $a_row(id_column) = :rel_id" 
 

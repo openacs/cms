@@ -4,15 +4,12 @@
 request create
 request set_param item_id -datatype integer
 
-set sql "begin 
-           content_item.unset_live_revision( :item_id );
-         end;"
-
 publish::unpublish_item $item_id
 
-set db [template::begin_db_transaction]
-template::query unset_live_revision dml $sql
-template::end_db_transaction
-template::release_db_handle
+db_transaction {
+    db_exec_plsql unset_live_revision "begin 
+           content_item.unset_live_revision( :item_id );
+         end;"
+}
 
 template::forward "index?item_id=$item_id"
