@@ -404,7 +404,7 @@
 	<querytext>
 
     update cr_revisions 
-    set content = [set __lob_id [db_string get_id "select empty_lob()"]]
+    set lob = [set __lob_id [db_string get_id "select empty_lob()"]]
     where revision_id = :revision_id
 
 	</querytext>
