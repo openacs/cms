@@ -309,7 +309,7 @@ begin
     perform workflow__add_trans_role_assign_map(
             ''publishing_wf'',
             ''authoring'',
-            ''author'');
+            ''authoring'');
 
     return 0;
 end;' language 'plpgsql';

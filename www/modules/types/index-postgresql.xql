@@ -30,7 +30,7 @@
     attr.attribute_id, attr.attribute_name, attr.object_type,
     attr.pretty_name as attribute_name_pretty,
     datatype, types.pretty_name as pretty_name,
-    coalesce(description_key,'&nbsp') as description_key, 
+    coalesce(description_key,'&nbsp;') as description_key, 
     description, widget
   from 
     acs_attributes attr left outer join cm_attribute_widgets w using (attribute_id)

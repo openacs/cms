@@ -63,7 +63,7 @@
       attributes.attribute_id = params.attribute_id
 
 	</querytext>
-</fullquery>
+</partialquery>
 
 <partialquery name="content::create_form_element.cfe_attribute_name_to_char">
 	<querytext>

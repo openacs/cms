@@ -32,7 +32,7 @@
     attr.attribute_id, attr.attribute_name, attr.object_type,
     attr.pretty_name as attribute_name_pretty,
     datatype, types.pretty_name as pretty_name,
-    nvl(description_key,'&nbsp') as description_key, 
+    nvl(description_key,'&nbsp;') as description_key, 
     description, widget
   from 
     acs_attributes attr, acs_attribute_descriptions d,
