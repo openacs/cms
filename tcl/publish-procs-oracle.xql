@@ -2,15 +2,6 @@
 
 <queryset>
    <rdbms><type>oracle</type><version>8.1.6</version></rdbms>
-
-<fullquery name="publish::write_multiple_blobs.wmb_get_blob_file">      
-      <querytext>
-      
-      select [ad_decode $storage_type file "'[cr_fs_path]' || filename" content] from cr_revisions where revision_id = $revision_id
-    
-      </querytext>
-</fullquery>
-
  
 <fullquery name="publish::track_publish_status.tps_get_items_multilist">      
       <querytext>
