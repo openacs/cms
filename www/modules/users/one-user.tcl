@@ -6,7 +6,7 @@ request set_param parent_id -datatype keyword -optional
 set passthrough "mount_point=$mount_point&parent_id=$parent_id"
 
 # Find basic user params
-template::query info onerow "
+template::query get_info info onerow "
   select
     p.first_names, p.last_name, 
     pp.email, pp.url, 
@@ -24,7 +24,7 @@ template::query info onerow "
 "
 
 # Find the groups to which this user belongs
-template::query groups multirow "
+template::query get_groups groups multirow "
   select 
     g.group_name, g.group_id
   from

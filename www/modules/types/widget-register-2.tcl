@@ -15,9 +15,8 @@ form create widget_register -elements {
 }
 
 
-set db [template::get_db_handle]
 
-template::query attribute_info onerow "
+template::query get_attr_info attribute_info onerow "
   select
     a.pretty_name as attribute_name_pretty, 
     a.attribute_name,
@@ -45,7 +44,7 @@ element set_properties widget_register attribute_name \
 
 
 # get a list of params for this widget
-template::query widget_params multilist "
+template::query get_params widget_params multilist "
   select
     f.param_id, param, 
     decode(f.is_required,'t','t',w.is_required) is_required, is_html, 
@@ -67,8 +66,6 @@ template::query widget_params multilist "
   and
     f.param_id = w.param_id (+)
 "
-
-template::release_db_handle
 
 
 # create form sections and elements for each widget param
@@ -100,15 +97,13 @@ if { [form is_valid widget_register] } {
     form get_values widget_register \
 	    content_type attribute_name param_count
 
-    set db [template::begin_db_transaction]
+    db_transaction {
 
-    for { set i 0 } { $i < $param_count } { incr i } {
-	widget::process_param $db \
+        for { set i 0 } { $i < $param_count } { incr i } {
+            widget::process_param $db \
 		widget_register $i $content_type $attribute_name
+        }
     }
-
-    template::end_db_transaction
-    template::release_db_handle
 
     wizard forward
 }

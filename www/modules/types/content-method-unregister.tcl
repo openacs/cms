@@ -14,9 +14,8 @@ if { [template::util::is_nil return_url] } {
 }
 
 
-set db [template::begin_db_transaction]
-
-template::query content_method_unregister dml "
+db_transaction {
+    db_exec_plsql content_method_unregister "
   begin
   content_method.remove_method (
       content_type   => :content_type,
@@ -24,9 +23,7 @@ template::query content_method_unregister dml "
   );
   end;
 "
-
-template::end_db_transaction
-template::release_db_handle
+}
 
 
 template::forward $return_url

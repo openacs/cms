@@ -6,12 +6,12 @@ request set_param parent_id -datatype keyword -optional
 set user_id [User::getID]
 set ip [ns_conn peeraddr]
 
-set db [template::begin_db_transaction]
+db_transaction {
 
-if { [template::util::is_nil id] } {
-  set code {
-    if { [catch { 
-      template::query user_assoc_root dml "
+    if { [template::util::is_nil id] } {
+        set code {
+            if { [catch { 
+                db_exec_plsql user_assoc_root "
         declare
           v_id membership_rels.rel_id%TYPE;
           cursor c_rel_cur is
@@ -31,14 +31,14 @@ if { [template::util::is_nil id] } {
             membership_rel.delete(v_id);
           end loop;
         end;"
-    } errmsg] } {
-    }
-  }             
-  
-} else {
-  set code {
-    if { [catch { 
-      ns_ora exec_plsql_bind $db "
+            } errmsg] } {
+            }
+        }             
+        
+    } else {
+        set code {
+            if { [catch { 
+                db_exec_plsql user_assoc_root2 "
         declare
           v_group_id groups.group_id%TYPE;
           v_user_id users.user_id%TYPE;
@@ -53,16 +53,15 @@ if { [template::util::is_nil id] } {
 
           exception when no_data_found then null;
         end;" [list 1] rel_id
-    } errmsg] } {
+            } errmsg] } {
+            }
+        }   
     }
-  }   
+
+    set clip [clipboard::parse_cookie]
+
+    clipboard::map_code $clip $mount_point $code
 }
-
-set clip [clipboard::parse_cookie]
-
-clipboard::map_code $clip $mount_point $code
-template::end_db_transaction
-template::release_db_handle
 
 clipboard::free $clip
 

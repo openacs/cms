@@ -9,7 +9,6 @@ request set_param passthrough -datatype text -optional
 
 set user_id [User::getID]
 
-set db [template::get_db_handle]
 
 # Determine if the user can modify permissions on this object
 # Should it dump a user to an error page if no access ?
@@ -22,12 +21,11 @@ content::check_access $object_id "cm_examine" \
   -user_id $user_id -mount_point $mount_point -parent_id $parent_id
 
 if { ![string equal $user_permissions(cm_perm) t] } {
-  template::release_db_handle
   return
 }
 
 # Get a list of permissions that users have on the item
-template::query permissions multirow "
+template::query get_permissions permissions multirow "
   select * from ( 
     select 
       p.pretty_name, 
@@ -67,8 +65,6 @@ template::query permissions multirow "
   ) order by
     grantee_name, privilege
   " 
-
-template::release_db_handle
 
 # Create a URL passthrough stub to access permissions
 set perms_url_extra "return_url=$return_url&passthrough=$passthrough&object_id=$object_id"

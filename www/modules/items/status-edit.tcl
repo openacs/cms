@@ -37,7 +37,7 @@ if { [form is_request publish_status] } {
 # always show production
 set options [list [list "Production" production]]
 
-query is_publishable onevalue "
+template::query check_status is_publishable onevalue "
   select content_item.is_publishable( :item_id ) from dual"
 
 set is_live [element get_value publish_status is_live] 
@@ -48,7 +48,7 @@ if { [string equal $is_live t] && [string equal $is_publishable t] } {
   lappend options [list "Ready" ready] [list "Live (publishes the item)" live]
 }
 
-query is_published onevalue "
+template::query check_published is_published onevalue "
   select content_item.is_published( :item_id ) from dual"
 
 # show "Expired" only if the item is currently published
@@ -91,7 +91,8 @@ element create publish_status end_when \
 if { [form is_request publish_status] } {
 
   # Get the current status
-  set query "
+
+  template::query get_info info onerow "
     select
       NVL(publish_status, 'production') as publish_status,
       to_char(NVL(start_when, sysdate), 'YYYY MM DD HH24 MI SS') start_when,
@@ -103,8 +104,6 @@ if { [form is_request publish_status] } {
     and
       i.item_id = r.item_id (+)"
 
-  template::query info onerow $query
-
   form set_values publish_status info
 }
 
@@ -115,13 +114,13 @@ if { [form is_valid publish_status] } {
   form get_values publish_status publish_status start_when end_when item_id
 
   set db [template::begin_db_transaction]
+  db_transaction {
+      publish::set_publish_status $db $item_id $publish_status
 
-  publish::set_publish_status $db $item_id $publish_status
+      set start_when [template::util::date get_property sql_date $start_when]
+      set end_when [template::util::date get_property sql_date $end_when]
 
-  set start_when [template::util::date get_property sql_date $start_when]
-  set end_when [template::util::date get_property sql_date $end_when]
-
-  ns_ora dml $db "begin 
+      db_exec_plsql set_release_period "begin 
                     content_item.set_release_period(
                       item_id => :item_id,
                       start_when => $start_when,
@@ -129,8 +128,8 @@ if { [form is_valid publish_status] } {
                     );
                   end;"
 
-  template::end_db_transaction
-
+  }
+ 
   template::forward index?item_id=$item_id
 }
 

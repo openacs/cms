@@ -6,7 +6,7 @@ template::request set_param parent_id -datatype keyword -optional
 request set_param mount_point -datatype keyword -optional -value users
 
 # Determine if the group is empty
-template::query is_empty onevalue "
+template::query get_status is_empty onevalue "
   select NVL((select 'f' from dual where exists (
             select 1 from acs_rels 
               where object_id_one = :id 
@@ -24,10 +24,9 @@ if { [string equal $is_empty "f"] } {
 } else {
 
   # Otherwise, delete the group
-  set db [template::begin_db_transaction]
-  template::query delete_group dml "begin acs_group.delete(:id); end;"
-  template::end_db_transaction
-  template::release_db_handle
+  db_transaction {
+      db_exec_plsql delete_group "begin acs_group.delete(:id); end;"
+  }
 
   # Remove it from the clipboard, if it exists
   set clip [clipboard::parse_cookie]

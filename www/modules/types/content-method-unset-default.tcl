@@ -14,17 +14,15 @@ if { [template::util::is_nil return_url] } {
 
 
 set db [template::begin_db_transaction]
-
-template::query unset_content_method_default dml "
+db_transaction {
+    db_exec_plsql unset_content_method_default "
   begin
     content_method.unset_default_method (
       content_type   => :content_type
     );
   end;
 "
-
-template::end_db_transaction
-template::release_db_handle
+}
 
 content_method::flush_content_methods_cache $content_type
 

@@ -7,23 +7,20 @@ request set_param return_url -datatype text -value "../workspace/index"
 
 
 set user_id [User::getID]
-set db [template::get_db_handle]
-
 
 # check that the task is still valid
-template::query is_valid_task onevalue "
+template::query get_status is_valid_task onevalue "
   select content_workflow.can_reject( :task_id, :user_id ) from dual
 " 
 
 if { [string equal $is_valid_task f] } {
-    template::release_db_handle
     forward $return_url
 }
 
 
 
 # Get the name of the item and of the task
-template::query task_info onerow "
+template::query get_task_info task_info onerow "
   select
     c.object_id, content_item.get_title(c.object_id) title, 
     tr.transition_name
@@ -46,7 +43,7 @@ template::query task_info onerow "
 
 
 # get the places I can reject to
-template::query reject_places multilist "
+template::query get_rejects reject_places multilist "
   select
     trans.transition_name, trans.transition_key
   from
@@ -70,8 +67,6 @@ template::query reject_places multilist "
   order by
     dest.sort_order desc
 " 
-
-template::release_db_handle
 
 # Create the form
 
@@ -126,36 +121,29 @@ if { [template::form is_valid reject] } {
     set ip_address [ns_conn peeraddr]    
     set user_id [User::getID]
 
+    db_transaction {
+        # check that the task is still valid
+        template::query is_valid_task onevalue "
+             select content_workflow.can_reject( :task_id, :user_id ) from dual" 
 
-    set db [template::begin_db_transaction]
-
-    # check that the task is still valid
-    template::query is_valid_task onevalue "
-      select content_workflow.can_reject( :task_id, :user_id ) from dual
-    " 
-
-    if { [string equal $is_valid_task f] } {
-	ns_ora dml $db "abort transaction"
-	template::release_db_handle
-	template::request::error invalid_task \
+        if { [string equal $is_valid_task f] } {
+            db_dml abort "abort transaction"
+            template::request::error invalid_task \
 		"task-reject.tcl - invalid task - $task_id"
-	return
+            return
+        }
+
+        db_exec_plsql workflow_reject "
+                      begin
+                        content_workflow.reject(
+                             task_id        => :task_id,
+                             user_id        => :user_id,
+                             ip_address     => :ip_address,
+                             transition_key => :transition_key,
+                             msg            => :msg
+                         );
+                       end;"
     }
-
-    template::query workflow_reject dml "
-      begin
-      content_workflow.reject(
-          task_id        => :task_id,
-          user_id        => :user_id,
-          ip_address     => :ip_address,
-          transition_key => :transition_key,
-          msg            => :msg
-      );
-      end;
-    "
-
-    template::end_db_transaction
-    template::release_db_handle
 
     # Flush the access cache in order to clear permissions
     content::flush_access_cache $task_info(object_id)

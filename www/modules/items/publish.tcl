@@ -6,7 +6,6 @@ request set_param revision_id -datatype integer
 
 set root_path [ns_info pageroot]
 
-set db [template::begin_db_transaction]
 db_transaction {
 
     template::query get_iteminfo iteminfo onerow "

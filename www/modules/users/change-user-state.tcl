@@ -7,13 +7,12 @@ request set_param new_state -datatype keyword
 request set_param parent_id -datatype keyword -optional
 request set_param mount_point -datatype keyword -optional -value users
 
-set db [template::begin_db_transaction]
-template::query change_member_state dml "
+db_transaction {
+    template::query change_member_state dml "
  update membership_rels set
    member_state=:new_state 
  where 
    rel_id=:rel_id" 
-template::end_db_transaction
-template::release_db_handle
+}
 
 template::forward "index?id=$group_id&parent_id=$parent_id&mount_point=$mount_point"

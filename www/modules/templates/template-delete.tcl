@@ -32,13 +32,12 @@ if { [template::util::is_nil empty_p] } {
 } else {
     # Otherwise, delete the item
     
-    set db [template::begin_db_transaction]
-    template::query delete_template dml "
+    db_transaction {
+        db_exec_plsql delete_template "
       begin 
         content_template.delete(:template_id); 
       end;" 
-    template::end_db_transaction
-    template::release_db_handle
+    }
 
     template::forward "../templates/index?id="
 }

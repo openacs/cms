@@ -22,10 +22,9 @@ request set_param item_id -datatype integer
 request set_param mount_point -datatype keyword -optional -value sitemap
 request set_param page -datatype integer -optional -value 1 
 
-set db [template::get_db_handle]
 
 # resolve any symlinks
-query resolved_item_id onevalue "
+template::query get_item_id resolved_item_id onevalue "
   select content_symlink.resolve(:item_id) from dual
 " -cache "symlink_resolve $item_id" -persistent
 
@@ -37,7 +36,7 @@ content::check_access $item_id cm_examine \
   -return_url "modules/sitemap/index" 
 
 # query the content_type of the item ID so we can check for a custom info page
-template::query info onerow "
+template::query get_info info onerow "
   select 
     content_type, latest_revision
   from 
@@ -47,7 +46,6 @@ template::query info onerow "
 
 template::util::array_to_vars info
 
-template::release_db_handle
 
 # build the path to the custom interface directory for this content type
 

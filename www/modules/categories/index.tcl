@@ -23,7 +23,7 @@ if { [util::is_nil id] || [string equal $id _all_] } {
 # Get self
 
 if { ![util::is_nil id] && ![string equal $id _all_] } {
-  template::query info onerow "
+  template::query get_info info onerow "
     select 
       content_keyword.is_leaf(:id) as is_leaf,
       content_keyword.get_heading(:id) as heading,
@@ -48,7 +48,7 @@ if { [string equal $info(is_leaf) t] } {
 set clip [clipboard::parse_cookie]
 
 # Get children
-template::query items multirow "
+template::query get_items items multirow "
   select
     keyword_id,
     content_keyword.is_leaf(keyword_id) as is_leaf,
@@ -65,7 +65,7 @@ template::query items multirow "
 
 # Get the parent id if it is missing
 if { [util::is_nil parent_id] && ![util::is_nil id] } {
-  template::query parent_id onevalue "
+  template::query get_parent_id parent_id onevalue "
     select
       context_id
     from

@@ -5,11 +5,9 @@ request set_param id -datatype keyword -optional
 request set_param parent_id -datatype keyword -optional
 request set_param mount_point -datatype keyword -value workflow
 
-set db [template::get_db_handle]
-
 # workflow totals
 
-template::query wf_stats onerow "
+template::query get_stats wf_stats onerow "
   select
     count( decode(content_workflow.is_finished(c.case_id, transition_key),
              'f',1,null)
@@ -33,7 +31,10 @@ template::query wf_stats onerow "
     c.state = 'active'
 " 
     
-set sql "
+
+
+# workflow tasks by transition state: content items, overdue items
+template::query get_transitions transitions multirow "
   select 
     trans.transition_key, transition_name, sort_order,
     count(transition_name) as transition_count,
@@ -64,13 +65,10 @@ set sql "
     sort_order, transition_name, trans.transition_key
 "
 
-# workflow tasks by transition state: content items, overdue items
-template::query transitions multirow $sql 
-
 
 
 # workflow tasks by user: content items, overdue items
-query user_tasks multirow "
+template::query get_user_tasks user_tasks multirow "
   select
     p.person_id, p.first_names, p.last_name,
     count(transition_name) as transition_count,
@@ -108,6 +106,5 @@ query user_tasks multirow "
     first_names, last_name, person_id 
 " 
 
-template::release_db_handle
 
 set page_title "Workflow Statistics"

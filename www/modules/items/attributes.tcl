@@ -59,7 +59,7 @@ content::check_access $info(item_id) cm_examine \
 
 set content_type $type_info(object_type)
 
-template::query attributes multirow "
+template::query get_attributes attributes multirow "
   select 
     types.pretty_name object_label, 
     types.table_name, 

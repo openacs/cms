@@ -24,23 +24,21 @@ if { [template::util::is_nil id] } {
 
 set clip [clipboard::parse_cookie]
 
-set db [template::begin_db_transaction]
-
-clipboard::map_code $clip categories {
-  if { [catch { 
-     ns_ora exec_plsql_bind $db "
+db_transaction {
+    clipboard::map_code $clip categories {
+        if { [catch { 
+            db_exec_plsql item_assign "
         begin 
          :1 := content_keyword.item_assign(
           :root_id, :item_id, null, :user_id, :ip); 
-        end;" [list 1] symlink_id
-     lappend folder_list [list $mount_point $item_id]
+        end;"
+            lappend folder_list [list $mount_point $item_id]
 
-  } errmsg] } {
-  }    
+        } errmsg] } {
+        }    
+    }
+
 }
-
-template::end_db_transaction
-template::release_db_handle
 
 clipboard::free $clip
 

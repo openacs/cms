@@ -5,9 +5,7 @@
 request create
 request set_param type -datatype integer -value content_revision
 
-set db [template::get_db_handle]
-
-template::query module_id onevalue "
+template::query get_module_id module_id onevalue "
   select module_id from cm_modules where key = 'types'
 " 
 
@@ -15,7 +13,7 @@ template::query module_id onevalue "
 content::check_access $module_id cm_examine -user_id [User::getID] 
 
 
-template::query rel_types multirow "
+template::query get_rel_types rel_types multirow "
   select
     pretty_name, target_type, relation_tag, min_n, max_n
   from
@@ -29,7 +27,7 @@ template::query rel_types multirow "
 " 
 
 
-template::query child_types multirow "
+template::query get_child_types child_types multirow "
   select
     pretty_name, child_type, relation_tag, min_n, max_n
   from
@@ -41,5 +39,3 @@ template::query child_types multirow "
   order by
     pretty_name, relation_tag
 " 
-
-template::release_db_handle

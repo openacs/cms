@@ -2,9 +2,8 @@ request create
 request set_param rel_type     -datatype keyword
 request set_param content_type -datatype keyword -value content_revision
 
-set db [template::get_db_handle]
 
-template::query module_id onevalue "
+template::query get_module_id module_id onevalue "
   select module_id from cm_modules where key = 'types'
 " 
 
@@ -25,11 +24,10 @@ if { [string equal $rel_type item_rel] } {
     set type_label "Child Content Type"
 
 } else {
-    template::release_db_handle
     template::forward index?id=$content_type
 }
 
-template::query pretty_name onevalue "
+template::query get_pretty_name pretty_name onevalue "
   select
     pretty_name
   from
@@ -38,7 +36,7 @@ template::query pretty_name onevalue "
     object_type = :content_type
 " 
 
-template::query target_types multilist "
+template::query get_target_types target_types multilist "
   select
     lpad(' ', level, '-') || pretty_name, object_type
   from
@@ -48,9 +46,6 @@ template::query target_types multilist "
   start with
     object_type = 'content_revision'
 " 
-
-template::release_db_handle
-
 
 element create relation target_type \
 	-datatype keyword \
@@ -115,16 +110,13 @@ if { [form is_valid relation] } {
           end;"
     }
 
-    set db [template::begin_db_transaction]
+    db_transaction {
 
-    if { [catch {template::query register_rel_types dml $sql} errmsg] } {
-	template::release_db_handle
-	template::request::error register_relation_type \
+        if { [catch {db_exec_plsql register_rel_types $sql} errmsg] } {
+            template::request::error register_relation_type \
 		"Could not register relation type - $errmsg"
-    }
-    
-    template::end_db_transaction
-    template::release_db_handle
+        }
+    }    
 
     template::forward "index?id=$content_type"
 }

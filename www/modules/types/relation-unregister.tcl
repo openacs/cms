@@ -8,9 +8,7 @@ request set_param content_type -datatype keyword
 request set_param target_type -datatype keyword
 request set_param relation_tag -datatype text -value ""
 
-set db [template::get_db_handle]
-
-template::query module_id onevalue "
+template::query get_module_id module_id onevalue "
   select module_id from cm_modules where key = 'types'
 "
 
@@ -41,17 +39,13 @@ if { [string equal $rel_type child_rel] } {
 
 } else {
     # bad rel_type, don't do anything
-    template::release_db_handle
     template::forward "index?id=$content_type"
 }
 
 
-if { [catch {ns_ora dml $db $sql} errmsg] } {
-    template::release_db_handle
+if { [catch {db_exec_plsql unregister $sql} errmsg] } {
     template::request::error unregister_relation_type \
 	    "Could not unregister relation type - $errmsg"
 }
-
-template::release_db_handle
 
 template::forward "index?id=$content_type"

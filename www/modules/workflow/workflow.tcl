@@ -5,14 +5,12 @@ request create
 request set_param transition -datatype keyword -value "all"
 
 
-set db [template::get_db_handle]
-
 if { [string equal $transition "all"] } {
     set transition_name "All Tasks"
     set transition_sql ""
 } else {
 
-    template::query transition_name onevalue "
+    template::query get_name transition_name onevalue "
       select 
         transition_name 
       from 
@@ -25,7 +23,6 @@ if { [string equal $transition "all"] } {
       -timeout 3600
 
     if { [template::util::is_nil transition_name] } {
-	template::release_db_handle
 	ns_log notice "workflow.tcl - Bad transition - $transition"
 	forward "workflow"
     }
@@ -36,7 +33,9 @@ if { [string equal $transition "all"] } {
 
 set date_format "'Mon. DD, YYYY HH24:MI:SS'"
 
-set sql "
+
+
+template::query get_active active_tasks multirow "
   select
     t.transition_key, transition_name, 
     item_id, content_item.get_title(item_id) as title,
@@ -76,11 +75,7 @@ set sql "
     trans.sort_order, title, assigned_party, deadline desc, state
 "
 
-template::query active_tasks multirow $sql 
-
-
-
-set sql "
+template::query get_waiting awaiting_tasks multirow "
   select
     ca.transition_key, transition_name, ca.party_id,
     item_id, content_item.get_title(item_id) as title,
@@ -124,9 +119,5 @@ set sql "
   $transition_sql
   order by
     trans.sort_order, title, assigned_party, dead.deadline desc"
-
-template::query awaiting_tasks multirow $sql 
-
-template::release_db_handle
 
 set page_title "Workflow Tasks - $transition_name"

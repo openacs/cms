@@ -15,8 +15,6 @@ if { [template::util::is_nil parent_id] } {
   set parent_id [cm::modules::${mount_point}::getRootFolderID]
 }
 
-set db [template::get_db_handle]
-
 # permissions check - need cm_new on the parent item
 content::check_access $parent_id cm_new -user_id [User::getID]
 
@@ -28,12 +26,11 @@ cms_folder::flush sitemap $flush_parent_id
 if { [file exists [ns_url2file \
 	"custom/$content_type/create-1.tcl"]] } {
 
-    template::release_db_handle
     template::forward "custom/$content_type/create-1?content_type=$content_type&mount_point=$mount_point&parent_id=$parent_id"
 }
 
 
-template::query content_type_name onevalue "
+template::query get_content_typ_name content_type_name onevalue "
   select
     pretty_name
   from
@@ -41,9 +38,6 @@ template::query content_type_name onevalue "
   where
     object_type = :content_type
 "
-
-template::release_db_handle
-
 
 if { [template::util::is_nil content_type_name] } {
     template::request::error bad_content_type \

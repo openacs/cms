@@ -11,10 +11,9 @@ if { [template::util::is_nil return_url] } {
     set return_url "index?id=$content_type"
 }
 
-set db [template::get_db_handle]
 
 # fetch the content methods registered to this content type
-template::query content_methods multirow "
+template::query get_methods content_methods multirow "
   select
     m.content_method, label, is_default, description
   from
@@ -30,7 +29,7 @@ template::query content_methods multirow "
 
 # text_entry content method filter
 # don't show text entry if a text mime type is not registered to the item
-template::query has_text_mime_type onevalue "
+template::query check_status has_text_mime_type onevalue "
   select
     count( mime_type )
   from
@@ -49,7 +48,7 @@ if { $has_text_mime_type == 0 } {
 
 
 # fetch the content methods not register to this content type
-template::query unregistered_content_methods multilist "
+template::query get_unregistered_methods unregistered_content_methods multilist "
   select
     label, m.content_method
   from
@@ -69,9 +68,6 @@ template::query unregistered_content_methods multilist "
 " 
 
 set unregistered_method_count [llength $unregistered_content_methods]
-
-template::release_db_handle
-
 
 
 # form to register unregistered content methods to this content type
@@ -104,9 +100,9 @@ if { [form is_valid register] } {
     form get_values register content_type content_method
     
     set db [template::begin_db_transaction]
+    db_transaction {
 
-
-    template::query content_method_add dml "
+        template::query add_method content_method_add dml "
       begin
       content_method.add_method (
           content_type   => :content_type,
@@ -115,9 +111,7 @@ if { [form is_valid register] } {
       );
       end;
     "
-
-    template::end_db_transaction
-    template::release_db_handle
+}
 
     content_method::flush_content_methods_cache $content_type
 

@@ -5,8 +5,6 @@ request create
 request set_param item_id -datatype integer
 request set_param mount_point -datatype keyword -optional -value sitemap
 
-set db [template::get_db_handle]
-
 set user_id [User::getID]
 
 # Check permissions
@@ -16,7 +14,7 @@ content::check_access $item_id cm_examine \
   -request_error
 
 # check if the user has write permission on the types module
-template::query can_set_default_template onevalue "
+template::query allowed_set_p can_set_default_template onevalue "
   select
     cms_permission.permission_p( module_id, :user_id, 'cm_write' )
   from

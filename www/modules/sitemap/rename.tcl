@@ -5,10 +5,8 @@ request set_param item_id -datatype integer
 request set_param mount_point -datatype keyword -value sitemap
 
 
-set db [template::get_db_handle]
 # permissions check - renaming a folder requires cm_write on the folder
 content::check_access $item_id cm_write -user_id [User::getID] 
-template::release_db_handle
 
 
 # Create then form
@@ -42,8 +40,7 @@ if { [form is_request rename_folder] } {
   set item_id [element get_value rename_folder item_id]
 
   # Get existing folder parameters
-  set db [template::get_db_handle]
-  template::query info onerow "
+  template::query get_info info onerow "
     select
       i.name, f.label, f.description
     from 
@@ -52,7 +49,6 @@ if { [form is_request rename_folder] } {
       i.item_id = :item_id
     and
       f.folder_id = :item_id"
-  template::release_db_handle
 
   element set_properties rename_folder name -value $info(name)
   element set_properties rename_folder label -value $info(label)
@@ -70,9 +66,9 @@ if { [form is_valid rename_folder] } {
   form get_values rename_folder \
 	  item_id name label description parent_id mount_point
 
-  set db [template::begin_db_transaction]
+  db_transaction {
 
-  template::query rename_folder dml "
+      db_exec_plsql rename_folder "
     begin 
     content_folder.rename (
         folder_id   => :item_id, 
@@ -81,9 +77,7 @@ if { [form is_valid rename_folder] } {
         description => :description
     ); 
     end;"
-
-  template::end_db_transaction
-  template::release_db_handle
+  }
 
   # flush paginator cache for this folder
   cms_folder::flush $mount_point $parent_id

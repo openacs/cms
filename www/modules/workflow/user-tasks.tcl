@@ -6,14 +6,13 @@ request set_param party_id -datatype integer
 
 set date_format "'Mon. DD, YYYY HH24:MI:SS'"
 
-template::query party_name onevalue "
+template::query get_party_name party_name onevalue "
   select nvl(party.name(:party_id),person.name(:party_id)) from dual
 " 
 
-
 set date_format "'Mon., DD, YYYY HH24:MI:SS'"
 
-set sql "
+template::query get_active active_tasks multirow  "
   select
     trans.transition_key, transition_name, 
     item_id, content_item.get_title(item_id) as title,
@@ -51,9 +50,8 @@ set sql "
     trans.sort_order, title"
 
 
-template::query active_tasks multirow $sql 
 
-set sql "
+template::query get_waiting awaiting_tasks multirow "
   select
     ca.transition_key, transition_name, 
     item_id, content_item.get_title(item_id) as title,
@@ -94,7 +92,5 @@ set sql "
     ca.party_id = :party_id
   order by
     trans.sort_order, title"
-
-template::query awaiting_tasks multirow $sql
 
 set page_title "Workflow Tasks Assigned to $party_name"

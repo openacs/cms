@@ -12,9 +12,6 @@ if { [template::util::is_nil id] } {
   set folder_id $id
 }
 
-
-set db [template::get_db_handle]
-
 # permission check - must have cm_write on the current folder
 set user_id [User::getID]
 content::check_access $folder_id cm_new -user_id $user_id
@@ -29,7 +26,7 @@ if { $clip_length == 0 } {
     set no_items_on_clipboard "f"
 }
 
-template::query path onevalue "
+template::query get_path path onevalue "
   select
     content_item.get_path( :folder_id )
   from 
@@ -37,7 +34,7 @@ template::query path onevalue "
 " 
 
 # get relevant marked items
-template::query marked_items multirow "
+template::query get_marked marked_items multirow "
   select
     content_item.get_title(item_id) title, 
     content_item.get_path(item_id,:root_id) name, 
@@ -51,7 +48,6 @@ template::query marked_items multirow "
     cms_permission.permission_p(item_id, :user_id, 'cm_write') = 't'
 " 
 
-template::release_db_handle
 
 form create move
 element create move mount_point \
@@ -97,39 +93,35 @@ if { [form is_valid move] } {
     form get_values move id mount_point
     set moved_items [element get_values move moved_items]
 
+    db_transaction {
+        set folder_flush_list [list]
+        foreach mv_item_id $moved_items {
+            set parent_id [element get_values move "parent_id_$mv_item_id"]
 
-    set db [template::begin_db_transaction]
+            set sql 
 
-    set folder_flush_list [list]
-    foreach mv_item_id $moved_items {
-	set parent_id [element get_values move "parent_id_$mv_item_id"]
-
-	set sql "
+            if { [catch {db_exec_plsql move_items "
 	    begin
             content_item.move(
                 item_id          => :mv_item_id,
                 target_folder_id => :folder_id
             ); 
-            end;"
+            end;"} errmsg] } {
+                # possibly a duplicate name
+                ns_log notice "move.tcl - while moving $errmsg"
+            }
 
-	if { [catch {template::query move_items dml $sql} errmsg] } {
-	    # possibly a duplicate name
-	    ns_log notice "move.tcl - while moving $errmsg"
-	}
+            # flush the cache
+            if { [lsearch -exact $folder_flush_list $parent_id] == -1 } {
+                lappend folder_flush_list $parent_id
+                if { $parent_id == $root_id } {
+                    set parent_id ""
+                }
+                cms_folder::flush $mount_point $parent_id
+            }
 
-	# flush the cache
-	if { [lsearch -exact $folder_flush_list $parent_id] == -1 } {
-	    lappend folder_flush_list $parent_id
-	    if { $parent_id == $root_id } {
-		set parent_id ""
-	    }
-	    cms_folder::flush $mount_point $parent_id
-	}
-
+        }
     }
-
-    template::end_db_transaction
-    template::release_db_handle
 
 
     # flush cache for destination folder

@@ -12,7 +12,7 @@ set user_id [User::getID]
 set db [template::get_db_handle]
 
 # check that the task is still valid
-template::query is_valid_task onevalue "
+template::query get_status is_valid_task onevalue "
   select content_workflow.can_approve( :task_id, :user_id ) from dual
 " 
 
@@ -23,7 +23,7 @@ if { [string equal $is_valid_task f] } {
 
 
 # Get the name of the item and of the task
-template::query task_info onerow "
+template::query get_task_info task_info onerow "
   select
     c.object_id, content_item.get_title(c.object_id) title, 
     tr.transition_name
@@ -89,37 +89,31 @@ if { [template::form is_valid task_finish] } {
     set ip_address [ns_conn peeraddr]    
     set user_id [User::getID]
 
+    db_transaction {
+        template::query get_status is_valid_task onevalue "
+             select content_workflow.can_approve( :task_id, :user_id ) from dual"
 
-    set db [template::begin_db_transaction]
-
-    template::query is_valid_task onevalue "
-      select content_workflow.can_approve( :task_id, :user_id ) from dual
-    "
-
-    if { [string equal $is_valid_task f] } {
-	ns_ora dml $db "abort transaction"
-	template::release_db_handle
-	template::request::error invalid_task \
+        if { [string equal $is_valid_task f] } {
+            db_dml abort "abort transaction"
+            template::request::error invalid_task \
 		"task-finish.tcl - This task is no longer valid - $task_id"
-	return
+            return
+        }
+
+        db_exec_plsql workflow_approve "
+           begin
+               content_workflow.approve(
+                       task_id    => :task_id,
+                       user_id    => :user_id,
+                       ip_address => :ip_address,
+                       msg        => :msg
+                 );
+            end;"
+
+        # send email notification to the creator of the item
+        workflow::notify_admin_of_finished_task $db $task_id
+
     }
-
-    template::query workflow_approve dml "
-      begin
-      content_workflow.approve(
-          task_id    => :task_id,
-          user_id    => :user_id,
-          ip_address => :ip_address,
-          msg        => :msg
-      );
-      end;
-    "
-
-    # send email notification to the creator of the item
-    workflow::notify_admin_of_finished_task $db $task_id
-
-    template::end_db_transaction
-    template::release_db_handle
 
     # Flush the access cache in order to clear permissions
     content::flush_access_cache $task_info(object_id)

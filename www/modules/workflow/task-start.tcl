@@ -6,22 +6,20 @@ request set_param task_id    -datatype integer
 request set_param return_url -datatype text -value "../workspace/index"
 
 set user_id [User::getID]
-set db [template::get_db_handle]
 
 # make sure the task hasn't expired yet
-template::query is_valid_task onevalue "
+template::query get_status is_valid_task onevalue "
   select content_workflow.can_start( :task_id, :user_id ) from dual
 " 
 
 # if the task is no longer valid, go to My Tasks page
 if { [string equal $is_valid_task f] } {
-  template::release_db_handle
   template::forward $return_url
 }
 
 
 # task info
-template::query task_info onerow "
+template::query get_task_info task_info onerow "
   select
     c.object_id, tr.transition_name,
     content_item.get_title(c.object_id) title,
@@ -39,8 +37,6 @@ template::query task_info onerow "
   and
     tk.case_id = c.case_id
 " 
-
-template::release_db_handle
 
 set holding_user $task_info(holding_user)
 
@@ -117,21 +113,19 @@ if { [form is_valid task_start] } {
     set user_id [User::getID]
 
     set db [template::begin_db_transaction]
+    db_transaction {
+        # check that task has not expired, if it has display error msg
+        template::query get_status is_valid_task onevalue "
+      select content_workflow.can_start( :task_id, :user_id ) from dual" 
 
-    # check that task has not expired, if it has display error msg
-    template::query is_valid_task onevalue "
-      select content_workflow.can_start( :task_id, :user_id ) from dual
-    " 
-
-    if { [string equal $is_valid_task f] } {
-	ns_ora dml $db "abort transaction"
-	template::release_db_handle
-	template::request::error invalid_task \
+        if { [string equal $is_valid_task f] } {
+            db_dml abort "abort transaction"
+            template::request::error invalid_task \
 		"task-start.tcl - invalid task - $task_id"
-	return
-    }
+            return
+        }
 
-    template::query workflow_checkout dml "
+        db_exec_plsql workflow_checkout "
       begin
       content_workflow.checkout(
           task_id      => :task_id,             
@@ -142,9 +136,7 @@ if { [form is_valid task_start] } {
       );
       end;
     "
-
-    template::end_db_transaction
-    template::release_db_handle
+    }
     
     template::forward $return_url
 }

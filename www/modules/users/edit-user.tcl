@@ -89,18 +89,18 @@ if { [form is_valid edit_user] } {
   }
 
   set db [template::begin_db_transaction]
-  template::query edit_user_1 dml "
+  db_transaction {
+      db_dml edit_user_1 "
     update users $users_update where user_id = :item_id
   "
-  template::query edit_user_2 dml "
+      db_dml edit_user_2 "
     update persons set first_names=:first_names, last_name = :last_name 
       where person_id=:item_id
   "
-  template::query edit_user_3 dml "
+      db_dml edit_user_3 "
     update parties set email=:email, url=:url where party_id = :item_id
   "
-  template::end_db_transaction
-  template::release_db_handle
+  }
 
   template::forward "one-user?id=$item_id&parent_id=$parent_id&mount_point=$mount_point"
 

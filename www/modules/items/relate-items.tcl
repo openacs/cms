@@ -13,7 +13,7 @@ content::check_access $item_id cm_relate \
 ######################## BASIC PHASE: create default elements ###################
 
   # Get the item title and type
-  query item_info onerow "
+  template::query get_item_info item_info onerow "
     select 
       content_item.get_title(i.item_id) as title,
       i.content_type
@@ -39,7 +39,7 @@ content::check_access $item_id cm_relate \
   }
 
   # Get all possible relation types
-  query type_options multilist "
+  template::query get_options type_options multilist "
     select 
       lpad(' ', level, '-') || pretty_name as pretty_name, 
       object_type
@@ -167,19 +167,16 @@ content::check_access $item_id cm_relate \
     set rel_list [list]
     set source_id $item_id
 
-    set db [template::begin_db_transaction]    
+      db_transaction {
+          clipboard::ui::process_form rel_form {
+              if { $row(checked) } {
 
-    clipboard::ui::process_form rel_form {
-      if { $row(checked) } {
+                  template::util::array_to_vars row
 
-	template::util::array_to_vars row
-
-        lappend rel_list [list $item_id $relation_tag $order_n $relation_type]
+                  lappend rel_list [list $item_id $relation_tag $order_n $relation_type]
+              }
+          }
       }
-    }
-
-    template::end_db_transaction
-    template::release_db_handle
 
     # If no rows are checked, we're done
     if { [llength $rel_list] < 1 } {

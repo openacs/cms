@@ -73,7 +73,7 @@ while { \
       if { [template::util::is_nil width] || \
            [template::util::is_nil height] } {
         set revision_id [item::get_best_revision $item_id]
-        template::query image_info onerow "
+        template::query get_image_info image_info onerow "
           select width, height from images 
           where image_id = :revision_id
         " -cache "image_width_height $revision_id"

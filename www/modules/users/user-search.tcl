@@ -37,7 +37,7 @@ set form_title [element get_value user_search form_title]
 
 if { [util::is_nil form_title] } {
   if { ![util::is_nil group_id] } {
-    template::query who onevalue "select acs_object.name(:group_id) from dual"
+    template::query get_who who onevalue "select acs_object.name(:group_id) from dual"
     set form_title "Search members of $who"
   } else {
     set form_title "Search All Users"

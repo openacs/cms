@@ -12,7 +12,7 @@ request set_param parent_id -datatype keyword -optional
 # Determine if the user has admin privileges on the user module
 set user_id [User::getID]
 set module_id [cm::modules::get_module_id $mount_point]
-template::query admin_p onevalue "
+template::query check_admin admin_p onevalue "
   select 
     cms_permission.permission_p (:module_id, :user_id, 'cm_admin')
   from
@@ -22,7 +22,7 @@ if { [string equal $admin_p t] } {
   set admin_url "make-admin?mount_point=$mount_point&parent_id=$parent_id&target_user_id="
 }
 
-template::query perm_p onevalue "
+template::query check_perm perm_p onevalue "
   select 
     cms_permission.permission_p (:module_id, :user_id, 'cm_perm')
   from
@@ -39,7 +39,7 @@ if { ![util::is_nil id] } {
   set current_id $id
 
   # Get info about the current group
-  query info onerow "
+  template::query get_info1 info onerow "
     select 
       g.group_id, g.group_name, p.email, p.url,
       NVL((select 'f' from dual where exists (
@@ -126,7 +126,7 @@ if { ![util::is_nil id] } {
   set current_id $module_id
 
   # the everyone party
-  query info onerow "
+  template::query get_info2 info onerow "
     select
       party_id group_id, 'All Users' as group_name, 
       email, url, 'f' as is_empty
@@ -180,7 +180,7 @@ if { ![util::is_nil id] } {
 }
 
 # Select subgroups, users
-query subgroups multirow $groups_query
-query users multirow $users_query -eval $users_eval
+template::query get_subgroups subgroups multirow $groups_query
+template::query get_users users multirow $users_query -eval $users_eval
 
 set return_url [ns_conn url]

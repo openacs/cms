@@ -7,7 +7,6 @@ request set_param return_url -datatype text    -value "../workspace/index"
 
 
 set user_id [User::getID]
-set db [template::get_db_handle]
 
 # check that the task is still valid
 query is_valid_task onevalue "
@@ -22,7 +21,7 @@ if { [string equal $is_valid_task f] } {
 
 # task info
 
-template::query task_info onerow "
+template::query get_task_info task_info onerow "
   select
     c.object_id, tr.transition_name,
     content_item.get_title(c.object_id) title,
@@ -38,8 +37,6 @@ template::query task_info onerow "
   and
     tk.case_id = c.case_id
 " 
-
-template::release_db_handle
 
 
 set holding_user $task_info(holding_user)
@@ -105,19 +102,18 @@ if { [form is_valid task_start] } {
     set db [template::begin_db_transaction]
 
     # check that the task is still valid
-    template::query is_valid_task onevalue "
+    template::query get_task_status is_valid_task onevalue "
       select content_workflow.can_approve( :task_id, :user_id ) from dual
     " 
 
     if { [string equal $is_valid_task f] } {
-	ns_ora dml $db "abort transaction"
-	template::release_db_handle $db
+	db_dml abort "abort transaction"
 	template::request::error invalid_task \
 		"task-checkin.tcl - invalid task - $task_id"
 	return
     }
 
-    template::query workflow_checkin dml "
+    db_exec_plsql workflow_checkin "
       begin
       content_workflow.checkin(
           task_id      => :task_id,             
@@ -126,10 +122,6 @@ if { [form is_valid task_start] } {
           msg          => :msg
       );
       end;
-    "
-
-    template::end_db_transaction
-    template::release_db_handle
-    
+    "    
     template::forward $return_url
 }

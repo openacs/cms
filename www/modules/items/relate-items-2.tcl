@@ -119,19 +119,19 @@ if { [form is_valid rel_form_2] || $form_complete } {
   cms_rel::sort_related_item_order $item_id  
 
 
-  set db [template::begin_db_transaction ]
+  db_transaction { 
 
-  unset row
+      unset row
 
-  for { set i 1 } { $i <= ${rel_attrs:rowcount} } {incr i} {
-    upvar 0 "rel_attrs:$i" row
-    template::util::array_to_vars row
+      for { set i 1 } { $i <= ${rel_attrs:rowcount} } {incr i} {
+          upvar 0 "rel_attrs:$i" row
+          template::util::array_to_vars row
 
-    # Insert the basic data
-    
-    # Insert at the end if no order
-    if { [template::util::is_nil order_n] } {
-      template::query get_order order_n onevalue "
+          # Insert the basic data
+          
+          # Insert at the end if no order
+          if { [template::util::is_nil order_n] } {
+              template::query get_order order_n onevalue "
         select 
 	  NVL(max(order_n) + 1, 1) 
 	from 
@@ -139,10 +139,10 @@ if { [form is_valid rel_form_2] || $form_complete } {
 	where 
 	  item_id = :item_id
         " 
-    }
+          }
 
-    # Perform the insertion
-    db_exec_plsql "begin 
+          # Perform the insertion
+          db_exec_plsql relate "begin 
       :rel_id := content_item.relate (
           item_id       => :item_id,
           object_id     => :related_id,
@@ -152,18 +152,16 @@ if { [form is_valid rel_form_2] || $form_complete } {
       );
     end;" rel_id
 
-    # Insert any extra attributes
-    if { [llength $elements] > 0 } {
-      set attr_list [template::util::tcl_to_sql_list $elements]
-      ns_log notice "$i : $attr_list"
-      content::insert_element_data $db rel_form_2 $relation_type \
-        [list acs_object cr_item_rel] $rel_id "_$i" \
-        " attribute_name in ($attr_list)"
-    }
+          # Insert any extra attributes
+          if { [llength $elements] > 0 } {
+              set attr_list [template::util::tcl_to_sql_list $elements]
+              ns_log notice "$i : $attr_list"
+              content::insert_element_data $db rel_form_2 $relation_type \
+                  [list acs_object cr_item_rel] $rel_id "_$i" \
+                  " attribute_name in ($attr_list)"
+          }
+      }
   }
-
-  template::end_db_transaction
-  template::release_db_handle
 
   template::forward "index?item_id=$item_id&mount_point=$mount_point"
 }

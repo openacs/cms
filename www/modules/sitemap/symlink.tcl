@@ -15,8 +15,6 @@ if { [template::util::is_nil id] } {
     set folder_id $id
 }
 
-
-set db [template::get_db_handle]
 # permission check - must have cm_new on id
 set user_id [User::getID]
 content::check_access $folder_id cm_new -user_id $user_id
@@ -32,7 +30,7 @@ if { $clip_length == 0 } {
 }
 
 # get title, name, item_id of each marked item
-template::query marked_items multirow "
+template::query get_marked marked_items multirow "
   select
     content_item.get_title(item_id) title, 'symlink_to_' || name as name, 
     item_id
@@ -48,7 +46,6 @@ template::query marked_items multirow "
     cms_permission.permission_p(item_id, :user_id, 'cm_examine') = 't'
 " 
 
-template::release_db_handle
 
 form create symlink
 
@@ -104,16 +101,17 @@ if { [form is_valid symlink] } {
     form get_values symlink id mount_point
     set symlinked_items [element get_values symlink symlinked_items]
 
-    set db [template::begin_db_transaction]
+    db_transaction {
+        foreach sym_item_id $symlinked_items {
+            set element_name_1 "name_$sym_item_id"
+            set element_name_2 "title_$sym_item_id"
 
-    foreach sym_item_id $symlinked_items {
-	set element_name_1 "name_$sym_item_id"
-	set element_name_2 "title_$sym_item_id"
+            set name [element get_values symlink $element_name_1]
+            set label [lindex [element get_values symlink $element_name_2] 0]
 
-	set name [element get_values symlink $element_name_1]
-	set label [lindex [element get_values symlink $element_name_2] 0]
+            set sql 
 
-	set sql "
+            if { [catch {db_exec_plsql new_link "
 	    begin
             :symlink_id := content_symlink.new(
                 name          => :name, 
@@ -124,18 +122,14 @@ if { [form is_valid symlink] } {
                 creation_user => :user_id, 
                 creation_ip   => :ip
             ); 
-            end;"
+            end;" symlink_id} errmsg] } {
+                # possibly a duplicate name
+                ns_log notice "symlink.tcl - while symlinking $errmsg"
+            }
 
-	if { [catch {ns_ora exec_plsql_bind $db $sql symlink_id} errmsg] } {
-	    # possibly a duplicate name
-	    ns_log notice "symlink.tcl - while symlinking $errmsg"
-	}
+        }
 
     }
-
-
-    template::end_db_transaction
-    template::release_db_handle
 
     clipboard::free $clip
 

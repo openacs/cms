@@ -150,20 +150,16 @@ if { [form is_valid register_templates] } {
 	eval "set template_id $$id_name"
 	eval "set context $$context_name"
 
-	set sql "begin
+        db_transaction {
+            db_exec_plsql register_templates "begin
                    content_type.register_template(
                        content_type => :content_type,
 	               template_id  => :template_id,
 	               use_context  => :context );
                  end;"
-
-	set db [template::begin_db_transaction]
-	template::query register_templates dml $sql
-        template::end_db_transaction
-        template::release_db_handle
+        }
 
     }
-
 
     forward "index?id=$content_type"
 

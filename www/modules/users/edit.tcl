@@ -53,18 +53,16 @@ if { [form is_valid edit_group] } {
                             email url mount_point
 
   set db [template::begin_db_transaction]
-  template::query edit_group_1 dml "
+  db_transaction {
+      db_dml edit_group_1 "
     update groups 
       set group_name = :group_name
-      where group_id = :group_id
-  "
-  template::query edit_group_2 dml "
+      where group_id = :group_id"
+      db_dml edit_group_2 "
     update parties
       set email = :email, url = :url
-      where party_id = :group_id
-  "
-  template::end_db_transaction
-  template::release_db_handle
+      where party_id = :group_id"
+  }
 
   refreshCachedFolder $user_id $mount_point $parent_id
 

@@ -29,11 +29,9 @@ element create add_group url \
 if { [form is_request add_group] } {
   
   # Get the next folder id
-  set db [template::get_db_handle]
-  template::query group_id onevalue "
+  template::query get_group_id group_id onevalue "
     select acs_object_id_seq.nextval from dual
   "
-  template::release_db_handle
 
   element set_properties add_group group_id -value $group_id
 }
@@ -46,26 +44,24 @@ if { [form is_valid add_group] } {
   template::form get_values add_group group_name parent_id \
                             group_id user_id email url
 
-  set db [template::begin_db_transaction]
+  db_transaction {
 
-  ns_ora exec_plsql_bind $db "begin :1 := acs_group.new(
+      set group_id [db_exec_plsql new_group "begin :1 := acs_group.new(
     group_id => :group_id, 
     group_name => :group_name, 
     email => :email,
     url => :url,
     creation_user => :user_id, 
-    creation_ip => :ip ); end;" [list 1] group_id
+    creation_ip => :ip ); end;"]
 
-  if { ![util::is_nil parent_id] } {
-    ns_ora exec_plsql_bind $db "begin :1 := composition_rel.new(
+      if { ![util::is_nil parent_id] } {
+          set rel_id [db_exec_plsql new_rel "begin :1 := composition_rel.new(
     object_id_one => :parent_id,
     object_id_two => :group_id,
     creation_user => :user_id, 
-    creation_ip => :ip ); end;" [list 1] rel_id
+    creation_ip => :ip ); end;"]
+      }
   }
-
-  template::end_db_transaction
-  template::release_db_handle
 
   # Update the folder and refresh the tree
   refreshCachedFolder $user_id sitemap $parent_id

@@ -5,9 +5,8 @@ request set_param attribute_id -datatype integer
 request set_param content_type -datatype keyword
 request set_param widget -datatype keyword -optional
 
-set db [template::get_db_handle]
 
-template::query module_id onevalue "
+template::query get_module_id module_id onevalue "
   select
     module_id
   from
@@ -19,7 +18,6 @@ template::query module_id onevalue "
 # permissions check - need cm_write on types module to edit a widget
 content::check_access $module_id cm_write -user_id [User::getID] 
 
-template::release_db_handle
 
 wizard set_param attribute_id $attribute_id
 wizard set_param content_type $content_type

@@ -16,30 +16,29 @@ request create -params {
 # The root ID is to determine the appropriate path to the item
 set root_id [cm::modules::templates::getRootFolderID]
 
-set db [template::get_db_handle]
 
 # resolve any symlinks
-template::query resolved_template_id onevalue "
+template::query get_id resolved_template_id onevalue "
   select content_symlink.resolve(:template_id) from dual
 " 
 
 set template_id $resolved_template_id
 
 # get the path
-template::query path onevalue "
+template::query get_path path onevalue "
   select content_item.get_path(:template_id, :root_id) from dual
 " 
 
 # check for valid template_id
 if { [template::util::is_nil path] } {
-  template::release_db_handle
   ns_log Notice "/templates/template.tcl - BAD TEMPLATE_ID - $template_id"
   template::forward "../sitemap/index?mount_point=templates&id="
 }
 
 
 # get the context bar info
-set query "select
+
+template::query context multirow "select
       t.tree_level, t.context_id, content_item.get_title(t.context_id) as title
     from (
       select 
@@ -58,11 +57,9 @@ set query "select
     order by
       tree_level desc"
 
-template::query context multirow $query
-
 
 # find out which items this template is registered to
-template::query items multirow "
+template::query get_items items multirow "
   select
     content_item.get_title(item_id) title, item_id, use_context
   from
@@ -74,7 +71,7 @@ template::query items multirow "
 
 
 # find out which types this template is registered to
-template::query types multirow "
+template::query get_types types multirow "
   select
     pretty_name, content_type, use_context
   from
@@ -85,5 +82,3 @@ template::query types multirow "
     types.object_type = map.content_type
   order by
     types.pretty_name"
-
-template::release_db_handle

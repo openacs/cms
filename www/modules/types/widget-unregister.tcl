@@ -1,11 +1,10 @@
 request create
 request set_param attribute_id -datatype integer
 
-set db [template::get_db_handle]
 
 # permissions check - must have cm_write on the types module to unregister
 #  a widget
-template::query module_id onevalue "
+template::query get_module_id module_id onevalue "
   select
     module_id
   from
@@ -17,7 +16,7 @@ template::query module_id onevalue "
 content::check_access $module_id cm_write -user_id [User::getID]
 
 
-template::query attribute_info onerow "
+template::query get_attr_info attribute_info onerow "
   select
     attribute_name, object_type as content_type
   from
@@ -28,19 +27,17 @@ template::query attribute_info onerow "
 
 template::util::array_to_vars attribute_info
 
-set sql "
+
+if { [catch {db_exec_plsql unregister "
   begin
   cm_form_widget.unregister_attribute_widget (
       content_type   => :content_type,
       attribute_name => :attribute_name
   );
   end;
-"
-
-if { [catch {ns_ora dml $db $sql} errmsg] } {
+"} errmsg] } {
   template::request::error unregister_attribute_widget $errmsg
 }
 
-template::release_db_handle
 
 template::forward index?id=$content_type

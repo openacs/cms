@@ -4,14 +4,13 @@ request create
 request set_param item_id -datatype keyword
 request set_param mount_point -datatype keyword -value sitemap
 
-set db [template::begin_db_transaction]
+db_transaction {
+    # permissions check - must have cm_write permissions on item to delete
+    content::check_access $item_id cm_write -user_id [User::getID]
 
-# permissions check - must have cm_write permissions on item to delete
-content::check_access $item_id cm_write -user_id [User::getID]
-
-# get all the parent_id's of the items being deleted
-#   because we need to flush the paginator cache for each of these folders
-template::query flush_list onelist "
+    # get all the parent_id's of the items being deleted
+    #   because we need to flush the paginator cache for each of these folders
+    template::query flush flush_list onelist "
   select
     parent_id
   from
@@ -20,15 +19,13 @@ template::query flush_list onelist "
     resolved_id = :item_id
 " 
 
-template::query item_delete dml "
+    db_exec_plsql item_delete "
   begin 
     content_item.delete(
       item_id => :item_id
     ); 
   end;" 
-
-template::end_db_transaction
-template::release_db_handle
+}
 
 # flush cache
 set root_id [cm::modules::${mount_point}::getRootFolderID]
