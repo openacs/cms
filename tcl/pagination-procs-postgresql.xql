@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <queryset>
+<rdbms><type>postgresql</type><version>7.1</version></rdbms>
 
 <partialquery name="pagination::paginate_query.pg_paginate_query">
 	<querytext>
