@@ -418,7 +418,12 @@ ad_proc -public publish::schedule_status_sweep { {interval ""} } {
   if { [template::util::is_nil interval] } {
     # Kludge: relies on that CMS is a singleton package
     set package_id [apm_package_id_from_key "cms"]
-    set interval [ad_parameter -package_id $package_id StatusSweepInterval 3600]
+    if { ![template::util::is_nil package_id] } {
+      set interval [ad_parameter -package_id $package_id StatusSweepInterval 3600]
+    } else { 
+      ns_log Warning "Unable to lookup package_id for cms in publish::schedule_status_sweep defaulting to interval 3600"
+      set interval 3600
+    } 
   }
 
   ns_log notice "CMS publish::schedule_status_sweep: Scheduling status sweep every $interval seconds"
