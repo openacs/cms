@@ -13,14 +13,7 @@ content::check_access $item_id cm_relate \
 ######################## BASIC PHASE: create default elements ###################
 
   # Get the item title and type
-  template::query get_item_info item_info onerow "
-    select 
-      content_item.get_title(i.item_id) as title,
-      i.content_type
-    from 
-      cr_items i
-    where
-      i.item_id = :item_id"
+  db_1row get_item_info "" -column_array item_info
 
   set item_title $item_info(title)
   set item_type $item_info(content_type)
@@ -39,16 +32,7 @@ content::check_access $item_id cm_relate \
   }
 
   # Get all possible relation types
-  template::query get_options type_options multilist "
-    select 
-      lpad(' ', level, '-') || pretty_name as pretty_name, 
-      object_type
-    from
-      acs_object_types
-    connect by
-      prior object_type = supertype
-    start with
-      object_type = 'cr_item_rel'"
+  set type_options [db_list_of_lists get_options ""]
 
   # Prepare the query
   set sql_items "('"
@@ -57,32 +41,7 @@ content::check_access $item_id cm_relate \
 
   
 
-
-  template::query get_clip_items clip_items multirow "
-    select
-      i.item_id as related_id, 
-      content_item.get_title(i.item_id) as title,
-      content_item.get_path(i.item_id) as path,   
-      tr.relation_tag
-    from
-      cr_items i, cr_type_relations tr
-    where
-      content_item.is_subclass(i.content_type, tr.target_type) = 't'
-    and
-      content_item.is_subclass(:item_type, tr.content_type) = 't'
-    and (
-      tr.max_n is null 
-      or 
-      (select count(*) from cr_item_rels 
-	where item_id = :item_id 
-	and relation_tag = tr.relation_tag) < tr.max_n
-      )
-    and 
-      i.item_id in $sql_items
-    and
-      i.item_id ^= :item_id
-    order by
-      path, i.item_id, tr.relation_tag"
+  db_multirow clip_items get_clip_items ""
 
   if { ${clip_items:rowcount} < 1} {
     set no_valid_items t

@@ -42,5 +42,33 @@ if { [form is_valid add_comment] } {
 
   }
 
+  set query "
+  select
+    rel_id, relation_tag, 
+    i.item_id, i.name, trim(r.title) as title, t.pretty_name, 
+    to_char(o.creation_date, 'MM/DD/YY HH24:MM') last_modified
+  from
+    cr_items i, acs_object_types t, acs_objects o, cr_revisions r,
+    cr_child_rels c
+  where
+    i.parent_id = :item_id
+  and
+    o.object_id = :item_id
+  and
+    i.content_type = t.object_type
+  and
+    r.revision_id = NVL(i.live_revision, i.latest_revision)
+  and
+    c.parent_id = i.parent_id
+  and
+    c.child_id = i.item_id
+  order by
+    t.pretty_name, title"
+
+#template::query children multirow $query
+
+
+
+
   template::forward "index?item_id=$object_id"
 }

@@ -26,15 +26,9 @@ if { [string equal $relation_type child] } {
 db_transaction {
 
     # Get item_id the related/child item
-    template::query get_item_id item_id onevalue "
-  select 
-    $rel_parent_column
-  from 
-    $rel_table
-  where 
-    rel_id = :rel_id" 
+    set item_id [db_string get_item_id "" -default ""]
 
-    if { [template::util::is_nil item_id] } {
+    if { [string equal $item_id ""] } {
         db_abort_transaction
         request::error no_such_rel "The relationship $rel_id does not exist."
         return
@@ -59,42 +53,18 @@ db_transaction {
     }
 
     # grab the (sorted) order of the original related/child item
-    template::query get_order order_n onevalue "
-  select
-    order_n
-  from
-    $rel_table
-  where
-    rel_id = :rel_id"
-
+    set order_n [db_string get_order ""]
 
     # Move the relation up or down
     if { [string equal $order "up"] } {
 
         # Get the previous related/child
-        template::query get_prev_swap_rel swap_rel onerow "
-      select 
-        rel_id, order_n 
-      from 
-        $rel_table
-      where 
-        $rel_parent_column = :item_id
-      and 
-        order_n = :order_n - 1"
+        db_0or1row get_prev_swap_rel "" -column_array swap_rel
 
     } else {
 
         # Get the next related/child item
-        template::query get_next_swap_rel swap_rel onerow "
-      select 
-        rel_id, order_n 
-      from 
-        $rel_table
-      where 
-        $rel_parent_column = :item_id
-      and 
-        order_n = :order_n + 1"
-
+        db_0or1row get_next_swap_rel "" -column_array swap_rel
     }
 
 
