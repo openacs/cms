@@ -7,11 +7,11 @@
       <querytext>
       
   select
-    ca.transition_key, transition_name, ca.party_id, 
+    trans.transition_key, transition_name, ca.party_id, 
     item_id, content_item.get_title(item_id) as title,
     nvl(party.name(ca.party_id),person.name(ca.party_id)) as assigned_party,
     to_char(dead.deadline,'Mon. DD, YYYY') as deadline_pretty,
-    content_workflow.get_status(c.case_id, ca.transition_key) as status
+    content_workflow.get_status(c.case_id, trans.transition_key) as status
   from 
     wf_transitions trans, wf_cases c, wf_case_deadlines dead, 
     wf_case_assignments ca, cr_items i
