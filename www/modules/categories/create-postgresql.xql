@@ -9,11 +9,11 @@
     select content_keyword__new(
       :heading, 
       :description, 
-      null,
+      :pid,
       :keyword_id,
       now(),
       :user_id,
-      :ip$pid,
+      :ip,
       'content_keyword');
 
       </querytext>
@@ -29,4 +29,14 @@
 </fullquery>
 
  
+<partialquery name="pid">      
+      <querytext>
+      
+         $parent_id
+
+  
+      </querytext>
+</partialquery>
+
+
 </queryset>
