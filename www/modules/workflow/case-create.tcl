@@ -21,20 +21,12 @@ content::check_access $item_id cm_item_workflow \
 	-request_error
 
 # get a list of users (this should be context-specific)
-template::query get_users users multilist "
-  select 
-    person.name(user_id) name, user_id 
-  from 
-    users 
-  where 
-    user_id > 0 
-  order by 
-    name
-" 
+set users [db_list_of_lists get_users ""]
 
 # Prepare the form elements
 
 set transition_list [list]
+
 template::query::iterate get_name_key  "
   select 
     transition_name, transition_key 
