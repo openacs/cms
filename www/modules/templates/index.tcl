@@ -87,14 +87,14 @@ template::list::create \
     }
 
 db_multirow -extend { copy file_size is_folder template_id upload_url edit_url type item_url } -unclobber folder_contents get_folders "" {
-    set copy [clipboard::render_bookmark sitemap $item_id $package_url]
+    set copy [clipboard::render_bookmark templates $item_id $package_url]
     set is_folder 1
     set type "Template Folder"
     set item_url [export_vars -base index { item_id }]
 }
 
 db_multirow -append -extend { copy is_folder folder_id label upload_url edit_url type item_url } folder_contents get_items "" {
-    set copy [clipboard::render_bookmark sitemap $item_id $package_url]
+    set copy [clipboard::render_bookmark templates $item_id $package_url]
     set is_folder 0
     set type "Template"
     set item_url [export_vars -base properties { item_id }]

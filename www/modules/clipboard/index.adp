@@ -71,14 +71,14 @@
    </div>
  </else>
 
- <if @clip_tab@ eq keywords>
+ <if @clip_tab@ eq categories>
    <div class="tab" id="subnavbar-here">
      Keywords
    </div>
  </if>
  <else>
    <div class="tab">
-     <a href="@package_url@modules/clipboard/index?mount_point=@mount_point@&clip_tab=keywords" title="" class="subnavbar-unselected">Keywords</a>
+     <a href="@package_url@modules/clipboard/index?mount_point=@mount_point@&clip_tab=categories" title="" class="subnavbar-unselected">Keywords</a>
    </div>
  </else>
 

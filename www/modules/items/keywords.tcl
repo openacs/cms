@@ -28,14 +28,14 @@ template::list::create \
     -elements {
 	heading {
 	    label "Heading"
-	    display_template "<a href=\"@keywords.keyword_url@\" title=\"View keyword\">keywords.heading</a>"
+	    display_template "<a href=\"@keywords.keyword_url@\" title=\"View keyword\">@keywords.heading@</a>"
 	}
 	description {
 	    label "Description"
 	}
     }    
 
-db_multirow keywords get_keywords "" {
+db_multirow -extend {keyword_url} keywords get_keywords "" {
     set keyword_url "../categories/index?id=$keyword_id&mount_point=categories"
 }
 

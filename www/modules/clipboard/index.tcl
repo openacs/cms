@@ -37,7 +37,7 @@ if {$id == "" } {
 set clip [clipboard::parse_cookie]
 
 set total_items [clipboard::get_total_items $clip]
-set user_id [User::getID]
+set user_id [auth::require_login]
 
 if { ![util::is_nil id] } {
   

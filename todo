@@ -1,7 +1,6 @@
 basic/cosmetic
 ---------
 list-ize child items (or what to do with it? shouldn't we be able to relate items that already exist?)
-templates not showing up on clipboard as templates
 better navigation strategy (i.e., "back" links while visiting attributes, rename, delete pages, etc.)
 new icon for "clipping" items - new listbuilder checkboxes confuse UI a bit
 include description in heading on folder attributes page
