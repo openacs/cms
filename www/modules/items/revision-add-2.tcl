@@ -28,10 +28,10 @@ form create add_revision -html { enctype "multipart/form-data" }
 
 # autogenerate the revision form
 content::add_revision_form \
-	-form_name add_revision \
-	-content_method $content_method \
-	-content_type $content_type \
-	-item_id $item_id
+    -form_name add_revision \
+    -content_method $content_method \
+    -content_type $content_type \
+    -item_id $item_id
 
 if { [form is_valid add_revision] } {
     form get_values add_revision item_id
