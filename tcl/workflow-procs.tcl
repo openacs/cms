@@ -267,37 +267,3 @@ ad_proc -public workflow::check_wf_permission { item_id {show_error t}} {
 	return f
     }
 }
-
-ad_proc -private workflow::mail_notifications {} {
-
-  @private mail_notifications
-
-  Schedules procedure for mailing notifications
-
-  @author Michael Pih
-
-} {
-    ns_log Notice "Running Scheduled Notifications Proc"
-
-    set mail_server [template::util::get_param mail_server "ns/server/[ns_info server]/cms" OutgoingMailServer]
-    set mail_port [template::util::get_param mail_port "ns/server/[ns_info server]/cms" MailPort]
-
-    # if there's no mail server, don't run scheduled processes
-    if { [template::util::is_nil mail_server] } {
-	return
-    }
-
-    # default mail port, if none is set
-    if { [template::util::is_nil mail_port] } {
-	set mail_port 25
-    }
-    db_transaction {
-        db_exec_plsql process_queue "
-            begin
-                nt.process_queue( :mail_server, :mail_port );
-            end;
-            "
-    }
-}
-
-ns_schedule_proc -thread 300 workflow::mail_notifications
