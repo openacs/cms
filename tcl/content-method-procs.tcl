@@ -110,16 +110,7 @@ ad_proc content_method::text_entry_filter_sql { content_type } {
     
     set text_entry_filter_sql ""
 
-    template::query count_text_mime_types has_text_mime_type onevalue "
-      select
-        count(*)
-      from
-        cr_content_mime_type_map
-      where
-        mime_type like ('%text/%')
-      and
-        content_type = :content_type
-    "
+    set has_text_mime_type [db_string count_text_mime_types ""]
 
     if { $has_text_mime_type == 0 } {
 	set text_entry_filter_sql \
@@ -145,6 +136,8 @@ ad_proc content_method::flush_content_methods_cache { {content_type ""} } {
 } {
 
     if { [template::util::is_nil content_type] } {
+        # FIXME: figure out what to do with these after template::query calls
+        # are gone.
 
 	# flush the entire content_method_types cache
 	template::query::flush_cache "content_method_types*"

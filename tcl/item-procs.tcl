@@ -29,16 +29,14 @@ ad_proc -public item::get_live_revision { item_id } {
 
 } {
 
-  template::query glr_get_live_revision live_revision onevalue "
-    select live_revision from cr_items
-      where item_id = :item_id" -cache "item_live_revision $item_id"
+    set live_revision [db_string glr_get_live_revision ""]
 
-  if { [template::util::is_nil live_revision] } {
-    ns_log notice "WARNING: No live revision for item $item_id"
-    return ""
-  } else {
-    return $live_revision
-  }
+    if { [template::util::is_nil live_revision] } {
+        ns_log notice "WARNING: No live revision for item $item_id"
+        return ""
+    } else {
+        return $live_revision
+    }
 }
 
 
@@ -55,10 +53,8 @@ ad_proc -public item::get_item_from_revision { revision_id } {
   @see proc item::get_best_revision
 
 } {
-  template::query gifr_get_one_revision item_id onevalue "
-    select item_id from cr_revisions where revision_id = :revision_id
-  " -cache "item_from_revision $revision_id"
-  return $item_id
+    set item_id [db_string gifr_get_one_revision ""}
+    return $item_id
 }
 
 
@@ -91,7 +87,7 @@ ad_proc -public item::get_id { url {root_folder ""}} {
   }
 
   # Get the path
-  template::query id_get_item_id item_id onevalue "select content_item__get_id(:url $root_sql) from dual" -cache "item_id $url $root_folder" 
+  set item_id [db_string id_get_item_id ""]
 
   if { [info exists item_id] } {
     return $item_id
@@ -117,16 +113,13 @@ ad_proc -public item::get_content_type { item_id } {
 
 } {
 
-  template::query gct_get_content_type content_type onevalue "
-    select content_type from cr_items where
-      item_id = :item_id
-  " -cache "item_content_type $item_id"
+    set content_type [db_string gct_get_content_type ""]
 
-  if { [info exists content_type] } {
-    return $content_type
-  } else {
-    return ""
-  }
+    if { [info exists content_type] } {
+        return $content_type
+    } else {
+        return ""
+    }
 }
 
 
@@ -154,11 +147,7 @@ ad_proc -public item::content_methods_by_type { content_type args } {
   
   template::util::get_opts $args
 
-  template::query cmbt_get_content_mime_types types onelist "
-    select mime_type from cr_content_mime_type_map
-      where content_type = :content_type
-      and lower(mime_type) like 'text/%'
-  " -cache "content_mime_types $content_type"
+  set types [db_list cmbt_get_content_mime_types ""]
 
   set need_text [expr [llength $types] > 0]
 
@@ -236,25 +225,10 @@ ad_proc -public item::get_revision_content { revision_id args } {
   set content_type [get_content_type $item_id]
 
   # Get the table name
-  template::query grc_get_table_names table_name onevalue "
-    select table_name from acs_object_types 
-    where object_type = :content_type
-  " -cache "type_table_name $content_type" -persistent \
-    -timeout 3600
+  set table_name [db_string grc_get_table_names ""]
 
   # Get (all) the content (note this is really dependent on file type)
-  template::query grc_get_all_content content onerow "select 
-    x.*, 
-    :item_id as item_id $text_sql, 
-    :content_type as content_type
-  from
-    cr_revisions r, ${table_name}x x
-  where
-    r.revision_id = :revision_id
-  and 
-    x.revision_id = r.revision_id
-  " -cache "content_for_revision $revision_id" -persistent \
-    -timeout 3600
+  db_0or1row grc_get_all_content "" -column_array content
 
   upvar content content
 
@@ -286,11 +260,9 @@ ad_proc -public item::is_publishable { item_id } {
   @return    1 if the item is publishable, 0 otherwise
 
 } {
-  template::query ip_is_publishable_p is_publishable onevalue "
-    select content_item.is_publishable(:item_id) from dual
-  " -cache "item_is_publishable $item_id"
+    set is_publishable [db_string ip_is_publishable_p ""]
 
-  return [string equal $is_publishable t]
+    return [string equal $is_publishable t]
 } 
 
 
@@ -317,9 +289,7 @@ ad_proc -public item::get_publish_status { item_id } {
 
 } {
 
-  template::query gps_get_publish_status publish_status onevalue "
-    select publish_status from cr_items where item_id = :item_id
-  " -cache "item_publish_status $item_id"
+  set publish_status [db_string gps_get_publish_status ""]
 
   return $publish_status
 }
@@ -339,9 +309,8 @@ ad_proc -public item::get_title { item_id } {
   @see proc item::get_best_revision
 
 } {
-  template::query gt_get_title title onevalue "
-    select content_item.get_title(:item_id) from dual
-  " -cache "item_title $item_id"
 
-  return $title
+    set title [db_string gt_get_title ""]
+
+    return $title
 }

@@ -56,12 +56,7 @@ ad_proc -public pagination::get_total_pages { sql } {
 
 } {
 
-    template::query gtp_get_total_pages total_pages onevalue "
-	  select 
-	    ceil(count(*) / [pagination::get_rows_per_page] )
-	  from
-            ($sql) x
-	"
+    set total_pages [db_string gtp_get_total_pages ""]
 
     return $total_pages
 }

@@ -53,14 +53,13 @@ namespace eval User {
   #   on the CMS pages root folder
   ad_proc cms_admin_exists {} {
   
-    template::query cae_admin_exists admin_exists onevalue "
-      select content_permission.cm_admin_exists from dual"
+      set_admin_exists [db_string cae_admin_exists ""]
 
-    if { [string equal $admin_exists t] } {
-      return 1
-    } else {
-      return 0
-    }
+      if { [string equal $admin_exists t] } {
+          return 1
+      } else {
+          return 0
+      }
   }
 
 }

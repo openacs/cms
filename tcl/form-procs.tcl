@@ -35,10 +35,11 @@ ad_proc -public content::query_form_metadata {
   if { ![template::util::is_nil extra_orderby] } {
     append query ", $extra_orderby"
   }  
-
-  uplevel "
-    template::query get_form_metadata $datasource_name $datasource_type \{$query\}
-  "
+  if [string equal $datasource_type multirow] {
+      uplevel "db_multirow $datasource_name get_form_metadata \{$query\}"
+  } else {
+      uplevel "set $datasource_name [db_list_of_lists get_form_metadata {}]"
+  }
 
 }
 
@@ -128,9 +129,7 @@ ad_proc -public content::create_form_element {
   } elseif { ![template::util::is_nil opts(item_id)] } {
       
     set item_id $opts(item_id)
-    template::query get_revision_id revision_id onevalue "
-      select content_item.get_latest_revision(:item_id) from dual
-    "
+    set revision_id [db_string get_revision_id ""]
   }
 
   if { [info exists opts(content_type)] } {
@@ -146,10 +145,7 @@ ad_proc -public content::create_form_element {
       return
     }
    
-    template::query get_content_type content_type onevalue "
-       select content_type from cr_items i, cr_revisions r
-       where r.item_id = i.item_id
-       and   r.revision_id = :revision_id"
+    set content_type [db_string get_content_type ""]
   }
 
   # Run the gigantic uber-query. This is somewhat wasteful; should
@@ -182,9 +178,7 @@ ad_proc -public content::create_form_element {
       }
     }
     
-    template::query get_element_value element_value onevalue "
-      select $what from ${table_name}x where revision_id = :revision_id
-    "
+    set element [db_string get_element_value ""]
 
     lappend code_params -value $element_value -values [list $element_value]
   }
@@ -339,7 +333,7 @@ ad_proc content::get_revision_create_element {} {
                 # build the option list
                 if { [string equal $datatype "enumeration"] } {
 
-                    template::query get_enum_values options multilist $__sql
+                    set options [db_list_of_list get_enum_values $__sql]
                     lappend code_params -options $options
                 }
                 
@@ -350,7 +344,20 @@ ad_proc content::get_revision_create_element {} {
                     if { [string equal $param_source "eval"] } {
                         set source [eval $value]
                     } elseif { [string equal $param_source "query"] } {
-                        template::query revision_create_get_value source $param_type $value
+                        switch $param_type {
+                            onevalue {
+                                set source [db_string revision_create_get_value $value]
+                            }
+                            onelist {
+                                set source [db_list revision_create_get_value $value]
+                            }
+                            multilist {
+                                set source [db_list_of_lists revision_create_get_value $value]
+                            }
+                            default {
+                                error "invalid param_type"
+                            }
+                        }
                     } else {
                         set source $value
                     }
@@ -389,28 +396,7 @@ ad_proc -public content::process_revision_form { form_name content_type item_id 
 
     set last_table ""
     set last_id_column ""
-    template::query get_extended_attributes rows multirow "
-          select 
-            types.table_name, types.id_column, attr.attribute_name,
-            attr.datatype
-          from 
-            acs_attributes attr,
-            ( select 
-                object_type, table_name, id_column, level as inherit_level
-              from 
-                acs_object_types
-              where 
-                object_type <> 'acs_object'
-              and
-                object_type <> 'content_revision'
-              connect by 
-                prior supertype = object_type
-              start with 
-                object_type = :content_type) types        
-          where 
-            attr.object_type (+) = types.object_type
-          order by 
-            types.inherit_level desc"
+    db_multirow rows get_extended_attributes ""
 
     for { set i 1 } { $i <= ${rows:rowcount} } { incr i } {
         upvar 0 "rows:${i}" row
@@ -507,7 +493,7 @@ ad_proc -public content::insert_element_data {
 
     set last_table ""
     set last_id_column ""
-    template::query insert_element_data rows multirow $query
+    db_multirow rows insert_element_data $query
 
     for { set i 1 } { $i <= ${rows:rowcount} } { incr i } {
         upvar 0 "rows:${i}" row
@@ -726,11 +712,7 @@ ad_proc -public content::add_revision { form_name { tmpfile "" } } {
   ns_set put $bind_vars revision_id $revision_id
 
   # query for content_type and table_name
-  template::query addrev_get_content_type info onerow "
-    select object_type content_type, table_name
-    from acs_object_types
-    where object_type = (select content_type from cr_items 
-                         where item_id = :item_id)"
+  set info [db_1row addrev_get_content_type ""]
 
   set insert_statement [attribute_insert_statement \
 	  $info(content_type) $info(table_name) $bind_vars $form_name]
@@ -1407,19 +1389,7 @@ ad_proc -public content::add_content_element {
 		  [template::element get_value $form_name content_type]
 
 	  # change mime types select widget to only allow text MIME types
-	  template::query get_text_mime_types text_mime_types multilist "
-	    select
-	      label, map.mime_type as value
-	    from
-	      cr_mime_types types, cr_content_mime_type_map map
-	    where
-	      types.mime_type = map.mime_type
-	    and
-	      map.content_type = :content_type
-	    and
-	      lower(types.mime_type) like ('text/%')
-	    order by
-	      label"
+          set text_mime_types [db_list_of_lists get_text_mime_types ""]
 	      
 	  template::element set_properties $form_name mime_type \
 		  -options $text_mime_types
@@ -1485,29 +1455,14 @@ ad_proc content::add_child_relation_element { form_name args } {
   }
 
   # Get the parent type. If the parent is not an item, abort
-  template::query get_parent_type parent_type onevalue "
-    select content_type from cr_items 
-    where item_id = :parent_id
-   " -cache "item_content_type $parent_id" -persistent \
-     -timeout 3600
+  set parent_type [db_string get_parent_type ""]
 
   if { [template::util::is_nil parent_type] } {
     return
   }
 
   # Get a multilist of all valid relation tags
-  template::query get_all_valid_relation_tags options multilist "
-    select 
-      relation_tag as label, relation_tag as value 
-    from 
-      cr_type_children c
-    where
-      content_item.is_subclass(:parent_type, c.parent_type) = 't'
-    and
-      content_item.is_subclass(:content_type, c.child_type) = 't'
-    and
-      content_item.is_valid_child(:parent_id, c.child_type) = 't'
-  " 
+  set options [db_list_of_lists get_all_valid_relation_tags ""]
 
   if { [template::util::is_nil options] } {  
     return
@@ -1515,9 +1470,7 @@ ad_proc content::add_child_relation_element { form_name args } {
 
   # Create the section, if specified
   if { ![template::util::is_nil opts(section)] } {
-    template::query get_parent_title parent_title onevalue "
-      select content_item.get_title(:parent_id) from dual
-    "
+      set parent_title [db_string get_parent_title ""]
 
     if { ![template::util::is_nil parent_title] } {
       template::form section $form_name "Relationship to $parent_title"
@@ -1566,7 +1519,17 @@ ad_proc -private content::get_widget_param_value {
       query {
 	#set content_type content_revision
 	set item_id {}
-	template::query set_content_values value $param(param_type) $param(value)
+        switch $param(param_type) {
+            onevalue {
+                set value [db_string set_content_values $param(value)]
+            }
+            onelist {
+                set value [db_list set_content_values $param(value)]
+            }
+            multilist {
+                set value [db_list_of_lists set_content_values $param(value)]
+            }
+        }
       }
       default {
 	set value $param(value)
@@ -1602,6 +1565,7 @@ ad_proc -private content::get_type_attribute_params { args } {
     lappend in_list [ns_dbquotevalue $object_type]
   }
 
+  
   template::query gtap_get_attribute_data attribute_data nestedlist "
     select
       [join $columns ","]
@@ -1685,14 +1649,7 @@ ad_proc -private content::set_attribute_values { form_name content_type revision
       
   # Query for values from a previous revision
 
-  template::query get_previous_version_values values onerow  "
-    select 
-      [join $columns ", "] 
-    from 
-      [get_type_info $content_type table_name]x
-    where 
-      revision_id = :revision_id
-  "
+  db_1row get_previous_version_values "" -column_array values
 
   # Set the form values, handling dates with the date acquire function
   foreach pair $attr_types {
@@ -1746,16 +1703,15 @@ ad_proc -private content::get_default_content_method { content_type } {
 
 } {
 
-  template::query count_mime_type is_text onevalue "select count(*) from cr_content_mime_type_map
-    where content_type = :content_type and mime_type like 'text/%'"
+    set is_text [db_string count_mime_type ""]
 
-  if { $is_text > 0 } {
-    set content_method text_entry
-  } else {
-    set content_method file_upload
-  }
+    if { $is_text > 0 } {
+        set content_method text_entry
+    } else {
+        set content_method file_upload
+    }
 
-  return $content_method
+    return $content_method
 }
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -1779,25 +1735,12 @@ ad_proc -private content::get_type_info { object_type ref args } {
 
   if { [llength $args] == 0 } {
 
-    template::query get_type_info_1 info onevalue "
-      select 
-        $ref
-      from 
-        acs_object_types 
-      where 
-        object_type = :object_type"
+      set info [db_string get_type_info_1 ""]
 
-    return $info
+      return $info
 
   } else {
-
-    template::query get_type_info_2 $ref onerow "
-      select 
-        [join $args ","]
-      from 
-        acs_object_types 
-      where 
-        object_type = :object_type" -uplevel
+      uplevel 1 "db_1row get_type_info_2 {} -column_array $ref"
   }
 }
 
@@ -1837,30 +1780,11 @@ ad_proc -private content::get_attributes { content_type args } {
 
   if { [llength $args] == 1 } {
     set type onelist
+      set attributes [db_list ga_get_attributes ""]
   } else {
     set type multilist
+      set attributes [db_list_of_lists ga_get_attributes ""]
   }
-
-  template::query ga_get_attributes attributes $type  "
-    select
-      [join $args ","]
-    from
-      acs_attributes,
-      (
-	select 
-	  object_type ancestor, level as type_order
-	from 
-	  acs_object_types
-	connect by 
-	  prior supertype = object_type
-	start with 
-          object_type = :content_type
-      ) types
-    where
-      object_type = ancestor
-    and
-      attribute_name <> 'ldap dn'
-    order by type_order desc, sort_order"
 
   return $attributes
 }
@@ -1878,19 +1802,9 @@ ad_proc -public content::get_attribute_enum_values { attribute_id } {
 
 } {
 
-  template::query gaev_get_enum_values enum multilist "
-           select
-	     nvl(pretty_name,enum_value), 
-	     enum_value
-	   from
-	     acs_enum_values
-	   where
-	     attribute_id = :attribute_id
-	   order by
-	     sort_order"
+    set enum [db_list_of_lists gaev_get_enum_values ""]
 
-
-  return $enum
+    return $enum
 }
 
 ad_proc -public content::get_latest_revision { item_id } {
@@ -1903,10 +1817,9 @@ ad_proc -public content::get_latest_revision { item_id } {
 
 } {
 
-  template::query glr_get_latest_revision latest_revision onevalue "
-    select content_item.get_latest_revision(:item_id) from dual"
+    set latest_revision [db_string glr_get_latest_revision ""]
 
-  return $latest_revision
+    return $latest_revision
 }
 
 
@@ -2040,15 +1953,10 @@ ad_proc -public content::copy_content { revision_id_src revision_id_dest } {
 	}
 	
 	# fetch the mime_type of the source revision
-	template::query cc_get_mime_type mime_type onevalue "
-      select mime_type from cr_revisions where revision_id = :revision_id_src" 
+        set mime_type [db_string cc_get_mime_type ""]
 
 	# copy the mime_type to the destination revision
-	db_dml cc_update_cr_revisions "
-           update cr_revisions
-           set mime_type = :mime_type
-           where revision_id = :revision_id_dest"
-
+	db_dml cc_update_cr_revisions ""
     }
 
 }
@@ -2094,23 +2002,9 @@ ad_proc -public content::validate_name { form_name } {
     set parent_id [template::element get_value $form_name parent_id]
 
     if { [template::util::is_nil parent_id] } {
-	template::query vn_same_name_count1 same_name_count onevalue "
-	  select
-	    count(1)
-	  from
-            cr_items
-          where
-	    name = :name"
+        set same_name_count [db_string vn_same_name_count1 ""]
     } else {
-	template::query vn_same_name_count2 same_name_count onevalue "
-	  select
-            count(1)
-          from
-            cr_items
-          where
-            name = :name
-          and 
-            parent_id = :parent_id"
+        set same_name_count [db_string vn_same_name_count2 ""]
     }
 
     if { $same_name_count > 0 } {

@@ -24,16 +24,7 @@ ad_proc -public cms_rel::sort_related_item_order { item_id } {
     db_transaction {
 
 	# grab all related items ordered by order_n, rel_id
-	template::query srio_get_related_items related_items onelist "
-            select
-              rel_id
-            from
-              cr_item_rels
-            where
-              item_id = :item_id
-            order by
-              order_n, rel_id
-        " 
+        set related_items [db_list srio_get_related_items ""]
 
 	# assign each related items a new order_n
 	set i 0
@@ -68,16 +59,7 @@ ad_proc -public cms_rel::sort_child_item_order { item_id } {
     db_transaction {
 
 	# grab all related items ordered by order_n, rel_id
-	template::query scio_get_child_order child_items onelist "
-            select
-              rel_id
-            from
-              cr_child_rels
-            where
-              parent_id = :item_id
-            order by
-              order_n, rel_id
-        " 
+        set child_items [db_list scio_get_child_order ""]
 
 	# assign each related items a new order_n
 	set i 0

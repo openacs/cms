@@ -73,15 +73,7 @@ ad_proc -public content::check_access { object_id privilege args } {
     set switches ""
   }
 
-  template::query ca_get_perm_list perm_list multilist "
-    select 
-      p.privilege,
-      cms_permission.permission_p (
-        :object_id, :user_id, p.privilege
-      ) as is_granted
-    from 
-      acs_privileges p
-   " -cache "content::check_access $object_id $user_id" -persistent -timeout 300 $switches 
+  set perm_list [db_list_of_lists ca_get_perm_list ""]
     
   template::util::list_of_lists_to_array $perm_list user_permissions
 
@@ -92,9 +84,7 @@ ad_proc -public content::check_access { object_id privilege args } {
     }
 
     # See if the user is even logged in
-    template::query ca_get_user_name user_name onevalue "
-      select screen_name from users where user_id = :user_id
-    " 
+      set user_name [db_string ca_get_user_name ""]
 
     if { [template::util::is_nil user_name] } {
       set msg "You are not logged in. Press Ok to go to the login screen."
@@ -102,14 +92,7 @@ ad_proc -public content::check_access { object_id privilege args } {
     } else {
 
       # Get the error message
-      template::query ca_get_msg_info msg_info onerow "
-	select 
-	  acs_object.name(:object_id) as obj_name, 
-	  pretty_name as perm_name
-	from 
-	  acs_privileges
-	where 
-	  privilege = :privilege" 
+        db_0or1row ca_get_msg_info "" -column_array msg_info
 
       if { ![info exists msg_info] } {
 	set msg "Access Denied: no such privilege $privilege"
@@ -164,11 +147,11 @@ ad_proc -public content::perm_form_generate { form_name_in {passthrough "" } } {
     set permission_options [list]
     set permission_values  [list]
 
-    template::query pfg_execute_gpb permission_boxes multirow $__sql -eval {
-      if { [string equal $row(parent_permission_p) f] } {
-        lappend permission_options [list $row(label) $row(privilege)]
-        if { [string equal $row(permission_p) t] && $is_request } {
-          lappend permission_values $row(privilege)
+    db_multirow permission_boxes pfg_execute_gpb $__sql {
+      if { [string equal $parent_permission_p f] } {
+        lappend permission_options [list $label $privilege]
+        if { [string equal $permission_p t] && $is_request } {
+          lappend permission_values $privilege
         }
       }
     }
@@ -230,10 +213,9 @@ ad_proc -public content::perm_form_process { form_name_in } {
 	  foreach pair $permission_options {
 	      set privilege [lindex $pair 1]
 	      if { [lsearch $permission_values $privilege] >= 0 } {
-		  template::query pfp_grant_permission grant_permission dml $__sql_grant 
-
+                  db_dml pfp_grant_permission $__sql_grant
 	      } else {
-		  template::query pfp_revoke_permission revoke_permission dml $__sql_revoke
+                  db_dml pfp_revoke_permission $__sql_revoke
 	      }
 	  }
 

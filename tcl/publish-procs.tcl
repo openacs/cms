@@ -364,20 +364,7 @@ ad_proc -private publish::track_publish_status {} {
       if { [catch {
 
 	  # Get all ready but nonlive items, make them live
-	  template::query tps_get_items_multilist items multilist "
-            select 
-	      distinct i.item_id, i.live_revision 
-            from 
-      	      cr_items i, cr_release_periods p
-            where
-  	      i.publish_status = 'ready'
-             and
-	      i.live_revision is not null
-             and 
-              i.item_id = p.item_id
-             and
-              (sysdate between p.start_when and p.end_when)
-          "
+          set items [db_list_of_lists tps_get_items_multilist ""]
 
 	  # Have to do it this way, or else "no active select", since
 	  # the other queries will clobber the current query
@@ -389,23 +376,7 @@ ad_proc -private publish::track_publish_status {} {
     
 
 	  # Get all live but expired items, make them nonlive
-	  template::query tps_get_items_onelist items onelist "
-            select 
-  	      distinct i.item_id
-            from 
-  	      cr_items i, cr_release_periods p
-            where
-	      i.publish_status = 'live'
-            and
-  	      i.live_revision is not null
-            and 
-              i.item_id = p.item_id     
-            and 
-	      not exists (select 1 from cr_release_periods p2
-		          where p2.item_id = i.item_id
-		           and (sysdate between p2.start_when and p2.end_when)
-	                 )
-            "
+          set items [db_list tps_get_items_onelist ""]
    
 	  foreach item_id $items {
 	      publish::set_publish_status $db $item_id expired 
