@@ -33,9 +33,7 @@ element create rel_form_2 page_title -label "Page Title" \
 upvar 0 "rel_attrs:rowcount" index
 set index 0
 
-
-template::query get_title item_title onevalue "
-  select content_item.get_title(:item_id) from dual"
+set item_title [db_string get_title ""]
 
 # Create the main multirow datasource
 
@@ -70,16 +68,7 @@ foreach rel $rel_list {
     set form_complete 0
 
     # Get the header
-    template::query get_rel_info onerow "
-      select 
-	content_item.get_title(:item_id) as item_title,
-	content_item.get_title(:related_id) as related_title,
-	pretty_name
-      from
-	acs_object_types
-      where
-	object_type = :relation_type
-    "
+    db_1row get_rel_info "" -column_array rel_info
 
     # Create the form section
     form section rel_form_2 \
@@ -131,14 +120,7 @@ if { [form is_valid rel_form_2] || $form_complete } {
           
           # Insert at the end if no order
           if { [template::util::is_nil order_n] } {
-              template::query get_order order_n onevalue "
-        select 
-	  NVL(max(order_n) + 1, 1) 
-	from 
-	  cr_item_rels
-	where 
-	  item_id = :item_id
-        " 
+              set order_n [db_string get_order ""]
           }
 
           # Perform the insertion

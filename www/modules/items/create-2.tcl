@@ -25,15 +25,7 @@ request set_param is_wizard -datatype keyword -value f
 # permissions check - need cm_new on the parent item
 content::check_access $parent_id cm_new -user_id [User::getID]
 
-template::query get_item new_item onerow "
-  select 
-    NVL(content_item.get_path(:parent_id), '/') as item_path,
-    pretty_name as content_type_name
-  from
-    acs_object_types
-  where
-    object_type = :content_type
-"
+db_0or1row get_item "" -column_array new_item
 
 # validate content_type and parent_id
 if { [template::util::is_nil new_item] } {

@@ -26,8 +26,11 @@
     o.creation_user = p.person_id (+)
   and
     msg is not null
+  and
+    rowid < 11
   order by
     o.creation_date desc
+  
 
       </querytext>
 </fullquery>

@@ -30,14 +30,7 @@ if { [file exists [ns_url2file \
 }
 
 
-template::query get_content_typ_name content_type_name onevalue "
-  select
-    pretty_name
-  from
-    acs_object_types
-  where
-    object_type = :content_type
-"
+set content_type_name [db_string get_content_typ_name ""]
 
 if { [template::util::is_nil content_type_name] } {
     template::request::error bad_content_type \

@@ -4,9 +4,7 @@ request create -params {
   item_id -datatype integer 
 }
 
-template::query get_title item_title onevalue "
-  select content_item.get_title(:item_id) from dual
-"
+set item_title [db_string get_title ""]
 
 form create add_comment -elements "
   journal_id -datatype integer -widget hidden
@@ -18,10 +16,8 @@ form create add_comment -elements "
 "
 
 if { [form is_request add_comment] } {
-  template::query get_journal_id journal_id onevalue "
-    select acs_object_id_seq.nextval from dual
-  "
-  element set_properties add_comment journal_id -value $journal_id
+    set journal_id [db_string get_journal_id ""]
+    element set_properties add_comment journal_id -value $journal_id
 }
 
 if { [form is_valid add_comment] } {

@@ -9,9 +9,7 @@ request set_param passthrough -datatype text -optional -value [content::assemble
 
 db_transaction {
     # Get the irelated items
-    template::query get_rel_info rel_info onerow "
-  select parent_id as item_id, order_n from cr_child_rels 
-  where rel_id = :rel_id" 
+    db_0or1row get_rel_info "" -column_array rel_info
 
     if { ![info exists rel_info] } {
         db_abort_transaction
@@ -26,24 +24,10 @@ db_transaction {
 
     if { [string equal $order up] } {
         # Get the previous item's order
-        template::query get_prev_swap_rel swap_rel onerow "
-    select rel_id, order_n from cr_child_rels r1
-    where r1.parent_id = :item_id
-    and r1.order_n < :order_n 
-    and not exists (select order_n from cr_child_rels r2
-                    where r2.parent_id = :item_id
-                    and r2.order_n < :order_n
-                    and r2.order_n > r1.order_n)" 
+        db_0or1row get_prev_swap_rel "" -column_array swap_rel
     } else {
         # Get the next item's order
-        template::query get_next_swap_rel swap_rel onerow "
-    select rel_id, order_n from cr_child_rels r1
-    where r1.parent_id = :item_id
-    and r1.order_n > :order_n 
-    and not exists (select order_n from cr_child_rels r2
-                    where r2.parent_id = :item_id
-                    and r2.order_n > :order_n
-                    and r2.order_n < r1.order_n)" 
+        db_0or1row get_next_swap_rel "" -column_array swap_rel
     }
 
     # Only need to perform DML if the rel is not already at the top/bottom

@@ -24,9 +24,7 @@ request set_param page -datatype integer -optional -value 1
 
 
 # resolve any symlinks
-template::query get_item_id resolved_item_id onevalue "
-  select content_symlink.resolve(:item_id) from dual
-" -cache "symlink_resolve $item_id" -persistent
+set resolved_item_id [db_string get_item_id ""]
 
 set item_id $resolved_item_id
 
@@ -36,16 +34,7 @@ content::check_access $item_id cm_examine \
   -return_url "modules/sitemap/index" 
 
 # query the content_type of the item ID so we can check for a custom info page
-template::query get_info info onerow "
-  select 
-    content_type, latest_revision
-  from 
-    cr_items 
-  where 
-   item_id = :item_id"
-
-template::util::array_to_vars info
-
+db_1row get_info ""
 
 # build the path to the custom interface directory for this content type
 

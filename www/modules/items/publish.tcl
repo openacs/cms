@@ -8,19 +8,7 @@ set root_path [ns_info pageroot]
 
 db_transaction {
 
-    template::query get_iteminfo iteminfo onerow "
-  select
-    item_id,
-    content_item.is_publishable( item_id ) as publish_p
-  from
-    cr_revisions
-  where
-    revision_id = :revision_id
-" 
-
-
-    template::util::array_to_vars iteminfo
-    # item_id, publish_p
+    db_1row get_iteminfo ""
 
     if { [string equal $publish_p t] } {
 

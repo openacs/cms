@@ -28,6 +28,7 @@
     msg is not null
   order by
     o.creation_date desc
+  limit 10
 
       </querytext>
 </fullquery>

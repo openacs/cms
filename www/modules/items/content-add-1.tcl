@@ -4,19 +4,7 @@
 request create
 request set_param revision_id -datatype integer
 
-
-template::query get_revision one_revision onerow "
-  select
-    i.item_id, content_type, title as name, mime_type
-  from
-    cr_revisions r, cr_items i
-  where
-    i.item_id = r.item_id
-  and
-    r.revision_id = :revision_id
-" 
-
-template::util::array_to_vars one_revision
+db_1row get_revision_one ""
 
 # permissions check - must have cm_write on the item
 content::check_access $item_id cm_write -user_id [User::getID]

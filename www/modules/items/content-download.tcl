@@ -8,16 +8,7 @@ template::request set_param revision_id -datatype integer
 
 set user_id [User::getID]
 
-template::query get_iteminfo iteminfo onerow "
-  select
-    item_id, content_revision.is_live( revision_id ) is_live
-  from
-    cr_revisions
-  where
-    revision_id = :revision_id
-"
-
-template::util::array_to_vars iteminfo
+db_1row get_iteminfo ""
 
 # item_id, is_live
 

@@ -13,18 +13,8 @@ content::check_access $item_id cm_examine \
   -request_error
 
 
-template::query get_name name onevalue "select name from cr_items where item_id = :item_id"
+set name [db_string get_name ""]
 
-template::query get_keywords keywords multirow "select
-             keyword_id,
-             content_keyword.get_heading(keyword_id) heading,
-             NVL(content_keyword.get_description(keyword_id),
-                '-') description
-           from
-             cr_item_keyword_map
-           where
-             item_id = :item_id
-           order by
-             heading"
+db_multirow get_keywords ""
 
 set page_title "Content Keywords for $name"

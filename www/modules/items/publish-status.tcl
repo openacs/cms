@@ -9,19 +9,7 @@ content::check_access $item_id cm_examine -user_id [User::getID]
 
 # Query for publish status and release schedule, if any
 
-template::query get_info info onerow "
-  select
-    NVL(initcap(publish_status), 'Production') publish_status, 
-    NVL(to_char(start_when, 'MM/DD/YY HH:MI AM'), 'Immediate') start_when,
-    NVL(to_char(end_when, 'MM/DD/YY HH:MI AM'), 'Indefinite') end_when,
-    content_item.is_publishable(:item_id) is_publishable,
-    live_revision
-  from
-    cr_items i, cr_release_periods r
-  where
-    i.item_id = :item_id
-  and
-    i.item_id = r.item_id (+)"
+db_string get_info "" -column_array info
 
 # Build a sentence describing the publishing status
 
@@ -60,15 +48,7 @@ switch $info(publish_status) {
 
 # determine whether the item is publishable or not
 
-template::query get_publish_info publish_info onerow "
-  select 
-    content_item.is_publishable( item_id ) is_publishable, 
-    live_revision
-  from
-    cr_items
-  where
-    item_id = :item_id
-" 
+db_1row get_publish_info ""
 
 template::util::array_to_vars publish_info
 
@@ -80,9 +60,7 @@ if { [template::util::is_nil live_revision] } {
 
 # determine if there is an unfinished workflow
 
-template::query unfinished_exists unfinished_workflow_exists onevalue "
-  select content_workflow.unfinished_workflow_exists( :item_id ) from dual
-" 
+set unfinished_workflow_exists [db_string unfinished_exists ""]
 
 # determine if child type constraints have been satisfied
 

@@ -10,14 +10,7 @@ db_transaction {
 
     # get all the parent_id's of the items being deleted
     #   because we need to flush the paginator cache for each of these folders
-    template::query flush flush_list onelist "
-  select
-    parent_id
-  from
-    cr_resolved_items
-  where
-    resolved_id = :item_id
-" 
+    set flush_list [db_list flush ""]
 
     db_exec_plsql item_delete "
   begin 

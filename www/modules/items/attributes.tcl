@@ -39,8 +39,7 @@ content::check_access $info(item_id) cm_examine \
 
 set content_type $type_info(object_type)
 
-db_multirow attributes get_attributes ""
-template::query get_attributes attributes multirow ""  {
+db_multirow attributes get_attributes ""{
   
     if { [catch { set value $info($attribute_name) } errmsg] } {
 	# catch - value doesn't exist
