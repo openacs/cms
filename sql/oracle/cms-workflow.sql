@@ -971,7 +971,7 @@ as
       t.task_id = notify_of_checkout.task_id;
 
     -- send out the request
-    v_request_id := nt.post_request (
+    v_request_id := acs_mail_nt.post_request (
         party_from   => notify_of_checkout.holding_user_new,
         party_to     => notify_of_checkout.holding_user_old,
         expand_group => 'f',

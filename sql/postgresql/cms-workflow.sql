@@ -921,19 +921,17 @@ begin
     and
       t.task_id = p_task_id;
 
-   -- FIXME: not ported yet.
-/*
     -- send out the request
-    v_request_id := nt.post_request (
-        party_from   => p_holding_user_new,
-        party_to     => p_holding_user_old,
-        expand_group => ''f'',
-        subject      => v_hold_user_new || '' stole the lock for '' ||
-		        v_transition_name || '' of '' || v_item_name,
-        message      => ''Dear '' || v_hold_user_old || '',\n'' ||
-                         p_msg
+    v_request_id := acs_mail_nt__post_request (
+        p_holding_user_new,                               -- party_from
+        p_holding_user_old,                               -- party_to
+        ''f'',                                            -- expand_group
+        v_hold_user_new || '' stole the lock for '' ||
+		  v_transition_name || '' of '' || v_item_name,   -- subject
+        ''Dear '' || v_hold_user_old || '',\n'' || p_msg, -- message
+        0                                                 -- max_retries
     );
-*/
+
     return 0; 
 end;' language 'plpgsql';
 
