@@ -9,10 +9,9 @@ if { [template::util::is_nil parent_id] } {
   set parent_id [cm::modules::templates::getRootFolderID]
 }
 
-template::query get_folder_name folder_name onevalue "
-  select name from cr_items where item_id = :parent_id"
+set folder_name [db_string get_folder_name "" -default ""]
 
-if { [util::is_nil folder_name] } {
+if { [string equal $folder_name ""] } {
     set folder_name "/"
 }
 
@@ -32,7 +31,7 @@ set parent_id [element get_value create_template parent_id]
 if { [form is_request create_template] } {
 
     # to avoid dupe submits
-    template::query get_template_id template_id onevalue "select acs_object_id_seq.nextval from dual"
+    set template_id [db_string get_template_id ""]
     element set_properties create_template template_id -value $template_id
 }
 

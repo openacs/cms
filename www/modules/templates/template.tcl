@@ -18,27 +18,23 @@ set root_id [cm::modules::templates::getRootFolderID]
 
 
 # resolve any symlinks
-template::query get_id resolved_template_id onevalue "
-  select content_symlink.resolve(:template_id) from dual
-" 
+set resolved_template_id [db_string get_id ""]
 
 set template_id $resolved_template_id
 
 # get the path
-template::query get_path path onevalue "
-  select content_item.get_path(:template_id, :root_id) from dual
-" 
+set path [db_string get_path "" -default ""]
 
 # check for valid template_id
-if { [template::util::is_nil path] } {
+if { [string equal $path ""] } {
   ns_log Notice "/templates/template.tcl - BAD TEMPLATE_ID - $template_id"
   template::forward "../sitemap/index?mount_point=templates&id="
 }
 
 
 # get the context bar info
-
-template::query context multirow "select
+# FIXME: postgresql query needs to be fixed
+template::query get_context context multirow "select
       t.tree_level, t.context_id, content_item.get_title(t.context_id) as title
     from (
       select 

@@ -35,5 +35,29 @@
       </querytext>
 </fullquery>
 
- 
+<fullquery name="get_items">      
+      <querytext>
+
+select
+      t.tree_level, t.context_id, content_item.get_title(t.context_id) as title
+    from (
+      select 
+        context_id, level as tree_level
+      from 
+        acs_objects
+      where
+        context_id <> 0
+      connect by
+        prior context_id = object_id
+      start with
+        object_id = :template_id
+      ) t, cr_items i
+    where
+      i.item_id = t.context_id
+    order by
+      tree_level desc
+
+       </querytext>
+</fullquery>
+
 </queryset>

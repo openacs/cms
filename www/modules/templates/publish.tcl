@@ -4,14 +4,7 @@ request create -params {
 
 
 # query for the path and ID of the template
-
-template::query get_info info onerow "
-  select 
-    content_item.get_path(item_id) path, item_id 
-  from 
-    cr_items 
-  where item_id = (
-    select item_id from cr_revisions where revision_id = :revision_id)"
+db_1row get_info "" -column_array info
 
 # write the template to the file system
 
