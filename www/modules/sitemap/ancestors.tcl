@@ -110,10 +110,11 @@ if { [catch {
 }
 
 #set preview_path [ns_normalizepath "$root_path/$preview_path"]
-set preview_path [ns_normalizepath "/$preview_path"]
+set preview_path [ns_normalizepath "/acs-content-repository/$preview_path"]
 
-
+ns_log Notice "mount_point = $mount_point"
 if { [string equal $mount_point sitemap] } {
+    ns_log Notice "is_folder = $is_folder, has_index_page = $has_index_page"
     if { [string equal $is_folder t] && [string equal $has_index_page t] } {
 	set preview_p t
     } elseif { ![string equal $is_folder t] && \
@@ -121,6 +122,7 @@ if { [string equal $mount_point sitemap] } {
 	    set preview_p t
     }
 }
+ns_log Notice "preview_p = $preview_p"
 # an item cannot be previewed if it has no associated template
 if { [string equal $has_index_page t] } {
     template::query get_template_id template_id onevalue "
