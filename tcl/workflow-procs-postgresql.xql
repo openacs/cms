@@ -3,6 +3,47 @@
 <queryset>
    <rdbms><type>postgresql</type><version>7.1</version></rdbms>
 
+
+<fullquery name="workflow::notify_of_assignments.notify">      
+      <querytext>
+
+	   select acs_mail_nt__post_request(
+	      :user_id,
+	      :party_id,
+	      :subject,
+	      :message
+	  );
+
+      </querytext>
+</fullquery>
+
+<fullquery name="workflow::notify_admin_of_new_tasks.notify">      
+      <querytext>
+
+	   select acs_mail_nt__post_request(
+	      -1,
+	      :admin_id,
+	      :subject,
+	      :message
+	  );
+
+      </querytext>
+</fullquery>
+
+<fullquery name="workflow::notify_admin_of_finished_task.notify">      
+      <querytext>
+
+	   select acs_mail_nt__post_request(
+	      -1,
+	      :admin_id,
+	      :subject,
+	      :message
+	  );
+
+      </querytext>
+</fullquery>
+
+
 <fullquery name="workflow::notify_of_assignments.noa_get_assignments">      
       <querytext>
       

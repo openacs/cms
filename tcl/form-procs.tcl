@@ -881,6 +881,7 @@ ad_proc -public content::upload_content { revision_id tmpfile filename } {
 
     # if it is HTML then strip out the body
     set mime_type [ns_guesstype $filename]
+    ns_log Notice "guessed mime_type: $mime_type, filename = $filename"
     if { [string equal $mime_type text/html] } {
 	set text [template::util::read_file $tmpfile]
 	if { [regexp {<body[^>]*>(.*?)</body>} $text x body] } {
@@ -920,15 +921,17 @@ ad_proc -public content::upload_content { revision_id tmpfile filename } {
              returning content into :1" -blob_files [list $tmpfile]
     }
 
+    # this seems to abort the transaction even with the catch.
+
     # update mime_type to match the file 
-    if { [catch {db_dml update_mime_type "
-      update cr_revisions 
-        set mime_type = :mime_type 
-        where revision_id = :revision_id"} errmsg] } {
-	#  if it fails, use user submitted mime_type
-	ns_log notice "form-procs - add_revision_dml - using user mime_type 
-	  instead of guessed mime type = $mime_type"
-    }
+#     if { [catch {db_dml update_mime_type "
+#       update cr_revisions 
+#         set mime_type = :mime_type 
+#         where revision_id = :revision_id"} errmsg] } {
+# 	#  if it fails, use user submitted mime_type
+# 	ns_log notice "form-procs - add_revision_dml - using user mime_type 
+# 	  instead of guessed mime type = $mime_type"
+#     }
 
     # delete the tempfile
     ns_unlink $tmpfile
