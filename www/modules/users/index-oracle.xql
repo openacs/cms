@@ -51,7 +51,7 @@
     and
       (aru.member_state <> 'deleted' or aru.member_state is null)
     order by
-      upper(pretty_name
+      upper(pretty_name)
 
       </querytext>
 </partialquery>

@@ -936,7 +936,7 @@ as
     v_hold_user_old	varchar(100);
     v_hold_user_new	varchar(100);
     v_transition_name	wf_transitions.transition_name%TYPE;
-    v_request_id	nt_requests.request_id%TYPE;
+    v_request_id	acs_mail_queue_messages.message_id%TYPE;
     v_item_name		varchar(100);
   begin
 

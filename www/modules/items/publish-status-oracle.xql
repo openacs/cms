@@ -53,7 +53,7 @@
     child_type, relation_tag, min_n, 
     o.pretty_name as child_type_pretty, 
     o.pretty_plural as child_type_plural, 
-    case when max_n = null then '-' else max_n end max_n,
+    case when max_n = null then '-' else to_char(max_n) end as max_n,
     (
       select
         count(*)
@@ -65,7 +65,7 @@
         content_item.get_content_type( child_id ) = c.child_type
       and
         relation_tag = c.relation_tag
-    ) child_count
+    ) as child_count
   from
     cr_type_children c, cr_items i, acs_object_types o
   where
@@ -87,7 +87,7 @@
     target_type, relation_tag, min_n, 
     o.pretty_name as target_type_pretty,
     o.pretty_plural as target_type_plural,
-    case when max_n = null then '-' else max_n end max_n,
+    case when max_n = null then '-' else to_char(max_n) end max_n,
     (
       select
         count(*)

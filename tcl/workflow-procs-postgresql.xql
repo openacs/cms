@@ -21,7 +21,7 @@
       <querytext>
 
 	   select acs_mail_nt__post_request(
-	      -1,
+	      null,
 	      :admin_id,
 	      :subject,
 	      :message
@@ -34,7 +34,7 @@
       <querytext>
 
 	   select acs_mail_nt__post_request(
-	      -1,
+	      null,
 	      :admin_id,
 	      :subject,
 	      :message
@@ -140,7 +140,7 @@
 
 	  begin
 	    return acs_mail_nt__post_request(
-	        -1,           -- party_from
+	        null,           -- party_from
 	        :admin_id,    -- party_to
 	        'f',          -- expand_group
 	        :subject,     -- subject
@@ -196,7 +196,7 @@
 
 	  begin
 	    return acs_mail_nt__post_request(
-	        -1,           -- party_from
+	        null,           -- party_from
 	        :admin_id,    -- party_to
 	        'f',          -- expand_group
 	        :subject,     -- subject

@@ -31,7 +31,7 @@
  
 <fullquery name="get_revisions">      
       <querytext>
-      pagination::paginate_query "
+
   select 
     revision_id, 
     trim(title) as title, 
@@ -42,7 +42,7 @@
   where 
     r.item_id = $item_id
   order by
-    revision_number desc" $page
+    revision_number desc
       </querytext>
 </fullquery>
 

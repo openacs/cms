@@ -183,13 +183,13 @@
       </querytext>
 </fullquery>
  
-<fullquery name="content::upload_content.upload_revision">      
+<fullquery name="content::upload_content.upload_file_revision">      
       <querytext>
 
 
         update cr_revisions 
-        set content = '[read [set __f [open $tmpfile r]]] [close $__f]',
-        content_length = '[file size $tmpfile]'
+        set content = '[set file_path [cr_create_content_file $item_id $revision_id $tmpfile]]',
+        content_length = '[cr_file_size $file_path]'
         where revision_id = :revision_id
 
       </querytext>
@@ -219,6 +219,46 @@
       
       </querytext>
 </fullquery>
+
+
+<fullquery name="content::update_content_from_file.upload_file_revision">      
+      <querytext>
+
+
+        update cr_revisions 
+        set content = '[set file_path [cr_create_content_file $item_id $revision_id $tmpfile]]',
+        content_length = '[cr_file_size $file_path]'
+        where revision_id = :revision_id
+
+      </querytext>
+</fullquery>
+
+<fullquery name="content::update_content_from_file.upload_text_revision">      
+      <querytext>
+
+        update 
+          cr_revisions 
+        set 
+          content = '[DoubleApos [read [set __f [open $tmpfile r]]]][close $__f]',
+          content_length = [file size $tmpfile]
+        where 
+          revision_id = :revision_id
+      
+      </querytext>
+</fullquery>
+
+
+<fullquery name="content::update_content_from_file.upload_revision">      
+      <querytext>
+
+             update cr_revisions 
+             set content = [set __lob_id [db_string new_lob "select empty_lob()"]]
+             where revision_id = :revision_id
+      
+      </querytext>
+</fullquery>
+
+
 
 
 <partialquery name="content::get_sql_value.string_to_timestamp">

@@ -164,11 +164,12 @@
 </fullquery>
 
 
-<fullquery name="content::upload_content.upload_revision">      
+<fullquery name="content::upload_content.upload_file_revision">      
       <querytext>
       update cr_revisions 
-      set content = empty_blob() where revision_id = :revision_id
-      returning content into :1
+      set content ='[set file_path [cr_create_content_file $item_id $revision_id $tmpfile]]',
+      content_length = [cr_file_size $file_path]
+      where revision_id = :revision_id
       </querytext>
 </fullquery>
 

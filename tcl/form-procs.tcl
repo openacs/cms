@@ -1993,13 +1993,38 @@ ad_proc -private content::update_content_from_file { revision_id tmpfile } {
 
 } {
 
+    db_1row get_storage_type {select 
+                                storage_type, item_id 
+                              from 
+                                cr_items 
+                              where 
+                                item_id = (select 
+                                             item_id 
+                                           from 
+                                             cr_revisions 
+                                           where revision_id = :revision_id)}
 
-  db_dml upcff_update_cr_revisions "
-    update cr_revisions 
-    set content = empty_blob() where revision_id = :revision_id
-    returning content into :1" -blob_files [list $tmpfile]
+    if {[string equal $storage_type file]} {
+        db_dml upload_file_revision "
+                             update cr_revisions 
+                             set content = '[set file_path [cr_create_content_file $item_id $revision_id $tmpfile]]',
+                             content_length = [cr_file_size $file_path]
+                             where revision_id = :revision_id"
+    } elseif {[string equal $storage_type text]} {
+        # upload the file into the revision content
+        db_dml upload_text_revision "update cr_revisions 
+             set content = empty_blob() where revision_id = :revision_id
+             returning content into :1" -blob_files [list $tmpfile]
 
-  ns_unlink $tmpfile
+    } else {
+        # upload the file into the revision content
+        db_dml upload_revision "update cr_revisions 
+             set content = empty_blob() where revision_id = :revision_id
+             returning content into :1" -blob_files [list $tmpfile]
+    }
+
+    # delete the tempfile
+    ns_unlink $tmpfile
 }
 
 

@@ -15,7 +15,7 @@ select
            where
              item_id = :item_id
            order by
-             heading"
+             heading
       </querytext>
 </fullquery>
 
