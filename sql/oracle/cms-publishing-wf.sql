@@ -11,7 +11,7 @@
 /*
  * Cases table
  */
-create table cr_workflows (
+create table publishing_wf_cases (
   case_id               integer primary key
                         references wf_cases on delete cascade
 );
@@ -29,7 +29,7 @@ begin
         pretty_plural => 'Simple Publishing Workflows', 
         description => 'A simple linear workflow for authoring,
                           editing and scheduling content items.', 
-        table_name => 'cr_workflows'
+        table_name => 'publishing_wf_cases'
     );
 end;
 /
