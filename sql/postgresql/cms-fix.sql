@@ -13,7 +13,7 @@ update cm_form_widget_params
 -- content_module inherit from content_item
 -- this way it is possible to grant permissions on content modules
 
-create function inline_0 ()
+create or replace function inline_0 ()
 returns integer as '
 declare
   v_user_id             users.user_id%TYPE;

@@ -7,7 +7,7 @@
       <querytext>
 
   select
-    t.pretty_name, c.child_type
+    distinct t.pretty_name, c.child_type
   from
     acs_object_types t, cr_type_children c
   where

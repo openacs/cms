@@ -3,7 +3,7 @@
 
 
 /* insert form widgets and params */
-create function inline_0 ()
+create or replace function inline_0 ()
 returns integer as '
 begin
 
@@ -94,7 +94,7 @@ drop function inline_0 ();
 
 -- show errors
 
-create function inline_1 ()
+create or replace function inline_1 ()
 returns integer as '
 begin
 
@@ -123,7 +123,7 @@ drop function inline_1 ();
 
 
 
-create function inline_2 ()
+create or replace function inline_2 ()
 returns integer as '
 begin
 
@@ -188,7 +188,7 @@ drop function inline_2 ();
 
 /* Register attribute widgets for content_revision and image */
 
-create function inline_3 ()
+create or replace function inline_3 ()
 returns integer as '
 begin
   -- register form widgetes for content revision attributes
@@ -302,7 +302,7 @@ drop function inline_3 ();
 
 
 
-create function inline_4 ()
+create or replace function inline_4 ()
 returns integer as '
 begin
 

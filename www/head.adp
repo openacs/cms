@@ -17,8 +17,9 @@
 <tr>
   <th valign=top align=left nowrap>My Workspace: @name@</th>
   <td align=right nowrap>
-  <a href="help.adp">Help</a> | 
-  <a href="prefs.adp">Preferences</a> | 
+  <!-- JCD: Not implemented : 
+  <a href="help">Help</a> | 
+  <a href="prefs">Preferences</a> | -->
   <a href="signout" target="_parent">Sign Out</a></td>
 </tr>
 </table></td></tr>

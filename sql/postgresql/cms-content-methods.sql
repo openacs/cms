@@ -125,7 +125,7 @@ as
 
 -- create or replace package body content_method as
 -- function get_method
-create function content_method__get_method (varchar)
+create or replace function content_method__get_method (varchar)
 returns varchar as '
 declare
   p_content_type                alias for $1;  
@@ -173,7 +173,7 @@ end;' language 'plpgsql';
 
 
 -- function is_mapped
-create function content_method__is_mapped (varchar,varchar)
+create or replace function content_method__is_mapped (varchar,varchar)
 returns boolean as '
 declare
   p_content_type          alias for $1;  
@@ -193,7 +193,7 @@ end;' language 'plpgsql';
 
 
 -- procedure add_method
-create function content_method__add_method (varchar,varchar,boolean)
+create or replace function content_method__add_method (varchar,varchar,boolean)
 returns integer as '
 declare
   p_content_type                alias for $1;  
@@ -234,7 +234,7 @@ end;' language 'plpgsql';
 
 
 -- procedure add_all_methods
-create function content_method__add_all_methods (varchar)
+create or replace function content_method__add_all_methods (varchar)
 returns integer as '
 declare
   p_content_type    alias for $1;  
@@ -262,7 +262,7 @@ end;' language 'plpgsql';
 
 
 -- procedure set_default_method
-create function content_method__set_default_method (varchar,varchar)
+create or replace function content_method__set_default_method (varchar,varchar)
 returns integer as '
 declare
   p_content_type      alias for $1;  
@@ -284,7 +284,7 @@ end;' language 'plpgsql';
 
 
 -- procedure unset_default_method
-create function content_method__unset_default_method (varchar)
+create or replace function content_method__unset_default_method (varchar)
 returns integer as '
 declare
   p_content_type   alias for $1;  
@@ -299,7 +299,7 @@ end;' language 'plpgsql';
 
 
 -- procedure remove_method
-create function content_method__remove_method (varchar,varchar)
+create or replace function content_method__remove_method (varchar,varchar)
 returns integer as '
 declare
   p_content_type      alias for $1;  

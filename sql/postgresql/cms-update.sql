@@ -1,6 +1,6 @@
 
 -- Modify permissions to include the cm_relate permission
-create function inline_0 ()
+create or replace function inline_0 ()
 returns integer as '
 declare
   v_exists integer;
@@ -33,7 +33,7 @@ drop function inline_0 ();
 -- This parent_id column was not included in the cr_keywords table
 -- for RC 0.  Ensure this column is there.
 
-create function inline_1 ()
+create or replace function inline_1 ()
 returns integer as '
 begin
 
@@ -63,7 +63,7 @@ drop function inline_1 ();
 -- show errors
 
 -- Drop the broken trigger, if any
-create function inline_2 ()
+create or replace function inline_2 ()
 returns integer as '
 begin
   -- FIXME: DCW - can''t locate where this trigger is created.  Need a table

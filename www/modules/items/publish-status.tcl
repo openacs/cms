@@ -84,7 +84,7 @@ db_multirow -extend {is_fulfilled difference direction} child_types get_child_ty
 	set difference [expr $min_n - $child_count]
 	set direction more
     }
-    if { ![string equal $max_n -] && $child_count > $max_n } {
+    if { ![string equal {} $max_n] && $child_count > $max_n } {
 	set row(is_fulfilled) f
 	incr unpublishable_child_types
 	set difference [expr $child_count - $max_n]
@@ -116,7 +116,7 @@ db_multirow  -extend {is_fulfilled difference direction} rel_types get_rel_types
 	set difference [expr $min_n - $rel_count]
 	set direction more
     }
-    if { ![string equal $max_n -] && $rel_count > $max_n } {
+    if { ![string equal {} $max_n] && $rel_count > $max_n } {
 	set is_fulfilled f
 	incr unpublishable_rel_types
 	set difference [expr $rel_count - $max_n]

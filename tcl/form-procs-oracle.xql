@@ -159,7 +159,7 @@
 <fullquery name="content::new_item.get_item_id">
 	<querytext>
         begin 
-          :item_id := content_item.new( [join $params ","] );
+          :1 := content_item.new( [join $params ","] );
         end;
         </querytext>
 </fullquery>
@@ -186,8 +186,7 @@
       <querytext>
 
       update cr_revisions 
-      set filename ='[cr_create_content_file $item_id $revision_id $tmpfile]',
-      content_length = [file size $tmpfile]
+      set filename =:file_path, content_length = :file_size
       where revision_id = :revision_id
     
       </querytext>
@@ -237,7 +236,7 @@
     and
       content_item.is_subclass(:content_type, c.child_type) = 't'
     and
-      content_item.is_valid_child(:parent_id, c.child_type) = 't'
+      content_item.is_valid_child(:parent_id, c.child_type, relation_tag) = 't'
 
 	</querytext>
 </fullquery>
@@ -277,8 +276,6 @@
       ) types
     where
       object_type = ancestor
-    and
-      attribute_name <> 'ldap dn'
     order by type_order desc, sort_order
 
 	</querytext>

@@ -48,50 +48,52 @@ if { ![util::is_nil id] } {
   # Could fail because of some SQL error or because the procedure does not exist
 
   if { [catch { 
-    set items:rowcount 0
-    cm::modules::${id}::getSortedPaths items $item_id_list \
-      [cm::modules::${id}::getRootFolderID] {
-        switch $row(item_type) {
-          content_template { 
-	    set row(url) "../templates/properties?id=$row(item_id)"
+      cm::modules::${id}::getSortedPaths items $item_id_list \
+          [cm::modules::${id}::getRootFolderID]
+
+      template::multirow extend items url
+      template::multirow foreach items { 
+          switch $item_type {
+              content_template { 
+                  set url "../templates/properties?id=$item_id"
+              }
+              party {
+                  set url "../$id/index?id="
+              }
+              user {
+                  set url "../$id/one-user?id=$item_id"
+              }
+              default {
+                  set url "../$id/index?id=$item_id"
+              }
           }
-	  party {
-	    set row(url) "../$id/index?id="
-	  }
-	  user {
-	    set row(url) "../$id/one-user?id=$row(item_id)"
-	  }
-          default {
-            set row(url) "../$id/index?id=$row(item_id)"
-	  }
-	}
-	# this is for all items in the sitemap that need to be listed under the
-	# item folder
-	if {$id == "sitemap" && $row(item_type) != "content_folder"} {
-	  set row(url) "../items/index?item_id=$row(item_id)"
-	}
-        append row(url) "&mount_point=$id"
+          # this is for all items in the sitemap that need to be listed under the
+          # item folder
+          if {$id == "sitemap" && $item_type != "content_folder"} {
+              set url "../items/index?item_id=$item_id"
+          }
+          append url "&mount_point=$id"
       }
   } errmsg ] } {
-    # Process the list manually. Path information will not be shown, but at least
-    # the names will be
-    ns_log notice "CLIPBOARD ERROR: $errmsg"
-    set items:rowcount 0
-    foreach item_id $item_id_list {
-      incr items:rowcount
-      upvar 0 "items:${items:rowcount}" row
-      set row(rownum) ${items:rowcount}
-      set row(item_id) $item_id        
-      if { [string equal $item_id "content_revision"] && [string equal $id "types"] } {
-        set link_id ""
-        set row(item_path) "Basic Item"
-      } else {
-        set link_id $row(item_id)
-        set row(item_path) [folderAccess name [getFolder $user_id $id $link_id state]]
+      # Process the list manually. Path information will not be shown, but at least
+      # the names will be
+
+      ns_log Warning "CLIPBOARD ERROR: $errmsg"
+      template::multirow create items item_id item_path item_type url
+
+      foreach item_id $item_id_list {
+          if { [string equal $item_id "content_revision"] && [string equal $id "types"] } {
+              set link_id ""
+              set item_path "Basic Item"
+          } else {
+              set link_id $item_id
+              set item_path [folderAccess name [getFolder $user_id $id $link_id state]]
+          } 
+          set item_type ""
+          set url "../$id/index?id=$link_id"
+          
+          template::multirow append items $item_id $item_path $item_type $url
       }
-      set row(item_type) ""
-      set row(url) "../$id/index?id=$link_id"
-    }
   }
 }
 

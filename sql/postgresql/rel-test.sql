@@ -18,7 +18,7 @@ create table cr_directional_rels (
                  check (direction in ('in', 'out'))
 ); 
 
-create function inline_0 () returns integer as '
+create or replace function inline_0 () returns integer as '
 declare
   attr_id       integer;
 begin
@@ -95,7 +95,7 @@ create table cr_weighted_rels (
   weight_b       integer not null
 ); 
 
-create function inline_1 () returns integer as '
+create or replace function inline_1 () returns integer as '
 declare
   attr_id       integer;
 begin

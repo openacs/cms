@@ -39,14 +39,16 @@ content::check_access $info(item_id) cm_examine \
 
 set content_type $type_info(object_type)
 
-db_multirow attributes get_attributes "" {
-  
+db_multirow -extend attribute_value attributes get_attributes "" {
+
     if { [catch { set value $info($attribute_name) } errmsg] } {
 	# catch - value doesn't exist
 	set value "-"
     } 
 
-    if { [string equal $value {}] } { set value "-" } 
+    if { [string equal $value {}] } {
+        set value "-" 
+    }
 
     set attribute_value $value
 }

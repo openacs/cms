@@ -26,7 +26,7 @@
 </fullquery>
 
  
-<fullquery name="get_names">      
+<fullquery name="get_name">      
       <querytext>
       
       select

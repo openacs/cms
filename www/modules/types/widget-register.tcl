@@ -5,7 +5,7 @@ request set_param attribute_id -datatype integer
 request set_param content_type -datatype keyword
 request set_param widget -datatype keyword -optional
 
-seet module_id [db_string get_module_id ""]
+set module_id [db_string get_module_id ""]
 
 # permissions check - need cm_write on types module to edit a widget
 content::check_access $module_id cm_write -user_id [User::getID] 

@@ -182,14 +182,13 @@
                      
       </querytext>
 </fullquery>
- 
+
 <fullquery name="content::upload_content.upload_file_revision">      
       <querytext>
 
 
         update cr_revisions 
-        set content = '[set file_path [cr_create_content_file $item_id $revision_id $tmpfile]]',
-        content_length = '[cr_file_size $file_path]'
+        set content = :file_path, content_length = :file_size
         where revision_id = :revision_id
 
       </querytext>
@@ -329,8 +328,6 @@
       ) types
     where
       object_type = ancestor
-    and
-      attribute_name <> 'ldap dn'
     order by type_order desc, sort_order
 
 	</querytext>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <queryset>
 
-<fullquery name="cms_rel::sort_related_item_order.srio_get_related_items">      
+<fullquery name="cms_rel::sort_related_item_order.get_related_items">      
       <querytext>
       
             select
@@ -16,8 +16,17 @@
       </querytext>
 </fullquery>
 
+
+<fullquery name="cms_rel::sort_related_item_order.reorder">      
+      <querytext>
+  	        update cr_item_rels
+                  set order_n = :i
+                  where rel_id = :rel_id
+      </querytext>
+</fullquery>
+
  
-<fullquery name="cms_rel::sort_child_item_order.scio_get_child_order">      
+<fullquery name="cms_rel::sort_child_item_order.get_child_order">      
       <querytext>
       
             select
@@ -32,5 +41,12 @@
       </querytext>
 </fullquery>
 
+<fullquery name="cms_rel::sort_child_item_order.reorder">      
+      <querytext>
+  	        update cr_child_rels
+                  set order_n = :i
+                  where rel_id = :rel_id
+      </querytext>
+</fullquery>
  
 </queryset>
