@@ -53,7 +53,7 @@ namespace eval User {
   #   on the CMS pages root folder
   ad_proc cms_admin_exists {} {
   
-      set_admin_exists [db_string cae_admin_exists ""]
+      set admin_exists [db_string cae_admin_exists ""]
 
       if { [string equal $admin_exists t] } {
           return 1

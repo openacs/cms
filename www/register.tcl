@@ -1,3 +1,4 @@
+# cms/www/register.tcl 
 
 form create register_user -elements {
   user_id -datatype integer -widget hidden
@@ -20,10 +21,9 @@ form create register_user -elements {
 }
 
 
-
 if { [form is_request register_user] } {
-    
-    set user_id [db_string get_user_id ""]
+
+    set user_id [db_nextval "acs_object_id_seq"]
 
     set cms_admin_exists [User::cms_admin_exists]
 
@@ -43,14 +43,9 @@ if { [form is_valid register_user] } {
 	    password screen_name
 
     db_transaction {
-        
-        set user_id [ad_user_new $email $first_name $last_name $password \
-                         "" "" "" "" "" $user_id]
-
-        db_dml update_users "
-        update users
-        set screen_name = :screen_name
-        where user_id = :user_id"
+        array set results [auth::create_user -user_id $user_id -password $password \
+			       -email $email -screen_name $screen_name \
+			       -first_names $first_name -last_name $last_name ]
 
         # if there are no users with the 'cm_admin' privilege 
         #   (the CMS has never been used), then this user will be the admin
@@ -64,36 +59,7 @@ if { [form is_valid register_user] } {
         # make admin - grant 'cm_admin' privileges for all content items
         #   and for content modules
         if { [string equal $is_admin t] } {
-            db_dml grant_permissions "
-	declare
-	  cursor c_item_cur is
-	    select item_id from cr_items
-	    connect by parent_id = prior item_id
-	    start with parent_id = 0;
-	
-          cursor c_module_cur is
-	    select module_id from cm_modules;
-
-	begin
-  
-	  for item_row in c_item_cur loop 
-	    acs_permission.grant_permission (
-	        object_id  => item_row.item_id, 
-	        grantee_id => :user_id, 
-	        privilege  => 'cm_admin'
-	    );
-	  end loop;
-
-	  for v_module in c_module_cur loop
-	    acs_permission.grant_permission (
-	        object_id  => v_module.module_id,
-	        grantee_id => :user_id,
-	        privilege  => 'cm_admin'
-            );
-	  end loop;
-
-	end;
-	"
+            db_exec_plsql grant_permissions {*SQL*}
         }
 
         User::login $user_id

@@ -35,18 +35,7 @@
 
           return null;
 	end;
-	
       </querytext>
 </fullquery>
 
- 
-<fullquery name="get_user_id">      
-      <querytext>
-      
-      select acs_object_id_seq.nextval 
-    
-      </querytext>
-</fullquery>
-
- 
 </queryset>
