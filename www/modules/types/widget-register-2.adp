@@ -1,4 +1,3 @@
-<master src="../../master">
 <property name="title">Set Attribute Widget Params</property>
 
 <if @widget@ nil>
@@ -9,6 +8,6 @@
 <else>
 
   <h3>Set Attribute Widget Params</h3>
-  <formtemplate id="widget_register" style="wizard"></formtemplate>
+  <formtemplate id="widget_register"></formtemplate>
 
 </else>

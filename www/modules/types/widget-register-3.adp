@@ -1,4 +1,3 @@
-<master src="../../master">
 <property name="title">Preview Attribute Widget</property>
 
 <if @widget@ nil>
@@ -10,7 +9,7 @@
 
   <if @outstanding_params@ eq 0>
     <h3>Preview Attribute Widget</h3>
-    <formtemplate id="widget_preview" style="wizard"></formtemplate>
+    <formtemplate id="widget_preview"></formtemplate>
   </if>
   <else>
     <h3>The following widget params must have values:</h3>
