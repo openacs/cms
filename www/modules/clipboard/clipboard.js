@@ -181,3 +181,7 @@ function getCookie(Name) {
    return "";
 }
 
+function openrefreshClipboard(URL, winName, winFeatures)
+{
+  clipboardWin = window.open (URL,winName,winFeatures);
+}

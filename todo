@@ -9,9 +9,7 @@ inheritance display should not link to "basic item" on its page and should not i
 move all item info (clip check, title, path, etc.) into an include and put in /lib (with ancestors and bookmark)
 combine the index pages for templates and items into one and put in /lib? (if they can be made the same)
 use page_title in master (possible?)
-
 fix "clear the clipboard" functionality
-fix [float] link in tabs
 list-ize user browser
 floatclipboard_p working?
 
