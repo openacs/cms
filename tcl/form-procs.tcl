@@ -609,61 +609,40 @@ ad_proc content::assemble_url { base_url args } {
 
 ad_proc content::new_item { form_name { tmpfile "" } } {
 
-  # RBM: Set defaults for PostgreSQL
-  # I'm assumming 'name' will always have something
-    
-  set paramList [list name parent_id item_id locale creation_date creation_user \
-		     context_id creation_ip item_subtype content_type title \
-		     description mime_type nls_language data]
+  array set defaults [list item_id "" locale "" parent_id "" content_type "content_revision"]
 
-  set defaultList [list {} null null null "now()" "[User::getID]" \
-		       null "[ns_conn peeraddr]" content_item content_revision null \
-		       null "text/plain" null null]
-
-  for {set i 0} {$i < [llength $paramList]} {incr i} {
-      set defArray([lindex $paramList $i]) [lindex $defaultList $i]
-  }
-		    
-  foreach param $paramList {
+  foreach param { item_id name locale parent_id content_type } {
 
     if { [template::element exists $form_name $param] } {
       set $param [template::element get_value $form_name $param]
 
-      
       if { ! [string equal [set $param] {}] } {
-	# include the parameter if it is not null
-	lappend params [db_map cont_new_item_non_null_params]
 
-      } else {
-        lappend params [db_map cont_new_item_def_params]
+	# include the parameter if it is not null
+	lappend params "$param => :$param"
       }
+    } else {
+      set $param $defaults($param)
     }
   }
-  # RBM: FIX ME! In all PG content_item__new functions, relation_tag
-  #      is set to NULL. Is that ok?
-  
+
+  lappend params "creation_user => [User::getID]"
+  lappend params "creation_ip   => '[ns_conn peeraddr]'"
+  lappend params "storage_type => :storage_type"
+
   # Use the correct relation tag, if specified
   if { [template::element exists $form_name relation_tag] } {
     set relation_tag [template::element get_value $form_name relation_tag]
-      set rel_tag [string trim [db_map cont_new_item_rel_tag]]
-      
-    if{ $rel_tag != "null" } {
-	# The content_item__new PG functions don't take relation_tag as
-	# argument. So I made it so the PG .xql returns null, and the element
-	# is not included in the list. But the Oracle one is, if it exists.
-	
-	lappend params $rel_tag
-    }
+    lappend params "relation_tag => :relation_tag"
   }
 
-  set sql 
-
   db_transaction {
-      db_exec_plsql create_new_content_item "
-        begin 
-          :item_id := content_item.new( [join $params ","] );
-        end;" -bind item_id
-      
+
+      set item_id [db_exec_plsql get_item_id  "
+                     begin 
+                       :1 := content_item.new( [join $params ","] );
+                     end;"]
+
       add_revision $form_name $tmpfile
   }
 
@@ -1369,7 +1348,7 @@ ad_proc content::add_content_element {
 #
 # @option label {Child relation tag} The label for the element
 
-proc content::add_child_relation_element { form_name args } {
+ad_proc content::add_child_relation_element { form_name args } {
   
   # Process parameters
 
@@ -1698,7 +1677,7 @@ ad_proc content::get_type_info { object_type ref args } {
 
 ad_proc content::get_object_id {} {
 
-  return [db_nextval select acs_object_id_seq]
+  return [db_string nextval "select acs_object_id_seq.nextval from dual"]
 }
 
 ad_proc content::get_content_value { revision_id } {
@@ -1745,10 +1724,31 @@ ad_proc content::get_attributes { content_type args } {
   ### HACK ! What the hell is "ldap dn" ?
 
   if { [llength $args] == 1 } {
-    template::query ga_get_attributes attributes onelist ""
+    set type onelist
   } else {
-    template::query attributes multilist ""
+    set type multilist
   }
+
+  template::query ga_get_attributes attributes $type  "
+    select
+      [join $args ","]
+    from
+      acs_attributes,
+      (
+	select 
+	  object_type ancestor, level as type_order
+	from 
+	  acs_object_types
+	connect by 
+	  prior supertype = object_type
+	start with 
+          object_type = :content_type
+      ) types
+    where
+      object_type = ancestor
+    and
+      attribute_name <> 'ldap dn'
+    order by type_order desc, sort_order"
 
   return $attributes
 }

@@ -53,7 +53,7 @@ ad_proc content_method::get_content_methods { content_type args } {
     } else {
 	# otherwise look up all content method mappings
 
-	template::query methods onelist "
+	template::query get_methods_1 methods onelist "
 	  select
 	    map.content_method
 	  from
@@ -69,7 +69,7 @@ ad_proc content_method::get_content_methods { content_type args } {
     # if there are no mappings, return all methods
     if { [template::util::is_nil methods] } {
 
-	template::query methods onelist "
+	template::query get_methods_2 methods onelist "
 	  select
 	    content_method
 	  from
@@ -100,7 +100,7 @@ ad_proc content_method::get_content_method_options { content_type } {
     
     set text_entry_filter [text_entry_filter_sql $content_type]
 
-    template::query default_method onerow "
+    template::query get_content_default_method default_method onerow "
       select
         label, map.content_method
       from
@@ -118,7 +118,7 @@ ad_proc content_method::get_content_method_options { content_type } {
 	set methods [list [list $label $content_method]]
     } else {
 	# otherwise look up all content methods mappings
-	template::query methods multilist "
+	template::query get_methods_1 methods multilist "
 	  select
 	    label, map.content_method
 	  from
@@ -134,7 +134,7 @@ ad_proc content_method::get_content_method_options { content_type } {
     # if there are no mappings, return all methods
     if { [template::util::is_nil methods] } {
 
-	template::query methods multilist "
+	template::query get_methods_2 methods multilist "
 	  select
 	    label, content_method
 	  from

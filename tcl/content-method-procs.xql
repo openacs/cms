@@ -8,4 +8,32 @@
 			 and content_type = :content_type
 		</querytext>
 	</fullquery>
+	<fullquery name="content_method::get_content_methods.get_methods_1">
+		<querytext>
+	  select
+	    map.content_method
+	  from
+	    cm_content_type_method_map map, cm_content_methods m
+	  where
+	    map.content_method = m.content_method
+	  and
+	    map.content_type = :content_type
+	  $text_entry_filter
+
+		</querytext>
+	</fullquery>
+
+	<fullquery name="content_method::get_content_methods.get_methods_2">
+		<querytext>
+
+	  select
+	    content_method
+	  from
+	    cm_content_methods m
+	  where 1 = 1
+	  $text_entry_filter
+
+		</querytext>
+	</fullquery>
 </queryset>
+

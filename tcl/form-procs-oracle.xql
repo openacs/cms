@@ -155,25 +155,7 @@
 	</querytext>
 </partialquery>
 
-<partialquery name="content::new_item.cont_new_item_non_null_params">
-	<querytext>
-	$param => :$param
-	</querytext>
-</partialquery>
-
-<partialquery name="content::new_item.cont_new_item_def_params">
-	<querytext>
-	$param => $defArray($param)
-	</querytext>
-</partialquery>
-
-<partialquery name="content::new_item.cont_new_item_rel_tag">
-	<querytext>
-	relation_tag => :relation_tag
-	</querytext>
-</partialquery>
-
-<fullquery name="content::new_item.create_new_content_item">
+<fullquery name="content::new_item.get_item_id">
 	<querytext>
         begin 
           :item_id := content_item.new( [join $params ","] );

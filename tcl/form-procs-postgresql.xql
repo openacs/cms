@@ -160,29 +160,27 @@
 	</querytext>
 </partialquery>
 
-<partialquery name="content::new_item.cont_new_item_non_null_params">
-	<querytext>
-	:$param
-	</querytext>
+<fullquery name="content::new_item.get_item_id">      
+      <querytext>
 
-</partialquery>
-
-<partialquery name="content::new_item.cont_new_item_def_params">
-	<querytext>
-	$defArray($param)
-	</querytext>
-</partialquery>
-
-<partialquery name="content::new_item.cont_new_item_rel_tag">
-	<querytext>
-null
-	</querytext>
-</partialquery>
-
-<fullquery name="content::new_item.create_new_content_item">
-	<querytext>
-          select content_item__new( [join $params ","] ) as item_id
-        </querytext>
+        select content_item__new(:name,
+                                 :parent_id,
+                                 :item_id,
+                                 :locale,
+                                 now(),
+                                 [User::getID],
+                                 null,
+                                 '[ns_conn peeraddr]',
+                                 'content_item',
+                                 :content_type,
+                                 null,
+                                 null,
+                                 'text/plain',
+                                 null,
+                                 null,
+                                 :storage_type)
+                     
+      </querytext>
 </fullquery>
 
 <fullquery name="content::upload_content.update_cr_revisions">
