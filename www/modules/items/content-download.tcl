@@ -27,9 +27,10 @@ if { ![string equal $is_live t] } {
   content::check_access $item_id cm_read -user_id $user_id
 }
 
-template::query get_filename file_name onevalue "
+db_1row get_filename "
   select
-    name
+    name as file_name,
+    storage_type,
   from
     cr_items
   where

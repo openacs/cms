@@ -5,7 +5,8 @@
       <querytext>
       
   select
-    name
+    name as file_name,
+    storage_type
   from
     cr_items
   where

@@ -7,7 +7,7 @@
       <querytext>
       
   select
-    content 
+        [ad_decode $storage_type file "'[cr_fs_path]' || filename" content] as content
   from 
     cr_revisions
   where

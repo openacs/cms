@@ -905,8 +905,8 @@ ad_proc -public content::upload_content { revision_id tmpfile filename } {
     if {[string equal $storage_type file]} {
         db_dml upload_file_revision "
                              update cr_revisions 
-                             set content = '[set file_path [cr_create_content_file $item_id $revision_id $tmpfile]]',
-                             content_length = [cr_file_size $file_path]
+                             set filename = '[cr_create_content_file $item_id $revision_id $tmpfile]',
+                             content_length = [file size $tmpfile]
                              where revision_id = :revision_id"
     } elseif {[string equal $storage_type text]} {
         # upload the file into the revision content
@@ -2011,14 +2011,14 @@ ad_proc -private content::update_content_from_file { revision_id tmpfile } {
     if {[string equal $storage_type file]} {
         db_dml upload_file_revision "
                              update cr_revisions 
-                             set content = '[set file_path [cr_create_content_file $item_id $revision_id $tmpfile]]',
-                             content_length = [cr_file_size $file_path]
+                             set filename = '[cr_create_content_file $item_id $revision_id $tmpfile]',
+                             content_length = [file size $tmpfile]
                              where revision_id = :revision_id"
     } elseif {[string equal $storage_type text]} {
         # upload the file into the revision content
         db_dml upload_text_revision "update cr_revisions 
              set content = empty_blob(),
-             content_length = '[file size $tmpfile]' where 
+             content_length = [file size $tmpfile] where 
              revision_id = :revision_id
              returning content into :1" -blob_files [list $tmpfile]
 
@@ -2026,7 +2026,7 @@ ad_proc -private content::update_content_from_file { revision_id tmpfile } {
         # upload the file into the revision content
         db_dml upload_revision "update cr_revisions 
              set content = empty_blob(),
-             content_length = '[file size $tmpfile]' 
+             content_length = [file size $tmpfile]
              where revision_id = :revision_id
              returning content into :1" -blob_files [list $tmpfile]
     }

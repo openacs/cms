@@ -163,13 +163,32 @@
         </querytext>
 </fullquery>
 
+<fullquery name="content::upload_content.get_storage_type">
+	<querytext>
+
+                select 
+                  storage_type, item_id 
+                from 
+                  cr_items 
+                where 
+                  item_id = (select 
+                               item_id 
+                             from 
+                               cr_revisions 
+                             where revision_id = :revision_id)
+
+	</querytext>
+</fullquery>
+
 
 <fullquery name="content::upload_content.upload_file_revision">      
       <querytext>
+
       update cr_revisions 
-      set content ='[set file_path [cr_create_content_file $item_id $revision_id $tmpfile]]',
-      content_length = [cr_file_size $file_path]
+      set filename ='[cr_create_content_file $item_id $revision_id $tmpfile]',
+      content_length = [file size $tmpfile]
       where revision_id = :revision_id
+    
       </querytext>
 </fullquery>
 
@@ -177,7 +196,9 @@
       <querytext>
 
              update cr_revisions 
-             set content = empty_blob() where revision_id = :revision_id
+             set content = empty_blob(), 
+             content_length = [file size $tmpfile] 
+             where revision_id = :revision_id
              returning content into :1
       
       </querytext>
@@ -187,7 +208,9 @@
       <querytext>
 
              update cr_revisions 
-             set content = empty_blob() where revision_id = :revision_id
+             set content = empty_blob(), 
+             content_length = [file size $tmpfile]
+             where revision_id = :revision_id
              returning content into :1
       
       </querytext>
@@ -305,16 +328,59 @@
       </querytext>
 </fullquery>
 
-
-<fullquery name="content::update_content_from_file.upcff_update_cr_revisions">
+<fullquery name="content::update_content_from_file.get_storage_type">
 	<querytext>
 
-    update cr_revisions 
-    set content = empty_blob() where revision_id = :revision_id
-    returning content into :1
+                select 
+                  storage_type, item_id 
+                from 
+                  cr_items 
+                where 
+                  item_id = (select 
+                               item_id 
+                             from 
+                               cr_revisions 
+                             where revision_id = :revision_id)
 
 	</querytext>
 </fullquery>
+
+
+<fullquery name="content::update_content_from_file.upload_file_revision">      
+      <querytext>
+
+      update cr_revisions 
+      set filename ='[cr_create_content_file $item_id $revision_id $tmpfile]',
+      content_length = [file size $tmpfile]
+      where revision_id = :revision_id
+
+      </querytext>
+</fullquery>
+
+<fullquery name="content::update_content_from_file.upload_text_revision">      
+      <querytext>
+
+             update cr_revisions 
+             set content = empty_blob(), 
+             content_length = [file size $tmpfile] 
+             where revision_id = :revision_id
+             returning content into :1
+      
+      </querytext>
+</fullquery>
+
+<fullquery name="content::update_content_from_file.upload_revision">      
+      <querytext>
+
+             update cr_revisions 
+             set content = empty_blob(), 
+             content_length = [file size $tmpfile]
+             where revision_id = :revision_id
+             returning content into :1
+      
+      </querytext>
+</fullquery>
+
 
 <fullquery name="content::copy_content.cc_copy_content">
 	<querytext>
