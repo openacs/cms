@@ -7,7 +7,7 @@
       <querytext>
       
     begin 
-    content_folder.rename (
+    content_folder.edit_name (
         folder_id   => :item_id, 
         name        => :name, 
         label       => :label, 

@@ -6,7 +6,7 @@
 <fullquery name="rename_item">      
       <querytext>
 
-        select content_item__rename (
+        select content_item__edit_name (
             :item_id, 
             :name 
          ); 

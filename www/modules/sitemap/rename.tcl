@@ -62,7 +62,7 @@ if { [form is_valid rename_folder] } {
 
       db_exec_plsql rename_folder "
     begin 
-    content_folder.rename (
+    content_folder.edit_name (
         folder_id   => :item_id, 
         name        => :name, 
         label       => :label, 
