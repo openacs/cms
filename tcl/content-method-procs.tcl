@@ -177,7 +177,7 @@ ad_proc content_method::text_entry_filter_sql { content_type } {
 
     if { $has_text_mime_type == 0 } {
 	set text_entry_filter_sql \
-		"and m.content_method ^= 'text_entry'"
+		"and m.content_method <> 'text_entry'"
     }
 
     return $text_entry_filter_sql

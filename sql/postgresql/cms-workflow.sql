@@ -417,7 +417,7 @@ end;' language 'plpgsql';
 
 
 
-create function get_first_place() returns varchar as '
+create function content_workflow__get_first_place() returns varchar as '
 declare
     v_first_place wf_places.place_key%TYPE;
 begin

@@ -7,7 +7,9 @@
       <querytext>
 
   select
-    '[cr_fs_path]' || r.content as content, i.storage_type 
+    case when i.storage_type = 'file' 
+        then '[cr_fs_path]' || r.content 
+        else r.content end as content, i.storage_type 
   from 
     cr_revisions r, cr_items i
   where

@@ -16,7 +16,7 @@ db_transaction {
     and item_id = :item_id"
 
     if { $second_template_p == 0 } {
-        if { [catch { template::query template_register dml "begin content_item.register_template(
+        if { [catch { db_exec_plsql register_template_to_item "begin content_item.register_template(
             item_id     => :item_id,
             template_id => :template_id,
             use_context => :context ); 

@@ -6,7 +6,11 @@
 <fullquery name="publish::write_multiple_blobs.wmb_get_blob_file">      
       <querytext>
 
-      select content from cr_revisions where revision_id = $revision_id
+      select case when i.storage_type = 'file' 
+                       then '[cr_fs_path]' || r.content 
+                       else r.content end as content, i.storage_type 
+      from cr_revisions r, cr_items i 
+      where r.item_id = i.item_id and r.revision_id = $revision_id
     
       </querytext>
 </fullquery>
