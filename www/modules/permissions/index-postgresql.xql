@@ -16,24 +16,21 @@
     from 
       acs_permissions per, acs_privileges p, parties u,
       persons n,
-      (select o2.object_id 
-         from (select * from acs_objects where object_id = :object_id) o1, 
-              acs_objects o2
-        where o1.tree_sortkey between o2.tree_sortkey and tree_right(o2.tree_sortkey)
-          and tree_ancestor_p(o2.tree_sortkey, o1.tree_sortkey)
-          and tree_level(o2.tree_sortkey) >= (select
-                                                case when max(tree_level(ob2.tree_sortkey)) is null
+      (select o.object_id 
+         from (select tree_ancestor_keys(acs_objects_get_tree_sortkey(:object_id)) as tree_sortkey) parents,
+           acs_objects o
+        where o.tree_sortkey = parents.tree_sortkey
+          and tree_level(o.tree_sortkey) >= (select
+                                                case when max(tree_level(ob.tree_sortkey)) is null
                                                   then 0
-                                                  else max(tree_level(ob2.tree_sortkey))
+                                                  else max(tree_level(ob.tree_sortkey))
                                                 end  
                                               from
-                                                (select * 
-                                                 from acs_objects 
-                                                 where object_id = :object_id) ob1,
-                                                acs_objects ob2
-                                              where ob1.tree_sortkey between ob2.tree_sortkey and tree_right(ob2.tree_sortkey)
-                                                and tree_ancestor_p(ob2.tree_sortkey, ob1.tree_sortkey)
-                                                and ob2.security_inherit_p = 'f')) o
+                                                (select tree_ancestor_keys(acs_objects_get_tree_sortkey(:object_id))
+                                                  as tree_sortkey) parents,
+                                                acs_objects ob
+                                              where ob.tree_sortkey = parents.tree_sortkey
+                                                and ob.security_inherit_p = 'f')) o
     where
       per.privilege = p.privilege
     and
