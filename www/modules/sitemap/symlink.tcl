@@ -120,7 +120,7 @@ if { [form is_valid symlink] } {
                 creation_user => :user_id, 
                 creation_ip   => :ip
             ); 
-            end;" symlink_id} errmsg] } {
+            end;"} errmsg] } {
                 # possibly a duplicate name
                 ns_log notice "symlink.tcl - while symlinking $errmsg"
             }
