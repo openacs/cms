@@ -268,7 +268,7 @@ ad_proc -public workflow::check_wf_permission { item_id {show_error t}} {
     }
 }
 
-proc -private workflow::mail_notifications {} {
+ad_proc -private workflow::mail_notifications {} {
 
   @private mail_notifications
 
