@@ -40,7 +40,7 @@
   from 
     cr_revisions r
   where 
-    r.item_id = :item_id
+    r.item_id = $item_id
   order by
     revision_number desc" $page
       </querytext>

@@ -37,7 +37,7 @@
       
   select 
     template_id, use_context, 
-    content_item__get_path( template_id ) as path,
+    content_item__get_path( template_id, null ) as path,
     cms_permission__permission_p( template_id, :user_id, 'cm_examine')
       as can_read_template
   from 
