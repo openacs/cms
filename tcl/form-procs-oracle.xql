@@ -196,7 +196,7 @@
       returning content into :1
 
 	</querytext>
-<fullquery>
+</fullquery>
 
 <partialquery name="string_to_timestamp">
 	<querytext>
