@@ -156,7 +156,7 @@ ad_proc -private publish::delete_multiple_files { url {root_path ""}} {
 } {
   foreach_publish_path $url {
     ns_unlink -nocomplain $filename 
-    ns_log notice "PUBLISH: Delete file $filename"
+    ns_log debug "publish::delete_multiple_files: Delete file $filename"
   } $root_path
 }
 
@@ -187,7 +187,7 @@ ad_proc -public publish::publish_revision { revision_id args} {
   } else {
     set root_path $opts(root_path)
   }
-  ns_log Notice "PUBLISH REVISION: root_path = $root_path"
+  ns_log debug "publish::publish_revision: root_path = $root_path"
   # Get tem id
   set item_id [item::get_item_from_revision $revision_id]
   # Render the item
@@ -358,7 +358,7 @@ ad_proc -private publish::track_publish_status {} {
 
 } {
   
-  ns_log notice "PUBLISH: Tracking publish status"
+  ns_log debug "publish::track_publish_status: Tracking publish status"
 
   db_transaction {
 
@@ -385,7 +385,7 @@ ad_proc -private publish::track_publish_status {} {
     
 
       } errmsg] } {
-	  ns_log notice "Error in publish::track_publish_status: $errmsg"
+	  ns_log Warning "publish::track_publish_status: error: $errmsg"
       }
   }
 }
@@ -421,12 +421,12 @@ ad_proc -public publish::schedule_status_sweep { {interval ""} } {
     if { ![template::util::is_nil package_id] } {
       set interval [ad_parameter -package_id $package_id StatusSweepInterval 3600]
     } else { 
-      ns_log Warning "Unable to lookup package_id for cms in publish::schedule_status_sweep defaulting to interval 3600"
+      ns_log Warning "publish::schedule_status_sweep: unable to lookup package_id for cms defaulting to interval 3600"
       set interval 3600
     } 
   }
 
-  ns_log notice "CMS publish::schedule_status_sweep: Scheduling status sweep every $interval seconds"
+  ns_log notice "publish::schedule_status_sweep: Scheduling status sweep every $interval seconds"
   set proc_id [ns_schedule_proc -thread $interval publish::track_publish_status]
   cache set status_sweep_proc_id $proc_id
   

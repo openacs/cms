@@ -15,7 +15,7 @@ ad_proc -public clipboard::parse_cookie {} {
 
 } {
     set clipboard_cookie [template::util::get_cookie content_marks]   
-    ns_log notice $clipboard_cookie
+    ns_log debug "clipboard::parse_cookie: cookie $clipboard_cookie"
     set clip [ns_set create]
     set mount_branches [split $clipboard_cookie "|"]
     set mount_points [list]
@@ -23,7 +23,7 @@ ad_proc -public clipboard::parse_cookie {} {
     
     foreach branch $mount_branches {
         if { [regexp {([a-zA-Z0-9]+):(.*)} $branch match mount_point items] } {
-            ns_log notice "CLIP: $branch"
+            ns_log debug "clipboard::parse_cookie: branch: $branch"
             set items_list [split $items ","]  
             set items_size [llength $items_list]
             incr total_items $items_size

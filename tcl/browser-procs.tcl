@@ -88,7 +88,7 @@ ad_proc -public updateTreeStateChildren {
 
         collapse {
           # Collapse: empty the children list
-          ns_log notice "COLLAPSING: [folderPath $user_id $mount_point $target_id]"
+          ns_log debug "updateTreeStateChildren: COLLAPSING: [folderPath $user_id $mount_point $target_id]"
           set child_children [list]   
         }
 
@@ -101,7 +101,7 @@ ad_proc -public updateTreeStateChildren {
             set target_id ""
             set target_mount_point ""
 
-            ns_log notice "EXPANDING: [folderPath $user_id $mount_point $target_id]"
+            ns_log debug "updateTreeStateChildren: EXPANDING: [folderPath $user_id $mount_point $target_id]"
 
             # If the list is empty, retreive children from the database and recache the folder later
             if { [llength [folderAccess children $the_folder]] == 0 } {
@@ -117,14 +117,14 @@ ad_proc -public updateTreeStateChildren {
 
         reload {
           # Reload the folder if it has changed in the db 
-          ns_log notice "RELOADING: [folderPath $user_id $mount_point $target_id]"
+          ns_log debug "updateTreeStateChildren: RELOADING: [folderPath $user_id $mount_point $target_id]"
           set folder_exists 0
           set use_new_children 1
         }
   
         set_children {
           # Manually set the children of a folder
-          ns_log notice "SYNCHRONIZING: [folderPath $user_id $mount_point $target_id]"
+          ns_log debug "updateTreeStateChildren: SYNCHRONIZING: [folderPath $user_id $mount_point $target_id]"
           set folder_children $payload
           set folder_exists 0
           set use_new_children 1
@@ -298,7 +298,7 @@ ad_proc -public folderChildrenDB { mount_point folder_id } {
  Recache the child folders if specified
 
 } {
-  ns_log notice "DATABASE HIT: $mount_point.$folder_id"
+  ns_log debug "folderChildrenDB: DATABASE HIT: $mount_point.$folder_id"
   return [cm::modules::${mount_point}::getChildFolders $folder_id]
 }   
 
@@ -419,7 +419,7 @@ ad_proc -public getFolder { user_id mount_point folder_id stateRef } {
   set folder_path [folderPath $user_id $mount_point $folder_id]
 
   if { ![folderIsCached $user_id $mount_point $folder_id] } {
-    ns_log notice "CACHE MISS: $folder_path"
+    ns_log debug "getFolder: CACHE MISS: $folder_path"
 
     # Traverse the state to determine the path to the current folder, caching all the folders
     # on the path     
@@ -441,7 +441,7 @@ ad_proc -public getFolder { user_id mount_point folder_id stateRef } {
 
     # Now, if THAT failed, then the folder was probably deleted... Give up
     if { ![folderIsCached $user_id $mount_point $folder_id] } {
-      ns_log notice "CACHE FAILED for: [folderPath $user_id $mount_point $folder_id]"
+      ns_log debug "getFolder: CACHE FAILED for: [folderPath $user_id $mount_point $folder_id]"
       return [list]
     }
   } 
@@ -479,7 +479,7 @@ ad_proc -public cacheOneFolder { user_id folder { override 0 }} {
 } {
   set path [folderAccess path $folder $user_id]
   if { $override || ![nsv_exists browser_state $path] } {
-    ns_log notice "CACHING: $path $folder , override = $override"
+    ns_log debug "cacheOneFolder: CACHING: $path $folder , override = $override"
     nsv_set browser_state $path $folder
   }
 }
@@ -591,7 +591,7 @@ ad_proc -public cacheMountPointFolders { user_id mount_point target_folder_id } 
 
 } {
 
-  ns_log notice "CRITICAL MISS: [folderPath $user_id $mount_point $target_folder_id]"
+  ns_log debug "cacheMountPointFolders: CRITICAL MISS: [folderPath $user_id $mount_point $target_folder_id]"
 
   set queue [folderChildrenDB $mount_point ""]
 

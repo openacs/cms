@@ -210,7 +210,7 @@ ad_proc -public clipboard::ui::generate_form_header { form_name {row_index 1}} {
   upvar "${form_name}_data:${row_index}" row
 
   if { ![info exists row] } {
-    ns_log notice "NO SUCH ROW: $row_index"
+    ns_log notice "clipboard::ui::generate_form_header: No such row $row_index"
     return
   }
 

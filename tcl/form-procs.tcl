@@ -245,9 +245,9 @@ ad_proc -public content::get_revision_form {
                 }
                 set form_element \
                     "template::element create $form_name $last_attribute_name $code_params"
-                ns_log notice "*** CREATING..."
-		ns_log notice "***   ATTRIBUTE     : $last_attribute_name"
-		ns_log notice "***   TYPE_LABEL    : $last_type"
+                ns_log debug "content::get_revision_form: CREATING"
+		ns_log debug "content::get_revision_form:   attribute : $last_attribute_name"
+		ns_log debug "content::get_revision_form:   type_label: $last_type"
                 eval $form_element
                 
                 set code_params [list]
@@ -277,7 +277,7 @@ ad_proc -public content::get_revision_form {
     }
 
     set form_element "template::element create $form_name $last_attribute_name $code_params"
-    ns_log notice "***ELEMENT CREATE: $form_element"
+    ns_log debug "content::get_revision_form:   ELEMENT CREATE: $form_element"
     eval $form_element
 
 
@@ -402,8 +402,8 @@ ad_proc -public content::process_revision_form { form_name content_type item_id 
         upvar 0 "rows:${i}" row
         template::util::array_to_vars row
 
-        ns_log notice "=========> $attribute_name"
-        ns_log notice "=========> $table_name"
+        ns_log debug "content::process_revision_form: attribute_name $attribute_name"
+        ns_log debug "content::process_revision_form: table_name $table_name"
         
         if { ![string equal $last_table $table_name] } {
             if { $i != 1 } {                
@@ -489,7 +489,7 @@ ad_proc -public content::insert_element_data {
 
     append query [db_map ied_get_objects_tree_order_by]
 
-    ns_log notice "insert_element_data: $query"
+    ns_log debug "content::insert_element_data: $query"
     
     set last_table ""
     set last_id_column ""
@@ -499,8 +499,8 @@ ad_proc -public content::insert_element_data {
         upvar 0 "rows:${i}" row
         template::util::array_to_vars row
 
-        ns_log notice "=========> $attribute_name"
-        ns_log notice "=========> $table_name"
+        ns_log debug "content::insert_element_data: attribute_name $attribute_name"
+        ns_log debug "content::insert_element_data: table_name $table_name"
         
         if { ![string equal $last_table $table_name] } {
             if { $i != 1 } {                
@@ -637,7 +637,7 @@ ad_proc -public content::new_item { form_name { storage_type text } { tmpfile ""
 } {
     # Here we walk the item prefixes and create them all, unless the content_prefixes var 
     # does not exist or we are already handling the form
-    ns_log Warning "JCD: handling prefix $prefix"
+    ns_log Warning "content::new_item: handling prefix $prefix"
     if {[string equal "StArT" $prefix]} { 
         if {[template::element exists $form_name content_prefixes]} { 
             foreach prefix [template::element get_value $form_name content_prefixes] { 
@@ -730,7 +730,7 @@ ad_proc -public content::add_revision { form_name { tmpfile "" } {prefix {}} {ne
     
     @param new_p Whether the revision is attached to a new cr_item or if previousrevision exist
 } {
-    ns_log Debug "JCD: add_revision $form_name $tmpfile $prefix $new_p"
+    ns_log Debug "content::add_revision: $form_name $tmpfile $prefix $new_p"
     # initialize an ns_set to hold bind values
     set bind_vars [ns_set create]
 
@@ -908,7 +908,7 @@ ad_proc -public content::upload_content { revision_id tmpfile filename } {
 
     # if it is HTML then strip out the body
     set mime_type [ns_guesstype $filename]
-    ns_log Notice "guessed mime_type: $mime_type, filename = $filename"
+    ns_log debug "content::upload_content: guessed mime_type: $mime_type, filename = $filename"
     if { [string equal $mime_type text/html] } {
         set text [template::util::read_file $tmpfile]
         if { [regexp {<body[^>]*>(.*?)</body>} $text x body] } {
@@ -958,7 +958,7 @@ ad_proc -public content::upload_content { revision_id tmpfile filename } {
     #         set mime_type = :mime_type 
     #         where revision_id = :revision_id"} errmsg] } {
     # 	#  if it fails, use user submitted mime_type
-    # 	ns_log notice "form-procs - add_revision_dml - using user mime_type 
+    # 	ns_log debug "form-procs - add_revision_dml - using user mime_type 
     # 	  instead of guessed mime type = $mime_type"
     #     }
 
@@ -1019,7 +1019,7 @@ ad_proc -private content::prepare_content_file { form_name } {
 
         # check for a text file based on the extension (not ideal)
         if { [regexp {\.(htm|html|txt)$} $content] } {
-            ns_log Notice "Converting text file $content to UTF-8..."
+            ns_log debug "content::prepare_content_file: converting text file $content to UTF-8."
             set content [template::util::read_file $tmpfile]
             set is_text 1
         }
@@ -1289,7 +1289,7 @@ ad_proc -public content::add_revision_form { args } {
 
     set attributes [add_attribute_elements $opts(form_name) $opts(content_type) {} $opts(prefix) $opts(section) $opts(exclude) $opts(hidden)]
 
-    ns_log Notice "JCD: add_revision_form content method $opts(content_method)"
+    ns_log debug "content::add_revision_form: content method $opts(content_method)"
 
     add_content_element $opts(form_name) $opts(content_method) $opts(prefix)
 
@@ -1486,7 +1486,7 @@ ad_proc -public content::add_attribute_element {
         lappend command -optional
     }
 
-    # ns_log Notice "content::add_attribute_element: command = $command"
+    # ns_log debug "content::add_attribute_element: command = $command"
 
     eval $command
 }
@@ -1507,7 +1507,7 @@ ad_proc -public content::add_content_element {
     @param section        A section name for the added elements
     @param prefix         A prefix for the form element name
 } {
-    ns_log Notice "JCD: add_content_element content method $content_method"
+    ns_log debug "content::add_content_element: content method $content_method"
 
     template::element create $form_name "${prefix}content_method" \
         -datatype keyword \
