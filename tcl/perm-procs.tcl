@@ -58,8 +58,6 @@ ad_proc -public content::check_access { object_id privilege args } {
 
   template::util::get_opts $args 
 
-  ns_log notice [array get opts]
-
   if { [template::util::is_nil opts(user_id)] } {
     set user_id [User::getID]
   } else {
@@ -177,7 +175,7 @@ ad_proc -public content::perm_form_generate { form_name_in {passthrough "" } } {
 
     # Only show checkboxes if the privilege is in pf_show_boxes
     # The join is just a hack for now
-#    set pf_show_boxes [join $pf_show_boxes "|"]
+    # set pf_show_boxes [join $pf_show_boxes "|"]
 
     element create $perm_form_name object_id -label "Object ID" \
       -datatype integer -widget hidden -param

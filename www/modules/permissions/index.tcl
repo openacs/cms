@@ -66,6 +66,7 @@ template::query get_permissions permissions multirow "
     grantee_name, privilege
   " 
 
+
 # Create a URL passthrough stub to access permissions
 set perms_url_extra "return_url=$return_url&passthrough=$passthrough&object_id=$object_id"
 

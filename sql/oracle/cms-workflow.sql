@@ -526,6 +526,9 @@ as
     return v_next_place;
     exception
       when NO_DATA_FOUND then
+        if c_places_cur%ISOPEN then
+           close c_places_cur;
+        end if;
         return null;
   end get_next_place;
 
@@ -568,6 +571,9 @@ as
     return v_previous_place;
     exception
       when NO_DATA_FOUND then
+        if c_places_cur%ISOPEN then
+           close c_places_cur;
+        end if;
         return null;
   end get_previous_place;
 
