@@ -7,7 +7,7 @@
       <querytext>
       
     begin
-      :1 = journal_entry.new(
+      :1 := journal_entry.new(
                              journal_id => :journal_id,
                              object_id => :object_id,
                              action => 'comment',

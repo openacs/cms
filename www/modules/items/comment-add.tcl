@@ -30,7 +30,7 @@ if { [form is_valid add_comment] } {
   db_transaction {
       set journal_id [db_exec_plsql new_entry "
     begin
-      :1 = journal_entry.new(
+      :1 := journal_entry.new(
                              journal_id => :journal_id,
                              object_id => :object_id,
                              action => 'comment',
