@@ -7,11 +7,7 @@
       <querytext>
 
   select
-    r.item_id,
-    coalesce(trim(
-      case when o.object_type = 'content_symlink' then r.label
-           when o.object_type = 'content_folder' then f.label
-	   else coalesce(v.title, i.name) end),'-') as title
+    r.item_id, v.title
   from 
     cr_items i
         LEFT OUTER JOIN
@@ -20,15 +16,11 @@
     cr_revisions u ON i.live_revision = u.revision_id
         LEFT OUTER JOIN
     cr_folders f ON i.item_id = f.folder_id, 
-    cr_resolved_items r, acs_objects o, acs_object_types t
+    cr_resolved_items r
   where
     r.parent_id = $parent_var
   and
     r.resolved_id = i.item_id
-  and
-    i.item_id = o.object_id
-  and
-    i.content_type = t.object_type
    [template::list::orderby_clause -name folder_items -orderby]
 
       </querytext>
@@ -41,10 +33,10 @@
     r.item_id, r.item_id as id, v.revision_id, r.resolved_id, r.is_symlink,
     r.name, i.parent_id, i.content_type, i.publish_status, u.publish_date,
     coalesce(trim(
-      case when o.object_type = 'content_symlink' then r.label
-           when o.object_type = 'content_folder' then f.label
+      case when i.content_type = 'content_symlink' then r.label
+           when i.content_type = 'content_folder' then f.label
 	   else coalesce(v.title, i.name) end),'-') as title,
-    o.object_type, t.pretty_name as pretty_content_type, last_modified, 
+    t.pretty_name as pretty_content_type, last_modified, 
     v.content_length
   from 
     cr_items i

@@ -14,15 +14,6 @@ ad_page_contract {
     { page:optional }
 }
 
-# request create
-# request set_param id -datatype keyword -optional
-# request set_param mount_point -datatype keyword -optional -value sitemap
-# request set_param parent_id -datatype keyword -optional
-# request set_param orderby -datatype keyword -optional -value name
-
-# paginator variables
-#request set_param page -datatype integer -value 1
-
 # Create all the neccessary URL params for passthrough
 set passthrough "mount_point=$mount_point&parent_id=$parent_id"
 
