@@ -74,7 +74,7 @@ if { [form is_valid delete] } {
             # get all the parent_id's of the items being deleted
             #   because we need to flush the paginator cache for each of 
             #   these folders
-            set flush_list [db_list get_flush_list ""]
+            set flush_list [db_list get_list ""]
 
             # set up the call to the proper PL/SQL delete procedure
             if { [string equal $is_symlink "t"] } {

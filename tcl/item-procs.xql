@@ -64,4 +64,15 @@
       </querytext>
 </fullquery>
 
+ 
+<fullquery name="item::get_live_revision.glr_get_live_revision">      
+      <querytext>
+      
+    select live_revision from cr_items
+      where item_id = :item_id
+  
+      </querytext>
+</fullquery>
+
+
 </queryset>

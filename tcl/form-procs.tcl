@@ -1493,16 +1493,21 @@ ad_proc -private content::get_widget_param_value {
       query {
 	#set content_type content_revision
 	set item_id {}
-        switch $param(param_type) {
-            onevalue {
-                set value [db_string set_content_values $param(value)]
+        if [catch {
+            switch $param(param_type) {
+            
+                onevalue {
+                    set value [db_string set_content_values $param(value)]
+                }
+                onelist {
+                    set value [db_list set_content_values $param(value)]
+                }
+                multilist {
+                    set value [db_list_of_lists set_content_values $param(value)]
+                }             
             }
-            onelist {
-                set value [db_list set_content_values $param(value)]
-            }
-            multilist {
-                set value [db_list_of_lists set_content_values $param(value)]
-            }
+        }] {
+            set value ""
         }
       }
       default {

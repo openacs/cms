@@ -34,7 +34,8 @@ content::check_access $item_id cm_examine \
   -return_url "modules/sitemap/index" 
 
 # query the content_type of the item ID so we can check for a custom info page
-db_1row get_info ""
+db_1row get_info "" -column_array info
+template::util::array_to_vars info
 
 # build the path to the custom interface directory for this content type
 

@@ -15,6 +15,6 @@ content::check_access $item_id cm_examine \
 
 set name [db_string get_name ""]
 
-db_multirow get_keywords ""
+db_multirow keywords get_keywords ""
 
 set page_title "Content Keywords for $name"
