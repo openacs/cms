@@ -712,7 +712,7 @@ begin
         new.item_id, v_user_id, ''cm_write''
        ) = ''f'' 
     then
-      acs_permission__grant_permission (
+      perform acs_permission__grant_permission (
         new.item_id, v_user_id, ''cm_write''
       );
     end if;
@@ -721,7 +721,7 @@ begin
         new.item_id, v_user_id, ''cm_perm''
        ) = ''f'' 
     then
-      acs_permission__grant_permission (
+      perform acs_permission__grant_permission (
         new.item_id, v_user_id, ''cm_perm''
       );
     end if; 
