@@ -44,7 +44,7 @@
   where 
     attr.object_type = types.object_type
   order by 
-    types.inherit_level desc
+    types.inherit_level desc, attr.sort_order
       </querytext>
 </fullquery>
 
