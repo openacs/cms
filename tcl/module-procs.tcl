@@ -309,7 +309,7 @@ ad_proc -public cm::modules::clipboard::getChildFolders { id } {
     
     set module_name [namespace tail [namespace current]] 
 
-    set result [db_multilist clip_get_result ""]
+    set result [db_list_of_lists clip_get_result ""]
 
     return $result
 }
