@@ -47,7 +47,7 @@
             from 
               acs_object_types
             where 
-              object_type ^= 'acs_object'
+              object_type <> 'acs_object'
             connect by 
               prior supertype = object_type
             start with 
@@ -58,6 +58,15 @@
       ) attributes
     where
       attributes.attribute_id = params.attribute_id
+
+	</querytext>
+</partialquery>
+
+<partialquery name="cfe_attribute_name_to_char">
+	<querytext>
+
+	to_char($attribute_name, 'YYYY MM DD HH24 MI SS') 
+                   as $attribute_name
 
 	</querytext>
 </partialquery>

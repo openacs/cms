@@ -2,7 +2,7 @@
 <queryset>
 <rdbms><type>postgresql</type><version>7.1</version></rdbms>
 
-<fullquery name="">      
+<fullquery name="attributes_query_1">      
 	<querytext>
 		
     select
@@ -11,17 +11,16 @@
       attribute_label, type_label, object_type as subtype, datatype, 
       params.is_html, params.is_required,
       widget, param,
-      nvl( (select param_type from cm_attribute_widget_params
-            where attribute_id = attributes.attribute_id
-            and param_id = params.param_id), 'literal' ) param_type, 
-      nvl( (select param_source from cm_attribute_widget_params
-            where attribute_id = attributes.attribute_id
-            and param_id = params.param_id), 
-           'onevalue' ) param_source, 
-      nvl( (select value from cm_attribute_widget_params
-            where attribute_id = attributes.attribute_id
-            and param_id = params.param_id), 
-           params.default_value ) value
+      coalesce( (select param_type from cm_attribute_widget_params
+                 where attribute_id = attributes.attribute_id
+                 and param_id = params.param_id), 'literal' ) param_type, 
+      coalesce( (select param_source from cm_attribute_widget_params
+                 where attribute_id = attributes.attribute_id
+                 and param_id = params.param_id), 'onevalue' ) param_source, 
+      coalesce( (select value from cm_attribute_widget_params
+                 where attribute_id = attributes.attribute_id
+                 and param_id = params.param_id), 
+                 params.default_value ) value
     from
       (
         select
@@ -40,27 +39,40 @@
           types.object_type, types.pretty_name as type_label, 
           tree_level, types.table_name
         from
-          acs_attributes attr,
+          acs_attributes attr RIGHT OUTER JOIN,
           (
             select 
-              object_type, pretty_name, level as tree_level,
-              table_name
-            from 
-              acs_object_types
+              o2.object_type, o2.pretty_name, tree_level(o2.tree_sortkey) as tree_level,
+              o2.table_name
+            from
+               (
+                 SELECT *
+                 FROM acs_object_types
+                 WHERE object_type = :content_type
+               ) o1, acs_object_types o2
             where 
-              object_type ^= 'acs_object'
-            connect by 
-              prior supertype = object_type
-            start with 
-              object_type = :content_type
-          ) types
-        where
-          attr.object_type = types.object_type
+              o2.object_type <> 'acs_object'
+            AND
+              o2.tree_sortkey <= o1.tree_sortkey
+            AND
+              o1.tree_sortkey like (o2.tree_sortkey || '%')
+
+          ) types USING (object_type)
       ) attributes
     where
       attributes.attribute_id = params.attribute_id
+
 	</querytext>
 </fullquery>
+
+<partialquery name="cfe_attribute_name_to_char">
+	<querytext>
+
+	to_char($attribute_name, 'YYYY MM DD HH24 MI SS') 
+                   as $attribute_name
+
+	</querytext>
+</partialquery>
 
 <fullquery name="get_revision_id">
 	<querytext>
@@ -70,7 +82,7 @@
 
 <partialquery name="get_enum_1">
 	<querytext>
-	select nvl(pretty_name,enum_value), enum_value
+	select coalesce(pretty_name,enum_value), enum_value
 	from acs_enum_values
 	where attribute_id = :attribute_id
 	order by sort_order
@@ -79,7 +91,8 @@
 
 <fullquery name="new_content_revision">
 	<querytext>
-	     :revision_id := select content_revision__new(:title,:description,:mime_type,' ',content_symlink__resolve(:item_id),'[ns_conn peeraddr]',[User::getID]
+
+	     select content_revision__new(:title,:description,:mime_type,' ',content_symlink__resolve(:item_id),'[ns_conn peeraddr]',[User::getID]) as revision_id
 
 	</querytext>
 </fullquery>
@@ -90,7 +103,7 @@
             types.table_name, types.id_column, attr.attribute_name,
             attr.datatype
           from 
-            acs_attributes attr PIGHT OUTER JOIN
+            acs_attributes attr RIGHT OUTER JOIN
             ( select 
                 o2.object_type, o2.table_name, o2.id_column,
 		tree_level(o2.tree_sortkey) as inherit_level
