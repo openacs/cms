@@ -13,62 +13,75 @@
 create table cr_directional_rels (
   rel_id         integer 
                   constraint cr_dir_rels_fk references acs_objects,
-  direction      varchar2(20)
+  direction      varchar(20)
                  constraint cr_dir_rels_ck 
                  check (direction in ('in', 'out'))
 ); 
 
+create function inline_0 () returns integer as '
 declare
-  attr_id integer;
+  attr_id       integer;
 begin
 
- acs_object_type.create_type (
-   supertype => 'cr_item_rel',
-   object_type => 'cr_directional_rel',
-   pretty_name => 'Directional Relationship',
-   pretty_plural => 'Directional Relationships',
-   table_name => 'cr_directional_rels',
-   id_column => 'rel_id',
-   name_method => 'acs_object.default_name'
+ PERFORM acs_object_type__create_type (
+   ''cr_directional_rel'',
+   ''Directional Relationship'',
+   ''Directional Relationships'',
+   ''cr_item_rel'',
+   ''cr_directional_rels'',
+   ''rel_id'',
+   null,
+   ''f'',
+   null,
+   ''acs_object__default_name''
  );
 
- attr_id := acs_attribute.create_attribute (
-   object_type => 'cr_directional_rel',
-   attribute_name => 'direction',
-   datatype => 'keyword',
-   pretty_name => 'Direction',
-   pretty_plural => 'Directions'
+ attr_id := acs_attribute__create_attribute (
+   ''cr_directional_rel'',
+   ''direction'',
+   ''keyword'',
+   ''Direction'',
+   ''Directions'',
+   null,
+   null,
+   null,
+   1,
+   1,
+   null,
+   ''type_specific'',
+   ''f''
  ); 
 
- cm_form_widget.register_attribute_widget(
-     content_type   => 'cr_directional_rel',
-     attribute_name => 'direction',
-     widget	    => 'select',
-     is_required    => 't'
+ PERFORM cm_form_widget__register_attribute_widget(
+     ''cr_directional_rel'',
+     ''direction'',
+     ''select'',
+     ''t''
  );
 
- cm_form_widget.set_attribute_param_value(
-      content_type   => 'cr_directional_rel', 
-      attribute_name => 'direction', 
-      param	     => 'options', 
-      param_type     => 'multilist', 
-      param_source   => 'literal',
-      value	     => '{In in} {Out out}'
+ PERFORM cm_form_widget__set_attribute_param_value(
+      ''cr_directional_rel'', 
+      ''direction'', 
+      ''options'', 
+      ''multilist'', 
+      ''literal'',
+      ''{In in} {Out out}''
   );
 
-  cm_form_widget.set_attribute_param_value(
-      content_type   => 'cr_directional_rel',
-      attribute_name => 'direction',
-      param	     => 'values', 
-      param_type     => 'onevalue', 
-      param_source   => 'literal', 
-      value	     => 'in'
+  PERFORM cm_form_widget__set_attribute_param_value(
+      ''cr_directional_rel'',
+      ''direction'',
+      ''values'', 
+      ''in'',
+      ''onevalue'', 
+      ''literal''
   );
 
-end;
-/
-show errors
+end;' language 'plpgsql';
 
+select inline_0 ();
+
+drop function inline_0 ();
 
 ---------------------------------------------------------
 -- Create a "Weighted Relationship", child of 
@@ -82,50 +95,73 @@ create table cr_weighted_rels (
   weight_b       integer not null
 ); 
 
+create function inline_1 () returns integer as '
 declare
-  attr_id integer;
+  attr_id       integer;
 begin
 
- acs_object_type.create_type (
-   supertype => 'cr_directional_rel',
-   object_type => 'cr_weighted_rel',
-   pretty_name => 'Weighted Relationship',
-   pretty_plural => 'Weighted Relationships',
-   table_name => 'cr_weighted_rels',
-   id_column => 'rel_id',
-   name_method => 'acs_object.default_name'
+ PERFORM acs_object_type__create_type (
+   ''cr_weighted_rel'',
+   ''Weighted Relationship'',
+   ''Weighted Relationships'',
+   ''cr_directional_rel'',
+   ''cr_weighted_rels'',
+   ''rel_id'',
+   null,
+   ''f'',
+   null,
+   ''acs_object__default_name''
  );
 
- attr_id := acs_attribute.create_attribute (
-   object_type => 'cr_weighted_rel',
-   attribute_name => 'weight_a',
-   datatype => 'integer',
-   pretty_name => 'Weight A',
-   pretty_plural => 'Weights A'
+ attr_id := acs_attribute__create_attribute (
+   ''cr_weighted_rel'',
+   ''weight_a'',
+   ''integer'',
+   ''Weight A'',
+   ''Weights A'',
+   null,
+   null,
+   null,
+   1,
+   1,
+   null,
+   ''type_specific'',
+   ''f''
  ); 
 
- attr_id := acs_attribute.create_attribute (
-   object_type => 'cr_weighted_rel',
-   attribute_name => 'weight_b',
-   datatype => 'integer',
-   pretty_name => 'Weight B',
-   pretty_plural => 'Weights B'
+ attr_id := acs_attribute__create_attribute (
+   ''cr_weighted_rel'',
+   ''weight_b'',
+   ''integer'',
+   ''Weight B'',
+   ''Weights B'',
+   null,
+   null,
+   null,
+   1,
+   1,
+   null,
+   ''type_specific'',
+   ''f''
  ); 
 
- cm_form_widget.register_attribute_widget (
-     content_type   => 'cr_weighted_rel',
-     attribute_name => 'weight_a',
-     widget	    => 'text',
-     is_required    => 't'
+ PERFORM cm_form_widget__register_attribute_widget (
+     ''cr_weighted_rel'',
+     ''weight_a'',
+     ''text'',
+     ''t''
  );
 
- cm_form_widget.register_attribute_widget (
-     content_type   => 'cr_weighted_rel',
-     attribute_name => 'weight_b',
-     widget	    => 'text',
-     is_required    => 't'
+ PERFORM cm_form_widget__register_attribute_widget (
+     ''cr_weighted_rel'',
+     ''weight_b'',
+     ''text'',
+     ''t''
  );
 
-end;
-/
-show errors
+end;' language 'plpgsql';
+
+
+select inline_1 ();
+
+drop function inline_1 ();
