@@ -22,7 +22,7 @@ if { [string equal $empty_p ""] } {
     db_transaction {
         db_exec_plsql delete_template "
       begin 
-        content_template.delete(:template_id); 
+        content_template.del(:template_id); 
       end;" 
     }
 

@@ -26,7 +26,7 @@ if { [string equal $is_empty "f"] } {
 
   # Otherwise, delete the folder
   db_transaction {
-      db_exec_plsql delete_folder "begin content_folder.delete(:id); end;"
+      db_exec_plsql delete_folder "begin content_folder.del(:id); end;"
   }
 
   # Remove it from the clipboard, if it exists

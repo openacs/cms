@@ -20,7 +20,7 @@ if { [string equal $is_empty "f"] } {
 
   db_transaction {
       # Otherwise, delete the folder
-      set delete_keyword [db_exec_plsql delete_keyword "begin :1 := content_keyword.delete(:id); end;"]
+      set delete_keyword [db_exec_plsql delete_keyword "begin :1 := content_keyword.del(:id); end;"]
   }
 
   # Remove it from the clipboard, if it exists

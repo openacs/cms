@@ -45,7 +45,7 @@
 <partialquery name="symlink_delete">      
       <querytext>
 
-        content_symlink.delete
+        content_symlink.del
 
       </querytext>
 </partialquery>
@@ -53,7 +53,7 @@
 <partialquery name="folder_delete">      
       <querytext>
 
-        content_folder.delete
+        content_folder.del
 
       </querytext>
 </partialquery>
@@ -61,7 +61,7 @@
 <partialquery name="template_delete">      
       <querytext>
 
-        content_template.delete
+        content_template.del
 
       </querytext>
 </partialquery>
@@ -69,7 +69,7 @@
 <partialquery name="item_delete">      
       <querytext>
 
-        content_item.delete
+        content_item.del
 
       </querytext>
 </partialquery>

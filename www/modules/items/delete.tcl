@@ -14,7 +14,7 @@ db_transaction {
 
     db_exec_plsql item_delete "
   begin 
-    content_item.delete(
+    content_item.del(
       item_id => :item_id
     ); 
   end;" 

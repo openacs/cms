@@ -5,7 +5,7 @@
 
 <fullquery name="delete">      
       <querytext>
-      begin content_template.delete(:template_id); end;
+      begin content_template.del(:template_id); end;
       </querytext>
 </fullquery>
 

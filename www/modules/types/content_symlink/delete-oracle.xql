@@ -6,7 +6,7 @@
 <fullquery name="symlink_delete">      
       <querytext>
       
-         begin content_symlink.delete(:id); end;
+         begin content_symlink.del(:id); end;
       </querytext>
 </fullquery>
 

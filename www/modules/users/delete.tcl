@@ -20,7 +20,7 @@ if { [string equal $is_empty "f"] } {
 
   # Otherwise, delete the group
   db_transaction {
-      db_exec_plsql delete_group "begin acs_group.delete(:id); end;"
+      db_exec_plsql delete_group "begin acs_group.del(:id); end;"
   }
 
   # Remove it from the clipboard, if it exists

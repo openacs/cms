@@ -22,7 +22,7 @@
           loop
             fetch c_rel_cur into v_id;
             exit when c_rel_cur%NOTFOUND;
-            membership_rel.delete(v_id);
+            membership_rel.del(v_id);
           end loop;
         end;
       </querytext>

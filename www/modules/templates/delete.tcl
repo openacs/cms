@@ -15,7 +15,7 @@ if { ! [string equal $submit {}] } {
       db_transaction {
 
           foreach template_id [ns_querygetall template_id] {
-              db_exec_plsql delete "begin content_template.delete(:template_id); end;"
+              db_exec_plsql delete "begin content_template.del(:template_id); end;"
           }
       }
   }

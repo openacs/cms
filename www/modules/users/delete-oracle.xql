@@ -5,7 +5,7 @@
 
 <fullquery name="delete_group">      
       <querytext>
-      begin acs_group.delete(:id); end;
+      begin acs_group.del(:id); end;
       </querytext>
 </fullquery>
 

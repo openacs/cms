@@ -49,7 +49,7 @@ begin
     delete from acs_permissions 
       where object_id in (select module_id from cm_modules);
     for v_module_val in c_module_cur loop
-      acs_object.delete( v_module_val.module_id );
+      acs_object.del( v_module_val.module_id );
     end loop;
 
     acs_object_type.drop_type ( 'content_module' );

@@ -5,7 +5,7 @@
 
 <fullquery name="delete_folder">      
       <querytext>
-      begin content_folder.delete(:id); end;
+      begin content_folder.del(:id); end;
       </querytext>
 </fullquery>
 

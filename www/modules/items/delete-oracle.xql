@@ -7,7 +7,7 @@
       <querytext>
       
   begin 
-    content_item.delete(
+    content_item.del(
       item_id => :item_id
     ); 
   end;
