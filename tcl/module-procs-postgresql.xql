@@ -101,8 +101,8 @@
       <querytext>
 
           select
-            lpad(' ', tree_level(t.tree_sortkey), '-') || pretty_name as label,
-            object_type as value
+            lpad(' ', tree_level(t.tree_sortkey), '-') || t.pretty_name as label,
+            t.object_type as value
           from
             acs_object_types t, acs_object_types t2
           where t2.object_type = 'content_revision'
