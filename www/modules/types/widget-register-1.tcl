@@ -13,8 +13,7 @@ form create widget_register -elements {
 }
 
 
-set form_widgets [db_list_of_lists get_form_widgets ""]
-
+set form_widgets [db_list_of_lists get_form_widgets "" ]
 
 element create widget_register widget \
 	-datatype keyword \
@@ -37,7 +36,7 @@ if { [form is_request widget_register] } {
 
     db_1row get_attr_info ""
 
-    db_1row get_reg_widget ""
+    db_0or1row get_reg_widget ""
 
     element set_properties widget_register content_type_pretty \
 	    -value $content_type_pretty
@@ -67,29 +66,17 @@ if { [form is_valid widget_register] } {
 
     db_transaction {
 
-        set already_registered [db_string registered "" -default ""]
+        set already_registered [db_string check_registered "" -default ""]
 
         # just update the is_required column if this widget is already registered
         #   this way we don't overwrite the existing attribute widget params
         if { ![string equal $already_registered ""] && \
                  $already_registered } {
-            db_dml update_widgets "
-	  update cm_attribute_widgets
-            set is_required = decode(is_required,'t','f','t')
-            where attribute_id = :attribute_id
-            and widget = :widget"
+            db_dml update_widgets ""
         } else {
 
             # (re)register a widget to an attribute
-            db_exec_plsql register_widget "
-	  begin
-	  cm_form_widget.register_attribute_widget(
-              content_type   => :content_type,
-              attribute_name => :attribute_name,
-              widget         => :widget,
-              is_required    => :is_required
-          );
-	  end;"
+            db_exec_plsql register_widget ""
         }
     }
     
