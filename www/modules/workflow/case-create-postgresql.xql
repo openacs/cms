@@ -6,7 +6,6 @@
 <fullquery name="new_case">      
       <querytext>
 
-
         select  workflow_case__new(
 	    :case_id,
 	    'publishing_wf', 
@@ -20,7 +19,7 @@
       </querytext>
 </fullquery>
 
- 
+
 <fullquery name="add_assignment">      
       <querytext>
 
@@ -90,3 +89,6 @@
 
  
 </queryset>
+
+
+

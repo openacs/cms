@@ -35,7 +35,9 @@
   and
     assign.case_id = task.case_id
   and
-    assign.transition_key = task.transition_key
+    assign.role_key = trans.role_key
+  and
+    task.transition_key = trans.transition_key
   and (
     task.state = 'enabled'
     or (task.state = 'started' and task.holding_user = :user_id)

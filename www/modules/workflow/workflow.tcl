@@ -26,7 +26,7 @@ if { [string equal $transition "all"] } {
 	ns_log notice "workflow.tcl - Bad transition - $transition"
 	forward "workflow"
     }
-    set transition_sql "and ca.transition_key = :transition"
+    set transition_sql "and ca.role_key = trans.role_key"
 }
 
 

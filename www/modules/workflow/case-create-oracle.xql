@@ -24,7 +24,7 @@
 		  begin
 		  workflow_case.add_manual_assignment(
 		      case_id        => :case_id,
-		      transition_key => :transition,
+		      role_key 	     => :transition,
 		      party_id       => :value
 		  );
 		  end;
@@ -39,7 +39,7 @@
 		      begin
 	    	      workflow_case.add_manual_assignment(
 		          case_id         => :case_id,
-	                  transition_key  => :transition,
+	                  role_key        => :transition,
 	                  party_id        => :new_value
 		      );
 		      end;

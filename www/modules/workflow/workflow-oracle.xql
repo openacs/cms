@@ -37,7 +37,7 @@
   and
     t.transition_key = trans.transition_key
   and
-    ca.transition_key = t.transition_key
+    ca.role_key = trans.role_key
   and
     t.state in ('started','enabled')
   $transition_sql
@@ -52,11 +52,11 @@
       <querytext>
       
   select
-    ca.transition_key, transition_name, ca.party_id,
+    trans.transition_key, transition_name, ca.party_id,
     item_id, content_item.get_title(item_id) as title,
     nvl(party.name(ca.party_id),person.name(ca.party_id)) as assigned_party,
     to_char(dead.deadline,'Mon.DD, YYYY') as deadline_pretty,
-    content_workflow.is_overdue(c.case_id, ca.transition_key) as is_overdue
+    content_workflow.is_overdue(c.case_id, trans.transition_key) as is_overdue
   from
     wf_cases c, wf_case_assignments ca, wf_case_deadlines dead,
     wf_transitions trans, cr_items i
@@ -71,7 +71,7 @@
   and
     c.case_id = dead.case_id
   and
-    ca.transition_key = trans.transition_key
+    ca.role_key = trans.role_key
   and
     dead.transition_key = trans.transition_key
   and
@@ -86,11 +86,11 @@
                  and
                    case_id = c.case_id
                  and
-                   transition_key = ca.transition_key )
+                   transition_key = trans.transition_key )
   and
     -- its finished
-    content_workflow.is_finished(c.case_id, ca.transition_key) = 'f'
-  -- ca.transition_key = transition 
+    content_workflow.is_finished(c.case_id, trans.transition_key) = 'f'
+  -- trans.transition_key = transition 
   $transition_sql
   order by
     trans.sort_order, title, assigned_party, dead.deadline desc

@@ -23,7 +23,8 @@
     wf_transitions trans, 
     wf_tasks task,
     wf_cases cases,
-    wf_case_deadlines dead
+    wf_case_deadlines dead,
+    wf_transition_role_assign_map trans_role
   where 
     dead.case_id = cases.case_id
   and
@@ -33,7 +34,9 @@
   and
     assign.case_id = task.case_id
   and
-    assign.transition_key = task.transition_key
+    assign.role_key = trans_role.assign_role_key
+  and
+    task.transition_key = trans_role.transition_key
   and 
     task.state = 'started'
   and

@@ -54,15 +54,18 @@
         coalesce(party__name(party_id), person__name(party_id)) as name
       from
         wf_transitions t, cr_items i,
-        wf_cases c, wf_case_assignments ca, wf_case_deadlines cd
+        wf_cases c, wf_case_assignments ca, wf_case_deadlines cd,
+    	wf_transition_role_assign_map trans_role
       where
         c.workflow_key = 'publishing_wf'
       and
         c.workflow_key = t.workflow_key
       and
-        ca.transition_key = t.transition_key
+    	ca.role_key = trans_role.assign_role_key
       and
-        ca.transition_key = cd.transition_key
+    	t.transition_key = trans_role.transition_key
+      and
+        trans_role.transition_key = cd.transition_key
       and
         c.case_id = ca.case_id
       and
@@ -107,7 +110,8 @@
         coalesce(party__name(admin_id),person__name(admin_id)) as admin_name
       from
         wf_cases c, wf_case_assignments ca, wf_case_deadlines cd,
-        wf_transitions t, cr_items i, acs_objects o
+        wf_transitions t, cr_items i, acs_objects o,
+    	wf_transition_role_assign_map trans_role
       where
         c.workflow_key = 'publishing_wf'
       and
@@ -119,9 +123,11 @@
       and
         c.case_id = :case_id
       and
-        ca.transition_key = t.transition_key
+    	ca.role_key = trans_role.assign_role_key
       and
-        ca.transition_key = cd.transition_key
+    	t.transition_key = trans_role.transition_key
+      and
+        trans_role.transition_key = cd.transition_key
       and
         t.transition_key = :transition_key
       and

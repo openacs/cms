@@ -20,9 +20,9 @@
   and
     c.case_id = ca.case_id
   and
-    ca.transition_key = dead.transition_key
+    ca.role_key = trans.role_key
   and
-    trans.transition_key = ca.transition_key
+    dead.transition_key = trans.transition_key
   and
     c.workflow_key = 'publishing_wf'
   and

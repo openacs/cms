@@ -12,9 +12,11 @@
 <fullquery name="get_status">      
       <querytext>
       select case when count(*) = 0 then 'no' else 'yes' end
-               from wf_case_assignments
+               from wf_case_assignments ca,
+		    wf_transitions trans
                where case_id = :case_id 
-               and transition_key = :transition_key 
+	       and ca.role_key = trans.role_key
+               and trans.transition_key = :transition_key 
                and party_id = :user_id
       </querytext>
 </fullquery>

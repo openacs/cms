@@ -98,7 +98,7 @@
   and
     c.case_id = ca.case_id
   and
-    ca.transition_key = t.transition_key
+    ca.role_key = t.role_key
   and
     p.person_id = ca.party_id
   and
