@@ -159,7 +159,7 @@
 <fullquery name="content::new_item.get_item_id">
 	<querytext>
         begin 
-          :item_id := content_item.new( [join $params ","] );
+          :1 := content_item.new( [join $params ","] );
         end;
         </querytext>
 </fullquery>
