@@ -738,6 +738,12 @@ ad_proc -public content::add_revision { form_name { tmpfile "" } {prefix {}} {ne
     foreach var {item_id revision_id content_method} {
         set $var [template::element get_values $form_name ${prefix}$var]
     } 
+
+    # MS: new items were bombing with a null revision_id
+    if {[empty_string_p $revision_id]} {
+        set revision_id [db_nextval acs_object_id_seq]
+    }
+
     ns_set put $bind_vars item_id $item_id
     ns_set put $bind_vars revision_id $revision_id
 
@@ -748,6 +754,7 @@ ad_proc -public content::add_revision { form_name { tmpfile "" } {prefix {}} {ne
                               $info(content_type) $info(table_name) $bind_vars $form_name $prefix $new_p]
 
     # if content exists, prepare it for insertion
+
     if { [template::element exists $form_name ${prefix}content] } {
         set filename [template::element get_value $form_name ${prefix}content]
         set tmpfile [prepare_content_file $form_name]
@@ -757,14 +764,6 @@ ad_proc -public content::add_revision { form_name { tmpfile "" } {prefix {}} {ne
 
     add_revision_dml $insert_statement $bind_vars $tmpfile $filename
 
-    # flush folder listing for item's parent because title may have changed
-    #template::query parent_id onevalue "
-    #  select parent_id from cr_items where item_id = :item_id" 
-    #
-    # if { $parent_id == [cm::modules::sitemap::getRootFolderID] } {
-    #    set parent_id ""
-    #}
-    #cms_folder::flush sitemap $parent_id
 }
 
 
@@ -2092,7 +2091,7 @@ ad_proc -public content::add_content { form_name revision_id } {
     @param revision_id  The object ID of the revision to be updated.
 
 } {
-    
+
     # if content exists, prepare it for insertion
     if { [template::element exists $form_name content] } {
         set filename [template::element get_value $form_name content]
