@@ -294,13 +294,13 @@ end;' language 'plpgsql';
 \i cms-content-methods.sql
 
 -- prompt *** Compiling workflow model...
-\i cms-publishing-wf.sql
+--\i cms-publishing-wf.sql
 
 -- prompt *** Compiling workflow helper package...
-\i cms-workflow.sql
+--\i cms-workflow.sql
 
 -- prompt *** Compiling permissions model...
-\i cms-permissions.sql
+-- \i cms-permissions.sql
 
 -- prompt *** Compiling fixes that need to be done...
 \i cms-fix.sql

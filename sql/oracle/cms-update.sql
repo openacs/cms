@@ -1,27 +1,27 @@
 
 -- Modify permissions to include the cm_relate permission
-declare
-  v_exists integer;
-begin
-  select count(*) into v_exists from acs_privileges 
-    where privilege = 'cm_admin';
+-- declare
+--   v_exists integer;
+-- begin
+--   select count(*) into v_exists from acs_privileges 
+--     where privilege = 'cm_admin';
 
-  if v_exists > 0 then
-    select count(*) into v_exists from acs_privileges 
-      where privilege = 'cm_relate';
+--   if v_exists > 0 then
+--     select count(*) into v_exists from acs_privileges 
+--       where privilege = 'cm_relate';
 
-    if v_exists < 1 then
-      acs_privilege.create_privilege('cm_relate', 'Relate Items', 'Relate Items'); 
-      acs_privilege.add_child('cm_admin', 'cm_relate');
-      update acs_privilege_hierarchy 
-	set privilege = 'cm_relate'
-      where privilege = 'cm_admin' 
-	and child_privilege = 'cm_write';
-    end if;
-  end if;
-end;
-/
-show errors
+--     if v_exists < 1 then
+--       acs_privilege.create_privilege('cm_relate', 'Relate Items', 'Relate Items'); 
+--       acs_privilege.add_child('cm_admin', 'cm_relate');
+--       update acs_privilege_hierarchy 
+-- 	set privilege = 'cm_relate'
+--       where privilege = 'cm_admin' 
+-- 	and child_privilege = 'cm_write';
+--     end if;
+--   end if;
+-- end;
+-- /
+-- show errors
 
 -- This parent_id column was not included in the cr_keywords table
 -- for RC 0.  Ensure this column is there.

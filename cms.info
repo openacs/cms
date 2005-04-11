@@ -7,7 +7,7 @@
     <initial-install-p>f</initial-install-p>
     <singleton-p>t</singleton-p>
 
-    <version name="4.2d" url="http://openacs.org/repository/download/apm/cms-4.2d.apm">
+    <version name="5.0d" url="http://openacs.org/repository/download/apm/cms-5.0d.apm">
     <database-support>
         <database>oracle</database>
         <database>postgresql</database>
@@ -24,12 +24,11 @@
         acs-workflow which has been deprecated.  Alternatives include etp and bcms (which is a work in progress), CMS 
         remains the best place to look to find examples of how the content repository should be used.
         </description>
-        <provides url="cms" version="4.2d"/>
-        <requires url="acs-content-repository" version="5.1.2"/>
-        <requires url="acs-kernel" version="5.1.2"/>
-        <requires url="acs-tcl" version="5.1.2"/>
-        <requires url="acs-templating" version="5.1.2"/>
-        <requires url="acs-workflow" version="4.5"/>
+        <provides url="cms" version="5.0d"/>
+        <requires url="acs-content-repository" version="5.1.5"/>
+        <requires url="acs-kernel" version="5.1.5"/>
+        <requires url="acs-tcl" version="5.1.5"/>
+        <requires url="acs-templating" version="5.1.5"/>
 
         <parameters>
             <parameter datatype="number"  min_n_values="1"  max_n_values="1"  name="ClipboardFloatsP"  default="0" description="Determine whether the clipboard should be in its own floating window."/>

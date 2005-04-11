@@ -1,31 +1,31 @@
 
 -- Modify permissions to include the cm_relate permission
-create or replace function inline_0 ()
-returns integer as '
-declare
-  v_exists integer;
-begin
-  select count(*) into v_exists from acs_privileges 
-    where privilege = ''cm_admin'';
+-- create or replace function inline_0 ()
+-- returns integer as '
+-- declare
+--   v_exists integer;
+-- begin
+--   select count(*) into v_exists from acs_privileges 
+--     where privilege = ''cm_admin'';
 
-  if v_exists > 0 then
-    select count(*) into v_exists from acs_privileges 
-      where privilege = ''cm_relate'';
+--   if v_exists > 0 then
+--     select count(*) into v_exists from acs_privileges 
+--       where privilege = ''cm_relate'';
 
-    if v_exists < 1 then
-      update acs_privilege_hierarchy 
-	set privilege = ''cm_relate''
-      where privilege = ''cm_admin'' 
-	and child_privilege = ''cm_write'';
-    end if;
-  end if;
+--     if v_exists < 1 then
+--       update acs_privilege_hierarchy 
+-- 	set privilege = ''cm_relate''
+--       where privilege = ''cm_admin'' 
+-- 	and child_privilege = ''cm_write'';
+--     end if;
+--   end if;
 
-  return 0;
-end;' language 'plpgsql';
+--   return 0;
+-- end;' language 'plpgsql';
 
-select inline_0 ();
+-- select inline_0 ();
 
-drop function inline_0 ();
+-- drop function inline_0 ();
 
 
 -- show errors
