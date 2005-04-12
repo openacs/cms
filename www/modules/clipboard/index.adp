@@ -12,6 +12,16 @@
 
 </script> 
 
+<p/>
+
+&nbsp;Clipboard
+
+<p/>
+
+&nbsp;&nbsp;&nbsp;Browse and delete from the clipboard below
+
+<p/>
+
 <div id="subnavbar-div">
   <div id="subnavbar-container">
     <div id="subnavbar">
@@ -79,17 +89,6 @@
  <else>
    <div class="tab">
      <a href="@package_url@modules/clipboard/index?mount_point=@mount_point@&clip_tab=categories" title="" class="subnavbar-unselected">Keywords</a>
-   </div>
- </else>
-
- <if @clip_tab@ eq users>
-   <div class="tab" id="subnavbar-here">
-     Users
-   </div>
- </if>
- <else>
-   <div class="tab">
-     <a href="@package_url@modules/clipboard/index?mount_point=@mount_point@&clip_tab=users" title="" class="subnavbar-unselected">Users</a>
    </div>
  </else>
 

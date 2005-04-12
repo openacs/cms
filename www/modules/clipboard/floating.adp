@@ -1,3 +1,6 @@
+<master src="../../../../../www/blank-master">
+<property title="Floating Clipboard"></property>
+
 <link rel="stylesheet" type="text/css" href="/resources/acs-subsite/site-master.css" media="all">
 
 <script language=javascript>
@@ -82,17 +85,6 @@
  <else>
    <div class="tab">
      <a href="@package_url@modules/clipboard/floating?mount_point=@mount_point@&clip_tab=keywords" title="" class="navbar-unselected">Keywords</a>
-   </div>
- </else>
-
- <if @clip_tab@ eq users>
-   <div class="tab" id="subnavbar-here">
-     Users
-   </div>
- </if>
- <else>
-   <div class="tab">
-     <a href="@package_url@modules/clipboard/floating?mount_point=@mount_point@&clip_tab=users" title="" class="navbar-unselected">Users</a>
    </div>
  </else>
 
