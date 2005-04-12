@@ -26,15 +26,11 @@ if { [form is_valid edit_keyword] } {
   form get_values edit_keyword keyword_id heading description
 
   db_transaction {
-      db_exec_plsql edit_keyword {
-    begin 
-      content_keyword.set_heading(:keyword_id, :heading);
-      content_keyword.set_description(:keyword_id, :description);
-    end;
-      }
+      db_exec_plsql edit_keyword {}
   }
 
-  template::forward "refresh-tree?id=$keyword_id&goto_id=$parent_id&mount_point=$mount_point"
+  set id $keyword_id
+  ad_returnredirect [export_vars -base index { id parent_id mount_point }]
 }
 
 

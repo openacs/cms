@@ -25,8 +25,6 @@ if { [form is_request add_keyword] } {
 if { [form is_valid add_keyword] } {
 
   form get_values add_keyword keyword_id heading parent_id description
-  set user_id [User::getID]
-  set ip [ns_conn peeraddr]
 
   db_transaction {
 
@@ -36,16 +34,12 @@ if { [form is_valid add_keyword] } {
           set pid ""
       }
 
-      set keyword_id [db_exec_plsql new_keyword "
-    begin :1 := content_keyword.new(
-      heading => :heading, 
-      description => :description, 
-      keyword_id => :keyword_id,
-      creation_user => :user_id,
-      creation_ip => :ip$pid); end;"]
+      set keyword_id [db_exec_plsql new_keyword {}]
+
   }
 
-  template::forward "refresh-tree?id=_all_&goto_id=$parent_id&mount_point=$mount_point"
+  set id $parent_id
+  ad_returnredirect [export_vars -base index?mount_point=$mount_point { id }]
 }
 
 

@@ -12,8 +12,8 @@
       :pid,
       :keyword_id,
       now(),
-      :user_id,
-      :ip,
+      null,
+      null,
       'content_keyword');
 
       </querytext>

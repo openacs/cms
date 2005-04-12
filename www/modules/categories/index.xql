@@ -1,15 +1,13 @@
 <?xml version="1.0"?>
 <queryset>
 
-<fullquery name="get_parent_id">      
+<fullquery name="get_parent_info">      
       <querytext>
       
-    select
-      context_id
-    from
-      acs_objects
-    where
-      object_id = :id
+   select o.context_id as parent_id, k.heading as parent_heading
+     from  acs_objects o, cr_keywords k
+    where object_id = :id
+      and o.object_id = k.keyword_id
 
       </querytext>
 </fullquery>

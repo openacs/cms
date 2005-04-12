@@ -21,5 +21,14 @@
       </querytext>
 </fullquery>
 
+
+<fullquery name="update_context_id">      
+      <querytext>
+      
+       update acs_objects set context_id = $update_value
+         where object_id = $item_id
+
+      </querytext>
+</fullquery>
  
 </queryset>

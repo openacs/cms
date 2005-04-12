@@ -11,10 +11,7 @@ set is_empty [db_string get_empty_status ""]
 # If nonempty, show error
 if { [string equal $is_empty "f"] } {
 
-  set message "This category contains subcategories and cannot be deleted."
-  set return_url "modules/categories/index"
-  set passthrough [list [list id $id] [list parent_id $parent_id]]
-  template::forward "../../error?message=$message&return_url=$return_url&passthrough=$passthrough"
+  ad_complain "This category contains subcategories and cannot be deleted."
 
 } else {
 
@@ -29,6 +26,6 @@ if { [string equal $is_empty "f"] } {
   clipboard::set_cookie $clip
   clipboard::free $clip 
 
-  template::forward "refresh-tree?id=_all_&goto_id=$parent_id&mount_point=$mount_point"
+  ad_returnredirect "index?id=$parent_id&mount_point=$mount_point"
 }
  

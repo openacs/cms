@@ -21,16 +21,9 @@ db_transaction {
 
     clipboard::map_code $clip $mount_point {
         if { [catch { 
-            db_dml move_keyword_item "
-       update cr_items set parent_id = $update_value
-         where item_id = $item_id
-         and exists (
-           select 1 from cr_keywords where keyword_id = item_id
-         )" 
-
-            db_dml move_keyword_keyword "
-       update cr_keywords set parent_id = $update_value
-         where keyword_id = $item_id" 
+            db_dml move_keyword_item {}
+            db_dml move_keyword_keyword {}
+            db_dml update_context_id {}
         } errmsg] } {
         }    
     }
@@ -38,8 +31,9 @@ db_transaction {
 
 clipboard::free $clip
 
-# Specify a null id so that the entire branch will be refreshed
-template::forward "refresh-tree?goto_id=$target_id&mount_point=$mount_point"
+set id $target_id
+ad_returnredirect [export_vars -base index {id mount_point}]
+
 
 
  

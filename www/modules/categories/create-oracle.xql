@@ -10,8 +10,8 @@
       heading => :heading, 
       description => :description, 
       keyword_id => :keyword_id,
-      creation_user => :user_id,
-      creation_ip => :ip$pid); end;
+      creation_user => null,
+      creation_ip => null); end;
       </querytext>
 </fullquery>
 
