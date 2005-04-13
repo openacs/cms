@@ -29,7 +29,7 @@ template::list::create \
 db_multirow -extend { widget_links } attribute_types get_attr_types "" {
     set edit_widget_url [export_vars -base widget-register {attribute_id widget content_type }]
     set unregister_widget_url [export_vars -base widget-unregister {attribute_id content_type}]
-    if {[string match $can_edit_widgets "t"]} {
+    if {$can_edit_widgets_p} {
 	if {[string match $object_type $content_type] && [expr ! [string match $object_type "content_revision"]]} {
 	    if {[template::util::is_nil widget]} {
 		set widget_links "<a href=\"$edit_widget_url\">Register Widget</a>"

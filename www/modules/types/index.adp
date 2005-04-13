@@ -106,7 +106,7 @@
   <if @type_props_tab@ eq attributes>
 
     <div id=section>
-    <include src="attributes" can_edit_widgets="@can_edit_widgets@" content_type="@content_type@">
+    <include src="attributes" can_edit_widgets_p="@can_edit_widgets_p@" content_type="@content_type@">
     </div>
     <p/>
 

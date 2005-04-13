@@ -36,7 +36,7 @@ set user_id [auth::require_login]
 permission::require_permission -party_id $user_id \
     -object_id $module_id -privilege read
 
-set can_edit_widgets [permission::permission_p -party_id $user_id \
+set can_edit_widgets_p [permission::permission_p -party_id $user_id \
     -object_id $module_id -privilege write]
 
 
