@@ -28,14 +28,16 @@ if { [string equal $id content_revision] } {
 }
 
 set content_type $id
-set user_id [auth::require_login]
 set root_id [cm::modules::templates::getRootFolderID]
 
 set module_id [db_string get_module_id ""]
 
-content::check_access $module_id cm_examine -user_id $user_id
+set user_id [auth::require_login]
+permission::require_permission -party_id $user_id \
+    -object_id $module_id -privilege read
 
-set can_edit_widgets $user_permissions(cm_write)
+set can_edit_widgets [permission::permission_p -party_id $user_id \
+    -object_id $module_id -privilege write]
 
 
 # get the content type pretty name
@@ -91,22 +93,4 @@ set page_title "Content Type - $object_type_pretty"
 # for the permissions include
 set return_url [ns_conn url]
 set passthrough [content::assemble_passthrough return_url mount_point id]
-
-# for templates table
-if { [string equal $user_permissions(cm_write) t] } {
-    set footer "<a href=\"register-templates?content_type=$content_type\">
-    Register marked templates to this content type</a>"
-} else {
-    set footer ""
-}
-
-# Create the tabbed dialog
-set url [ad_conn url]
-append url "?id=$id&mount_point=$mount_point&parent_id=$parent_id&refresh_tree=f"
-
-# template::tabstrip create type_props -base_url $url
-# template::tabstrip add_tab type_props attributes "Attributes and Uploads" attributes
-# template::tabstrip add_tab type_props relations "Relation Types" relations
-# template::tabstrip add_tab type_props templates "Templates" templates
-# template::tabstrip add_tab type_props permissions "Permissions" permissions
 

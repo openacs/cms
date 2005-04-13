@@ -6,15 +6,10 @@ request create -params {
   parent_id -datatype keyword -optional
 }
 
-set user_id [User::getID]
-set ip [ns_conn peeraddr]
 set folder_list [list]
 
-# Check permissions
-content::check_access $id cm_write \
-  -mount_point $mount_point -parent_id $parent_id \
-  -return_url "modules/sitemap/index" \
-  -passthrough [list id $parent_id] 
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $id -privilege write
 
 if { [template::util::is_nil id] } {
   set root_id [cm::modules::${mount_point}::getRootFolderID]
@@ -27,13 +22,8 @@ set clip [clipboard::parse_cookie]
 db_transaction {
     clipboard::map_code $clip categories {
         if { [catch { 
-            db_exec_plsql item_assign "
-        begin 
-         :1 := content_keyword.item_assign(
-          :root_id, :item_id, null, :user_id, :ip); 
-        end;"
+            db_exec_plsql item_assign {}
             lappend folder_list [list $mount_point $item_id]
-
         } errmsg] } {
         }    
     }

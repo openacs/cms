@@ -8,8 +8,9 @@ ad_page_contract {
     {mount_point "sitemap"}
 }
 
-# permission check - user must have cm_write on this folder to delete it
-#content::check_access $item_id cm_write -user_id [auth::require_login]
+set user_id [auth::require_login] 
+permission::require_permission -party_id $user_id \
+    -object_id $parent_id -privilege write
 
 # Determine if the folder is empty
 if { [string match [content::folder::is_empty -folder_id $folder_id] "f" ] } {

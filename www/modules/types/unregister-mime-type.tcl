@@ -10,17 +10,11 @@ request set_param mime_type -datatype text
 db_transaction {
 
     set module_id [db_string get_module_id ""]
+    permission::require_permission -party_id [auth::require_login] \
+	-object_id $module_id -privilege write
 
-    # permissions check - must have cm_write to unregister mime type
-    content::check_access $module_id cm_write -user_id [User::getID]
+    db_exec_plsql unregister_mime_type {}
 
-    db_exec_plsql unregister_mime_type "
-  begin
-    content_type.unregister_mime_type(
-        content_type => :content_type,
-        mime_type    => :mime_type
-    );
-  end;"
 }
 
 content_method::flush_content_methods_cache $content_type

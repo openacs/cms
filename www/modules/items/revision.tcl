@@ -11,13 +11,12 @@ set live_revision_p 0
 db_1row get_revision "" -column_array one_revision
 template::util::array_to_vars one_revision
 
-# Check permissions - must have cm_examine on the item
-content::check_access $item_id cm_examine \
-	-mount_point $mount_point \
-	-return_url "modules/sitemap/index" 
+set user_id [auth::require_login]
+permission::require_permission -party_id $user_id \
+    -object_id $item_id -privilege read
 
-
-ns_log notice "user_permissions = [array get user_permissions]"
+set write_p [permission::permission_p -party_id $user_id \
+		 -object_id $item_id -privilege write]
 # validate revision
 if { [template::util::is_nil item_id] } {
     template::request::error invalid_revision \

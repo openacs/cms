@@ -29,11 +29,8 @@ if { ! [info exists info(item_id)] } {
   return
 }
 
-# Check permissions
-content::check_access $info(item_id) cm_examine \
-  -mount_point $mount_point \
-  -return_url "modules/sitemap/index" \
-  -request_error
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $info(item_id) -privilege read
 
 # query the attributes for this content type
 

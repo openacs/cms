@@ -3,20 +3,7 @@
 <queryset>
    <rdbms><type>postgresql</type><version>7.1</version></rdbms>
 
-<fullquery name="allowed_set_p">      
-      <querytext>
-      
-  select
-    cms_permission__permission_p( module_id, :user_id, 'cm_write' )
-  from
-    cm_modules
-  where
-     key = 'types'
 
-      </querytext>
-</fullquery>
-
- 
 <fullquery name="get_iteminfo">      
       <querytext>
       

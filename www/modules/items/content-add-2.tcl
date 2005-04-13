@@ -6,9 +6,8 @@ request set_param revision_id -datatype integer
 
 db_1row get_revision ""
 
-# permissions check - must have cm_write on the item
-content::check_access $item_id cm_write -user_id [User::getID]
-
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $item_id -privilege write
 
 # if we have an invalid revision_id, then redirect
 if { [template::util::is_nil name] } {

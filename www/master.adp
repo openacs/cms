@@ -1,4 +1,5 @@
 <master>
+<property name="title">@title@</property>
 
 <style>
 div#section {
@@ -21,17 +22,6 @@ div#section-header {
   <div id="subnavbar-container">
     <div id="subnavbar">
 
- <if @section@ eq "workspace">
-  <div class="tab" id="subnavbar-here">
-    Workspace
-  </div>
- </if>
- <else>
-  <div class="tab">
-    <a href="@package_url@modules/workspace/index" title="">Workspace</a>
-  </div>
- </else>
-        
  <if @section@ eq "sitemap">
   <div class="tab" id="subnavbar-here">
     Content
@@ -84,28 +74,6 @@ div#section-header {
  <else>
   <div class="tab">
     <a href="@package_url@modules/search/index" title="">Search</a>
-  </div>
- </else>
-
- <if @section@ eq "workflow">
-  <div class="tab" id="subnavbar-here">
-    Workflow
-  </div>
- </if>
- <else>
-  <div class="tab">
-    <a href="@package_url@modules/workflow/index" title="">Workflow</a>
-  </div>
- </else>
-
- <if @section@ eq "users">
-  <div class="tab" id="subnavbar-here">
-    Users
-  </div>
- </if>
- <else>
-  <div class="tab">
-    <a href="@package_url@modules/users/index" title="">Users</a>
   </div>
  </else>
 

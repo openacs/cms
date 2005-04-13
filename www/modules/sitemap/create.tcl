@@ -7,8 +7,8 @@ ad_page_contract {
     {mount_point "sitemap"}
 }
 
-# permissions check - user must have cm_new on parent
-#content::check_access $create_parent_id cm_new -user_id [auth::require_login] 
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $folder_id -privilege write
 
 set path [content::item::get_path -item_id $folder_id]
 if {[template::util::is_nil path]} {

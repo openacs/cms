@@ -14,8 +14,8 @@
                 :folder_id,
                 null,
                 current_timestamp, 
-                :user_id, 
-                :ip
+                null, 
+                null
             ); 
             
       </querytext>

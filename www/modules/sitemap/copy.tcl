@@ -1,20 +1,21 @@
 # Copy folders under another folder
 
 request create 
-request set_param id -datatype integer -optional
+request set_param folder_id -datatype integer -optional
 request set_param mount_point -datatype keyword -value sitemap
 
 
 set root_id [cm::modules::${mount_point}::getRootFolderID]
-if { [template::util::is_nil id] } {
+if { [template::util::is_nil folder_id] } {
   set folder_id $root_id
-} else {
-  set folder_id $id
-}
+} 
+# else {
+#   set folder_id $id
+# }
 
-# permission check - must have cm_new on the current folder
-set user_id [User::getID]
-content::check_access $folder_id cm_new -user_id $user_id 
+set user_id [auth::require_login]
+permission::require_permission -party_id $user_id \
+    -object_id $folder_id -privilege write
 
 set clip [clipboard::parse_cookie]
 set clip_items [clipboard::get_items $clip $mount_point]
@@ -37,7 +38,7 @@ element create copy mount_point \
 	-widget hidden \
 	-value $mount_point
 
-element create copy id \
+element create copy folder_id \
 	-datatype integer \
 	-widget hidden \
 	-param \
@@ -69,10 +70,8 @@ for { set i 1 } { $i <= $marked_item_size } { incr i } {
 
 
 if { [form is_valid copy] } {
-    set user_id [User::getID]
-    set ip [ns_conn peeraddr]
 
-    form get_values copy id mount_point
+    form get_values copy folder_id mount_point
     set copied_items [element get_values copy copied_items]
 
     db_transaction {
@@ -81,36 +80,16 @@ if { [form is_valid copy] } {
         foreach cp_item_id $copied_items {
             set parent_id [element get_values copy "parent_id_$cp_item_id"]
 
-            if { [catch {db_exec_plsql copy_item "
-	    begin
-            content_item.copy(
-                item_id          => :cp_item_id,
-                target_folder_id => :folder_id,
-	        creation_user    => :user_id,
-	        creation_ip      => :ip
-            ); 
-            end;"} errmsg] } {
+            if { [catch {db_exec_plsql copy_item {} } errmsg] } {
                 # possibly a duplicate name
                 ns_log notice "ERROR: copy.tcl - while copying $errmsg"
-            }
-
-            # flush the cache
-            if { [lsearch -exact $folder_flush_list $parent_id] == -1 } {
-                lappend folder_flush_list $parent_id
-                cms_folder::flush $mount_point $parent_id
             }
 
         }
     }
 
-    # flush cache for destination folder
-    if { $folder_id == [cm::modules::${mount_point}::getRootFolderID] } {
-	set folder_id ""
-    }
-    cms_folder::flush $mount_point $folder_id
     clipboard::free $clip
 
-    # Specify a null id so that the entire branch will be refreshed
-    template::forward \
-	    "refresh-tree?goto_id=$folder_id&mount_point=$mount_point"
+    ad_returnredirect [export_vars -base index {folder_id mount_point}]
+
 }

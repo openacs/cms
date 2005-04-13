@@ -5,9 +5,8 @@ request create
 request set_param item_id -datatype integer
 request set_param mount_point -datatype keyword -value sitemap
 
-
-# permissions check - cm_write required to rename an item
-content::check_access $item_id cm_write -user_id [User::getID]
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $item_id -privilege read
 
 set item_name [db_string get_item_name ""]
 

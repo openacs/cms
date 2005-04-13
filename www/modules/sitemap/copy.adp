@@ -10,7 +10,7 @@
 <property name="title">Copy Items to @path;noquote@</property>
 <h2>Copy Items to @path@</h2>
 <formtemplate id="copy">
-<formwidget id="id">
+<formwidget id="folder_id">
 
 <p>  
   <formerror id=copied_items>
@@ -18,12 +18,12 @@
   </formerror>
 </p>
 
-<table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width="95%">
+<table cellspacing=0 cellpadding=4 border=0 width="95%">
 
 <tr>
 <td>
 
-<table bgcolor=#99CCFF cellspacing=0 cellpadding=2 border=0 width="100%">
+<table cellspacing=0 cellpadding=2 border=0 width="100%">
 
   <tr><td>&nbsp;</td>
       <th align=left>Name</th>

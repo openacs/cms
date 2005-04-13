@@ -6,9 +6,8 @@ request set_param revision_id -datatype integer
 
 db_1row get_revision ""
 
-# permissions check - must have cm_write on the item
-content::check_access $item_id cm_write -user_id [User::getID]
-
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $item_id -privilege write
 
 # check for custom content-add-1 form
 if { [file exists [ns_url2file \

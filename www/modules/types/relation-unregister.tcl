@@ -9,9 +9,8 @@ request set_param target_type -datatype keyword
 request set_param relation_tag -datatype text -value ""
 
 set module_id [db_string get_module_id ""]
-
-# permissions check - must have cm_write on the types module
-content::check_access $module_id cm_write -user_id [User::getID]
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $module_id -privilege write
 
 if { [string equal $rel_type child_rel] } {
 

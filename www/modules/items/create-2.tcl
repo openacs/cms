@@ -22,8 +22,8 @@ request set_param return_url -datatype text -value "index"
 request set_param page_title -datatype text -optional
 request set_param is_wizard -datatype keyword -value f
 
-# permissions check - need cm_new on the parent item
-content::check_access $parent_id cm_new -user_id [User::getID]
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $parent_id -privilege write
 
 db_0or1row get_item "" -column_array new_item
 
@@ -100,7 +100,7 @@ if { [form is_valid create_item] } {
     }
 
     form get_values create_item return_url item_id storage_type
-    
+
     set item_id [content::new_item create_item $storage_type]
 
     # do wizard forward or forward to return_url

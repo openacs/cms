@@ -6,9 +6,8 @@ request create
 request set_param content_type -datatype integer -value content_revision
 
 set module_id [db_string get_module_id ""]
-
-# permission check - must have cm_examine on types module
-content::check_access $module_id cm_examine -user_id [auth::require_login] 
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $module_id -privilege read
 
 template::list::create \
     -name rel_types \

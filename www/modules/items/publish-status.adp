@@ -1,28 +1,27 @@
 
-<table cellspacing=0 cellpadding=2 border=0 width=95% bgcolor="#BBBBBB">
-<tr bgcolor="#FFFFFF">
-  <th align=left>Publishing Status</th>
-  <td align=right>
-    <if @user_permissions.cm_item_workflow@ eq t>
-      [<a href="status-edit?item_id=@item_id@">Edit</a>]
+<table cellspacing=0 cellpadding=2 border=0 width=95%>
+<tr>
+  <td colspan=2>
+    <if @can_edit_status_p@>
+      <a href="status-edit?item_id=@item_id@" class="button">Edit Publishing Status</a>
     </if>
     <else>&nbsp;</else>
   </td>
 </tr>
 
-<tr bgcolor="#BBBBBB">
+<tr>
 <td colspan=2>
-  <table cellspacing=0 cellpadding=4 border=2 width="100%">
-  <tr bgcolor="#DDDDDD">
-    <th align=left>@message@</th>
+  <table cellspacing=0 cellpadding=4 width="100%">
+  <tr>
+    <td align=left>@message@</td>
   </tr>
 
 
-  <tr bgcolor="#EEEEEE">
+  <tr>
     <td>
-      <b>This item is 
-      <if @is_publishable@ eq f><font color="red">NOT</font></if> 
-      in a publishable state<if @is_publishable@ eq f>:</if><else>.</else></b>
+      This item is 
+      <if @is_publishable@ eq f><strong>NOT</strong></if> 
+      in a publishable state<if @is_publishable@ eq f>:</if><else>.</else>
 
   <if @is_publishable@ eq f>
   <ul>
@@ -35,13 +34,6 @@
   </if>
 
 
-  <!-- workflow status -->
-
-  <if @unfinished_workflow_exists@ eq t>
-    <li>This item's publishing workflow is still active.
-  </if>
-
-  
   <!-- child rel status -->
 
 

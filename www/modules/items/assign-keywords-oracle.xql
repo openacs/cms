@@ -8,7 +8,7 @@
       
         begin 
          :1 := content_keyword.item_assign(
-          :root_id, :item_id, null, :user_id, :ip); 
+          :root_id, :item_id, null, null, null); 
         end;
       </querytext>
 </fullquery>

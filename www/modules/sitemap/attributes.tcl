@@ -18,8 +18,8 @@ if { [template::util::is_nil folder_resolved_id] } {
     set folder_resolved_id $folder_id
 }
 
-# permissions check - user must have cm_examine on this folder
-#content::check_access $folder_id cm_examine -user_id [User::getID]
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $folder_id -privilege read
 
 # Get the registered types for the folder 
 # (besides symlinks/templates/subfolders)
@@ -78,8 +78,8 @@ ad_form -name special_types \
     -on_request {}\
     -on_submit {
 
-        content::check_access $folder_resolved_id cm_write \
-	    -user_id [auth::require_login]
+	permission::require_permission -party_id [auth::require_login] \
+	    -object_id $folder_id -privilege write
 
         if { [string equal $allow_subfolders "t"] } {
             set subfolder_method "register_content_type"
@@ -96,6 +96,6 @@ ad_form -name special_types \
         db_exec_plsql content ""
     } \
     -after_submit {
-	ad_returnredirect "attributes?folder_id=$folder_id&mount_point=$mount_point"
+	ad_returnredirect [export_vars -base attributes {folder_id mount_point}]
 	ad_script_abort
     }

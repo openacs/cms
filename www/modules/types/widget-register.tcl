@@ -6,10 +6,8 @@ request set_param content_type -datatype keyword
 request set_param widget -datatype keyword -optional
 
 set module_id [db_string get_module_id ""]
-
-# permissions check - need cm_write on types module to edit a widget
-content::check_access $module_id cm_write -user_id [User::getID] 
-
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $module_id -privilege write
 
 wizard set_param attribute_id $attribute_id
 wizard set_param content_type $content_type

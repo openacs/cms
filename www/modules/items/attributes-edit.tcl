@@ -3,14 +3,10 @@
 request create
 request set_param item_id -datatype integer
 
-# check permissions - user must have cm_write on the item
-content::check_access $item_id cm_write -user_id [User::getID]
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $item_id -privilege write
 
 db_0or1row get_item ""
-
-# flush the sitemap folder listing cache in anticipation 
-# of the new item
-cms_folder::flush sitemap $item_id
 
 # validate item_id
 #  if one_item doesn't exist, then this item may have no latest revision

@@ -1,12 +1,11 @@
 <master src="../../master">
 <property name="title">@page_title@</property>
 
-<nobr>
-<p class="h1">
+<p/>
+
 <include src="../../bookmark" mount_point="@mount_point@" id="@parent_id@">
+
 @page_title;noquote@ 
-</p>
-</nobr>
 
 <p/>
 

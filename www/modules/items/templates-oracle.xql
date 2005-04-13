@@ -3,20 +3,6 @@
 <queryset>
    <rdbms><type>oracle</type><version>8.1.6</version></rdbms>
 
-<fullquery name="allowed_set_p">      
-      <querytext>
-      
-  select
-    cms_permission.permission_p( module_id, :user_id, 'cm_write' )
-  from
-    cm_modules
-  where
-     key = 'types'
-
-      </querytext>
-</fullquery>
-
- 
 <fullquery name="get_iteminfo">      
       <querytext>
       

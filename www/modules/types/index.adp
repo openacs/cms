@@ -130,9 +130,9 @@
 <if @type_props_tab@ eq templates>
 
     <div id=section>    
-    <div id=section-header>Registered Templates</div>
-    <p/>
-    <listtemplate name="type_templates"></listtemplate>
+     <div id=section-header>Registered Templates</div>
+      <p/>
+      <listtemplate name="type_templates"></listtemplate>
     </div>
 
 </if>
@@ -140,11 +140,8 @@
 <if @type_props_tab@ eq permissions>
 
     <div id=section>    
-    <include src="../permissions/index" 
-      object_id=@module_id;noquote@ 
-      mount_point="types" 
-      return_url="@return_url;noquote@" 
-      passthrough="@passthrough;noquote@">
+     <div id=section-header>Permissions</div>
+      <include src="/packages/acs-subsite/www/permissions/perm-include" object_id="@module_id@">
     </div>
 
 </if>
@@ -152,7 +149,7 @@
 <if @type_props_tab@ eq subtypes>
     
     <div id=section>
-    <include src="subtypes" content_type=@content_type;noquote@ object_type_pretty=@object_type_pretty;noquote@>
+     <include src="subtypes" content_type=@content_type;noquote@ object_type_pretty=@object_type_pretty;noquote@>
     </div>
 
 </if>

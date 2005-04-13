@@ -12,10 +12,8 @@ if { [template::util::is_nil id] } {
   set folder_id $id
 }
 
-
-# permission check - must have cm_write on the current folder
-set user_id [User::getID]
-content::check_access $folder_id cm_new -user_id $user_id
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $folder_id -privilege write
 
 set clip [clipboard::parse_cookie]
 set clip_items [clipboard::get_items $clip $mount_point]
@@ -67,12 +65,8 @@ for { set i 1 } { $i <= $marked_item_size } { incr i } {
     element set_value move parent_id_$item_id $parent_id
 }
 
-
-
 if { [form is_valid move] } {
 
-    set user_id [User::getID]
-    set ip [ns_conn peeraddr]
     set root_id [cm::modules::${mount_point}::getRootFolderID]
 
     form get_values move id mount_point
@@ -83,39 +77,15 @@ if { [form is_valid move] } {
         foreach mv_item_id $moved_items {
             set parent_id [element get_values move "parent_id_$mv_item_id"]
 
-            if { [catch {db_exec_plsql move_items "
-	    begin
-            content_item.move(
-                item_id          => :mv_item_id,
-                target_folder_id => :folder_id
-            ); 
-            end;"} errmsg] } {
+            if { [catch {db_exec_plsql move_items {} } errmsg] } {
                 # possibly a duplicate name
                 ns_log notice "move.tcl - while moving $errmsg"
             }
-
-            # flush the cache
-            if { [lsearch -exact $folder_flush_list $parent_id] == -1 } {
-                lappend folder_flush_list $parent_id
-                if { $parent_id == $root_id } {
-                    set parent_id ""
-                }
-                cms_folder::flush $mount_point $parent_id
-            }
-
-        }
+	}
     }
 
-
-    # flush cache for destination folder
-    if { $folder_id == $root_id } {
-	set folder_id ""
-    }
-
-    cms_folder::flush $mount_point $folder_id
     clipboard::free $clip
 
-    # Specify a null id so that the entire branch will be refreshed
-    template::forward \
-	    "refresh-tree?goto_id=$folder_id&mount_point=$mount_point"
+    ad_returnredirect [export_vars -base index {folder_id mount_point}]
+
 }

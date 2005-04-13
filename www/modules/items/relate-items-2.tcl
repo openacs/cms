@@ -11,10 +11,8 @@ request create -params {
 # rel_list is a list of lists in form of
 # {item_id relation_tag order_n relation_type}
 
-# Check permissions
-content::check_access $item_id cm_relate \
-  -mount_point $mount_point \
-  -return_url "modules/sitemap/index"
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $item_id -privilege write
 
 # Create the basic form
 form create rel_form_2

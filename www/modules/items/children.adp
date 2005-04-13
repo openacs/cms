@@ -1,5 +1,3 @@
-<div id=section-header>Child Items</div>
-
 <table bgcolor=#6699CC cellspacing=0 cellpadding=4 border=0 width="95%">
 <tr bgcolor="#FFFFFF">
   <th align=left valign=bottom>Child Items</th>

@@ -4,8 +4,8 @@ request create
 request set_param item_id -datatype integer
 request set_param content_method -datatype keyword -value no_content
 
-# check permissions - user must have cm_write on the item
-content::check_access $item_id cm_write -user_id [User::getID]
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $item_id -privilege write
 
 # get content_type and name of item
 db_0or1row get_one_item ""

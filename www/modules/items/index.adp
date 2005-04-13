@@ -95,12 +95,16 @@
 <if @item_props_tab@ eq children>
 
   <div id=section>
-  <include src="children" item_id="@item_id;noquote@">
+   <div id=section-header>Child Items</div>
+   <p/>
+   <include src="children" item_id="@item_id;noquote@">
   </div>
   <p>
 
   <div id=section>
-  <include src="related-items" item_id="@item_id;noquote@">
+   <div id=section-header>Related Items</div>
+   <p/>
+   <include src="related-items" item_id="@item_id;noquote@">
   </div>
   <p>
 
@@ -109,25 +113,23 @@
 <if @item_props_tab@ eq publishing>
 
   <div id=section>
-  <include src="publish-status" item_id="@item_id;noquote@">
+   <div id=section-header>Publishing Status</div>
+   <p/>
+   <include src="publish-status" item_id="@item_id;noquote@">
   </div>
   <p>
 
   <div id=section>
-  <include src="templates" item_id="@item_id;noquote@">
+   <div id=section-header>Registered Templates</div>
+   <p/>
+   <include src="templates" item_id="@item_id;noquote@">
   </div>
   <p>
 
-
-  <if @user_permissions.cm_item_workflow@ eq t>
-    <div id=section>
-    <include src="../workflow/case-status" item_id="@item_id;noquote@">
-    </div>
-    <p>
-  </if>
-
   <div id=section>
-  <include src="comments" item_id="@item_id;noquote@">
+   <div id=section-header>Comments</div>
+   <p/>
+   Place holder for comments
   </div>
   <p>
 
@@ -136,8 +138,8 @@
 <if @item_props_tab@ eq permissions>
   
   <div id=section>
-  <include src="../permissions/index" object_id="@item_id;noquote@" 
-    mount_point="@mount_point;noquote@" return_url="@return_url;noquote@" passthrough="@passthrough;noquote@">
+  <div id=section-header>Item permissions</div>
+  <include src="/packages/acs-subsite/www/permissions/perm-include" object_id="@item_id@">
   </div>
   <p/>
 
@@ -145,12 +147,12 @@
 
 <!-- Options at the end -->
 
-<if @user_permissions.cm_write@ eq t>
+<if @can_edit_p@>
   <p>
   <a href="rename?item_id=@item_id@&mount_point=@mount_point@">
     Rename</a> this content item
 </if>
-<if @user_permissions.cm_write@ eq t>
+<if @can_edit_p@>
   <br>
   <a href="delete?item_id=@item_id@&mount_point=@mount_point@" 
      onClick="return confirm('Warning! You are about to delete this content item.');">

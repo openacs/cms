@@ -31,10 +31,12 @@ set resolved_item_id [db_string get_item_id ""]
 
 set item_id $resolved_item_id
 
-# Check permissions
-content::check_access $item_id cm_examine \
-  -mount_point $mount_point \
-  -return_url "modules/sitemap/index" 
+set user_id [auth::require_login]
+permission::require_permission -party_id $user_id \
+    -object_id $item_id -privilege read
+
+set can_edit_p [permission::permission_p -party_id $user_id \
+		    -object_id $item_id -privilege write]
 
 # query the content_type of the item ID so we can check for a custom info page
 db_1row get_info "" -column_array info

@@ -7,20 +7,14 @@ request set_param content_type -datatype keyword -value "content_revision"
 request set_param mount_point  -datatype keyword -value "sitemap"
 request set_param parent_id    -datatype integer -optional
 
-set flush_parent_id $parent_id
-
 # Manually set the value since the templating system is still broken in 
 # the -value flag
 if { [template::util::is_nil parent_id] } {
   set parent_id [cm::modules::${mount_point}::getRootFolderID]
 }
 
-# permissions check - need cm_new on the parent item
-content::check_access $parent_id cm_new -user_id [User::getID]
-
-# flush the sitemap folder listing cache in anticipation 
-# of the new item
-cms_folder::flush sitemap $flush_parent_id
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $parent_id -privilege write
 
 # check for custom create-1 form
 if { [file exists [ns_url2file \

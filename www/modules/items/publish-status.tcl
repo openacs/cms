@@ -4,8 +4,14 @@
 request create
 request set_param item_id -datatype integer
 
-# permissions check - requires cm_item_workflow
-content::check_access $item_id cm_examine -user_id [User::getID] 
+set user_id [auth::require_login]
+permission::require_permission -party_id $user_id \
+    -object_id $item_id -privilege read
+
+set can_edit_status_p [permission::permission_p \
+			   -party_id $user_id \
+			   -object_id $item_id \
+			   -privilege write]
 
 # Query for publish status and release schedule, if any
 
@@ -60,7 +66,7 @@ if { [template::util::is_nil live_revision] } {
 
 # determine if there is an unfinished workflow
 
-set unfinished_workflow_exists [db_string unfinished_exists ""]
+#set unfinished_workflow_exists [db_string unfinished_exists ""]
 
 # determine if child type constraints have been satisfied
 

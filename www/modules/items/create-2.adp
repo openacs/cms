@@ -4,9 +4,4 @@
 </if>
 <h2>@page_title@</h2>
 
-<if @is_wizard@ eq t>
-  <formtemplate id="create_item" style="wizard"></formtemplate>
-</if>
-<else>
-  <formtemplate id="create_item"></formtemplate>
-</else>
+<formtemplate id="create_item"></formtemplate>

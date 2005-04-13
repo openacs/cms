@@ -4,10 +4,8 @@ request create
 request set_param folder_id -datatype integer
 request set_param mount_point -datatype keyword -value sitemap
 
-
-# permissions check - renaming a folder requires cm_write on the folder
-#content::check_access $item_id cm_write -user_id [auth::require_login] 
-
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $folder_id -privilege write
 
 # Create then form
 form create rename_folder

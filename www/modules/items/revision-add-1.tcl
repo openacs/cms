@@ -5,8 +5,8 @@
 request create
 request set_param item_id -datatype integer
 
-# check permissions
-content::check_access $item_id cm_write -user_id [User::getID]
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $item_id -privilege write
 
 set content_type [db_string get_content_type ""]
 

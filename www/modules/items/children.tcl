@@ -6,11 +6,9 @@ request create -params {
   mount_point -datatype keyword -optional -value sitemap
 }
 
-# Check permissions
-content::check_access $item_id cm_examine \
-  -mount_point $mount_point \
-  -return_url "modules/sitemap/index" \
-  -request_error
+set user_id [auth::require_login]
+permission::require_permission -party_id $user_id \
+    -object_id $item_id -privilege read
 
 # create a form to add child items
 
@@ -19,7 +17,7 @@ set child_types [db_list_of_lists get_child_types ""]
 # do not display template if this content type does not allow children
 if { [llength $child_types] == 0 } { adp_abort }
 
-if { [string equal $user_permissions(cm_new) t] } {
+if { [permission::permission_p -party_id $user_id -object_id $item_id -privilege write] } {
   form create add_child -method get -action "create-1"
   element create add_child parent_id -datatype integer \
     -widget hidden -value $item_id

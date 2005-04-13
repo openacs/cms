@@ -15,9 +15,9 @@ if { [template::util::is_nil id] } {
     set folder_id $id
 }
 
-# permission check - must have cm_new on id
-set user_id [User::getID]
-content::check_access $folder_id cm_new -user_id $user_id
+set user_id [auth::require_login]
+permission::require_permission -party_id $user_id \
+    -object_id $folder_id -privilege write
 
 set clip [clipboard::parse_cookie]
 set clip_items [clipboard::get_items $clip $mount_point]
@@ -81,9 +81,6 @@ for { set i 1 } { $i <= $marked_item_size } { incr i } {
 
 if { [form is_valid symlink] } {
 
-    set user_id [User::getID]
-    set ip [ns_conn peeraddr]
-
     form get_values symlink id mount_point
     set symlinked_items [element get_values symlink symlinked_items]
 
@@ -95,18 +92,7 @@ if { [form is_valid symlink] } {
             set name [element get_values symlink $element_name_1]
             set label [lindex [element get_values symlink $element_name_2] 0]
 
-            if { [catch {db_exec_plsql new_link "
-	    begin
-            :1 := content_symlink.new(
-                name          => :name, 
-                label         => :label,
-                target_id     => :sym_item_id, 
-                parent_id     => :folder_id,
-                creation_date => sysdate, 
-                creation_user => :user_id, 
-                creation_ip   => :ip
-            ); 
-            end;"} errmsg] } {
+            if { [catch {db_exec_plsql new_link {} } errmsg] } {
                 # possibly a duplicate name
                 ns_log notice "symlink.tcl - while symlinking $errmsg"
             }
@@ -117,11 +103,6 @@ if { [form is_valid symlink] } {
 
     clipboard::free $clip
 
+    ad_returnredirect [export_vars -base index {folder_id mount_point}]
 
-    # flush folder listing cache
-    cms_folder::flush $mount_point $folder_id
-
-
-    # Specify a null id so that the entire branch will be refreshed
-    forward "refresh-tree?goto_id=$folder_id&id=$folder_id&mount_point=$mount_point"\
 }

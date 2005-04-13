@@ -7,7 +7,7 @@
       <querytext>
 
   select
-    r.item_id, v.title
+    r.item_id, v.title, last_modified
   from 
     cr_items i
         LEFT OUTER JOIN
@@ -16,11 +16,13 @@
     cr_revisions u ON i.live_revision = u.revision_id
         LEFT OUTER JOIN
     cr_folders f ON i.item_id = f.folder_id, 
-    cr_resolved_items r
+    cr_resolved_items r, acs_objects o
   where
     r.parent_id = $parent_var
   and
     r.resolved_id = i.item_id
+  and
+    i.item_id = o.object_id
    [template::list::orderby_clause -name folder_items -orderby]
 
       </querytext>

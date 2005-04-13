@@ -13,8 +13,8 @@
                 target_id     => :sym_item_id, 
                 parent_id     => :folder_id,
                 creation_date => sysdate, 
-                creation_user => :user_id, 
-                creation_ip   => :ip
+                creation_user => null, 
+                creation_ip   => null
             ); 
             end;
       </querytext>

@@ -1,9 +1,13 @@
-# delete.tcl
-# Delete marked items
-request create 
-request set_param id -datatype integer
-request set_param mount_point -datatype keyword -value sitemap
+ad_page_contract {
 
+    Delete marked items
+
+} {
+    {folder_id:integer}
+    {mount_point:optional "sitemap"}
+}
+
+set user_id [auth::require_login]
 
 set clip [clipboard::parse_cookie]
 set clip_items [clipboard::get_items $clip $mount_point]
@@ -15,8 +19,6 @@ if { $clip_length == 0 } {
     set no_items_on_clipboard "f"
 }
 
-set user_id [User::getID]
-
 # get title, content_type, path, item_id of each marked item
 
 db_multirow marked_items get_marked_items ""
@@ -27,6 +29,11 @@ form create delete
 element create delete deleted_items \
 	-datatype integer \
 	-widget checkbox
+
+element create delete folder_id \
+	-datatype integer \
+	-widget hidden \
+    -value $folder_id
 
 set marked_item_size [multirow size marked_items]
 
@@ -58,9 +65,6 @@ for { set i 1 } { $i <= $marked_item_size } { incr i } {
 
 if { [form is_valid delete] } {
 
-    set user_id [User::getID]
-    set ip [ns_conn peeraddr]
-
     set deleted_items [element get_values delete deleted_items]
 
     db_transaction {
@@ -91,42 +95,17 @@ if { [form is_valid delete] } {
                 set delete_key "item_id"
             }
 
-            # the following SQL will have this form:
-            # content_something.delete(
-            #   something_id => :del_item_id
-            # );
-
-            if { [catch { db_exec_plsql delete_items "
-	  begin
-	  $delete_proc (
-	    $delete_key => :del_item_id
-          );
-          end;" } errmsg] } {
+            if { [catch { db_exec_plsql delete_items {} } errmsg] } {
                 ns_log notice \
                     "../../sitemap/delete.tcl caught error in dml: - $errmsg"
                 ns_log notice \
                     "../../sitemap/delete.tcl - Item $del_item_id was not deleted"
             }
 
-            # build a list of parent items whose paginator cache needs flushing
-            foreach parent_id $flush_list {
-                # flush as few times as necessary
-                if { [lsearch -exact $parents $parent_id] == -1 } {
-                    # flush cache
-                    lappend parents $parent_id
-
-                    if { $parent_id == [cm::modules::${mount_point}::getRootFolderID] } {
-                        set parent_id ""
-                    }
-                    cms_folder::flush $mount_point $parent_id
-
-                }
-            }
         }
     }
 
     clipboard::free $clip
+    ad_returnredirect [export_vars -base index {folder_id mount_point}]
 
-    # Specify a null id so that the entire branch will be refreshed
-    forward "refresh-tree?goto_id=$id&id=$id&mount_point=$mount_point"
 }

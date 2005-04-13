@@ -7,23 +7,16 @@
       <querytext>
       
   select
-    r.item_id,
-    decode(o.object_type, 'content_symlink', r.label,
-			  'content_folder', f.label,
-			  nvl(v.title, i.name)) title,
-    decode(r.item_id, :index_page_id, 't', 'f') is_index_page,
-    nvl(to_char(round(v.content_length / 1000, 2)), '-') file_size
+    r.item_id, v.title, last_modified
   from 
     cr_resolved_items r, cr_items i, cr_folders f, cr_revisions v, 
-    cr_revisions u, acs_objects o, acs_object_types t
+    cr_revisions u, acs_objects o
   where
-    r.parent_id = $parent_var
+    r.parent_id = :parent_id
   and
     r.resolved_id = i.item_id
   and
     i.item_id = o.object_id
-  and
-    i.content_type = t.object_type
   and
     i.latest_revision = v.revision_id (+)
   and
@@ -52,7 +45,7 @@
     cr_resolved_items r, cr_items i, cr_folders f, cr_revisions v, 
     cr_revisions u, acs_objects o, acs_object_types t
   where
-    r.parent_id = $parent_var
+    r.parent_id = :parent_id
   and
     r.resolved_id = i.item_id
   and
@@ -84,7 +77,7 @@
 <fullquery name="get_index_page_id">      
       <querytext>
       
-  select content_folder.get_index_page($parent_var) from dual
+  select content_folder.get_index_page(:parent_id) from dual
 
       </querytext>
 </fullquery>

@@ -7,12 +7,10 @@
 
 <if @live_revision_p@ eq 1>
   This revision is live. &nbsp;
-  <if @user_permissions.cm_item_workflow@ eq t>
-    <a href="unpublish?item_id=@item_id@">Unpublish</a>
-  </if>
+  <a href="unpublish?item_id=@item_id@">Unpublish</a>
 </if>
 <else>
-  <if @user_permissions.cm_item_workflow@ eq t and @is_publishable@ eq t>
+  <if @is_publishable@ eq t>
     [ <a href="publish?item_id=@item_id@&revision_id=@revision_id@">
       Make this revision live
     </a> ]
@@ -70,7 +68,7 @@
     <td align=right>
       <if @content_size@ gt 1>&nbsp;</if>
       <else>
-        <if @user_permissions.cm_write@ eq t>
+        <if @write_p@>
 	  [<a href="content-add-1?revision_id=@revision_id@">Add</a>]
         </if>
         <else>&nbsp;</else>
@@ -101,7 +99,7 @@
 <p>
 
 
-<if @user_permissions.cm_write@ eq t>
+<if @write_p@>
   <a href="revision-add-1?item_id=@item_id@">
     Add a revision this content item</a>
   <br> 

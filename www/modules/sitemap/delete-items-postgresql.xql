@@ -22,7 +22,7 @@
     item_id in ([join $clip_items ","])
   and
     -- permissions check
-    cms_permission__permission_p( item_id, :user_id, 'cm_write' ) = 't'
+    acs_permission__permission_p( item_id, :user_id, 'write' ) = 't'
   order by
     -- this way parents are deleted after their children
     item_id desc

@@ -6,12 +6,8 @@ template::request create -params {
   mount_point -datatype keyword -optional -value "sitemap"
 }
 
-# Check permissions
-content::check_access $item_id cm_examine \
-  -mount_point $mount_point \
-  -return_url "modules/sitemap/index" \
-  -request_error
-
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $item_id -privilege read
 
 set name [db_string get_name ""]
 

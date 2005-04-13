@@ -2,9 +2,10 @@ request create
 request set_param content_type -datatype keyword -value content_revision
 request set_param return_url -datatype text -value ""
 
-# permissions check - user must have cm_examine on the types module
-set types_module_id [cm::modules::get_module_id types]
-content::check_access $types_module_id cm_examine -user_id [User::getID]
+# permissions check - user must have read on the types module
+set module_id [cm::modules::get_module_id types]
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $module_id -privilege read
 
 # default return_url
 if { [template::util::is_nil return_url] } {
