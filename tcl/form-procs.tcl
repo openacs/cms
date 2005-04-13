@@ -1775,13 +1775,14 @@ ad_proc -private content::set_attribute_values {
     foreach attr $attributes {
         if { [template::element exists $form_name "$prefix$attr"] } {
             set datatype [template::element get_property $form_name "$prefix$attr" datatype]
+	    set widget [template::element get_property $form_name "$prefix$attr" widget]
             if { [string equal $datatype date] } {
                 lappend columns [db_map timestamp_to_string]
             } else {
                 lappend columns $attr
             }
             
-            lappend attr_types [list $attr $datatype]
+            lappend attr_types [list $attr $datatype $widget]
         }
     }
     
@@ -1790,19 +1791,20 @@ ad_proc -private content::set_attribute_values {
     db_0or1row get_previous_version_values "" -column_array values
 
     # Set the form values, handling dates with the date acquire function
-    foreach pair $attr_types {
-        set element_name [lindex $pair 0]
-        set datatype [lindex $pair 1]
-        
+    foreach attr $attr_types {
+        set element_name [lindex $attr 0]
+        set datatype [lindex $attr 1]
+	set widget [lindex $attr 2]
         if { [info exists values($element_name)] } {
-
             if { [string equal $datatype date] } {
-                set value [template::util::date acquire \
-                               sql_date $values($element_name)]
+		set value [template::util::date acquire \
+			       sql_date $values($element_name)]
+            } elseif { [string equal $widget richtext] }  {
+		set value [template::util::richtext::create $values($element_name) {}]
             } else {
-                set value $values($element_name)
-            }
-            
+		set value $values($element_name)
+	    }
+
             template::element set_properties $form_name $prefix$element_name \
                 -value $value -values [list $value]
         }
@@ -1822,7 +1824,7 @@ ad_proc -private content::set_content_value { form_name revision_id } {
 
 } {
 
-    set content [get_content_value $revision_id]
+    set content [template::util::richtext::create [get_content_value $revision_id] {}]
 
     template::element set_properties $form_name content -value $content
 }
