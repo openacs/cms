@@ -215,7 +215,7 @@ if { [form is_valid add_item] } {
     if { [template::util::is_nil folder_id] } {
 	set folder_id [cm::modules::${mount_point}::getRootFolderID]
     } else {
-	set folder_id $item_id
+	set folder_id $original_folder_id
     }
 
     if { [string equal $mount_point "templates"] } {
