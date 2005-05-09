@@ -4,7 +4,7 @@
 <fullquery name="get_module_id">      
       <querytext>
       
-  select module_id from cm_modules where key = 'types'
+  select module_id from cm_modules where key = 'types' and package_id = :package_id
 
       </querytext>
 </fullquery>

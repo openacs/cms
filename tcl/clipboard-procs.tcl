@@ -87,8 +87,8 @@ ad_proc -public clipboard::render_bookmark { mount_point id package_url} {
   Compile and eval a chunk of ADP for the bookmark
 
 } {
-    set img_checked "[ad_conn package_url]resources/checked.gif"
-    set img_unchecked "[ad_conn package_url]resources/unchecked.gif"
+    set img_checked "${package_url}resources/checked.gif"
+    set img_unchecked "${package_url}resources/unchecked.gif"
     
     set clipboardfloats_p [clipboard::floats_p]
 

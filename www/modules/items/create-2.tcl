@@ -100,7 +100,7 @@ if { [form is_valid create_item] } {
     }
 
     form get_values create_item return_url item_id storage_type
-
+    ns_log notice "----------------- creating item $item_id $storage_type"
     set item_id [content::new_item create_item $storage_type]
 
     # do wizard forward or forward to return_url

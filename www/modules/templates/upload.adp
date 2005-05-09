@@ -1,4 +1,5 @@
 <master src="../../master">
+<property name="title">Upload new template revision</property>
 
 <script language=JavaScript>
   function setSrc(name, src) {
@@ -6,49 +7,17 @@
   }
 </script>
 
-<table cellpadding=2 cellspacing=0 border=1>
-<tr bgcolor=#6699CC>
-<td>
-<table cellpadding=0 cellspacing=0 border=0 width="100%">
+<h3>Upload Template</h3>
+@path@
 
-<tr><td nowrap height=1 bgcolor="#999999"><img src="assets/gray-dot.gif" height=1 width=1></td></tr>
-<tr><td nowrap height=1 bgcolor="#FFFFFF"><img src="assets/white-dot.gif" height=1 width=1></td></tr>
-
-<tr bgcolor=#DDDDDD>
-<td>
-  <table cellpadding=2 cellspacing=0 border=0>
-  <tr>
-
-      <th nowrap align=left>Upload Template:</th>
-      <td>&nbsp;</td>
-      <td nowrap align=left>@path@</td>
-
-  </tr>
-  </table>
-</td>
-</tr>
-
-<!-- end folder -->
-
-<tr><td nowrap height=1 bgcolor="#999999"><img src="assets/gray-dot.gif" height=1 width=1></td></tr>
-<tr><td nowrap height=1 bgcolor="#FFFFFF"><img src="assets/white-dot.gif" height=1 width=1></td></tr>
-<tr><td nowrap height=3 bgcolor="#DDDDDD"><img src="assets/light-gray-dot.gif" height=3 width=1></td></tr>
-<tr><td nowrap height=2 bgcolor="#999999"><img src="assets/gray-dot.gif" height=2 width=1></td></tr>
-<tr><td nowrap height=20 bgcolor="#DDDDDD"><img src="assets/light-gray-dot.gif" height=20 width=1></td></tr>
-
+<br/>
 <formtemplate id="edit_template">
 <formwidget id=template_id>
 <formwidget id=revision_id>
-<tr bgcolor=#DDDDDD align=left><td nowrap>&nbsp;&nbsp;<formwidget id=content>&nbsp;&nbsp;</td></tr>
-<tr><td nowrap height=20 bgcolor="#DDDDDD"><img src="assets/light-gray-dot.gif" height=20 width=1></td></tr>
-<tr bgcolor=#DDDDDD align=center><td nowrap>
-<input type=submit name=action value="Upload">&nbsp;&nbsp;
-<input type=submit name=action value="Cancel">
-</td></tr>
-<tr><td nowrap height=20 bgcolor="#DDDDDD"><img src="assets/light-gray-dot.gif" height=20 width=1></td></tr>
-</formtemplate>
+<formwidget id=content>
+<br/>
 
-</table>
-</td>
-</tr>
-</table>
+<input type=submit name=action value="Upload">
+<input type=submit name=action value="Cancel">
+
+</formtemplate>

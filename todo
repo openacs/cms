@@ -14,7 +14,7 @@ serving/editing strategy for multiple sites
  - serveroot/cms -> redirects to the cms?
  - all other urls are served by index.vuh?
  - create a new basic revision for each site upon which other content types will be based
-   - otherwise, all edits to basic item (content methods, etc.) will affect all sites
+   - otherwise, all edits to basic item (content methods, etc.) will affect all sites (actually, not true- UI doesn't allow editing of basic revision)
  - set root_key for content types to new basic revision type
  - create a new folder for templates and content and set module root_keys to folder_ids
  - set root content and template folder contexts to package_id 
@@ -28,10 +28,10 @@ tasks
 top priority
 ------------
 set up install procs that set contexts appropriately
+remove unused procs files
 tidy up "view revision" page
 move tab setup in index pages into a per section tab master and call that from each subpage
  - select from cm_modules to build tabs
-truncate (and noquote, if richtext) value column in content attribute list
 
 basic/cosmetic
 ---------
@@ -88,26 +88,28 @@ drop function content_workflow__get_status (integer,varchar);
 drop function content_workflow__can_touch (integer,integer);
 drop function content_workflow__unfinished_workflow_exists (integer);
  
+
+
 -- to drop old perms:
 delete from acs_permissions where privilege like '%cm%';
-select acs_privilege__remove_child('cm_root', 'cm_admin');
-select acs_privilege__remove_child('cm_admin', 'cm_relate');
-select acs_privilege__remove_child('cm_relate', 'cm_write');
-select acs_privilege__remove_child('cm_write', 'cm_new');  
-select acs_privilege__remove_child('cm_new', 'cm_examine');
-select acs_privilege__remove_child('cm_examine', 'cm_read');
-select acs_privilege__remove_child('cm_admin', 'cm_item_workflow');
-select acs_privilege__remove_child('cm_admin', 'cm_perm_admin');
-select acs_privilege__remove_child('cm_perm_admin', 'cm_perm');
-select acs_privilege__remove_child('admin', 'cm_root');
-select acs_privilege__drop_privilege('cm_root');
-select acs_privilege__drop_privilege('cm_admin');
-select acs_privilege__drop_privilege('cm_relate');
-select acs_privilege__drop_privilege('cm_write');
-select acs_privilege__drop_privilege('cm_new');
-select acs_privilege__drop_privilege('cm_examine');
-select acs_privilege__drop_privilege('cm_read');
-select acs_privilege__drop_privilege('cm_item_workflow');
-select acs_privilege__drop_privilege('cm_perm_admin');
-select acs_privilege__drop_privilege('cm_perm');
-
+-- removing privs below broke cms; still not sure why
+-- select acs_privilege__remove_child('cm_root', 'cm_admin');
+-- select acs_privilege__remove_child('cm_admin', 'cm_relate');
+-- select acs_privilege__remove_child('cm_relate', 'cm_write');
+-- select acs_privilege__remove_child('cm_write', 'cm_new');  
+-- select acs_privilege__remove_child('cm_new', 'cm_examine');
+-- select acs_privilege__remove_child('cm_examine', 'cm_read');
+-- select acs_privilege__remove_child('cm_admin', 'cm_item_workflow');
+-- select acs_privilege__remove_child('cm_admin', 'cm_perm_admin');
+-- select acs_privilege__remove_child('cm_perm_admin', 'cm_perm');
+-- select acs_privilege__remove_child('admin', 'cm_root');
+-- select acs_privilege__drop_privilege('cm_root');
+-- select acs_privilege__drop_privilege('cm_admin');
+-- select acs_privilege__drop_privilege('cm_relate');
+-- select acs_privilege__drop_privilege('cm_write');
+-- select acs_privilege__drop_privilege('cm_new');
+-- select acs_privilege__drop_privilege('cm_examine');
+-- select acs_privilege__drop_privilege('cm_read');
+-- select acs_privilege__drop_privilege('cm_item_workflow');
+-- select acs_privilege__drop_privilege('cm_perm_admin');
+-- select acs_privilege__drop_privilege('cm_perm');

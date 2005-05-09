@@ -8,7 +8,7 @@
 </nobr>
 <p/>
 
-Back to <a href="index?folder_id=@folder_id@&mount_point=@mount_point@">@folder_name@</a> contents
+Back to <a href="../@mount_point@/index?folder_id=@folder_id@&mount_point=@mount_point@">@folder_name@</a> contents
 
 <p/>
 

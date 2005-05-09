@@ -4,7 +4,7 @@
 <fullquery name="get_module_id">      
       <querytext>
       
-  select module_id from cm_modules where key = 'sitemap'
+  select module_id from cm_modules where key = 'sitemap' and package_id = :package_id
 
       </querytext>
 </fullquery>
@@ -12,7 +12,7 @@
 <fullquery name="get_module_name">      
       <querytext>
       
-    select name from cm_modules where key = :mount_point
+    select name from cm_modules where key = :mount_point and package_id = :package_id
   
       </querytext>
 </fullquery>

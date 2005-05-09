@@ -8,15 +8,16 @@ ad_page_contract {
     @creation-date October 2004
 } {
     { folder_id:integer ""}
-    { mount_point "sitemap" }
+    { mount_point:optional "sitemap" }
     { parent_id:integer ""}
     { orderby "title,asc" }
-    { page:optional }
+    { page:optional ""}
 }
 
 set original_folder_id $folder_id
 set user_id [auth::require_login]
-set root_id [cm::modules::${mount_point}::getRootFolderID]
+set package_id [ad_conn package_id]
+set root_id [cm::modules::${mount_point}::getRootFolderID $package_id]
 
 # Get the folder label/description
 #   If :id does not exist, then use :root_id
@@ -122,69 +123,6 @@ if { [permission::permission_p -party_id $user_id \
 "
 } 
 
-template::list::create \
-    -name folder_items \
-    -multirow folder_contents \
-    -has_checkboxes \
-    -key item_id \
-    -page_size 20 \
-    -page_query_name get_folder_contents_paginate \
-    -actions $actions \
-    -elements {
-	copy {
-	    label "Clipboard"
-	    display_template "<center>@folder_contents.copy;noquote@</center>"
-	}
-	title {
-	    label "Name"
-	    link_html { title "View this item"}
-	    link_url_col item_url
-	    orderby title
-	}
-	file_size {
-	    label "Size"
-	}
-	publish_date {
-	    label "Publish Date"
-	    display_eval {
-		[ad_decode $publish_status "live" \
-		     [lc_time_fmt $publish_date "%q %r"] \
-		     "-"]
-	    }
-	}
-	pretty_content_type {
-	    label "Type"
-	}
-	last_modified {
-	    label "Last Modified"
-	    orderby last_modified
-	    display_eval {[lc_time_fmt $last_modified "%q %r"]}
-	}
-    } \
-    -filters {
-	folder_id {}
-	parent_id {} 
-	mount_point {}
-    }
-
-db_multirow -extend { item_url copy file_size } folder_contents get_folder_contents "" {
-    switch $content_type {
-	content_folder {
-	    set folder_id $item_id
-	    set item_url [export_vars -base index?mount_point=sitemap { folder_id parent_id }]
-	}
-	default {
-	    set item_url [export_vars -base ../items/index?mount_point=sitemap { item_id revision_id parent_id }]
-	}
-    }
-    if { ![ template::util::is_nil content_length ] } {
-	set file_size [lc_numeric [expr $content_length / 1000.00] "%.2f"]
-    } else {
-	set file_size "-"
-    }
-    set copy [clipboard::render_bookmark sitemap $item_id [ad_conn package_url]]
-}
-
 form create add_item
 
 if { [template::util::is_nil original_folder_id] } {
@@ -197,23 +135,26 @@ element create add_item folder_id \
 	-datatype integer -widget hidden -param -optional
 
 element create add_item mount_point \
-	-datatype string -widget hidden -param -optional
+	-datatype string -widget hidden -value $mount_point
 
-set revision_types [cms_folder::get_registered_types $the_id]
+set revision_types [list [list "----------------" ""]]
+append revision_types " "
+append revision_types [cms_folder::get_registered_types $the_id]
 set num_revision_types [llength $revision_types]
 
 element create add_item content_type \
-	-datatype keyword \
-	-widget select \
-	-label "Content Type" \
-	-options $revision_types
+    -datatype keyword \
+    -widget select \
+    -label "Content Type" \
+    -options $revision_types \
+    -html { onchange "javascript:this.form.submit();" }
 
 if { [form is_valid add_item] } {
     form get_values add_item folder_id mount_point content_type
 
     # if the folder_id is empty, then it must be the root folder
     if { [template::util::is_nil folder_id] } {
-	set folder_id [cm::modules::${mount_point}::getRootFolderID]
+	set folder_id [cm::modules::${mount_point}::getRootFolderID [ad_conn package_id]]
     } else {
 	set folder_id $original_folder_id
     }
@@ -224,3 +165,4 @@ if { [form is_valid add_item] } {
  	forward "../items/create-1?parent_id=$folder_id&mount_point=$mount_point&content_type=$content_type"
     }
 }
+

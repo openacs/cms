@@ -48,9 +48,12 @@ template::list::create \
 	}
 	attribute_value {
 	    label "Value"
+	    display_template "@attributes.attribute_value;noquote@"
+	    html { width 60% }
 	}
 	object_label {
 	    label "Origin"
+	    html { width 10% }
 	}
     }
 
@@ -65,6 +68,6 @@ db_multirow -extend { attribute_value } attributes get_attributes "" {
         set value "-" 
     }
 
-    set attribute_value $value
+    set attribute_value [string_truncate $value]
 }
 

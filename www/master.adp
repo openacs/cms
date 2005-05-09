@@ -85,7 +85,7 @@ div#section-header {
  <else>
   <div class="tab">
     <a href="@package_url@modules/clipboard/index" title="">Clipboard</a>
-    [<a href="javascript: void(openrefreshClipboard('@package_url@modules/clipboard/floating?mount_point=clipboard','clipboard','toolbar=no,innerWidth=500,innerHeight=300,scrollbars=yes'))" title="Open floating clipboard">float</a>]
+    <!--[<a href="javascript: void(openrefreshClipboard('@package_url@modules/clipboard/floating?mount_point=clipboard','clipboard','toolbar=no,innerWidth=500,innerHeight=300,scrollbars=yes'))" title="Open floating clipboard">float</a>]-->
   </div>
  </else>
 

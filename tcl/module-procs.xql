@@ -6,6 +6,7 @@
       
         select module_id from cm_modules
           where key = :module_name
+            and package_id = :package_id
       
       </querytext>
 </fullquery>
@@ -35,5 +36,16 @@
       </querytext>
 </fullquery>
 
+<fullquery name="cm::modules::install::create_modules.update_module_context">      
+      <querytext>
+	update acs_objects set context_id = :package_id where object_id = :module_id
+      </querytext>
+</fullquery>
+
+<fullquery name="cm::modules::install::delete_modules.get_module_ids">      
+      <querytext>
+        select module_id from cm_modules where package_id = :package_id
+      </querytext>
+</fullquery>
  
 </queryset>

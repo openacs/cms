@@ -5,7 +5,7 @@
 <fullquery name="get_type">      
       <querytext>
 
-        select content_type from cr_items where item_id = :item_id
+        select content_type from cr_items where item_id = :folder_id
  
       </querytext>
 </fullquery>
@@ -19,7 +19,7 @@
   from
     cr_folders f, cr_items i, acs_objects o
   where
-    i.item_id = (select parent_id from cr_items where item_id = :item_id)
+    i.item_id = (select parent_id from cr_items where item_id = :folder_id)
   and
     i.item_id = f.folder_id
   and
@@ -37,7 +37,7 @@
   from
     cr_folders f, cr_items i, acs_objects o
   where
-    i.parent_id = :item_id
+    i.parent_id = :folder_id
   and
     i.item_id = f.folder_id
   and

@@ -24,7 +24,7 @@
 <fullquery name="get_path">      
       <querytext>
 
-        select content_item__get_path(:item_id, null)
+        select content_item__get_path(:folder_id, null)
 
       </querytext>
 </fullquery>
@@ -42,7 +42,7 @@
       RIGHT OUTER JOIN 
     cr_items i ON i.latest_revision = r.revision_id
   where
-    i.parent_id = :item_id
+    i.parent_id = :folder_id
   and
     i.item_id = t.template_id
   and
@@ -63,7 +63,7 @@
     where
       i.item_id = f.folder_id
     and
-      f.folder_id = :item_id
+      f.folder_id = :folder_id
   
       </querytext>
 </fullquery>

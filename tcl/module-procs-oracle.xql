@@ -190,5 +190,27 @@
       </querytext>
 </fullquery>
 
+<fullquery name="cm::modules::install::create_modules.create_module">      
+      <querytext>
+        begin
+	:1 := content_module.new (
+	:module_name, --name
+	to_lower(:module),
+	:root_key,
+	:sort_key,
+	:package_id, -- parent_id
+	:package_id -- package_id
+	);
+        end;
+      </querytext>
+</fullquery>
+
+<fullquery name="cm::modules::install::delete_modules.delete_module">      
+      <querytext>
+	begin
+        :1 := content_module.delete (:module_id);
+        end;
+      </querytext>
+</fullquery>
  
 </queryset>

@@ -32,7 +32,7 @@
         i1.tree_sortkey between i2.tree_sortkey and tree_right(i2.tree_sortkey)
     ) t
   where
-    i.item_id = t.parent_id
+    i.item_id = t.parent_id and t.tree_level > 2
   order by
     tree_level asc
 

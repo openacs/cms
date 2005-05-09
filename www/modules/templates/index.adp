@@ -3,7 +3,7 @@
 
 <p/>
 
-<include src="../../bookmark" mount_point="@mount_point@" id="@parent_id@">
+<include src="../../bookmark" mount_point="@mount_point@" id="@folder_id@">
 
 @page_title;noquote@ 
 
@@ -15,10 +15,15 @@
 
 <p/>
 
-<include src="../sitemap/ancestors" item_id=@parent_id@ mount_point=@mount_point@>
+<include src="../sitemap/ancestors" item_id="@folder_id@" mount_point="@mount_point@">
 
 <p/>
 
-<listtemplate name="folder_contents"></listtemplate>
+<include src="../../../lib/folder-items" folder_id="@folder_id@"
+  parent_id="@parent_id@" actions="@actions;noquote@" 
+  orderby="@orderby@" page="@page@" mount_point="@mount_point@" />
 
-<script language=JavaScript>set_marks('templates', 'assets/checked');</script>
+
+<script language=JavaScript>
+  set_marks('@mount_point@', '../../resources/checked');
+</script>

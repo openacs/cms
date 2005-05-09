@@ -24,17 +24,6 @@
   <div id="subnavbar-container">
     <div id="subnavbar">
 
- <if @template_props_tab@ eq general>
-   <div class="tab" id="subnavbar-here">
-     General
-   </div>
- </if>
- <else>
-   <div class="tab">
-     <a href="@package_url@modules/templates/properties?item_id=@item_id@&mount_point=@mount_point@&template_props_tab=general" title="" class="subnavbar-unselected">General</a>
-   </div>
- </else>
-
  <if @template_props_tab@ eq revisions>
    <div class="tab" id="subnavbar-here">
      Revisions
@@ -97,7 +86,13 @@
 <div id="subnavbar-body">
 
 <div id=section>
-<include src=@template_props_tab@ template_id=@item_id@>
+ <include src=@template_props_tab@ template_id=@item_id@>
 </div>
+
+<ul class="action-links">
+ <li><a href="edit?template_id=@item_id@">Edit</a> this template in the browser</li>
+ <li><a href="download?template_id=@item_id@">Save</a> the latest version of this template to a file</li>
+ <li><a href="upload?template_id=@item_id@">Upload</a> a new version of this template</li>
+</ul>
 
 </div>

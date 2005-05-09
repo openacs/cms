@@ -3,7 +3,7 @@
 
 <p/>
 
-<include src="../../bookmark" mount_point="@mount_point@" id="@parent_id@">
+<include src="../../bookmark" mount_point="@mount_point@" id="@original_folder_id@">
 
 @page_title;noquote@ 
 
@@ -15,17 +15,18 @@
 
 <p/>
 
-<include src="ancestors" item_id=@parent_id@ 
+<include src="ancestors" item_id=@original_folder_id@ 
   index_page_id=@index_page_id@ 
-  mount_point=@mount_point@>
+  mount_point=@mount_point@ />
 
 <p/>
 
-<listtemplate name="folder_items"></listtemplate>
+<include src="../../../lib/folder-items" folder_id="@folder_id@"
+  parent_id="@parent_id@" actions="@actions;noquote@" 
+  orderby="@orderby@" page="@page@" mount_point="@mount_point@" />
+
 
 <p/>
-
-<br/>
 
 <if @symlinks:rowcount@ gt 0>
   <b>Links to this folder</b>: 
@@ -45,27 +46,16 @@
 
 <if @mount_point@ eq sitemap>
   <if @num_revision_types@ gt 0>
-    <formtemplate id=add_item>
-    <img src="../../resources/Add24.gif" width=24 height=24 border=0>
-    <formwidget id=folder_id>
-    <formwidget id=mount_point>
-    Add a new <formwidget id=content_type> under this @what@.
-    <input type=submit value="Add Item">
-    </formtemplate><br>
+   <ul class="action-links">
+    <li><formtemplate id=add_item>
+     <formwidget id=folder_id>
+     <formwidget id=mount_point>
+     Add a new <formwidget id=content_type>
+     </formtemplate></li>
+   </ul>
   </if>
 </if>
-
-<br>
-
-<p>
 
 <script language=JavaScript>
   set_marks('@mount_point@', '../../resources/checked');
 </script>
-
-
-
-
-
-
-

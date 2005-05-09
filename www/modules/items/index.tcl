@@ -59,9 +59,9 @@ if { [file exists [ns_url2file $custom_dir/index.tcl]] } {
 # The root ID is to determine the appropriate path to the item
 
 if { [string equal $mount_point templates] } {
-    set root_id [cm::modules::templates::getRootFolderID]
+    set root_id [cm::modules::templates::getRootFolderID [ad_conn package_id]]
 } else {
-    set root_id [cm::modules::sitemap::getRootFolderID]
+    set root_id [cm::modules::sitemap::getRootFolderID [ad_conn package_id]]
 } 
 
 # Set up passthrough for permissions

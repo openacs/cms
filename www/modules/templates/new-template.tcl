@@ -2,7 +2,7 @@ request create -params {
   folder_id -datatype integer
 }
 
-ns_log Notice "folder_id is $folder_id"
+set title "New Template"
 
 set path [db_string get_path ""]
 
@@ -10,7 +10,8 @@ form create new_template -elements "
   return_url -datatype url -widget hidden
   template_id -datatype integer -widget hidden
   folder_id -datatype integer -widget hidden
-  name -datatype filename -html { size 40 }
+  path -datatype url -widget inform -label {Create in} -value $path
+  name -datatype filename -label {Template Name} Name -html { size 40 } -help_text {Must not contain any spaces or special characters}
 "
 
 set mime_types [db_list_of_lists get_mime_types ""]

@@ -10,7 +10,7 @@ request create -params {
     index_page_id -datatype integer -optional
 }
 
-set root_id [cm::modules::${mount_point}::getRootFolderID]
+set root_id [cm::modules::${mount_point}::getRootFolderID [ad_conn package_id]]
 set root_title [item::get_title $root_id]
 
 # special case - when the item_id is null, set it to the root folder
@@ -26,8 +26,11 @@ if { [template::util::is_nil item_id] } {
 #set bookmark [clipboard::get_bookmark_icon $clip $mount_point $item_id]
 
 # get the context bar info
-
-db_multirow context get_context ""
+if { $root_id == $item_id } {
+    set context:rowcount 0
+} else {
+    db_multirow context get_context ""
+}
 
 # pass in index_page_id to improve efficiency
 if { ![template::util::is_nil index_page_id] } {

@@ -83,16 +83,16 @@
  
 <fullquery name="cm::modules::templates::getRootFolderID.template_get_root_id">      
       <querytext>
-      
-            select content_template__get_root_folder() 
+            select root_key from cm_modules where key = 'templates' and package_id = :package_id
+            -- select content_template__get_root_folder() 
       </querytext>
 </fullquery>
 
  
 <fullquery name="cm::modules::sitemap::getRootFolderID.sitemap_get_root_id">      
       <querytext>
-      
-            select content_item__get_root_folder(null) 
+            -- select content_item__get_root_folder(null) 
+      select root_key from cm_modules where key = 'sitemap' and package_id = :package_id
       </querytext>
 </fullquery>
 
@@ -191,5 +191,23 @@
       </querytext>
 </fullquery>
 
- 
+<fullquery name="cm::modules::install::create_modules.create_module">      
+      <querytext>
+	select content_module__new (
+	:module_name, --name
+	lower(:module),
+	:root_key,
+	:sort_key,
+	:package_id, -- parent_id
+	:package_id -- package_id
+	)
+      </querytext>
+</fullquery>
+
+<fullquery name="cm::modules::install::delete_modules.delete_module">      
+      <querytext>
+	select content_module__delete (:module_id)
+      </querytext>
+</fullquery>
+
 </queryset>

@@ -52,6 +52,14 @@ begin
    pretty_plural  => 'Sort Keys'
  );
 
+ attr_id := acs_attribute.create_attribute (
+   object_type    => 'content_module',
+   attribute_name => 'package_id',
+   datatype       => 'number',
+   pretty_name    => 'Package ID',
+   pretty_plural  => 'Package IDs'
+ );
+
 
 end;
 /
@@ -87,6 +95,7 @@ function new (
   root_key      in cm_modules.root_key%TYPE,
   sort_key      in cm_modules.sort_key%TYPE,
   parent_id     in acs_objects.context_id%TYPE default null,
+  package_id    in cm_modules.package_id%TYPE,
   object_id	in acs_objects.object_id%TYPE default null,
   creation_date	in acs_objects.creation_date%TYPE
 			   default sysdate,
@@ -95,7 +104,6 @@ function new (
   creation_ip	in acs_objects.creation_ip%TYPE default null,
   object_type   in acs_objects.object_type%TYPE default 'content_module'
 ) return acs_objects.object_id%TYPE;
-
 
 function get_label (
   --/** Returns the label for the module. 
@@ -107,6 +115,9 @@ function get_label (
   module_id in cm_modules.module_id%TYPE
 ) return cm_modules.name%TYPE;
 
+function delete (
+  module_id     in cm_modules.module_id%TYPE
+) return cm_modules.module_id%TYPE;
 
 end content_module;
 /
@@ -121,6 +132,7 @@ function new (
   root_key      in cm_modules.root_key%TYPE,
   sort_key      in cm_modules.sort_key%TYPE,
   parent_id     in acs_objects.context_id%TYPE default null,
+  package_id    in cm_modules.package_id%TYPE,
   object_id	in acs_objects.object_id%TYPE default null,
   creation_date	in acs_objects.creation_date%TYPE
 			   default sysdate,
@@ -144,9 +156,9 @@ begin
   );
 
   insert into cm_modules
-    (module_id, key, name, root_key, sort_key)
+    (module_id, key, name, root_key, sort_key, package_id)
   values
-    (module_id, key, name, root_key, sort_key);
+    (module_id, key, name, root_key, sort_key, package_id);
 
   return module_id;
 end;
@@ -173,7 +185,18 @@ begin
 
 end get_label;
 
+function delete (
+  p_module_id     in cm_modules.module_id%TYPE
+) return cm_modules.module_id%TYPE
+is
+ v_module_id cm_modules.name%TYPE;
+begin
 
+  select content_item__delete(delete.p_module_id);
+  delete from cm_modules where module_id = delete.p_module_id;
+  return delete.p_module_id;
+
+end delete;
 
 
 end content_module;
@@ -181,26 +204,26 @@ end content_module;
 show errors
 
 -- Insert the default modules
-declare 
-  v_id		integer;
-  v_module_id	integer;
-begin
+-- declare 
+--   v_id		integer;
+--   v_module_id	integer;
+-- begin
 
-  v_id := content_module.new('My Tasks', 'workspace', NULL, 1,0);
-  v_id := content_module.new('Site Map', 'sitemap', 
-    content_item.get_root_folder, 2,0);
-  v_id := content_module.new('Templates', 'templates', 
-    content_template.get_root_folder, 3,0);
-  v_id := content_module.new('Content Types', 'types', 
-    'content_revision', 4,0);
-  v_id := content_module.new('Search', 'search', null, 5,0);
-  v_id := content_module.new('Subject Keywords', 'categories', 0, 6,0);
-  v_id := content_module.new('Users', 'users', null, 7,0);
-  v_id := content_module.new('Workflows', 'workflow', null, 8,0);
+--   v_id := content_module.new('My Tasks', 'workspace', NULL, 1,0);
+--   v_id := content_module.new('Site Map', 'sitemap', 
+--     content_item.get_root_folder, 2,0);
+--   v_id := content_module.new('Templates', 'templates', 
+--     content_template.get_root_folder, 3,0);
+--   v_id := content_module.new('Content Types', 'types', 
+--     'content_revision', 4,0);
+--   v_id := content_module.new('Search', 'search', null, 5,0);
+--   v_id := content_module.new('Subject Keywords', 'categories', 0, 6,0);
+--   v_id := content_module.new('Users', 'users', null, 7,0);
+--   v_id := content_module.new('Workflows', 'workflow', null, 8,0);
 
-end;
-/
-show errors
+-- end;
+-- /
+-- show errors
 
 prompt *** Defining utility functions 
 
@@ -231,10 +254,10 @@ prompt *** Compiling content methods model...
 @@ cms-content-methods
 
 prompt *** Compiling workflow model...
-@@ cms-publishing-wf
+-- @@ cms-publishing-wf
 
 prompt *** Compiling workflow helper package...
-@@ cms-workflow
+-- @@ cms-workflow
 
 prompt *** Compiling permissions model...
 -- @@ cms-permissions

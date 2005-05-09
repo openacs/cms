@@ -24,72 +24,72 @@ namespace eval publish {
 #
 # Publish procs
 
-ad_proc -public publish::get_page_root {} {
+# ad_proc -public publish::get_page_root {} {
 
-  @public get_page_root
+#   @public get_page_root
  
-  Get the page root. All items will be published to the 
-  filesystem with their URLs relative to this root.
-  The page root is controlled by the PageRoot parameter in CMS.
-  A relative path is relative to [ns_info pageroot]
-  The default is [ns_info pageroot]
+#   Get the page root. All items will be published to the 
+#   filesystem with their URLs relative to this root.
+#   The page root is controlled by the PageRoot parameter in CMS.
+#   A relative path is relative to [ns_info pageroot]
+#   The default is [ns_info pageroot]
  
-  @return The page root
+#   @return The page root
  
-  @see publish::get_template_root
-  @see publish::get_publish_roots
+#   @see publish::get_template_root
+#   @see publish::get_publish_roots
 
-} {
+# } {
 
-  set root_path [ad_parameter -package_id [ad_conn package_id] \
-      PageRoot dummy ""]
+#   set root_path [ad_parameter -package_id [ad_conn package_id] \
+#       PageRoot dummy ""]
 
-  if { [string index $root_path 0] != "/" } {
-    # Relative path, prepend server_root
-    set root_path "[ns_info pageroot]/$root_path"
-  }
+#   if { [string index $root_path 0] != "/" } {
+#     # Relative path, prepend server_root
+#     set root_path "[ns_info pageroot]/$root_path"
+#   }
 
-  return [ns_normalizepath $root_path]
+#   return [ns_normalizepath $root_path]
 
-}
+# }
 
-ad_proc -public publish::get_publish_roots {} {
+# ad_proc -public publish::get_publish_roots {} {
 
-  @public get_publish_roots
+#   @public get_publish_roots
  
-  Get a list of all page roots to which files may be published.
-  The publish roots are controlled by the PublishRoots parameter in CMS,
-  which should be a space-separated list of all the roots. Relative paths
-  are relative to publish::get_page_root.
-  The default is [list [publish::get_page_root]]
+#   Get a list of all page roots to which files may be published.
+#   The publish roots are controlled by the PublishRoots parameter in CMS,
+#   which should be a space-separated list of all the roots. Relative paths
+#   are relative to publish::get_page_root.
+#   The default is [list [publish::get_page_root]]
  
-  @return A list of all the publish roots
+#   @return A list of all the publish roots
  
-  @see publish::get_template_root
-  @see publish::get_page_root
+#   @see publish::get_template_root
+#   @see publish::get_page_root
 
-} {
+# } {
 
-  set root_paths [ad_parameter -package_id [ad_conn package_id] \
-      PublishRoots dummy]
+#   set root_paths [ad_parameter -package_id [ad_conn package_id] \
+#       PublishRoots dummy]
   
-  if { [llength $root_paths] == 0 } {
-    set root_paths [list [get_page_root]]
-  }
+#   if { [llength $root_paths] == 0 } {
+#     set root_paths [list [get_page_root]]
+#   }
 
-  # Resolve relative paths
-  set page_root [publish::get_page_root]
-  set absolute_paths [list]
-  foreach path $root_paths {
-    if { [string index $path 0] != "/" } {
-      lappend absolute_paths [ns_normalizepath "$page_root/$path"]
-    } else {
-      lappend absolute_paths $path
-    }
-  }
+#   # Resolve relative paths
+#   set page_root [publish::get_page_root]
+#   set absolute_paths [list]
+#   foreach path $root_paths {
+#     if { [string index $path 0] != "/" } {
+#       lappend absolute_paths [ns_normalizepath "$page_root/$path"]
+#     } else {
+#       lappend absolute_paths $path
+#     }
+#   }
 
-  return $absolute_paths
-}
+#   return $absolute_paths
+# }
 
 
 
@@ -121,23 +121,23 @@ ad_proc -public content::get_template_path {} {
 }
 
 
-ad_proc -public publish::mkdirs { path } {
+# ad_proc -public publish::mkdirs { path } {
 
-  @public mkdirs
+#   @public mkdirs
  
-  Create all the directories neccessary to save the specified file
+#   Create all the directories neccessary to save the specified file
  
-  @param path 
-     The path to the file that is about to be saved
+#   @param path 
+#      The path to the file that is about to be saved
  
 
-} {
+# } {
 
-  set index [string last "/" $path]
-  if { $index != -1 } {
-    file mkdir [string range $path 0 [expr $index - 1]]
-  } 
-}
+#   set index [string last "/" $path]
+#   if { $index != -1 } {
+#     file mkdir [string range $path 0 [expr $index - 1]]
+#   } 
+# }
 
 
 

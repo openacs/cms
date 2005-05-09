@@ -16,7 +16,7 @@ permission::require_permission -party_id $user_id \
 if { [string match [content::folder::is_empty -folder_id $folder_id] "f" ] } {
 
     util_user_message -message "Folder is not empty. Please delete folder contents and try again."
-    ad_returnredirect [export_vars -base index {folder_id}]
+    ad_returnredirect [export_vars -base ../$mount_point/index {folder_id}]
 
 } else {
 
@@ -30,6 +30,6 @@ if { [string match [content::folder::is_empty -folder_id $folder_id] "f" ] } {
 
     # Redirect to parent folder
     set folder_id $parent_id
-    ad_returnredirect [export_vars -base index {folder_id}]
+    ad_returnredirect [export_vars -base ../$mount_point/index {folder_id}]
 
 }

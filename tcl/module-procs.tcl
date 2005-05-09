@@ -29,18 +29,20 @@ namespace eval cm {
         namespace eval categories { }
         namespace eval users      { }
         namespace eval clipboard  { }
+        namespace eval install  { }
     }
 }
 
 
-ad_proc -public cm::modules::get_module_id { module_name } {
+ad_proc -public cm::modules::get_module_id { 
+    -module_name:required
+    -package_id:required
+} {
 
  Get the id of some module, return empty string on failure
 
 } {
-    set id [db_string module_get_id ""]
-
-    return $id
+    return [db_string module_get_id ""]
 }
 
 ad_proc -public cm::modules::getMountPoints {} {
@@ -78,17 +80,17 @@ ad_proc -public cm::modules::workspace::getChildFolders { id } {
 
 
 
-ad_proc -public cm::modules::templates::getRootFolderID {} {
+ad_proc -public cm::modules::templates::getRootFolderID { package_id } {
 
   Retreive the id of the root folder
 
 } {
-    if { ![nsv_exists browser_state template_root] } {
+    if { ![nsv_exists browser_state template_root_$package_id] } {
         set root_id [db_string template_get_root_id ""]
-        nsv_set browser_state template_root $root_id
+        nsv_set browser_state template_root_$package_id $root_id
         return $root_id
     } else {
-        return [nsv_get browser_state template_root]
+        return [nsv_get browser_state template_root_$package_id]
     }
 }
 
@@ -123,17 +125,17 @@ ad_proc -public cm::modules::workflow::getChildFolders { id } {
 
 
 
-ad_proc -public cm::modules::sitemap::getRootFolderID {} {
+ad_proc -public cm::modules::sitemap::getRootFolderID { package_id } {
 
   Retreive the id of the root folder
 
 } {
-    if { ![nsv_exists browser_state sitemap_root] } {
+    if { ![nsv_exists browser_state sitemap_root_$package_id] } {
         set root_id [db_string sitemap_get_root_id ""]
-        nsv_set browser_state sitemap_root $root_id
+        nsv_set browser_state sitemap_root_$package_id $root_id
         return $root_id
     } else {
-        return [nsv_get browser_state sitemap_root]
+        return [nsv_get browser_state sitemap_root_$package_id]
     }
 }
 
@@ -316,4 +318,56 @@ ad_proc -public cm::modules::clipboard::getChildFolders { id } {
 
 # end of clipboard namespace
 
+ad_proc -private cm::modules::install::create_modules { 
+    -package_id:required
+} {
 
+    Create modules for a new CMS instance
+
+} {
+    set instance_name [apm_instance_name_from_id $package_id]
+    set modules [list Sitemap Templates Types Categories Search]
+    set sort_key 0
+    set root_key ""
+    foreach module $modules {
+	incr sort_key
+	set module_name "$instance_name $module"
+	switch $module { 
+	    "Sitemap" {
+		set root_key [content::folder::new -name pkg_${package_id}_content \
+				  -context_id $package_id \
+				  -parent_id "-100" \
+				  -label "$instance_name $module" ]
+	    }
+	    "Templates" {
+		set root_key [content::folder::new -name pkg_${package_id}_templates \
+				  -context_id $package_id \
+				  -parent_id "-200" \
+				  -label "$instance_name $module" ]
+	    }
+	    "Types" {
+		set root_key content_revision
+	    }
+	    "Categories" {
+		set root_key 0
+	    }
+	}
+	set module_id [db_exec_plsql create_module {}]
+	# assign context_id of package_id
+	db_dml update_module_context {}
+    }
+}
+
+ad_proc -private cm::modules::install::delete_modules { 
+    -package_id:required
+} {
+    
+    Delete modules for a given CMS instance
+
+} {
+
+    db_foreach get_module_ids {
+	db_exec_plsql delete_module {}
+    }
+
+}

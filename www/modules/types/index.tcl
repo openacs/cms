@@ -19,6 +19,7 @@ request set_param type_props_tab -datatype keyword -value attributes
 request set_param refresh_tree -datatype keyword -optional -value t
 
 set package_url [ad_conn package_url]
+set package_id [ad_conn package_id]
 
 # Tree hack
 if { [string equal $id content_revision] } {
@@ -28,7 +29,7 @@ if { [string equal $id content_revision] } {
 }
 
 set content_type $id
-set root_id [cm::modules::templates::getRootFolderID]
+set root_id [cm::modules::templates::getRootFolderID [ad_conn package_id]]
 
 set module_id [db_string get_module_id ""]
 

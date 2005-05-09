@@ -20,7 +20,7 @@ element create rename_folder mount_point \
   -datatype keyword -widget hidden -value $mount_point
 
 element create rename_folder name \
-  -label "Name" -datatype keyword -widget text -html { size 20 } \
+  -label "Name" -datatype url -widget text -html { size 20 } \
   -validate { { expr ![string match $value "/"] } 
               { Folder name cannot contain slashes }}
 
@@ -55,7 +55,7 @@ if { [form is_valid rename_folder] } {
       db_exec_plsql rename_folder {}
   }
 
-  ad_returnredirect [export_vars -base index {folder_id}]
+  ad_returnredirect [export_vars -base ../$mount_point/index {folder_id}]
 
 }
 

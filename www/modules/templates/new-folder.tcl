@@ -3,13 +3,14 @@ request create -params {
 }
 
 set path [db_string get_path ""]
+set title "New Template Folder"
 
 form create new_folder -elements "
   return_url -datatype url -widget hidden
   folder_id -datatype integer -widget hidden
   parent_id -datatype integer -widget hidden
-  name -datatype filename -html { size 40 } -label {Folder Name}
-  label -datatype text -html { size 40 } -optional
+  name -datatype filename -html { size 40 } -label {Folder Name} -help_text {Short name containing no special characters}
+  label -datatype text -html { size 40 } -optional -help_text {More descriptive label}
   description -datatype text -widget textarea -optional \
     -html { rows 4 cols 40 }
 "

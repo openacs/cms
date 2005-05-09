@@ -81,6 +81,22 @@ begin
    ''f''
    );
 
+ attr_id := acs_attribute__create_attribute (
+   ''content_module'',
+   ''package_id'',
+   ''number'',
+   ''Package ID'',
+   ''Package IDs'',
+   null,
+   null,
+   null,
+   1,
+   1,
+   null,
+   ''type_specific'',
+   ''f''
+   );
+
 
   return 0;
 end;' language 'plpgsql';
@@ -99,14 +115,16 @@ create table cm_modules (
                              acs_objects on delete cascade
 		             constraint cm_modules_pk 
                              primary key,
-  key	     		     varchar(20)
-			     constraint cm_modules_unq
-			     unique,
+  key	     		     varchar(20),
   name			     varchar(100)
 			     constraint cm_modules_name_nil
 			     not null,
   root_key                   varchar(100),
-  sort_key		     integer
+  sort_key		     integer,
+  -- can probably remove this after 5.2 release but it made things v. easy
+  package_id		     integer 
+			     constraint cm_modules_pkg_id_fk
+                             refereneces apm_packages
 );
 
 comment on column cm_modules.root_key is '
@@ -149,14 +167,15 @@ comment on column cm_modules.root_key is '
 
 -- create or replace package body content_module
 
-create or replace function content_module__new (varchar,varchar,varchar,integer,integer)
+create or replace function content_module__new (varchar,varchar,varchar,integer,integer,integer)
 returns integer as '
 declare
   p_name                        alias for $1;  
   p_key                         alias for $2;  
   p_root_key                    alias for $3;  
   p_sort_key                    alias for $4;  
-  p_parent_id                   alias for $5;  -- default null
+  p_parent_id                   alias for $5;  -- default package_id
+  p_package_id                  alias for $6;
 begin
 
         return content_module__new(p_name,
@@ -164,6 +183,7 @@ begin
                                    p_root_key,
                                    p_sort_key,
                                    p_parent_id,
+                                   p_package_id,
                                    null,
                                    now(),
                                    null,
@@ -172,14 +192,14 @@ begin
                                    );
 end;' language 'plpgsql';
 
-create or replace function content_module__new (varchar,varchar,integer,integer,integer)
+create or replace function content_module__new (varchar,varchar,integer,integer,integer,integer)
 returns integer as '
 begin
-    return content_module__new ($1, $2, cast ($3 as varchar), $4, $5);
+    return content_module__new ($1, $2, cast ($3 as varchar), $4, $5, $6);
 end;' language 'plpgsql';
 
 -- function new
-create or replace function content_module__new (varchar,varchar,varchar,integer,integer,integer,timestamptz,integer,varchar,varchar)
+create or replace function content_module__new (varchar,varchar,varchar,integer,integer,integer,integer,timestamptz,integer,varchar,varchar)
 returns integer as '
 declare
   p_name                        alias for $1;  
@@ -187,11 +207,12 @@ declare
   p_root_key                    alias for $3;  
   p_sort_key                    alias for $4;  
   p_parent_id                   alias for $5;  -- null  
-  p_object_id                   alias for $6;  -- null
-  p_creation_date               alias for $7;  -- now()
-  p_creation_user               alias for $8;  -- null
-  p_creation_ip                 alias for $9;  -- null
-  p_object_type                 alias for $10; -- ''content_module''
+  p_package_id                  alias for $6;
+  p_object_id                   alias for $7;  -- null
+  p_creation_date               alias for $8;  -- now()
+  p_creation_user               alias for $9;  -- null
+  p_creation_ip                 alias for $10;  -- null
+  p_object_type                 alias for $11; -- ''content_module''
   v_module_id                   integer;       
 begin
   v_module_id := content_item__new(
@@ -214,14 +235,25 @@ begin
   );
 
   insert into cm_modules
-    (module_id, key, name, root_key, sort_key)
+    (module_id, key, name, root_key, sort_key, package_id)
   values
-    (v_module_id, p_key, p_name, p_root_key, p_sort_key);
+    (v_module_id, p_key, p_name, p_root_key, p_sort_key, p_package_id);
 
   return v_module_id;
 
 end;' language 'plpgsql';
 
+create or replace function content_module__delete (integer) returns int4 as '
+declare
+        p_module_id     alias for $1;
+begin
+
+  select content_item__delete(:p_module_id);
+  delete from cm_modules where module_id = :p_module_id;
+
+  return 0;
+
+end;' language 'plpgsql';
 
 create or replace function content_module__get_label (integer) returns varchar as '
 declare
@@ -240,32 +272,32 @@ begin
 
 end;' language 'plpgsql';
 
--- Insert the default modules
-create or replace function inline_1 () returns integer as '
-declare 
-  v_id		integer;
-  v_module_id	integer;
-begin
+-- Insert the default modules (MS: now done via callbacks)
+-- create or replace function inline_1 () returns integer as '
+-- declare 
+--   v_id		integer;
+--   v_module_id	integer;
+-- begin
 
-  v_id := content_module__new(''My Tasks'', ''workspace'', NULL, 1,0);
-  v_id := content_module__new(''Site Map'', ''sitemap'', 
-    content_item__get_root_folder(null), 2,0);
-  v_id := content_module__new(''Templates'', ''templates'', 
-    content_template__get_root_folder(), 3,0);
-  v_id := content_module__new(''Content Types'', ''types'', 
-    ''content_revision'', 4,0);
-  v_id := content_module__new(''Search'', ''search'', null, 5,0);
-  v_id := content_module__new(''Subject Keywords'', ''categories'', 0, 6,0);
-  v_id := content_module__new(''Users'', ''users'', null, 7,0);
-  v_id := content_module__new(''Workflows'', ''workflow'', null, 8,0);
+--   v_id := content_module__new(''My Tasks'', ''workspace'', NULL, 1,0);
+--   v_id := content_module__new(''Site Map'', ''sitemap'', 
+--     content_item__get_root_folder(null), 2,0);
+--   v_id := content_module__new(''Templates'', ''templates'', 
+--     content_template__get_root_folder(), 3,0);
+--   v_id := content_module__new(''Content Types'', ''types'', 
+--     ''content_revision'', 4,0);
+--   v_id := content_module__new(''Search'', ''search'', null, 5,0);
+--   v_id := content_module__new(''Subject Keywords'', ''categories'', 0, 6,0);
+--   v_id := content_module__new(''Users'', ''users'', null, 7,0);
+--   v_id := content_module__new(''Workflows'', ''workflow'', null, 8,0);
 
-  return null;
+--   return null;
 
-end;' language 'plpgsql';
+-- end;' language 'plpgsql';
 
-select inline_1 ();
+-- select inline_1 ();
 
-drop function inline_1 ();
+-- drop function inline_1 ();
 
 -- prompt *** Defining utility functions 
 

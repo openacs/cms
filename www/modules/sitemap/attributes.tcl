@@ -11,7 +11,7 @@ ad_page_contract {
 
 # default folder_id is the root folder
 if { [template::util::is_nil folder_id] } {
-    set folder_id [cm::modules::${mount_point}::getRootFolderID]
+    set folder_id [cm::modules::${mount_point}::getRootFolderID [ad_conn package_id]]
 }
 
 if { [template::util::is_nil folder_resolved_id] } {
