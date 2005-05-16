@@ -26,7 +26,10 @@ element create register_templates content_type \
 	-widget hidden \
 	-param
 
-
+element create register_templates type_props_tab \
+    -datatype keyword \
+    -widget hidden \
+    -value $type_props_tab
 
 # grab marked templates from the clipboard
 #set root_id [cm::modules::templates::getRootFolderID]
@@ -124,16 +127,11 @@ if { [form is_valid register_templates] } {
 	eval "set context $$context_name"
 
         db_transaction {
-            db_exec_plsql register_templates "begin
-                   content_type.register_template(
-                       content_type => :content_type,
-	               template_id  => :template_id,
-	               use_context  => :context );
-                 end;"
+            db_exec_plsql register_templates {}
         }
 
     }
 
-    forward "index?id=$content_type"
+    ad_returnredirect [export_vars -base index {content_type type_props_tab}]
 
 }

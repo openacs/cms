@@ -36,7 +36,7 @@ template::list::create \
 
 db_multirow -extend {item_unreg_link} rel_types get_rel_types "" {
     set rel_type item_rel
-    set item_unreg_link [export_vars -base relation-unregister {rel_type content_type target_type relation_tag}]
+    set item_unreg_link [export_vars -base relation-unregister {rel_type content_type target_type relation_tag type_props_tab}]
 }
 
 template::list::create \
@@ -67,5 +67,5 @@ template::list::create \
 db_multirow -extend {child_unreg_link} child_types get_child_types "" {
     set rel_type child_rel
     set target_type $child_type
-    set child_unreg_link [export_vars -base relation-unregister {rel_type content_type target_type relation_tag}]
+    set child_unreg_link [export_vars -base relation-unregister {rel_type content_type target_type relation_tag type_props_tab}]
 }

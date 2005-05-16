@@ -17,7 +17,6 @@
      where 
        mime_type = cr_revisions.mime_type
     ) as mime_type_pretty,
-    to_char(publish_date,'Month DD, YYYY') as publish_date_pretty,
     content_length as content_size
   from 
     cr_revisions
@@ -36,7 +35,6 @@
       </querytext>
 </fullquery>
 
- 
 <fullquery name="get_one_item">      
       <querytext>
       

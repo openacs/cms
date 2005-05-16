@@ -2,6 +2,11 @@
   <master src="../../master">
   <property name="title">@page_title;noquote@</property>
 </if>
-<h2>@page_title@</h2>
 
-<formtemplate id="create_item"></formtemplate>
+ <div id=section>
+  <div id=section-header>@page_title;noquote@</div>
+   <p/>
+   <formtemplate id="create_item"></formtemplate>
+ </div>
+
+

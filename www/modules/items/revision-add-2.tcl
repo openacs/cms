@@ -24,9 +24,7 @@ if { [file exists [ns_url2file \
   template::forward "custom/$content_type/revision-add-1?item_id=$item_id&content_method=$content_method"
 }
 
-form create add_revision \
-    -html { enctype "multipart/form-data" } \
-    -cancel_url [export_vars -base index {item_id mount_point item_props_tab}]
+form create add_revision -html { enctype "multipart/form-data" }
 
 # autogenerate the revision form
 content::add_revision_form \

@@ -28,7 +28,6 @@ set page_title "Edit Attributes for $name - $title"
 # Create the form
 
 form create add_revision -html { enctype "multipart/form-data" } \
-    -cancel_url [export_vars -base index {item_id mount_point item_props_tab}] \
     -elements {
 	item_id         -datatype integer -widget hidden
 	latest_revision -datatype integer -widget hidden

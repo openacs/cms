@@ -10,7 +10,7 @@ request set_param parent_id    -datatype integer -optional
 # Manually set the value since the templating system is still broken in 
 # the -value flag
 if { [template::util::is_nil parent_id] } {
-  set parent_id [cm::modules::${mount_point}::getRootFolderID]
+    set parent_id [cm::modules::${mount_point}::getRootFolderID [ad_conn package_id]]
 }
 
 permission::require_permission -party_id [auth::require_login] \
@@ -25,6 +25,7 @@ if { [file exists [ns_url2file \
 
 
 set content_type_name [db_string get_content_typ_name ""]
+set page_title "Create a New $content_type_name"
 
 if { [template::util::is_nil content_type_name] } {
     template::request::error bad_content_type \

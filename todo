@@ -27,11 +27,8 @@ tasks
 
 top priority
 ------------
-set up install procs that set contexts appropriately
-remove unused procs files
-tidy up "view revision" page
-move tab setup in index pages into a per section tab master and call that from each subpage
- - select from cm_modules to build tabs
+set up install procs that set contexts appropriately (done, not thoroughly tested)
+fix child items include
 
 basic/cosmetic
 ---------
@@ -53,6 +50,7 @@ utilize new cr tcl api where appropriate
 use ad_form where appropriate
 integrate categories and workflow packages
 ad_page_contract for non-include pages?
+select from cm_modules to build tabs?
 
 questions/ideas
 ---------

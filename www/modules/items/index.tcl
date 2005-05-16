@@ -8,7 +8,7 @@ ad_page_contract {
 } {
     { item_id:integer }
     { mount_point:optional "sitemap" }
-    { item_props_tab:optional "editing"}
+    { item_props_tab:optional "editing" }
 }
 
 set package_url [ad_conn package_url]

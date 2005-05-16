@@ -1,6 +1,9 @@
 <master src="../../master">
 <property name="title">Create a Folder</property>
 
-<h3>Create new folder</h3>
-
+<div id=section>
+<div id=section-header>Create a Folder</div>
 <formtemplate id=add_folder></formtemplate>
+</div>
+
+

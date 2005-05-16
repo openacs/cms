@@ -13,7 +13,7 @@ ad_page_contract {
 
 set original_id $id
 
-set root_id [cm::modules::${mount_point}::getRootFolderID]
+set root_id [cm::modules::${mount_point}::getRootFolderID [ad_conn package_id]]
 if { [util::is_nil id] || [string equal $id _all_] } {
     set where_clause "k.parent_id is null"
 } else {

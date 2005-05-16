@@ -5,7 +5,7 @@ request set_param id -datatype integer -optional
 request set_param mount_point -datatype keyword -value sitemap
 
 
-set root_id [cm::modules::${mount_point}::getRootFolderID]
+set root_id [cm::modules::${mount_point}::getRootFolderID [ad_conn package_id]]
 if { [template::util::is_nil id] } {
   set folder_id $root_id
 } else {
@@ -67,7 +67,7 @@ for { set i 1 } { $i <= $marked_item_size } { incr i } {
 
 if { [form is_valid move] } {
 
-    set root_id [cm::modules::${mount_point}::getRootFolderID]
+    set root_id [cm::modules::${mount_point}::getRootFolderID [ad_conn package_id]]
 
     form get_values move id mount_point
     set moved_items [element get_values move moved_items]

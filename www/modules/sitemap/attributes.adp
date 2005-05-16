@@ -1,7 +1,8 @@
 <master src="../../master">
 <property name="title">@page_title@</property>
+<property name="mount_point">@mount_point@</property>
 
-<nobr><p class="h1">
+<nobr><p>
 <include src="../../bookmark" mount_point="@mount_point@" id="@folder_id@">
 @page_title;noquote@ 
 </p>

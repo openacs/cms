@@ -1,5 +1,6 @@
 request create -params {
-  parent_id -datatype integer
+  parent_id -datatype integer -optional \
+      -value [cm::modules::templates::getRootFolderID [ad_conn package_id]]
 }
 
 set path [db_string get_path ""]

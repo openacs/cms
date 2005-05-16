@@ -6,7 +6,7 @@ request set_param parent_id -datatype integer -optional
 
 # Cannot use -value due to negative values
 if { [template::util::is_nil parent_id] } {
-  set parent_id [cm::modules::templates::getRootFolderID]
+  set parent_id [cm::modules::templates::getRootFolderID [ad_conn package_id]]
 }
 
 set folder_name [db_string get_folder_name "" -default ""]
@@ -43,7 +43,7 @@ if { [form is_valid create_template] } {
     set ip_address [ns_conn peeraddr]
     
     if { [util::is_nil parent_id] } {
-      set parent_id [cm::modules::templates::getRootFolderID]
+      set parent_id [cm::modules::templates::getRootFolderID [ad_conn package_id]]
     }
  
     db_transaction {

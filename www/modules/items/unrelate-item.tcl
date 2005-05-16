@@ -7,7 +7,6 @@ ad_page_contract {
     { rel_id:integer,multiple }
     { mount_point "sitemap" }
     { return_url "index" }
-    { passthrough "[content::assemble_passthrough mount_point]" }
 }
 
 set item_id ""
@@ -27,7 +26,5 @@ foreach rel $rel_id {
     
 }
 
-lappend passthrough [list item_id $item_id]
-
-set item_props_tab children
-ad_returnredirect [export_vars -base $return_url {item_props_tab mount_pount}]
+set item_props_tab related
+ad_returnredirect [export_vars -base $return_url {item_props_tab mount_pount item_props_tab}]

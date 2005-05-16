@@ -5,6 +5,7 @@
 request create
 request set_param rel_type -datatype keyword -value item
 request set_param content_type -datatype keyword
+request set_param type_props_tab -datatype keyword -optional -value related
 request set_param target_type -datatype keyword
 request set_param relation_tag -datatype text -value ""
 
@@ -29,16 +30,9 @@ if { [string equal $rel_type child_rel] } {
 }
 
 
-if { [catch {db_exec_plsql unregister "
-      begin
-      content_type.${unregister_method} (
-          $content_key  => :content_type,
-          $target_key   => :target_type,
-          relation_tag  => :relation_tag
-      );
-      end;"} errmsg] } {
+if { [catch {db_exec_plsql unregister {}} errmsg] } {
     template::request::error unregister_relation_type \
 	    "Could not unregister relation type - $errmsg"
 }
 
-template::forward "index?id=$content_type&type_props_tab=relations"
+ad_returnredirect [export_vars -base index {content_type type_props_tab mount_point}]

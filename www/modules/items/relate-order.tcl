@@ -5,9 +5,7 @@ request set_param rel_id -datatype integer
 request set_param order         -datatype keyword 
 request set_param mount_point   -datatype keyword -value "sitemap"
 request set_param return_url    -datatype text    -value "index"
-request set_param item_props_tab -datatype text    -value "children"
-request set_param passthrough   -datatype text \
-	-value [content::assemble_passthrough mount_point]
+request set_param item_props_tab -datatype text    -value "related"
 request set_param relation_type -datatype keyword -value "relation" 
 
 # Use hardcoding instead of inheritance, since inheritance is not in the

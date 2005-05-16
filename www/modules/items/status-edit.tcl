@@ -1,13 +1,20 @@
-# Build an appropriate form to edit the publishing status for an item.
-request create
-request set_param item_id -datatype integer
-request set_param mount_point -datatype keyword -value sitemap
-request set_param parent_id -datatype integer -optional
-request set_param item_props_tab -datatype text
+ad_page_contract {
+    Build an appropriate form to edit the publishing status for an item.
+
+    @author Michael Steigman
+    @creation-date May 2005
+} {
+    { item_id:integer }
+    { parent_id:integer,optional }
+    { mount_point "sitemap" }
+    { item_props_tab ""}
+}
 
 ## Create the form
 
-form create publish_status -cancel_url [export_vars -base index {item_id mount_point item_props_tab}]
+set cancel_url [export_vars -base index {item_props_tab item_id mount_point}]
+
+form create publish_status -cancel_url $cancel_url -cancel_label "Cancel Operation"
 
 element create publish_status item_id \
   -datatype integer -widget hidden -value $item_id

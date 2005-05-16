@@ -14,7 +14,7 @@ request create -params {
 }
 
 # The root ID is to determine the appropriate path to the item
-set root_id [cm::modules::templates::getRootFolderID]
+set root_id [cm::modules::templates::getRootFolderID [ad_conn package_id]]
 
 
 # resolve any symlinks

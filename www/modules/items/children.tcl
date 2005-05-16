@@ -28,6 +28,7 @@ if { [permission::permission_p -party_id $user_id -object_id $item_id -privilege
 template::list::create \
     -name children \
     -key rel_id \
+    -no_data "No child items" \
     -multirow children \
     -actions [list "Relate marked items to this item" \
 		  "relate-items?item_id=$item_id" \

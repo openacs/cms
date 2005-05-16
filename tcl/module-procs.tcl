@@ -72,7 +72,7 @@ ad_proc -public cm::modules::getChildFolders { mount_point id } {
     return $result
 }
 
-ad_proc -public cm::modules::workspace::getRootFolderID {} { return 0 } 
+ad_proc -public cm::modules::workspace::getRootFolderID { package_id } { return 0 } 
 
 ad_proc -public cm::modules::workspace::getChildFolders { id } {
     return [list]
@@ -99,7 +99,7 @@ ad_proc -public cm::modules::templates::getChildFolders { id } {
 
 } {
     if { [string equal $id {}] } {
-        set id [getRootFolderID]
+        set id [getRootFolderID [ad_conn package_id]]
     }
 
     # query for child site nodes
@@ -144,7 +144,7 @@ ad_proc -public cm::modules::sitemap::getChildFolders { id } {
 
 } {
     if { [string equal $id {}] } {
-        set id [getRootFolderID]
+        set id [getRootFolderID [ad_conn package_id]]
     }
 
     # query for child site nodes
@@ -185,7 +185,7 @@ ad_proc -public cm::modules::types::getTypesTree { } {
     return $result
 }
 
-ad_proc -public cm::modules::types::getRootFolderID {} { return "content_revision" } 
+ad_proc -public cm::modules::types::getRootFolderID { package_id } { return "content_revision" } 
 
 ad_proc -public cm::modules::types::getChildFolders { id } {
 
@@ -195,7 +195,7 @@ ad_proc -public cm::modules::types::getChildFolders { id } {
     set children [list]
 
     if { [string equal $id {}] } {
-        set id [getRootFolderID]
+        set id [getRootFolderID [ad_conn package_id]]
     }
 
     # query for message categories
@@ -208,14 +208,14 @@ ad_proc -public cm::modules::types::getChildFolders { id } {
 
 # end of types namespace
 
-ad_proc -public cm::modules::search::getRootFolderID {} { return 0 } 
+ad_proc -public cm::modules::search::getRootFolderID { package_id } { return 0 } 
 
 ad_proc -public cm::modules::search::getChildFolders { id } {
     return [list]
 }
 
 
-ad_proc -public cm::modules::categories::getRootFolderID {} { return 0 } 
+ad_proc -public cm::modules::categories::getRootFolderID { package_id } { return 0 } 
 
 ad_proc -public cm::modules::categories::getChildFolders { id } {
 
@@ -295,7 +295,7 @@ ad_proc -public cm::modules::users::getSortedPaths { name id_list {root_id 0} {e
 
 
 
-ad_proc -public cm::modules::clipboard::getRootFolderID {} { return 0 } 
+ad_proc -public cm::modules::clipboard::getRootFolderID { package_id } { return 0 } 
 
 ad_proc -public cm::modules::clipboard::getChildFolders { id } {
 

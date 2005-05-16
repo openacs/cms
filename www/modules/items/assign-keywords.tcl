@@ -12,7 +12,7 @@ permission::require_permission -party_id [auth::require_login] \
     -object_id $id -privilege write
 
 if { [template::util::is_nil id] } {
-  set root_id [cm::modules::${mount_point}::getRootFolderID]
+  set root_id [cm::modules::${mount_point}::getRootFolderID [ad_conn package_id]]
 } else {
   set root_id $id
 }

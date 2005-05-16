@@ -13,7 +13,7 @@ set item_name [db_string get_item_name ""]
 
 set page_title "Rename $item_name"
 
-form create rename_item -cancel_url [export_vars -base index {item_id mount_point item_props_tab}]
+form create rename_item 
 
 element create rename_item mount_point \
     -datatype text \

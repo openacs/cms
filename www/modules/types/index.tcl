@@ -72,8 +72,6 @@ template::list::create \
 # get template information
 db_multirow -extend {unreg_link unreg_link_url set_default_url} type_templates get_type_templates "" {
     set context $use_context
-    set unreg_link_url [export_vars -base unregister-template {template_id context content_type}]
-    set set_default_url [export_vars -base set-default-template {template_id context content_type}]
+    set unreg_link_url [export_vars -base unregister-template {template_id context content_type type_props_tab}]
+    set set_default_url [export_vars -base set-default-template {template_id context content_type type_props_tab}]
 }
-
-
