@@ -3,7 +3,8 @@
 
 request create
 request set_param item_id -datatype integer
-request set_param mount_point -datatype keyword -value sitemap
+request set_param mount_point -datatype text -value sitemap
+request set_param item_props_tab -datatype text
 
 permission::require_permission -party_id [auth::require_login] \
     -object_id $item_id -privilege read
@@ -12,27 +13,28 @@ set item_name [db_string get_item_name ""]
 
 set page_title "Rename $item_name"
 
-form create rename_item
+form create rename_item -cancel_url [export_vars -base index {item_id mount_point item_props_tab}]
 
 element create rename_item mount_point \
-  -datatype keyword \
-  -widget hidden \
-  -value $mount_point \
-  -optional
+    -datatype text \
+    -widget hidden \
+    -value $mount_point \
+    -optional
 
 element create rename_item item_id \
-  -datatype integer \
-  -widget hidden \
-  -param
+    -datatype integer \
+    -widget hidden \
+    -param
 
 element create rename_item name \
-  -label "Rename $item_name to:" \
-  -datatype keyword \
-  -widget text \
-  -html { size 20 } \
-  -validate { { expr ![string match $value "/"] } \
-              { Item name cannot contain slashes }} \
-  -value $item_name
+    -label "Rename $item_name to" \
+    -datatype keyword \
+    -widget text \
+    -html { size 20 } \
+    -validate { { expr ![string match $value "/"] } \
+		    { Item name cannot contain slashes }} \
+    -value $item_name \
+    -help_text "Short name using no special characters"
 
 # Rename
 if { [form is_valid rename_item] } {

@@ -49,7 +49,7 @@ template::list::create \
 	attribute_value {
 	    label "Value"
 	    display_template "@attributes.attribute_value;noquote@"
-	    html { width 60% }
+	    html { width 50% }
 	}
 	object_label {
 	    label "Origin"

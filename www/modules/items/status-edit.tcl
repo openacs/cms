@@ -3,10 +3,11 @@ request create
 request set_param item_id -datatype integer
 request set_param mount_point -datatype keyword -value sitemap
 request set_param parent_id -datatype integer -optional
+request set_param item_props_tab -datatype text
 
 ## Create the form
 
-form create publish_status
+form create publish_status -cancel_url [export_vars -base index {item_id mount_point item_props_tab}]
 
 element create publish_status item_id \
   -datatype integer -widget hidden -value $item_id

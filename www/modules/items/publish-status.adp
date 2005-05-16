@@ -3,7 +3,7 @@
 <tr>
   <td colspan=2>
     <if @can_edit_status_p@>
-      <a href="status-edit?item_id=@item_id@" class="button">Edit Publishing Status</a>
+      <a href="status-edit?item_id=@item_id@&item_props_tab=@item_props_tab@" class="button">Edit Publishing Status</a>
     </if>
     <else>&nbsp;</else>
   </td>

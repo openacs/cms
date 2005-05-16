@@ -1,30 +1,24 @@
-# /cms/modules/items/index.tcl
+ad_page_contract {
+    Assemble information for a content item.  Note this page is only
+    appropriate for revisioned content items.  Non-revisioned content
+    items (symlinks, extlinks and folders) have separate admin pages
 
-# Assemble information for a content item.  Note this page is only
-# appropriate for revisioned content items.  Non-revisioned content
-# items (symlinks, extlinks and folders) have separate admin pages
-
-# Most information on this page is included via components.
-
-# HACK: sometimes the query string does not get parsed when returning
-# from revision-add-2.  The reason for this is unclear.
+    @author Michael Steigman
+    @creation-date May 2005
+} {
+    { item_id:integer }
+    { mount_point:optional "sitemap" }
+    { item_props_tab:optional "editing"}
+}
 
 set package_url [ad_conn package_url]
 
+# HACK: sometimes the query string does not get parsed when returning
+# from revision-add-2.  The reason for this is unclear.
 if { [string equal [ns_queryget item_id] {}] } {
   ns_log Notice "ITEM ID NOT FOUND...PARSING QUERY STRING"
   set item_id [lindex [split [ns_conn query] "="] 1]
 }
-
-# The mount_point is used to determine the proper root context
-# when querying the path to the item.
-
-request create
-request set_param item_id -datatype integer
-request set_param mount_point -datatype keyword -optional -value sitemap
-request set_param item_props_tab -datatype keyword -optional -value editing
-request set_param page -datatype integer -optional -value 1 
-
 
 # resolve any symlinks
 set resolved_item_id [db_string get_item_id ""]
@@ -58,27 +52,4 @@ if { [file exists [ns_url2file $custom_dir/index.tcl]] } {
 
 # The root ID is to determine the appropriate path to the item
 
-if { [string equal $mount_point templates] } {
-    set root_id [cm::modules::templates::getRootFolderID [ad_conn package_id]]
-} else {
-    set root_id [cm::modules::sitemap::getRootFolderID [ad_conn package_id]]
-} 
-
-# Set up passthrough for permissions
-set return_url [ns_conn url]
-set passthrough [content::assemble_passthrough \
-  return_url mount_point item_id]
-
-### Create the tab strip for showing individual item property pages
-
-# Get the current tab, if any
-
-
-set url [ad_conn url]
-append url "?item_id=$item_id&mount_point=$mount_point&page=$page"
-
-# template::tabstrip create item_props -base_url $url
-# template::tabstrip add_tab item_props editing "Editing" editing
-# template::tabstrip add_tab item_props children "Sub-Items" children
-# template::tabstrip add_tab item_props publishing "Publishing" publishing
-# template::tabstrip add_tab item_props permissions "Permissions" permissions
+set root_id [cm::modules::${mount_point}::getRootFolderID [ad_conn package_id]]

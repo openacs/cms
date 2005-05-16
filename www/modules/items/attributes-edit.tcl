@@ -27,12 +27,14 @@ set page_title "Edit Attributes for $name - $title"
 
 # Create the form
 
-form create add_revision -html { enctype "multipart/form-data" } -elements {
-    item_id         -datatype integer -widget hidden
-    latest_revision -datatype integer -widget hidden
-    revision_id     -datatype integer -widget hidden
-    content_method  -datatype keyword -widget hidden -value "no_content"
-}
+form create add_revision -html { enctype "multipart/form-data" } \
+    -cancel_url [export_vars -base index {item_id mount_point item_props_tab}] \
+    -elements {
+	item_id         -datatype integer -widget hidden
+	latest_revision -datatype integer -widget hidden
+	revision_id     -datatype integer -widget hidden
+	content_method  -datatype keyword -widget hidden -value "no_content"
+    }
 
 # autogenerate the revision form
 set attributes_list [content::add_attribute_elements add_revision \
