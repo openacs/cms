@@ -1,31 +1,17 @@
 <master src="../../master">
 <property name="title">Edit Template</property>
 
-<script language=JavaScript>
-  function setSrc(name, src) {
-    document.images[name].src = "assets/" + src;
-  }
-</script>
+<include src="template-header" mount_point=@mount_point@ item_id=@template_id@ template_props_tab=@template_props_tab@>
 
-<h3>Edit Template</h3>
-@path;noquote@
-<br/>
+<include src="template-tabs" mount_point=@mount_point@ item_id=@template_id@ template_props_tab=@template_props_tab@>
 
-<formtemplate id="edit_template">
-<formwidget id=template_id>
-<formwidget id=revision_id>
-<formwidget id=content>
+<div id="subnavbar-body">
 
-<br/>
-Output Type: 
-<formwidget id="mime_type">
-<br/>
-Create new revision: 
-<formgroup id="is_update">
-  @formgroup.widget;noquote@ @formgroup.label;noquote@
-</formgroup>
-<br/>
-<input type=submit name=action value="Save">&nbsp;&nbsp;
-<input type=submit name=action value="Cancel">
+ <div id=section>
+  <div id=section-header>Edit Template @path;noquote@</div>
+   <p/>
+   <formtemplate id="edit_template"></formtemplate>
+ </div>
 
-</formtemplate>
+</div>
+

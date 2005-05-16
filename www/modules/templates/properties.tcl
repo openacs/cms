@@ -38,8 +38,6 @@ if { [string equal $type content_folder] } {
   template::forward index?id=$item_id
 }
 
-set package_url [ad_conn package_url]
-
 # query the content_type of the item ID so we can check for a custom info page
 db_1row get_info "" -column_array info
 template::util::array_to_vars info

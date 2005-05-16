@@ -1,5 +1,11 @@
-request create -params {
-  template_id -datatype integer
+ad_page_contract {
+
+    @author Michael Steigman
+    @creation-date May 2005
+} {
+    { template_id:integer }
+    { mount_point "templates"}
+    { template_props_tab:optional "revision"}
 }
 
 if { ! [request is_valid] } { return }
