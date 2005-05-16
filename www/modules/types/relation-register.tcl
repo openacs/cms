@@ -1,11 +1,10 @@
 request create
 request set_param rel_type     -datatype keyword
-request set_param content_type -datatype keyword -value content_revision
+request set_param content_type -datatype text -value content_revision
+request set_param type_props_tab -datatype text -optional -value attributes
 
-
-set module_id [db_string get_module_id ""]
 permission::require_permission -party_id [auth::require_login] \
-    -object_id $module_id -privilege write
+    -object_id [cm::modules::get_module_id -module_name types -package_id [ad_conn package_id]] -privilege write
 
 form create relation -elements {
     rel_type     -datatype keyword -widget hidden -param
@@ -25,8 +24,9 @@ if { [string equal $rel_type item_rel] } {
 }
 
 set pretty_name [db_string get_pretty_name ""]
-
 set target_types [db_list_of_lists get_target_types ""]
+
+set page_title "Register a $rel_type_pretty Relation Type to $pretty_name"
 
 element create relation target_type \
 	-datatype keyword \

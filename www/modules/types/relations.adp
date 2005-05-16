@@ -1,4 +1,3 @@
-<p/>
 <div id=section>
 <div id=section-header>Registered Item Relation Types</div>
 <p/>

@@ -11,4 +11,4 @@ if { [catch { db_exec_plsql unregister {} } errmsg] } {
 }
 
 
-template::forward index?id=$content_type
+template::forward index?content_type=$content_type

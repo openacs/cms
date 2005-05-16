@@ -22,6 +22,6 @@ wizard create -action "index?id=$content_type" -params {
     2 -label "Edit Widget Params"   -url "widget-register-2"
     3 -label "Preview Widget"       -url "widget-register-3" 
 }
-wizard set_finish_url [export_vars -base index { { id $content_type } }]
+wizard set_finish_url [export_vars -base index { { content_type $content_type } }]
 
 wizard get_current_step

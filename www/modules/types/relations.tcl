@@ -4,6 +4,7 @@
 
 request create
 request set_param content_type -datatype integer -value content_revision
+request set_param type_props_tab -datatype text -optional -value attributes
 
 permission::require_permission -party_id [auth::require_login] \
     -object_id [cm::modules::get_module_id -module_name types -package_id [ad_conn package_id]] -privilege read
@@ -13,7 +14,7 @@ template::list::create \
     -multirow rel_types \
     -has_checkboxes \
     -no_data "There are no item relation types registered to this content type." \
-    -actions [list "Register a new item relation type" [export_vars -base relation-register?rel_type=item_rel {content_type}] "Register a new item relation type"] \
+    -actions [list "Register a new item relation type" [export_vars -base relation-register?rel_type=item_rel {content_type type_props_tab}] "Register a new item relation type"] \
     -elements {
         pretty_name {
 	    label "Related Object Type"
@@ -43,7 +44,7 @@ template::list::create \
     -multirow child_types \
     -has_checkboxes \
     -no_data "There are no child relation types registered to this content type." \
-    -actions [list "Register a new child relation type" [export_vars -base relation-register?rel_type=child_rel {content_type}] "Register a new child relation type"] \
+    -actions [list "Register a new child relation type" [export_vars -base relation-register?rel_type=child_rel {content_type type_props_tab}] "Register a new child relation type"] \
     -elements {
         pretty_name {
 	    label "Child Type"

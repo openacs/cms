@@ -3,6 +3,7 @@
 
 request create
 request set_param content_type -datatype keyword
+request set_param type_props_tab -datatype text -optional -value attributes
 
 
 # get the content type pretty name
