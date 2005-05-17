@@ -348,7 +348,7 @@ ad_proc -public publish::set_publish_status { item_id new_status {revision_id ""
 }
      
  
-ad_proc -private publish::track_publish_status {} {
+ad_proc -private publish::track_publish_status {package_id} {
 
   @private track_publish_status
  
@@ -358,8 +358,8 @@ ad_proc -private publish::track_publish_status {} {
 
 } {
   
-  ns_log debug "publish::track_publish_status: Tracking publish status"
-
+  ns_log debug "publish::track_publish_status: Tracking publish status for package $package_id"
+  # MS: can't really do anything per package until 5.2
   db_transaction {
 
       if { [catch {
@@ -425,11 +425,13 @@ ad_proc -public publish::schedule_status_sweep { {interval ""} } {
 		set interval 3600
 		ns_log Warning "publish::schedule_status_sweep: unable to lookup package_id for cms defaulting to interval 3600"
 	    }
+
+	    ns_log notice "publish::schedule_status_sweep: Scheduling status sweep every $interval seconds for package_id $package_id"
+	    set proc_id [ns_schedule_proc -thread $interval publish::track_publish_status $package_id]
+	    cache set status_sweep_proc_id $proc_id
+   
 	}
 
-	ns_log notice "publish::schedule_status_sweep: Scheduling status sweep every $interval seconds"
-	set proc_id [ns_schedule_proc -thread $interval publish::track_publish_status]
-	cache set status_sweep_proc_id $proc_id
     }
 }
 
