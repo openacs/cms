@@ -4,8 +4,23 @@ request create -params {
     item_props_tab -datatype text -optional
 }
 
-permission::require_permission -party_id [auth::require_login] \
+set user_id [auth::require_login]
+permission::require_permission -party_id $user_id \
     -object_id $item_id -privilege read
+
+# # create a form to add related items...
+# set related_types [db_list_of_lists get_related_types ""]
+
+# # but do not display form if this content type does not allow relations
+# set related_types_registered_p [llength $related_types]
+
+# if { [permission::permission_p -party_id $user_id -object_id $item_id -privilege write] } {
+#     form create add_related_item -method get -action create-1
+#     element create add_related_item parent_id -datatype integer \
+# 	-widget hidden -value $item_id
+#     element create add_related_item content_type -datatype keyword \
+# 	-options $related_types -widget select 
+# }
 
 template::list::create \
     -name related \

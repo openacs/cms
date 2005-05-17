@@ -27,4 +27,4 @@ foreach rel $rel_id {
 }
 
 set item_props_tab related
-ad_returnredirect [export_vars -base $return_url {item_props_tab mount_pount item_props_tab}]
+ad_returnredirect [export_vars -base $return_url {item_id mount_pount item_props_tab}]

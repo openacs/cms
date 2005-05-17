@@ -143,7 +143,7 @@ if { [form is_valid rel_form_2] || $form_complete } {
       }
   }
 
-  template::forward "index?item_id=$item_id&mount_point=$mount_point"
+  template::forward "index?item_id=$item_id&mount_point=$mount_point&item_props_tab=related"
 }
      
     

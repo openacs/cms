@@ -1,7 +1,7 @@
 request create
 request set_param rel_type     -datatype keyword
 request set_param content_type -datatype text -value content_revision
-request set_param type_props_tab -datatype text -optional -value attributes
+request set_param type_props_tab -datatype text -optional -value relations
 
 permission::require_permission -party_id [auth::require_login] \
     -object_id [cm::modules::get_module_id -module_name types -package_id [ad_conn package_id]] -privilege write
@@ -94,5 +94,5 @@ if { [form is_valid relation] } {
         }
     }    
 
-    template::forward "index?id=$content_type&type_props_tab=relations"
+    ad_returnredirect [export_vars -base index {content_type type_props_tab}]
 }

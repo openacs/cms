@@ -97,8 +97,8 @@
                  mime_type     => :mime_type,
                  text          => ' ',
                  item_id       => content_symlink.resolve(:item_id),
-                 creation_ip   => '[ns_conn peeraddr]',
-                 creation_user => [User::getID]
+                 creation_ip   => null,
+                 creation_user => null
              );
              end;
 	</querytext>
@@ -312,8 +312,8 @@
                item_id       => content_symlink.resolve(:item_id),
                revision_id   => :revision_id,
                title         => :title,
-               creation_ip   => :creation_ip,
-               creation_user => :creation_user $param_sql); end;
+               creation_ip   => null,
+               creation_user => null $param_sql); end;
       </querytext>
 </fullquery>
 

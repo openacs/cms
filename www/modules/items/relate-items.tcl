@@ -1,8 +1,8 @@
 # This form will list all currently marked content items
 # and confirm that the user wishes to link them all to the current item
 request create -params {
-  item_id -datatype integer
-  mount_point -datatype keyword -value sitemap
+    item_id -datatype integer
+    mount_point -datatype keyword -value sitemap
 }
 
 permission::require_permission -party_id [auth::require_login] \

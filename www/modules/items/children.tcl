@@ -10,19 +10,18 @@ set user_id [auth::require_login]
 permission::require_permission -party_id $user_id \
     -object_id $item_id -privilege read
 
-# create a form to add child items
-
+# create a form to add child items...
 set child_types [db_list_of_lists get_child_types ""]
 
-# do not display template if this content type does not allow children
-if { [llength $child_types] == 0 } { adp_abort }
+# but do not display form if this content type does not allow children
+set child_types_registered_p [llength $child_types]
 
 if { [permission::permission_p -party_id $user_id -object_id $item_id -privilege write] } {
-  form create add_child -method get -action "create-1"
-  element create add_child parent_id -datatype integer \
-    -widget hidden -value $item_id
-  element create add_child content_type -datatype keyword \
-    -options $child_types -widget select 
+    form create add_child -method get -action create-1
+    element create add_child parent_id -datatype integer \
+	-widget hidden -value $item_id
+    element create add_child content_type -datatype keyword \
+	-options $child_types -widget select 
 }
 
 template::list::create \
@@ -42,25 +41,23 @@ template::list::create \
 	}
 	title_url {
 	    label "Title"
-	    display_template "<a href=\"@related.title_url@\" title=\"View content item\">@related.title@</a>"
+	    display_template "<a href=\"@children.title_url@\" title=\"View content item\">@children.title@</a>"
 	}
 	type_name {
 	    label "Relationship Type"
 	}
-	relation_view_url {
+	tag {
 	    label "Tag"
-	    display_template "<a href=\"@related.relation_view_url@\" title=\"View relation\">@related.tag@</a>"
 	}
 	reorder {
 	    label "Move"
-	    display_template "<nobr><a href=\"@related.move_up_url@\" title=\"Move item up\">up</a> &nbsp;|&nbsp; \
-                                    <a href=\"@related.move_down_url@\" title=\"Move item down\">down</a></nobr>"
+	    display_template "<nobr><a href=\"@children.move_up_url@\" title=\"Move item up\">up</a> &nbsp;|&nbsp; \
+                                    <a href=\"@children.move_down_url@\" title=\"Move item down\">down</a></nobr>"
 	}
     }    
 
 db_multirow -extend { title_url relation_view_url move_up_url move_down_url reorder } children get_children "" {
     set title_url "index?item_id=$item_id&mount_point=$mount_point"
-    set relation_view_url "relationship-view?rel_id=$rel_id&mount_point=$mount_point"
     set move_up_url "relate-order?rel_id=$rel_id&order=up&mount_point=$mount_point&item_props_tab=children&relation_type=relation"
     set move_down_url "relate-order?rel_id=$rel_id&order=down&mount_point=$mount_point&item_props_tab=children&relation_type=relation"
 }

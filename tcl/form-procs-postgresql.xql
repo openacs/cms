@@ -92,7 +92,7 @@
 <fullquery name="content::process_revision_form.new_content_revision">
 	<querytext>
 
-	     select content_revision__new(:title,:description,:mime_type,' ',content_symlink__resolve(:item_id),'[ns_conn peeraddr]',[User::getID]) as revision_id
+	     select content_revision__new(:title,:description,:mime_type,' ',content_symlink__resolve(:item_id),null,null) as revision_id
 
 	</querytext>
 </fullquery>
@@ -167,10 +167,10 @@
                                  :parent_id,
                                  :item_id,
                                  :locale,
-                                 now(),
-                                 [User::getID],
+                                 current_timestamp,
                                  null,
-                                 '[ns_conn peeraddr]',
+                                 null,
+                                 null,
                                  'content_item',
                                  :content_type,
                                  null,
@@ -363,15 +363,15 @@
         select content_revision__new(
                :title,
                :description,
-               now(),
+               current_timestamp,
                :mime_type,
                null,
                :text,
                content_symlink__resolve(:item_id),
                :revision_id,
-               now(),
-               :creation_user,
-               :creation_ip)
+               current_timestamp,
+               null,
+               null)
 
       </querytext>
 </fullquery>

@@ -28,7 +28,7 @@ tasks
 top priority
 ------------
 set up install procs that set contexts appropriately (done, not thoroughly tested)
-fix child items include
+clean up www/modules/items/relate-items (remove old table format)
 
 basic/cosmetic
 ---------

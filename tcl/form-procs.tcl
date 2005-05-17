@@ -378,22 +378,9 @@ ad_proc -public content::process_revision_form { form_name content_type item_id 
     template::form get_values $form_name title description mime_type
 
     # create the basic revision
-    set revision_id [db_exec_plsql new_content_revision "
-             begin
-	     :1 := content_revision.new(
-                 title         => :title,
-                 description   => :description,
-                 mime_type     => :mime_type,
-                 text          => ' ',
-                 item_id       => content_symlink.resolve(:item_id),
-                 creation_ip   => '[ns_conn peeraddr]',
-                 creation_user => [User::getID]
-             );
-        end;"]
-
+    set revision_id [db_exec_plsql new_content_revision {}]
 
     # query for extended attribute tables
-
     set last_table ""
     set last_id_column ""
     db_multirow rows get_extended_attributes ""
@@ -676,8 +663,8 @@ ad_proc -public content::new_item { form_name { storage_type text } { tmpfile ""
             }
         }
 
-        lappend params "creation_user => [User::getID]"
-        lappend params "creation_ip   => '[ns_conn peeraddr]'"
+        lappend params "creation_user => null"
+        lappend params "creation_ip   => null"
         lappend params "storage_type => :storage_type"
 
         # Use the correct relation tag, if specified
@@ -789,15 +776,13 @@ ad_proc -private content::attribute_insert_statement {
 
 } {
     # get creation_user and creation_ip
-    set creation_user [User::getID]
-    set creation_ip [ns_conn peeraddr]
-    ns_set put $bind_vars creation_user $creation_user
-    ns_set put $bind_vars creation_ip $creation_ip
+    ns_set put $bind_vars creation_user null
+    ns_set put $bind_vars creation_ip null
 
 
     # initialize the column and value list 
     set columns [list item_id revision_id creation_user creation_ip]
-    set values [list :item_id :revision_id :creation_user :creation_ip]
+    set values [list :item_id :revision_id null null]
     set default_columns [list] 
     set default_values [list]
     set missing_columns [list]
@@ -1970,9 +1955,6 @@ ad_proc -public content::add_basic_revision { item_id revision_id title args } {
 
     template::util::get_opts $args
 
-    set creation_ip [ns_conn peeraddr]
-    set creation_user [User::getID]
-
     set param_sql ""
     array set defaults [list description "" mime_type "text/plain" text " "]
     foreach param { description mime_type text } {
@@ -1987,12 +1969,7 @@ ad_proc -public content::add_basic_revision { item_id revision_id title args } {
 
     db_transaction {
 
-        set revision_id [db_exec_plsql basic_get_revision_id "begin :1 := content_revision.new(
-               item_id       => content_symlink.resolve(:item_id),
-               revision_id   => :revision_id,
-               title         => :title,
-               creation_ip   => :creation_ip,
-               creation_user => :creation_user $param_sql); end;"]
+        set revision_id [db_exec_plsql basic_get_revision_id {}]
 
         if { [info exists opts(tmpfile)] } {
 
