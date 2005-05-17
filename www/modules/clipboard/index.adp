@@ -129,7 +129,7 @@
 	 border=0></a>
     </td>
     <td>
-      <a href="@items.url@" target=listFrame>@items.item_path@</a>
+      <a href="@items.url@">@items.item_path@</a>
     </td>
   </tr>
   </multiple>
