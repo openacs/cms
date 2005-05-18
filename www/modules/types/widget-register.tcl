@@ -15,7 +15,7 @@ if { ![template::util::is_nil widget] } {
 }
 
 
-wizard create -action "index?id=$content_type" -params {
+wizard create -action "index?content_type=$content_type" -params {
     attribute_id content_type widget
 } -steps {
     1 -label "Choose a widget"      -url "widget-register-1"

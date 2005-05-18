@@ -20,7 +20,7 @@ if { [string equal $rel_type item_rel] } {
     set type_label "Child Content Type"
 
 } else {
-    template::forward index?id=$content_type
+    template::forward index?content_type=$content_type
 }
 
 set pretty_name [db_string get_pretty_name ""]

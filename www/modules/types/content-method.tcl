@@ -8,7 +8,7 @@ permission::require_permission -party_id [auth::require_login] \
 
 # default return_url
 if { [template::util::is_nil return_url] } {
-    set return_url "index?id=$content_type"
+    set return_url "index?content_type=$content_type"
 }
 
 template::list::create \

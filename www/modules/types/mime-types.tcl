@@ -17,7 +17,7 @@ set unregistered_mime_types_count [llength $unregistered_mime_types]
 if { [template::util::is_nil content_type_name] } {
     ns_log Notice \
       "register-mime-types.tcl - ERROR:  BAD CONTENT_TYPE - $content_type"
-    template::forward "index?id=content_revision"
+    template::forward "index?content_type=content_revision"
 }
 
 template::list::create \
@@ -79,5 +79,5 @@ if { [form is_valid register] } {
 
     content_method::flush_content_methods_cache $content_type
 
-    template::forward "index?id=$content_type"
+    template::forward "index?content_type=$content_type"
 }

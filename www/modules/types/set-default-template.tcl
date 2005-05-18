@@ -23,7 +23,7 @@ db_exec_plsql set_default_template "
 
 # set the default return_url if none exists
 if { [template::util::is_nil return_url] } {
-    set return_url "index?id=$content_type&mount_point=types"
+    set return_url "index?content_type=$content_type&mount_point=types"
 }
 
 forward $return_url

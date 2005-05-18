@@ -26,7 +26,7 @@ if { [string equal $rel_type child_rel] } {
 
 } else {
     # bad rel_type, don't do anything
-    template::forward "index?id=$content_type"
+    template::forward "index?content_type=$content_type"
 }
 
 

@@ -9,7 +9,7 @@ request set_param return_url     -datatype text -value ""
 
 # default return_url
 if { [template::util::is_nil return_url] } {
-    set return_url "index?id=$content_type"
+    set return_url "index?content_type=$content_type"
 }
 
 

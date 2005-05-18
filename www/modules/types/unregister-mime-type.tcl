@@ -18,4 +18,4 @@ db_transaction {
 
 content_method::flush_content_methods_cache $content_type
 
-template::forward "index?id=$content_type"
+template::forward "index?content_type=$content_type"
