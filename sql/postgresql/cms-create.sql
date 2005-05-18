@@ -124,7 +124,7 @@ create table cm_modules (
   -- can probably remove this after 5.2 release but it made things v. easy
   package_id		     integer 
 			     constraint cm_modules_pkg_id_fk
-                             refereneces apm_packages
+                             references apm_packages
 );
 
 comment on column cm_modules.root_key is '
