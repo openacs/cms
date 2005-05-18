@@ -28,7 +28,8 @@
     types.table_name, 
     types.id_column, 
     attr.attribute_name, 
-    attr.pretty_name as attribute_label
+    attr.pretty_name as attribute_label,
+    attr.datatype
   from 
     acs_attributes attr,
     ( select 
