@@ -8,6 +8,7 @@ template::list::create \
     -no_data "There are no items in this folder" \
     -page_size 20 \
     -page_query_name get_folder_contents_paginate \
+    -page_flush_p 1 \
     -actions $actions \
     -elements {
 	copy {
