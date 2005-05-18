@@ -69,7 +69,7 @@ db_multirow -extend { attribute_value } attributes get_attributes "" {
     }
 
     if { [string match $datatype date] } {
-	set value [lc_time_fmt $value "%q %r"]
+	set value [lc_time_fmt $value "%q %X"]
     }
 
     set attribute_value [string_truncate $value]

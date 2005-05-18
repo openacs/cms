@@ -52,6 +52,6 @@ db_multirow -extend { pretty_date revision_id_url view } revisions get_revisions
     if {[template::util::is_nil $description]} {
 	set description "-"
     }
-    set pretty_date [lc_time_fmt $publish_date "%q %r"]
+    set pretty_date [lc_time_fmt $publish_date "%q %X"]
     set revision_id_url "revision?revision_id=$revision_id"
 }

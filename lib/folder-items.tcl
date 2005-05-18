@@ -27,7 +27,7 @@ template::list::create \
 	    label "Publish Date"
 	    display_eval {
 		[ad_decode $publish_status "live" \
-		     [lc_time_fmt $publish_date "%q %r"] \
+		     [lc_time_fmt $publish_date "%q %X"] \
 		     "-"]
 	    }
 	}
@@ -37,7 +37,7 @@ template::list::create \
 	last_modified {
 	    label "Last Modified"
 	    orderby last_modified
-	    display_eval {[lc_time_fmt $last_modified "%q %r"]}
+	    display_eval {[lc_time_fmt $last_modified "%q %X"]}
 	}
     } \
     -filters {
