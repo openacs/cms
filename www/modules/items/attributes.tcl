@@ -68,7 +68,7 @@ db_multirow -extend { attribute_value } attributes get_attributes "" {
         set value "-" 
     }
 
-    if { [string match $datatype date] } {
+    if { [string match $datatype date] && [template::util::date::validate $value error] } {
 	set value [lc_time_fmt $value "%q %X"]
     }
 
