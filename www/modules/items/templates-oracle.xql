@@ -24,7 +24,7 @@
   select 
     template_id, use_context, 
     content_item.get_path( template_id ) path,
-    cms_permission.permission_p( template_id, :user_id, 'cm_examine')
+    acs_permission.permission_p( template_id, :user_id, 'read')
       as can_read_template
   from 
     cr_item_template_map t
@@ -43,7 +43,7 @@
   select 
     template_id, use_context, is_default,
     content_item.get_path( template_id ) path,
-    cms_permission.permission_p( template_id, :user_id, 'cm_examine') 
+    acs_permission.permission_p( template_id, :user_id, 'read') 
       as can_read_template,
     (select 1 
      from 
