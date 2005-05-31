@@ -28,16 +28,16 @@
 <if @item_props_tab@ eq related>
 
   <div id=section>
-   <div id=section-header>Child Items</div>
+   <div id=section-header>Related Items</div>
    <p/>
-    <include src="children" item_id="@item_id;noquote@">
+    <include src="related-items" item_id="@item_id;noquote@">
   </div>
   <p>
 
   <div id=section>
-   <div id=section-header>Related Items</div>
+   <div id=section-header>Child Items</div>
    <p/>
-    <include src="related-items" item_id="@item_id;noquote@">
+    <include src="children" item_id="@item_id;noquote@">
   </div>
   <p>
 
@@ -67,11 +67,11 @@
   </div>
   <p>
 
-  <div id=section>
+  <!-- <div id=section>
    <div id=section-header>Comments</div>
    <p/>
     Place holder for comments
-  </div>
+  </div> -->
   <p>
 
 </if>
