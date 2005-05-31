@@ -15,50 +15,32 @@
 <else>
 
 
-<table>
-<tr><td>
-
-<table>
-<tr>
-      <th>Name</th><td>&nbsp;&nbsp;</td>
-      <th>Type</th><td>&nbsp;&nbsp;</td>
-      <th>Description and multirow/form details</th><td>&nbsp;&nbsp;</td>
+<table class="list" cellpadding=3 cellspacing=1>
+<tr class="list-header">
+      <th class="list">Name</th>
+      <th class="list">Type</th>
+      <th class="list">Description and multirow/form details</th>
 </tr>  
-
 <multiple name="datasources">
-  <tr>
-    <td align=left valign=top>@datasources.name@</td><td>&nbsp;</td>
-    <td align=left valign=top>@datasources.structure@</td><td>&nbsp;</td>
+  <if @datasources.rownum@ "odd"><tr class="list-odd"></if><else><tr class="list-even"></else>
+    <td align=left valign=top>@datasources.name@</td>
+    <td align=left valign=top>@datasources.structure@</td>
     <td align=left valign=top>@datasources.comment@
      <if @datasources.structure@ in multirow multilist form>
-      <p/>
-       <table class="list" cellpadding=3 cellspacing=1>
         <if @datasources.structure@ in multirow multilist>
-         <tr class="list-header">
-	   <th class="list">Column</th><th class="list">Comment</th>
-         </tr>
+         <p/>Columns:
 	 <group column="name">
-           <if @datasources.rownum@ "odd"><tr class="list-odd"></if><else><tr class="list-even"></else>
-	    <td class="list">@datasources.column_name@</td>
-            <td class="list">@datasources.column_comment@</td>
-	   </tr>
+	   <strong>@datasources.column_name@</strong>, @datasources.column_comment@;
 	 </group>
         </if>
 	<else>
-	 <tr class="list-header">
-	    <th class="list">Name</th>
-            <th class="list">Type</th>
-	    <th class="list">Comment</th>
-	 </tr>
+         <p/>Fields:
 	 <group column="name">
-           <if @datasources.rownum@ "odd"><tr class="list-odd"></if><else><tr class="list-even"></else>
-            <td class="list">@datasources.input_name@</td>
-            <td class="list">@datasources.input_type@</td>
-            <td class="list">@datasources.input_comment@</td>
-           </tr>
+            <strong>@datasources.input_name@</strong>(@datasources.input_type@)
+            <if @datasources.input_comment@ not nil>,</if>
+            @datasources.input_comment@;
 	 </group>
 	</else>
-      </table>
      </if>
    </td>
   </tr>
@@ -66,8 +48,6 @@
 
 </table>
 
-</td></tr>
-</table>
 </else>
 </else>
 </else>
