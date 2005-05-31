@@ -7,30 +7,11 @@
       <querytext>
 
   select
-    coalesce(initcap(publish_status), 'Production') as publish_status, 
-    coalesce(to_char(start_when, 'MM/DD/YY HH:MI AM'), 'Immediate') as start_when,
-    coalesce(to_char(end_when, 'MM/DD/YY HH:MI AM'), 'Indefinite') as end_when,
-    content_item__is_publishable(:item_id) as is_publishable,
-    live_revision
+    publish_status, start_when, end_when
   from
     cr_items i left outer join cr_release_periods r using (item_id)
   where
     i.item_id = :item_id
-
-      </querytext>
-</fullquery>
-
- 
-<fullquery name="get_publish_info">      
-      <querytext>
-      
-  select 
-    content_item__is_publishable( item_id ) as is_publishable, 
-    live_revision
-  from
-    cr_items
-  where
-    item_id = :item_id
 
       </querytext>
 </fullquery>

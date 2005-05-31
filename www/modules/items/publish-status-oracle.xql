@@ -7,32 +7,13 @@
       <querytext>
       
   select
-    NVL(initcap(publish_status), 'Production') publish_status, 
-    NVL(to_char(start_when, 'MM/DD/YY HH:MI AM'), 'Immediate') start_when,
-    NVL(to_char(end_when, 'MM/DD/YY HH:MI AM'), 'Indefinite') end_when,
-    content_item.is_publishable(:item_id) is_publishable,
-    live_revision
+    publish_status, start_when, end_when
   from
     cr_items i, cr_release_periods r
   where
     i.item_id = :item_id
   and
     i.item_id = r.item_id (+)
-      </querytext>
-</fullquery>
-
- 
-<fullquery name="get_publish_info">      
-      <querytext>
-      
-  select 
-    content_item.is_publishable( item_id ) is_publishable, 
-    live_revision
-  from
-    cr_items
-  where
-    item_id = :item_id
-
       </querytext>
 </fullquery>
 

@@ -6,73 +6,58 @@ request set_param item_id -datatype integer
 request set_param item_props_tab -datatype text
 
 set user_id [auth::require_login]
-permission::require_permission -party_id $user_id \
-    -object_id $item_id -privilege read
+permission::require_permission -party_id $user_id -object_id $item_id \
+    -privilege read
 
-set can_edit_status_p [permission::permission_p \
-			   -party_id $user_id \
-			   -object_id $item_id \
-			   -privilege write]
+set can_edit_status_p [permission::permission_p -party_id $user_id \
+			   -object_id $item_id -privilege write]
 
 # Query for publish status and release schedule, if any
-
 db_1row get_info "" -column_array info
 
+set publish_status [ad_decode $info(publish_status) "" production $info(publish_status)]
+set starting [ad_decode $info(start_when) "" immediately ""]
+set ending [ad_decode $info(end_when) "" indefinitely ""]
+
 # Build a sentence describing the publishing status
-
-set actions [list]
-
-switch $info(publish_status) {
-
-  Production { 
-    set message "This item is in production."
-  }
-
-  Ready { 
-    set message "This item is ready for publishing. "
-    if { ! [string equal $info(start_when) Immediate] } {
-      append message "It has been scheduled for release
-                      on <b>$info(start_when)</b>."
-    } else {
-      append message "It has not been scheduled for release."
+switch $publish_status {
+    
+    production { 
+	set message "This item is in production."
     }
-  }
-
-  Live { 
-    set message "This item has been published. "
-    if { ! [string equal $info(end_when) Indefinite] } {
-      append message "It has been scheduled to expire
-                      on <b>$info(end_when)</b>."
-    } else {
-      append message "It has no expiration date."
+    
+    ready { 
+	set message "This item is ready for publishing. "
+	if { ! [string equal $starting immediately] } {
+	    append message "It has been scheduled for release
+                      on [lc_time_fmt $info(start_when) \"%q %X\"]."
+	} else {
+	    append message "It has not been scheduled for release."
+	}
     }
-  }
-
-  Expired { 
-    set message "This item is expired."
-  }
+    
+    live { 
+	set message "This item has been published. "
+	if { ! [string equal $ending indefinitely] } {
+	    append message "It has been scheduled to expire
+                        on [lc_time_fmt $info(end_when) \"%q %X\"]."
+	} else {
+	    append message "It has no expiration date."
+	}
+    }
+    
+    expired { 
+	set message "This item is expired."
+    }
 }
 
-# determine whether the item is publishable or not
-
-db_1row get_publish_info "" -column_array publish_info
-
-template::util::array_to_vars publish_info
-
-# if the live revision doesn't exist, the item is unpublishable
-if { [template::util::is_nil live_revision] } {
-    set is_publishable f
-}
-
-
-# determine if there is an unfinished workflow
-
-#set unfinished_workflow_exists [db_string unfinished_exists ""]
+set live_revision [content::item::get_live_revision -item_id $item_id]
+set latest_revision [content::item::get_latest_revision -item_id $item_id]
+set is_publishable [content::item::is_publishable -item_id $item_id]
 
 # determine if child type constraints have been satisfied
-
 set unpublishable_child_types 0
-db_multirow -extend {is_fulfilled difference direction} child_types get_child_types "" {
+db_multirow -extend {is_fulfilled difference direction} child_types get_child_types {} {
 
     # set is_fulfilled to t if the relationship constraints are fulfilled
     #   otherwise set is_fulfilled to f
@@ -99,12 +84,9 @@ db_multirow -extend {is_fulfilled difference direction} child_types get_child_ty
     }
 }
 
-
-
 # determine if relation type constraints have been satisfied
-
 set unpublishable_rel_types 0
-db_multirow  -extend {is_fulfilled difference direction} rel_types get_rel_types {
+db_multirow -extend { is_fulfilled difference direction } rel_types get_rel_types {} {
 
     # set is_fulfilled to t if the relationship constraints are fulfilled
     #   otherwise set is_fulfilled to f
@@ -131,5 +113,3 @@ db_multirow  -extend {is_fulfilled difference direction} rel_types get_rel_types
     }
 
 }
-
-
