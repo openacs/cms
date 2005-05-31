@@ -10,5 +10,12 @@
       </querytext>
 </fullquery>
 
+<fullquery name="get_contexts">      
+      <querytext>
+      
+  select use_context, use_context from cr_template_use_contexts
+
+      </querytext>
+</fullquery>
  
 </queryset>

@@ -1,10 +1,12 @@
 
-Templates Registered to @iteminfo.name@
+Templates Registered to content item "@iteminfo.name@":
 
 <listtemplate name="registered_templates"></listtemplate>
 
-<p/>
+<p>&nbsp;</p>
 
-Templates Registered to @iteminfo.pretty_name@
+Templates Registered to content type "@iteminfo.pretty_name@":
 
 <listtemplate name="type_templates"></listtemplate>
+
+<p/>

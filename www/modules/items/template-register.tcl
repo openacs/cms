@@ -1,26 +1,71 @@
-# Add a template of the item
+ad_page_contract {
 
-request create
-request set_param item_id -datatype integer
-request set_param template_id -datatype integer
-request set_param context -datatype keyword
+    @author Michael Steigman
+    @creation-date May 2005
+} {
+    { item_id:naturalnum }
+    { mount_point:optional "sitemap" }
+    { item_props_tab:optional "publishing" }
+    { template_id:naturalnum,optional }
+    { context:optional }
+}
 
+# get templates from the clipboard
+set clip [clipboard::parse_cookie]
+set templates [clipboard::get_items $clip templates]
 
-db_transaction {
+# if no templates are clipped, send user a message and abort
+if { [llength $templates] < 1 } {
+    util_user_message -message "There are no templates on the clipboard"
+    ad_returnredirect [export_vars -base index {item_id item_props_tab mount_point}]
+} 
 
-    # check to make sure that no template is already registered
-    #   to this item in this context
-    set second_template_p [db_string second_template_p ""]
+ad_form -name select_template -form {
+    {item_id:naturalnum(hidden) 
+	{value $item_id}}
+}
 
-    if { $second_template_p == 0 } {
-        if { [catch { db_exec_plsql register_template_to_item "begin content_item.register_template(
-            item_id     => :item_id,
-            template_id => :template_id,
-            use_context => :context ); 
-         end;"} err_msg] } {
-            ns_log notice "template-register.tcl got an error: $err_msg"
-        }
+# set up template options (if any)
+if { [llength $templates] > 1 } {
+    set options [list]
+    foreach template_id $templates {
+	set path [content::template::get_path -template_id $template_id]
+	lappend options [list $path $template_id]
+    }
+    ad_form -extend -name select_template -form {
+	{template_id:naturalnum(radio)
+	    {label "Template"}
+	    {options $options}}
+    }
+
+} else {
+    set path [content::template::get_path -template_id $templates]
+    ad_form -extend -name select_template -form {
+	{path:text(inform)
+	    {label "Template"}
+	    {value $path}}
+	{template_id:naturalnum(hidden)
+	    {value $templates}}
     }
 }
 
-forward "../items/index?item_id=$item_id&#templates"
+
+set context_options [db_list_of_lists get_contexts {}]
+ad_form -extend -name select_template -form {
+
+    {context:text(select)
+	{label "Use Context"}
+	{options $context_options}}
+
+} -on_submit {
+
+    if { ![db_string second_template_p {}] } {
+	content::item::register_template -item_id $item_id \
+	    -template_id $template_id -use_context $context
+    } else {
+	util_user_message -message "There is already a template registered for $context context"
+    }
+
+    ad_returnredirect [export_vars -base index { item_id mount_point item_props_tab }]
+
+}
