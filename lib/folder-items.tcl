@@ -67,5 +67,5 @@ db_multirow -extend { item_url copy file_size } folder_contents get_folder_conte
 	set file_size "-"
     }
 
-    set copy [clipboard::render_bookmark $mount_point $item_id [ad_conn package_url]]
+    set copy [clipboard::ui::render_bookmark $mount_point $item_id [ad_conn package_url]]
 }

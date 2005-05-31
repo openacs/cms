@@ -236,7 +236,20 @@ ad_proc -public clipboard::ui::process_form { form_name row_dml } {
   }
 }
   
-    
-    
+ad_proc -public clipboard::ui::render_bookmark { mount_point id package_url} {
 
+  Compile and eval a chunk of ADP for the bookmark
 
+} {
+    set img_checked "${package_url}resources/checked.gif"
+    set img_unchecked "${package_url}resources/unchecked.gif"
+    
+    set clipboardfloats_p [clipboard::floats_p]
+
+    set code "<a href=\"javascript:markx('@package_url@', '@mount_point@', '@id@',
+    '@img_checked@', '@img_unchecked@', '@clipboardfloats_p@')\" title=\"Copy this item to the clipboard\">
+    <img src=\"@img_unchecked@\" border=\"0\" name=\"mark@id@\"> </a>"
+
+    set compiled_code [template::adp_compile -string $code]
+    return [template::adp_eval compiled_code]
+}
