@@ -27,6 +27,7 @@
 
    <p/>
 
+  </div>
    <ul class="action-links">
     <if @content_size@ le 1>
      <if @write_p@>
@@ -51,5 +52,4 @@
     <li><a href="index?item_id=@item_id@">Back to the content item</a></li>
    </ul>
 
- </div>
 </div>

@@ -42,7 +42,7 @@ if { [string match "text/*" $mime_type] } {
 } elseif { [string match "image/*" $mime_type] } {
     set is_image_mime_type t
 }
-ns_log notice "----- $is_text_mime_type $is_image_mime_type $valid_revision_p $is_publishable $write_p $revision_count"
+
 # get item info
 db_1row get_one_item ""
     
