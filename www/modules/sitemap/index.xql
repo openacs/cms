@@ -1,18 +1,14 @@
 <?xml version="1.0"?>
 <queryset>
 
-<fullquery name="get_module_id">      
-      <querytext>
-      
-  select module_id from cm_modules where key = 'sitemap' and subsite_id = :subsite_id
-
-      </querytext>
-</fullquery>
-
 <fullquery name="get_module_name">      
       <querytext>
       
-    select name from cm_modules where key = :mount_point and subsite_id = :subsite_id
+  select name from cm_modules 
+   where key = 'sitemap' 
+     and package_id = 
+     (select package_id from subsite_package_map
+       where subsite_id = :subsite_id)         
   
       </querytext>
 </fullquery>
