@@ -1,15 +1,15 @@
-# unpublish.tcl
-# Publish a revision to the file system.
+ad_page_contract {
 
-request create
-request set_param item_id -datatype integer
-
-publish::unpublish_item $item_id
-
-db_transaction {
-    db_exec_plsql unset_live_revision "begin 
-           content_item.unset_live_revision( :item_id );
-         end;"
+    @author Michael Steigman
+    @creation-date May 2005
+} {
+    { item_id:naturalnum }
+    { mount_point "sitemap" }
+    { item_props_tab:optional "editing" }
 }
 
-template::forward "index?item_id=$item_id"
+content::item::unset_live_revision -item_id $item_id
+#publish::unpublish_item $item_id
+
+ad_returnredirect [export_vars -base index {item_id item_props_tab mount_point}]
+
