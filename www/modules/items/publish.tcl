@@ -1,38 +1,36 @@
-# publish.tcl
-# Publish a revision to the file system.
+ad_page_contract {
 
-request create
-request set_param revision_id -datatype integer
-
-set root_path [ns_info pageroot]
-
-db_transaction {
-
-    db_1row get_iteminfo ""
-
-    if { [string equal $publish_p t] } {
-
-        # publish::publish_revision $revision_id
-
-        db_exec_plsql set_live_revision "
-     begin 
-       content_item.set_live_revision( 
-         revision_id => :revision_id 
-       );
-     end;" 
-
-        publish::unpublish_item $item_id
-        
-    } else {
-
-        db_abort_transaction
-
-        set msg "This item is not in a publishable state" 
-        set return_url "index?item_id=$item_id"
-        set passthrough { { item_id $item_id } }
-
-        content::show_error $msg $return_url $passthrough
-    }
+    @author Michael Steigman
+    @creation-date May 2005
+} {
+    { item_id:naturalnum }
+    { revision_id:naturalnum }
+    { mount_point "sitemap" }
+    { item_props_tab:optional "publishing" }
 }
 
-template::forward "index?item_id=$item_id"
+content::item::set_live_revision -revision_id $revision_id
+ad_returnredirect [export_vars -base index {item_id item_props_tab mount_point}]
+
+# set root_path [ns_info pageroot]
+
+# db_transaction {
+
+#     db_1row get_iteminfo ""
+
+#     if { [string equal $publish_p t] } {
+
+#         # publish::publish_revision $revision_id
+
+#         db_exec_plsql set_live_revision {}
+#         publish::unpublish_item $item_id
+        
+#     } else {
+
+#         db_abort_transaction
+# 	util_user_message -message "This item is not in a publishable state"
+
+#     }
+# }
+
+
