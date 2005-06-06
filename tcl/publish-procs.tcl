@@ -285,7 +285,6 @@ ad_proc -public publish::set_publish_status { item_id new_status {revision_id ""
   live revision of the item to the filesystem. Otherwise, unpublish
   the item from the filesystem.
  
-  @param db          The database handle
   @param item_id     The item id
   @param new_status
     The new publish status. Must be "production", "expired", "ready" or
@@ -297,8 +296,8 @@ ad_proc -public publish::set_publish_status { item_id new_status {revision_id ""
   @see publish::unpublish_item
 
 } {
-
-
+    
+    ns_log debug "publish::set_publish_status: Setting publish status for item_id $item_id to $new_status"
   switch $new_status {
 
     production - expired {
@@ -309,46 +308,56 @@ ad_proc -public publish::set_publish_status { item_id new_status {revision_id ""
     ready {
       # Assume the live revision if none is passed in
       if { [template::util::is_nil revision_id] } {
-        set revision_id [item::get_live_revision $item_id]
+        set revision_id [content::item::get_live_revision -item_id $item_id]
       }
 
       # Live revision doesn't exist or item is not publishable, 
       # go to production
       if { [template::util::is_nil revision_id] || \
-              ![item::is_publishable $item_id] } {
-        set new_status "production"
+	       ![content::item::is_publishable -item_id $item_id] } {
+	  set new_status [list [list publish_status production]]
+	  content::item::update -item_id $item_id -attributes $new_status
+	  # Delete the published files
+	  #publish::unpublish_item $item_id
+      } else {
+	  set new_status [list [list publish_status ready]]
+	  content::item::update -item_id $item_id -attributes $new_status
       }
 
-      # Delete the published files
-      publish::unpublish_item $item_id
+
     }
 
     live {
       # Assume the live revision if none is passed in
       if { [template::util::is_nil revision_id] } {
-        set revision_id [item::get_live_revision $item_id]
+        set revision_id [content::item::get_live_revision -item_id $item_id]
       } 
 
       # If live revision exists, publish it
       if { ![template::util::is_nil revision_id] && \
-              [item::is_publishable $item_id] } {
-          publish_revision $revision_id -root_path [publish::get_publish_roots]
+              [content::item::is_publishable -item_id $item_id] } {
+	  set new_status [list [list publish_status live]]
+	  ns_log notice "MS: got a revision, setting status to $new_status"
+	  content::item::update -item_id $item_id -attributes $new_status
+          #publish_revision $revision_id -root_path [publish::get_publish_roots]
       } else {
         # Delete the published files
-        publish::unpublish_item $item_id
-        set new_status "production"
+	  set new_status [list [list publish_status production]]
+	  ns_log notice "MS: no revision, setting status to $new_status"
+	  content::item::update -item_id $item_id -attributes $new_status
+	  #publish::unpublish_item $item_id
+	  #set new_status "production"
       }
     }
 
   }
 
-  db_dml sps_update_cr_items "update cr_items set publish_status = :new_status
-                              where item_id = :item_id" 
+    #db_dml sps_update_cr_items {}
 
 }
      
  
-ad_proc -private publish::track_publish_status {package_id} {
+ad_proc -private publish::track_publish_status {} {
 
   @private track_publish_status
  
@@ -358,11 +367,10 @@ ad_proc -private publish::track_publish_status {package_id} {
 
 } {
   
-  ns_log debug "publish::track_publish_status: Tracking publish status for package $package_id"
-  # MS: can't really do anything per package until 5.2
+  ns_log debug "publish::track_publish_status: Tracking publish status"
   db_transaction {
 
-      if { [catch {
+#      if { [catch {
 
 	  # Get all ready but nonlive items, make them live
           set items [db_list_of_lists tps_get_items_multilist ""]
@@ -372,7 +380,7 @@ ad_proc -private publish::track_publish_status {package_id} {
 	  foreach pair $items {
 	      set item_id [lindex $pair 0]
 	      set live_revision [lindex $pair 1]
-	      publish::set_publish_status $db $item_id live $live_revision
+	      publish::set_publish_status $item_id live $live_revision
 	  }
     
 
@@ -380,60 +388,60 @@ ad_proc -private publish::track_publish_status {package_id} {
           set items [db_list tps_get_items_onelist ""]
    
 	  foreach item_id $items {
-	      publish::set_publish_status $db $item_id expired 
+	      publish::set_publish_status $item_id expired 
 	  }
     
 
-      } errmsg] } {
-	  ns_log Warning "publish::track_publish_status: error: $errmsg"
-      }
+#       } errmsg] } {
+# 	  ns_log Warning "publish::track_publish_status: error: $errmsg"
+#       }
   }
 }
 
 
-ad_proc -public publish::schedule_status_sweep { {interval ""} } {
+# ad_proc -public publish::schedule_status_sweep { {interval ""} } {
 
-  @public schedule_status_sweep
+#   @public schedule_status_sweep
  
-  Schedule a proc to keep track of the publish status. Resets
-  the publish status to "expired" if the expiration date has passed.
-  Publishes the item and sets the publish status to "live" if 
-  the current status is "ready" and the scheduled publication time
-  has passed.
+#   Schedule a proc to keep track of the publish status. Resets
+#   the publish status to "expired" if the expiration date has passed.
+#   Publishes the item and sets the publish status to "live" if 
+#   the current status is "ready" and the scheduled publication time
+#   has passed.
  
-  @param interval {default 3600}
-    The interval, in seconds, between the sweeps of all items in
-    the content repository. Lower values increase the precision
-    of the publishing/expiration dates but decrease performance.
-    If this parameter is not specified, the value of the 
-    StatusSweepInterval parameter in the server's INI file is used 
-    (if it exists).
+#   @param interval {default 3600}
+#     The interval, in seconds, between the sweeps of all items in
+#     the content repository. Lower values increase the precision
+#     of the publishing/expiration dates but decrease performance.
+#     If this parameter is not specified, the value of the 
+#     StatusSweepInterval parameter in the server's INI file is used 
+#     (if it exists).
     
-  @see publish::set_publish_status
-  @see publish::unschedule_status_sweep
-  @see publish::track_publish_status
+#   @see publish::set_publish_status
+#   @see publish::unschedule_status_sweep
+#   @see publish::track_publish_status
 
-} {
+# } {
 
-    if { [template::util::is_nil interval] } {
+#     if { [template::util::is_nil interval] } {
 	
-	db_foreach package_id {} {
+# 	db_foreach get_package_ids {} {
 
-	    set interval [ad_parameter -package_id $package_id StatusSweepInterval 3600]
-	    # if cms is installed but not mounted, return reasonable default
-	    if { $interval == "" } {
-		set interval 3600
-		ns_log Warning "publish::schedule_status_sweep: unable to lookup package_id for cms defaulting to interval 3600"
-	    }
+# 	    set interval [ad_parameter -package_id $package_id StatusSweepInterval 3600]
+# 	    # if cms is installed but not mounted, return reasonable default
+# 	    if { $interval == "" } {
+# 		set interval 3600
+# 		ns_log Warning "publish::schedule_status_sweep: unable to lookup package_id for cms defaulting to interval 3600"
+# 	    }
 
-	    ns_log notice "publish::schedule_status_sweep: Scheduling status sweep every $interval seconds for package_id $package_id"
-	    set proc_id [ns_schedule_proc -thread $interval publish::track_publish_status $package_id]
-	    cache set status_sweep_proc_id $proc_id
+# 	    ns_log notice "publish::schedule_status_sweep: Scheduling status sweep every $interval seconds for package_id $package_id"
+# 	    set proc_id ns_schedule_proc -thread $interval publish::track_publish_status
+# 	    cache set status_sweep_proc_id_${package_id} $proc_id
    
-	}
+# 	}
 
-    }
-}
+#     }
+# }
 
 ad_proc -public publish::unschedule_status_sweep {} {
 
@@ -454,5 +462,5 @@ ad_proc -public publish::unschedule_status_sweep {} {
 
 # Actually schedule the status sweep
 
-publish::schedule_status_sweep
+#publish::schedule_status_sweep
 

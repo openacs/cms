@@ -8,7 +8,7 @@
       </querytext>
 </fullquery>
 
-<fullquery name="publish::schedule_status_sweep.package_id">      
+<fullquery name="publish::schedule_status_sweep.get_package_ids">
       <querytext>
 	select package_id from apm_packages where package_key = 'cms'
       </querytext>
