@@ -15,25 +15,6 @@
       </querytext>
 </fullquery>
 
- 
-<fullquery name="check_status">      
-      <querytext>
-      
-  select content_item__is_publishable( :item_id ) 
-
-      </querytext>
-</fullquery>
-
- 
-<fullquery name="check_published">      
-      <querytext>
-      
-  select content_item__is_published( :item_id ) 
-
-      </querytext>
-</fullquery>
-
- 
 <fullquery name="get_info">      
       <querytext>
 
