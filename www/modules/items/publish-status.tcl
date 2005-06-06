@@ -26,11 +26,11 @@ switch $publish_status {
 	set message "This item is in production."
     }
     
-    ready { 
+    ready {
 	set message "This item is ready for publishing. "
 	if { ! [string equal $starting immediately] } {
-	    append message "It has been scheduled for release
-                      on [lc_time_fmt $info(start_when) \"%q %X\"]."
+	    set release_date [lc_time_fmt $info(start_when) "%q %X"]
+	    append message "It has been scheduled for release on $release_date."
 	} else {
 	    append message "It has not been scheduled for release."
 	}
@@ -39,8 +39,8 @@ switch $publish_status {
     live { 
 	set message "This item has been published. "
 	if { ! [string equal $ending indefinitely] } {
-	    append message "It has been scheduled to expire
-                        on [lc_time_fmt $info(end_when) \"%q %X\"]."
+	    set expire_date [lc_time_fmt $info(end_when) "%q %X"]
+	    append message "It has been scheduled to expire on $expire_date"
 	} else {
 	    append message "It has no expiration date."
 	}

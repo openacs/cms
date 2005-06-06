@@ -54,8 +54,10 @@
 
 <if @can_edit_status_p@>
  <ul class="action-links">
+  <if @live_revision@ nil>
+    <li><a href="publish?item_id=@item_id@&item_props_tab=@item_props_tab@&revision_id=@latest_revision@">Make latest revision live</a></li>
+  </if>
   <li><a href="status-edit?item_id=@item_id@&item_props_tab=@item_props_tab@">Edit publishing status</a></li>
-  <li><a href="publish?item_id=@item_id@&item_props_tab=@item_props_tab@&revision_id=@latest_revision@">Make latest revision live</a></li>
  </ul>
 </if>
 
