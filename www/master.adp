@@ -8,9 +8,10 @@ div#section {
 }
 
 div#section-header {
-  background-color: silver;
+  background-color: grey;
   color: white;
   font: bold;
+  padding-left: 10px;
 }
 </style>
 
