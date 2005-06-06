@@ -25,6 +25,7 @@ namespace eval cm {
         namespace eval workflow   { }
         namespace eval sitemap    { }
         namespace eval types      { }
+        namespace eval items      { }
         namespace eval search     { }
         namespace eval categories { }
         namespace eval users      { }
@@ -36,7 +37,7 @@ namespace eval cm {
 
 ad_proc -public cm::modules::get_module_id { 
     -module_name:required
-    -package_id:required
+    -subsite_id:required
 } {
 
  Get the id of some module, return empty string on failure
@@ -72,7 +73,7 @@ ad_proc -public cm::modules::getChildFolders { mount_point id } {
     return $result
 }
 
-ad_proc -public cm::modules::workspace::getRootFolderID { package_id } { return 0 } 
+ad_proc -public cm::modules::workspace::getRootFolderID { subsite_id } { return 0 } 
 
 ad_proc -public cm::modules::workspace::getChildFolders { id } {
     return [list]
@@ -80,17 +81,17 @@ ad_proc -public cm::modules::workspace::getChildFolders { id } {
 
 
 
-ad_proc -public cm::modules::templates::getRootFolderID { package_id } {
+ad_proc -public cm::modules::templates::getRootFolderID { subsite_id } {
 
   Retreive the id of the root folder
 
 } {
-    if { ![nsv_exists browser_state template_root_$package_id] } {
+    if { ![nsv_exists browser_state template_root_$subsite_id] } {
         set root_id [db_string template_get_root_id ""]
-        nsv_set browser_state template_root_$package_id $root_id
+        nsv_set browser_state template_root_$subsite_id $root_id
         return $root_id
     } else {
-        return [nsv_get browser_state template_root_$package_id]
+        return [nsv_get browser_state template_root_$subsite_id]
     }
 }
 
@@ -99,7 +100,7 @@ ad_proc -public cm::modules::templates::getChildFolders { id } {
 
 } {
     if { [string equal $id {}] } {
-        set id [getRootFolderID [ad_conn package_id]]
+        set id [getRootFolderID [ad_conn subsite_id]]
     }
 
     # query for child site nodes
@@ -125,17 +126,17 @@ ad_proc -public cm::modules::workflow::getChildFolders { id } {
 
 
 
-ad_proc -public cm::modules::sitemap::getRootFolderID { package_id } {
+ad_proc -public cm::modules::sitemap::getRootFolderID { subsite_id } {
 
   Retreive the id of the root folder
 
 } {
-    if { ![nsv_exists browser_state sitemap_root_$package_id] } {
+    if { ![nsv_exists browser_state sitemap_root_$subsite_id] } {
         set root_id [db_string sitemap_get_root_id ""]
-        nsv_set browser_state sitemap_root_$package_id $root_id
+        nsv_set browser_state sitemap_root_$subsite_id $root_id
         return $root_id
     } else {
-        return [nsv_get browser_state sitemap_root_$package_id]
+        return [nsv_get browser_state sitemap_root_$subsite_id]
     }
 }
 
@@ -144,7 +145,7 @@ ad_proc -public cm::modules::sitemap::getChildFolders { id } {
 
 } {
     if { [string equal $id {}] } {
-        set id [getRootFolderID [ad_conn package_id]]
+        set id [getRootFolderID [ad_conn subsite_id]]
     }
 
     # query for child site nodes
@@ -185,7 +186,7 @@ ad_proc -public cm::modules::types::getTypesTree { } {
     return $result
 }
 
-ad_proc -public cm::modules::types::getRootFolderID { package_id } { return "content_revision" } 
+ad_proc -public cm::modules::types::getRootFolderID { subsite_id } { return "content_revision" } 
 
 ad_proc -public cm::modules::types::getChildFolders { id } {
 
@@ -195,7 +196,7 @@ ad_proc -public cm::modules::types::getChildFolders { id } {
     set children [list]
 
     if { [string equal $id {}] } {
-        set id [getRootFolderID [ad_conn package_id]]
+        set id [getRootFolderID [ad_conn subsite_id]]
     }
 
     # query for message categories
@@ -208,14 +209,14 @@ ad_proc -public cm::modules::types::getChildFolders { id } {
 
 # end of types namespace
 
-ad_proc -public cm::modules::search::getRootFolderID { package_id } { return 0 } 
+ad_proc -public cm::modules::search::getRootFolderID { subsite_id } { return 0 } 
 
 ad_proc -public cm::modules::search::getChildFolders { id } {
     return [list]
 }
 
 
-ad_proc -public cm::modules::categories::getRootFolderID { package_id } { return 0 } 
+ad_proc -public cm::modules::categories::getRootFolderID { subsite_id } { return 0 } 
 
 ad_proc -public cm::modules::categories::getChildFolders { id } {
 
@@ -295,7 +296,7 @@ ad_proc -public cm::modules::users::getSortedPaths { name id_list {root_id 0} {e
 
 
 
-ad_proc -public cm::modules::clipboard::getRootFolderID { package_id } { return 0 } 
+ad_proc -public cm::modules::clipboard::getRootFolderID { subsite_id } { return 0 } 
 
 ad_proc -public cm::modules::clipboard::getChildFolders { id } {
 
@@ -318,6 +319,10 @@ ad_proc -public cm::modules::clipboard::getChildFolders { id } {
 
 # end of clipboard namespace
 
+ad_proc -private cm::modules::items::getRootFolderID { subsite_id } {
+    return [cm::modules::sitemap::getRootFolderID $subsite_id]
+}
+
 ad_proc -private cm::modules::install::create_modules { 
     -package_id:required
 } {
@@ -326,6 +331,7 @@ ad_proc -private cm::modules::install::create_modules {
 
 } {
     set instance_name [apm_instance_name_from_id $package_id]
+    set subsite_id [ad_conn subsite_id]
     set modules [list Sitemap Templates Types Categories Search]
     set sort_key 0
     set root_key ""
@@ -336,13 +342,13 @@ ad_proc -private cm::modules::install::create_modules {
 	    "Sitemap" {
 		set root_key [content::folder::new -name pkg_${package_id}_content \
 				  -context_id $package_id \
-				  -parent_id "-100" \
+				  -parent_id "0" \
 				  -label "$instance_name $module" ]
 	    }
 	    "Templates" {
 		set root_key [content::folder::new -name pkg_${package_id}_templates \
 				  -context_id $package_id \
-				  -parent_id "-200" \
+				  -parent_id "0" \
 				  -label "$instance_name $module" ]
 	    }
 	    "Types" {
@@ -355,6 +361,7 @@ ad_proc -private cm::modules::install::create_modules {
 	set module_id [db_exec_plsql create_module {}]
 	# assign context_id of package_id
 	db_dml update_module_context {}
+	db_dml map_subsite {}
     }
 }
 
@@ -365,7 +372,7 @@ ad_proc -private cm::modules::install::delete_modules {
     Delete modules for a given CMS instance
 
 } {
-
+    set subsite_id [ad_conn subsite_id]
     db_foreach get_module_ids {
 	db_exec_plsql delete_module {}
     }

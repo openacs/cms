@@ -52,4 +52,4 @@ if { [file exists [ns_url2file $custom_dir/index.tcl]] } {
 
 # The root ID is to determine the appropriate path to the item
 
-set root_id [cm::modules::${mount_point}::getRootFolderID [ad_conn package_id]]
+set root_id [cm::modules::${mount_point}::getRootFolderID [ad_conn subsite_id]]

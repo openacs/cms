@@ -28,7 +28,7 @@ if { ! [string equal $path {}] } {
 } else {
 
   if { [string equal $folder_id {}] } {
-      set folder_id [cm::modules::templates::getRootFolderID [ad_conn package_id]]
+      set folder_id [cm::modules::templates::getRootFolderID [ad_conn subsite_id]]  
   }
 
   set path [db_string get_path ""]

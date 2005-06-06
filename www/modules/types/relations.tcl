@@ -7,7 +7,7 @@ request set_param content_type -datatype integer -value content_revision
 request set_param type_props_tab -datatype text -optional -value attributes
 
 permission::require_permission -party_id [auth::require_login] \
-    -object_id [cm::modules::get_module_id -module_name types -package_id [ad_conn package_id]] -privilege read
+    -object_id [cm::modules::get_module_id -module_name types -subsite_id [ad_conn subsite_id]] -privilege read
 
 template::list::create \
     -name rel_types \

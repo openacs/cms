@@ -5,7 +5,7 @@ request set_param folder_id -datatype integer -optional
 request set_param mount_point -datatype keyword -value sitemap
 
 
-set root_id [cm::modules::${mount_point}::getRootFolderID [ad_conn package_id]]
+set root_id [cm::modules::${mount_point}::getRootFolderID [ad_conn subsite_id]]
 if { [template::util::is_nil folder_id] } {
   set folder_id $root_id
 } 

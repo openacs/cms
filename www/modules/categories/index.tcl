@@ -13,7 +13,7 @@ ad_page_contract {
 
 set original_id $id
 
-set root_id [cm::modules::${mount_point}::getRootFolderID [ad_conn package_id]]
+set root_id [cm::modules::${mount_point}::getRootFolderID [ad_conn subsite_id]]
 if { [util::is_nil id] || [string equal $id _all_] } {
     set where_clause "k.parent_id is null"
 } else {
@@ -95,5 +95,5 @@ db_multirow -extend { copy keyword_url type } items get_items {} {
     }
     set id $keyword_id
     set keyword_url [export_vars -base index?mount_point=categories { id parent_id }]
-    set copy [clipboard::render_bookmark categories $keyword_id [ad_conn package_url]]
+    set copy [clipboard::ui::render_bookmark categories $keyword_id [ad_conn package_url]]
 }

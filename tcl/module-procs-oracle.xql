@@ -80,21 +80,6 @@
       </querytext>
 </fullquery>
 
- 
-<fullquery name="cm::modules::templates::getRootFolderID.template_get_root_id">      
-      <querytext>
-      
-            select content_template.get_root_folder() from dual
-      </querytext>
-</fullquery>
-
- 
-<fullquery name="cm::modules::sitemap::getRootFolderID.sitemap_get_root_id">      
-      <querytext>
-      
-            select content_item.get_root_folder() from dual
-      </querytext>
-</fullquery>
 
  
 <fullquery name="cm::modules::types::getTypesTree.types_get_result">      
@@ -199,7 +184,7 @@
 	:root_key,
 	:sort_key,
 	:package_id, -- parent_id
-	:package_id -- package_id
+	:package_id -- subsite_id
 	);
         end;
       </querytext>

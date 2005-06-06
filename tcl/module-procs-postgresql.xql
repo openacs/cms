@@ -80,23 +80,6 @@
       </querytext>
 </fullquery>
 
- 
-<fullquery name="cm::modules::templates::getRootFolderID.template_get_root_id">      
-      <querytext>
-            select root_key from cm_modules where key = 'templates' and package_id = :package_id
-            -- select content_template__get_root_folder() 
-      </querytext>
-</fullquery>
-
- 
-<fullquery name="cm::modules::sitemap::getRootFolderID.sitemap_get_root_id">      
-      <querytext>
-            -- select content_item__get_root_folder(null) 
-      select root_key from cm_modules where key = 'sitemap' and package_id = :package_id
-      </querytext>
-</fullquery>
-
- 
 <fullquery name="cm::modules::types::getTypesTree.types_get_result">      
       <querytext>
 
@@ -199,7 +182,7 @@
 	:root_key,
 	:sort_key,
 	:package_id, -- parent_id
-	:package_id -- package_id
+	:package_id -- subsite_id
 	)
       </querytext>
 </fullquery>

@@ -49,7 +49,7 @@ if { ![util::is_nil id] } {
 
   if { [catch { 
       cm::modules::${id}::getSortedPaths items $item_id_list \
-          [cm::modules::${id}::getRootFolderID [ad_conn package_id]]
+          [cm::modules::${id}::getRootFolderID [ad_conn subsite_id]]
 
       template::multirow extend items url
       template::multirow foreach items { 

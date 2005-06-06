@@ -79,7 +79,10 @@ create table cm_modules (
 			     constraint cm_modules_name_nil
 			     not null,
   root_key                   varchar2(100),
-  sort_key		     integer
+  sort_key		     integer,
+  package_id		     integer 
+			     constraint cm_modules_pkg_id_fk
+                             references apm_packages
 );
 
 comment on column cm_modules.root_key is '
@@ -224,6 +227,14 @@ show errors
 -- end;
 -- /
 -- show errors
+-- map subsites to cms package
+
+create table subsite_package_map (
+ subsite_id	integer,
+ package_id	integer
+                constraint subsite_package_map_pkg_id_fk references
+                apm_packages on delete cascade
+)
 
 prompt *** Defining utility functions 
 

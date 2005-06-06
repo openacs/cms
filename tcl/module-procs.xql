@@ -6,7 +6,9 @@
       
         select module_id from cm_modules
           where key = :module_name
-            and package_id = :package_id
+            and package_id = 
+              (select package_id from subsite_package_map
+                 where subsite_id = :subsite_id)
       
       </querytext>
 </fullquery>
@@ -36,15 +38,49 @@
       </querytext>
 </fullquery>
 
+<fullquery name="cm::modules::templates::getRootFolderID.template_get_root_id">      
+      <querytext>
+        select root_key from cm_modules
+          where key = 'templates'
+            and package_id = 
+              (select package_id from subsite_package_map
+                 where subsite_id = :subsite_id)
+      </querytext>
+</fullquery>
+
+ 
+<fullquery name="cm::modules::sitemap::getRootFolderID.sitemap_get_root_id">      
+      <querytext>
+        select root_key from cm_modules
+          where key = 'sitemap'
+            and package_id = 
+              (select package_id from subsite_package_map
+                 where subsite_id = :subsite_id)
+      </querytext>
+</fullquery>
+
 <fullquery name="cm::modules::install::create_modules.update_module_context">      
       <querytext>
 	update acs_objects set context_id = :package_id where object_id = :module_id
       </querytext>
 </fullquery>
 
+<fullquery name="cm::modules::install::create_modules.update_module_context">      
+      <querytext>
+	insert into subsite_package_map
+        (subsite_id,package_id)
+        values
+        (:subsite_id,:package_id)
+      </querytext>
+</fullquery>
+
 <fullquery name="cm::modules::install::delete_modules.get_module_ids">      
       <querytext>
-        select module_id from cm_modules where package_id = :package_id
+        select module_id from cm_modules
+          where key = :module_name
+            and package_id = 
+              (select package_id from subsite_package_map
+                 where subsite_id = :subsite_id)
       </querytext>
 </fullquery>
  

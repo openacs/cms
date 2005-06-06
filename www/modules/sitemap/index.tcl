@@ -16,8 +16,8 @@ ad_page_contract {
 
 set original_folder_id $folder_id
 set user_id [auth::require_login]
-set package_id [ad_conn package_id]
-set root_id [cm::modules::${mount_point}::getRootFolderID $package_id]
+set subsite_id [ad_conn subsite_id]
+set root_id [cm::modules::${mount_point}::getRootFolderID $subsite_id]
 
 # Get the folder label/description
 #   If :id does not exist, then use :root_id
@@ -154,7 +154,7 @@ if { [form is_valid add_item] } {
 
     # if the folder_id is empty, then it must be the root folder
     if { [template::util::is_nil folder_id] } {
-	set folder_id [cm::modules::${mount_point}::getRootFolderID [ad_conn package_id]]
+	set folder_id [cm::modules::${mount_point}::getRootFolderID [ad_conn subsite_id]]
     } else {
 	set folder_id $original_folder_id
     }

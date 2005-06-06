@@ -4,7 +4,7 @@ request set_param return_url -datatype text -value ""
 
 # permissions check - user must have read on the types module
 permission::require_permission -party_id [auth::require_login] \
-    -object_id [cm::modules::get_module_id -module_name types -package_id [ad_conn package_id]] -privilege read
+    -object_id [cm::modules::get_module_id -module_name types -subsite_id [ad_conn subsite_id]] -privilege read
 
 # default return_url
 if { [template::util::is_nil return_url] } {

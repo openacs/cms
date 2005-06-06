@@ -10,7 +10,7 @@ request create -params {
     index_page_id -datatype integer -optional
 }
 
-set root_id [cm::modules::${mount_point}::getRootFolderID [ad_conn package_id]]
+set root_id [cm::modules::${mount_point}::getRootFolderID [ad_conn subsite_id]]
 set root_title [item::get_title $root_id]
 
 # special case - when the item_id is null, set it to the root folder

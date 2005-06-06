@@ -8,7 +8,7 @@ template::request set_param mount_point -datatype keyword \
   -optional -value "sitemap"
 
 if { [template::util::is_nil item_id] } {
-  set resolved_id [cm::modules::${mount_point}::getRootFolderID [ad_conn package_id]]
+    set resolved_id [cm::modules::${mount_point}::getRootFolderID [ad_conn subsite_id]]
 } else {
   set resolved_id $item_id
 }

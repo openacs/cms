@@ -10,7 +10,7 @@ request set_param target_type -datatype keyword
 request set_param relation_tag -datatype text -value ""
 
 permission::require_permission -party_id [auth::require_login] \
-    -object_id [cm::modules::get_module_id -module_name types -package_id [ad_conn package_id]] -privilege write
+    -object_id [cm::modules::get_module_id -module_name types -subsite_id [ad_conn subsite_id]] -privilege write
 
 if { [string equal $rel_type child_rel] } {
 

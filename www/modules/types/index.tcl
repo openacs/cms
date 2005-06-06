@@ -17,10 +17,10 @@ request set_param parent_type -datatype keyword -optional
 request set_param mount_point -datatype keyword -value types
 request set_param type_props_tab -datatype keyword -optional -value attributes
 
-set root_id [cm::modules::templates::getRootFolderID [ad_conn package_id]]
+set root_id [cm::modules::templates::getRootFolderID [ad_conn subsite_id]]
 
 set user_id [auth::require_login]
-set module_id [cm::modules::get_module_id -module_name types -package_id [ad_conn package_id]]
+set module_id [cm::modules::get_module_id -module_name types -subsite_id [ad_conn subsite_id]]
 permission::require_permission -party_id $user_id \
     -object_id $module_id -privilege read
 
