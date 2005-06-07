@@ -305,7 +305,7 @@ create table subsite_package_map (
  package_id	integer
                 constraint subsite_package_map_pkg_id_fk references
                 apm_packages on delete cascade
-)
+);
 
 -- prompt *** Defining utility functions 
 
