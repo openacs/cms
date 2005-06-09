@@ -7,7 +7,7 @@
   select name from cm_modules 
    where key = 'sitemap' 
      and package_id = 
-     (select package_id from subsite_package_map
+     (select package_id from cms_subsite_package_map
        where subsite_id = :subsite_id)         
   
       </querytext>

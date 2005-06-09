@@ -12,7 +12,7 @@ names for templates (steal from xcms-ui)
 
 basic/cosmetic
 ---------
-add preview functionality
+add preview functionality (add ad_properties to index.vuh with preview/printer-friendly option?)
 printer friendly template (steal from xcms-ui)
 clean up www/modules/items/relate-items (remove old table format)
 new icon for "clipping" items - competing with new listbuilder checkboxes, confuse UI a bit

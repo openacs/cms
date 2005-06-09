@@ -1,29 +1,67 @@
-################## KLUDGE BY STAS ###############
-# Try and look up the item in the content repository
-#################################################
-
-# Get the paths
+# try to find/serve the requested content
 
 set the_url [ad_conn path_info]
-set package_key [ad_conn package_key]
 set the_root [ns_info pageroot]
 
-# Get the IDs
-set content_root \
-  [db_string content_root "select content_item.get_root_folder from dual"]
-set template_root \
-  [db_string template_root "select content_template.get_root_folder from dual"]
+# get roots
+set content_root [cm::modules::sitemap::getRootFolderID [ad_conn subsite_id]]
+set template_root [cm::modules::templates::getRootFolderID [ad_conn subsite_id]]
 
-# Serve the page
+# get item id from url
+set item_id [content::item::get_id -item_path $the_url -root_folder_id $content_root]
 
-# DRB: Note that content::init modifies the local variable the_root, which is treated
-# as though it's been passed by reference.   This requires that the redirect treat the
-# path as an absolute path within the filesystem.
+# if there's no id, must not be a cr_item
+if { [template::util::is_nil item_id] } {
+    ns_log notice "CMS index.vuh: bailing out on $the_url; not a CR item!"
+    ns_returnnotfound
+    ad_script_abort
+}
 
-if { [content::init the_url the_root $content_root $template_root] } {
-  set file "$the_root/$the_url"
-  rp_internal_redirect -absolute_path $file
-} else {
-  ns_returnnotfound
+if { [string match [content::item::get_content_type -item_id $item_id] content_folder] } {
+    # it's a folder, so set item_id to nil
+    set folder_id $item_id
+    set item_id ""
+
+    # look for index page
+    set item_id [content::folder::get_index_page -folder_id $folder_id]
+}
+
+# no index page for folder
+if { [template::util::is_nil item_id] } {
+    ns_log notice "CMS index.vuh: bailing out on $the_url; no index page for folder!"
+    ns_returnnotfound
+    ad_script_abort
+}
+
+# check perms (want to allow for unregistered users to view public content)
+permission::require_permission -object_id $item_id \
+    -party_id [ad_conn user_id] -privilege read
+
+# grab mime info
+set revision_id [content::item::get_best_revision -item_id $item_id]
+item::get_mime_info $revision_id
+
+switch $mime_info(mime_type) {
+
+    text/html - text/plain - "text/plain; format=flowed" - text/enriched {
+	# parameter to determine whether or not to call content::init or serve from db?
+	set template_id [content::item::get_template -item_id $item_id -use_context public]
+	# if there's no template, just write content and hope for the best
+	if { [template::util::is_nil template_id] } {
+	    cr_write_content -revision_id $revision_id
+	}
+	set path "/templates/"
+	append path [content::template::get_path -template_id $template_id]
+
+	# put item_id into form so template can get it out ...
+	# and then redirect to template
+	rp_form_put item_id $item_id
+	rp_internal_redirect $path
+    }
+
+    default {
+	cr_write_content -revision_id $revision_id
+    }
+
 }
 

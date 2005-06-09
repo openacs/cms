@@ -10,7 +10,10 @@ ad_proc -public cms::install::package_instantiate { -package_id } {
     # create modules for new instance
     cm::modules::install::create_modules -package_id $package_id
 
-    set subsite_dir "/www"
+    set subsite_id [ad_conn subsite_id]
+    db_dml map_subsite {}
+
+    set subsite_dir "[acs_root_dir]/www"
     append subsite_dir [site_node::get_url_from_object_id -object_id [ad_conn subsite_id]]
     # check that directory exists and...
     if { ![file exists $subsite_dir] } {
@@ -18,7 +21,7 @@ ad_proc -public cms::install::package_instantiate { -package_id } {
     }
 
     # copy content delivery .vuh file to subsite root
-    file copy -force /packages/cms/www/index.vuh $subsite_dir
+    file copy -force [acs_root_dir]/packages/cms/www/index.vuh $subsite_dir
     
 }
 

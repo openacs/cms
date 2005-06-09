@@ -344,6 +344,9 @@ ad_proc -private cm::modules::install::create_modules {
 				  -context_id $package_id \
 				  -parent_id "0" \
 				  -label "$instance_name $module" ]
+		# register content_revision and subtypes to main folder
+		content::folder::register_content_type -folder_id $root_key \
+		    -content_type content_revision -include_subtypes t
 	    }
 	    "Templates" {
 		set root_key [content::folder::new -name pkg_${package_id}_templates \
@@ -358,10 +361,11 @@ ad_proc -private cm::modules::install::create_modules {
 		set root_key 0
 	    }
 	}
+	
 	set module_id [db_exec_plsql create_module {}]
+	
 	# assign context_id of package_id
 	db_dml update_module_context {}
-	db_dml map_subsite {}
     }
 }
 

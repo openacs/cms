@@ -125,6 +125,7 @@ create table cm_modules (
   package_id		     integer 
 			     constraint cm_modules_pkg_id_fk
                              references apm_packages
+                             on delete cascade
 );
 
 comment on column cm_modules.root_key is '
@@ -300,7 +301,7 @@ end;' language 'plpgsql';
 -- drop function inline_1 ();
 
 -- map subsites to cms package
-create table subsite_package_map (
+create table cms_subsite_package_map (
  subsite_id	integer,
  package_id	integer
                 constraint subsite_package_map_pkg_id_fk references

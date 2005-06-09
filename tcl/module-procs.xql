@@ -7,7 +7,7 @@
         select module_id from cm_modules
           where key = :module_name
             and package_id = 
-              (select package_id from subsite_package_map
+              (select package_id from cms_subsite_package_map
                  where subsite_id = :subsite_id)
       
       </querytext>
@@ -43,7 +43,7 @@
         select root_key from cm_modules
           where key = 'templates'
             and package_id = 
-              (select package_id from subsite_package_map
+              (select package_id from cms_subsite_package_map
                  where subsite_id = :subsite_id)
       </querytext>
 </fullquery>
@@ -54,7 +54,7 @@
         select root_key from cm_modules
           where key = 'sitemap'
             and package_id = 
-              (select package_id from subsite_package_map
+              (select package_id from cms_subsite_package_map
                  where subsite_id = :subsite_id)
       </querytext>
 </fullquery>
@@ -65,9 +65,9 @@
       </querytext>
 </fullquery>
 
-<fullquery name="cm::modules::install::create_modules.update_module_context">      
+<fullquery name="cm::modules::install::create_modules.map_subsite">
       <querytext>
-	insert into subsite_package_map
+	insert into cms_subsite_package_map
         (subsite_id,package_id)
         values
         (:subsite_id,:package_id)
@@ -79,7 +79,7 @@
         select module_id from cm_modules
           where key = :module_name
             and package_id = 
-              (select package_id from subsite_package_map
+              (select package_id from cms_subsite_package_map
                  where subsite_id = :subsite_id)
       </querytext>
 </fullquery>
