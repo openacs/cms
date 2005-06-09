@@ -12,14 +12,10 @@
         <owner url="mailto:karlg@arsdigita.com">Karl Goldstein</owner>
         <owner url="mailto:lutter@arsdigita.com">David Lutterkort</owner>
         <summary>A CMS implemented on top of the Content Repository</summary>
-        <release-date>2001-01-26</release-date>
+        <release-date>2005-06-09</release-date>
         <vendor url="http://www.openacs.org">OpenACS</vendor>
-        <description format="text/html">CMS is a full featured content management system implemented on top of
-        the content repository which supports workflow, composite objects, dynamicly created attributes, publishing to 
-        the filesystem and categorization.  The user interface needs a great deal of work and the package relies on 
-        acs-workflow which has been deprecated.  Alternatives include etp and bcms (which is a work in progress), CMS 
-        remains the best place to look to find examples of how the content repository should be used.
-        </description>
+        <description format="text/html">CMS is a full featured content management system implemented on top of the content repository which supports composite objects, dynamicly created attributes, publishing to the filesystem and categorization. CMS remains the best place to look to find examples of how the content repository should be used.</description>
+
         <provides url="cms" version="5.0d"/>
         <requires url="acs-content-repository" version="5.1.5"/>
         <requires url="acs-kernel" version="5.1.5"/>
@@ -29,6 +25,7 @@
 
         <callbacks>
             <callback type="after-instantiate"  proc="cms::install::package_instantiate"/>
+            <callback type="before-uninstantiate"  proc="cms::install::package_uninstantiate"/>
         </callbacks>
         <parameters>
             <parameter datatype="number"  min_n_values="1"  max_n_values="1"  name="ClipboardFloatsP"  default="1" description="Determine whether the clipboard should be in its own floating window."/>

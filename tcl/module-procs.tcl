@@ -378,6 +378,7 @@ ad_proc -private cm::modules::install::delete_modules {
 } {
     set subsite_id [ad_conn subsite_id]
     db_foreach get_module_ids {
+	content::item::delete -item_id $module_id
 	db_exec_plsql delete_module {}
     }
 

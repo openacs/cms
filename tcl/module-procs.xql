@@ -77,8 +77,7 @@
 <fullquery name="cm::modules::install::delete_modules.get_module_ids">      
       <querytext>
         select module_id from cm_modules
-          where key = :module_name
-            and package_id = 
+          where package_id = 
               (select package_id from cms_subsite_package_map
                  where subsite_id = :subsite_id)
       </querytext>
