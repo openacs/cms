@@ -3,12 +3,11 @@ tasks
 
 top priority
 ------------
-add track_publish_status, update_publish_status to CR, add param for sched interval
- - yank plsql exec stuff there now and junk in cms
-test instantiate procs that create modules and set contexts
+names for templates (steal from xcms-ui, bcms)
 add interface to allow admin to map subsite to cms instance
  - should copy index.vuh to /www/subsite and add entry to subsite_package_map
-names for templates (steal from xcms-ui)
+add track_publish_status, update_publish_status to CR, add param for sched interval
+ - yank plsql exec stuff there now and junk in cms
 
 basic/cosmetic
 ---------
@@ -16,17 +15,13 @@ add preview functionality (add ad_properties to index.vuh with preview/printer-f
 printer friendly template (steal from xcms-ui)
 clean up www/modules/items/relate-items (remove old table format)
 new icon for "clipping" items - competing with new listbuilder checkboxes, confuse UI a bit
-include description in heading on folder attributes page
-inheritance display should not link to "basic item" on its page and should not include the current type (related to navigation strategy)
 fix "clear the clipboard" functionality
 floatclipboard_p working?
 
 plumbing
 --------
 integrate categories and workflow packages
-build up actions list for folder using allow_* vars (i.e., links? new folders?) on sitemap browser
-fix search module (when i have tsearch2, ie upgrade to rhel4)
-utilize new cr tcl api where appropriate
+fix search module (will try when i have tsearch2, ie upgrade to rhel4)
 select from cm_modules to build tabs?
 
 questions/ideas
