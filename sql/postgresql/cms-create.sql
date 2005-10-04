@@ -231,7 +231,8 @@ begin
       ''text/plain'',
       null,
       null,
-      ''file''
+      ''file'',
+      p_package_id
   );
 
   insert into cm_modules

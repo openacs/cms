@@ -7,12 +7,12 @@
     <initial-install-p>f</initial-install-p>
     <singleton-p>f</singleton-p>
     
-    <version name="5.0d" url="http://www.arsdigita.com/acs-repository/download/apm/cms-5.0d.apm">
-        <owner url="mailto:michael@steigman.net">Michael Steigman</owner>
-        <owner url="mailto:karlg@arsdigita.com">Karl Goldstein</owner>
+    <version name="5.1d" url="http://www.arsdigita.com/acs-repository/download/apm/cms-5.1d.apm">
         <owner url="mailto:lutter@arsdigita.com">David Lutterkort</owner>
+        <owner url="mailto:karlg@arsdigita.com">Karl Goldstein</owner>
+        <owner url="mailto:michael@steigman.net">Michael Steigman</owner>
         <summary>A CMS implemented on top of the Content Repository</summary>
-        <release-date>2001-01-26</release-date>
+        <release-date>2005-10-04</release-date>
         <vendor url="http://www.openacs.org">OpenACS</vendor>
         <description format="text/html">CMS is a full featured content management system implemented on top of
         the content repository which supports workflow, composite objects, dynamicly created attributes, publishing to 
@@ -20,7 +20,9 @@
         acs-workflow which has been deprecated.  Alternatives include etp and bcms (which is a work in progress), CMS 
         remains the best place to look to find examples of how the content repository should be used.
         </description>
-        <provides url="cms" version="5.0d"/>
+        <maturity>0</maturity>
+
+        <provides url="cms" version="5.1d"/>
         <requires url="acs-content-repository" version="5.1.5"/>
         <requires url="acs-kernel" version="5.1.5"/>
         <requires url="acs-mail" version="5.1.5"/>
