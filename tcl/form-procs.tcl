@@ -807,7 +807,7 @@ ad_proc -private content::attribute_insert_statement {
                 }
             }
             
-            if { ! [string equal $value {} ] } {
+            if { ! [string equal $value {} ] && ![expr { [string equal $ancestor "content_revision"] && [string equal $attribute_name "title"] }] } {
                 ns_set put $bind_vars $attribute_name $value
 
                 lappend columns $attribute_name
@@ -832,7 +832,6 @@ ad_proc -private content::attribute_insert_statement {
     } else { 
         set insert_statement "insert into ${table_name}i ( [join [concat $columns $missing_columns] ", "] )\nselect [join [concat $values $missing_columns] ", "]\nfrom ${table_name}i\nwhere revision_id = content_item.get_latest_revision(:item_id)"
     }
-
     return $insert_statement
 }
 
