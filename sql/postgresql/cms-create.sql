@@ -333,7 +333,7 @@ end;' language 'plpgsql';
 --\i cms-workflow.sql
 
 -- prompt *** Compiling permissions model...
--- \i cms-permissions.sql
+\i cms-permissions.sql
 
 -- prompt *** Compiling fixes that need to be done...
 \i cms-fix.sql
