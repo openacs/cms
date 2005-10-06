@@ -807,7 +807,7 @@ ad_proc -private content::attribute_insert_statement {
                 }
             }
             
-            if { ! [string equal $value {} ] } {
+            if { ! [string equal $value {} ] && ![expr { [string equal $ancestor "content_revision"] && [string equal $attribute_name "title"] }] } {
                 ns_set put $bind_vars $attribute_name $value
 
                 lappend columns $attribute_name
