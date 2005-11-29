@@ -21,9 +21,7 @@ if { [string equal [ns_queryget item_id] {}] } {
 }
 
 # resolve any symlinks
-set resolved_item_id [db_string get_item_id ""]
-
-set item_id $resolved_item_id
+set item_id [content::symlink::resolve -item_id $item_id]
 
 set user_id [auth::require_login]
 permission::require_permission -party_id $user_id \
@@ -32,12 +30,11 @@ permission::require_permission -party_id $user_id \
 set can_edit_p [permission::permission_p -party_id $user_id \
 		    -object_id $item_id -privilege write]
 
-# query the content_type of the item ID so we can check for a custom info page
+# query the content_type of the item ID so we can check for a custom info page (among other things)
 db_1row get_info "" -column_array info
 template::util::array_to_vars info
 
-set item_title [db_string get_item_title ""]
-set page_title "Content Item - $item_title"
+set page_title "Content Item - $title"
 
 # build the path to the custom interface directory for this content type
 

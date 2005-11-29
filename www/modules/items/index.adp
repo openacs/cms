@@ -93,7 +93,7 @@
   <li><a href="rename?item_id=@item_id@&mount_point=@mount_point@&item_props_tab=@item_props_tab@">
     Rename</a> this content item</li>
   <li><a href="delete?item_id=@item_id@&mount_point=@mount_point@" 
-     onClick="return confirm('Warning! You are about to delete this content item.');">
+     onClick="return confirm('Warning! You are about to delete this @type_pretty_name@: @title@.');">
      Delete</a> this content item</li>
  </ul>
 </if>
