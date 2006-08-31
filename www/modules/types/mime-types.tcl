@@ -23,26 +23,24 @@ if { [template::util::is_nil content_type_name] } {
 template::list::create \
     -name mime_types \
     -multirow registered_mime_types \
-    -has_checkboxes \
-    -key mime_types \
+    -key mime_type \
+    -bulk_actions [list "Unregister marked mime types" \
+                       [export_vars -base unregister-mime-type {mount_point}] \
+                       "Unregister marked mime types"] \
+    -bulk_action_export_vars content_type \
+    -no_data "No mime types registered to this content type yet." \
     -elements {
 	label {
 	    label "Mime Type"
 	}
-	unreg {
-	    display_template "<a href=\"@registered_mime_types.unreg_url@\">unregister</a>"
-	}
     }
 
-db_multirow -extend {unreg unreg_url} registered_mime_types get_reg_mime_types "" {
-    set unreg_url [export_vars -base unregister-mime-type {content_type mime_type}]
-}
-  
+db_multirow registered_mime_types get_reg_mime_types {}
+
 set page_title "Register MIME types to $content_type_name"
 
 
-form create register 
-#-action "mime-types"
+form create register -action mime-types
 
 element create register id \
 	-datatype keyword \
@@ -64,20 +62,11 @@ element create register mime_type \
 
 if { [form is_valid register] } {
     form get_values register content_type mime_type
+    ns_log notice "========================================== is_valid! "
+    content::type::register_mime_type -content_type $content_type \
+	-mime_type $mime_type
 
-    db_transaction {
-
-        db_exec_plsql register_mime_type "
-      begin
-        content_type.register_mime_type (
-            content_type => :content_type,
-            mime_type    => :mime_type
-        );
-      end;"
-
-    }
-
-    content_method::flush_content_methods_cache $content_type
-
-    template::forward "index?content_type=$content_type"
+    cms::type::flush_content_methods_cache $content_type
+    set type_props_tab mime_types
+    ad_returnredirect [export_vars -base index {content_type type_props_tab}]
 }

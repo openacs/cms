@@ -3,7 +3,7 @@
 
 <include src="item-header" item_id="@item_id@" mount_point="sitemap">
 
-<include src="item-tabs" item_id="@item_id@" item_props_tab="editing">
+<include src="item-tabs" item_id="@item_id@" tab="item">
 
 <div id="subnavbar-body">
 

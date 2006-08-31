@@ -3,7 +3,7 @@
 
 <p/>
 
-<include src="../../bookmark" mount_point="@mount_point@" id="@original_id@">
+<include src="/packages/cms/lib/clip" mount_point="@mount_point@" id="@original_id@">
 
 @page_title;noquote@
 

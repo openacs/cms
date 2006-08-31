@@ -1,35 +1,134 @@
 tasks
 =====
 
-top priority
-------------
-names for templates (steal from xcms-ui, bcms)
+can rename template folders? how?
+root template/content folder procs returning correct info?
+clean up www/modules/items/relate-items (convert old table/grid format to listbuilder ala perm-include from acs-subsite)
+finish moving the content_method stuff to tcl api (then delete many of the xql files under types)
+ - [content::revision::delete], content method stuff using package_plsql broken?
+make content_method stuff make sense (ok for now, if developer sets up the type information [content_method, mime_type] correctly?)
+when you view a symlink in CMS should the path show up as the path of the linked item or the symlink (latter methinks)?
+show symlinks to an item (extra tab, if they exist) or folder (where in UI?)
+junk move/copy/symlink stuff in sitemap, revisions in items/templates
+continue cleanup/removal of xql files
 add interface to allow admin to map subsite to cms instance
  - should copy index.vuh to /www/subsite and add entry to subsite_package_map
-add track_publish_status, update_publish_status to CR, add param for sched interval
- - yank plsql exec stuff there now and junk in cms
-
-basic/cosmetic
----------
-add preview functionality (add ad_properties to index.vuh with preview/printer-friendly option?)
-printer friendly template (steal from xcms-ui)
-clean up www/modules/items/relate-items (remove old table format)
-new icon for "clipping" items - competing with new listbuilder checkboxes, confuse UI a bit
-fix "clear the clipboard" functionality
-floatclipboard_p working?
+printer friendly template (steal from xcms-ui? add ad_page_contract to index.vuh with preview/printer-friendly option?)
+new icon for "clipping" items - competing with new listbuilder checkboxes, confuses UI a bit
+go through various listbuilder lists and remove "un-xxx" links in favor of bulk actions
+ unregister item templates - types/content methods & templates
+redo tab files - just cycle through list of tabs to create the tab html?
+floating clipboard working?
+hide data model for users creating/editing items:
+ - for new items, if:
+   -> if has_text_mime_types_p, forward to create-2 with content_method=text_entry
+   -> if !has_text_mime_types_p & has_mime_types, forward with cm=file_upload
+   -> else, forward with cm=no_content
+ - for revisions, if:
+   -> if storage_type is text and content eq "", forward to revision-add-2 with content_method=no_content "Author new revision"
+   -> if storage_type is text and content ne "", forward to revision-add-2 with content_method=text_entry "Author new revision"
+   -> if storage_type is files, use content_method=file_upload "Upload new revision"
 
 plumbing
 --------
+dav for templates root
+internationalization
 integrate categories and workflow packages
 fix search module (will try when i have tsearch2, ie upgrade to rhel4)
-select from cm_modules to build tabs?
 
 questions/ideas
 ---------
 how do we get extlinks and other types (if any?) which do not sub-class content_revision into the system?
 comment integration?
 
+
+wf-notes
+--------
+
+ states/roles/actions
+ -------------------
+
+states
+
+- authored
+- edited
+- ready
+- live
+- expired
+
+roles
+
+- author
+- editor
+- publisher
+
+actions
+
+- request (initiated)
+- author - cms::form::new_item (initiated)
+- edit - cms::form::add_revision?
+- approve/publish | reject 
+- comment
+
+[initiate] -> (initiated) 
+    -> [author] -> (authored*) 
+          -> [edit] -> (edited) 
+                -> [publish] -> (ready*) ... (live)
+                       -> (expired)
+                       -> [revise] -> (authored) 
+                             -> [edit] -> (edited)
+                -> [reject] -> (authored*)
+                
+* affects cr_items.publish_status
+
+ lifecycles (see http://www.redhat.com/docs/manuals/cms/rhea-ag-cms-en-6.1/s1-concepts-lifecycles.html among other sites)
+ ------------------------
+
+- simple (always live)
+- expiring (content is deleted?)
+- archiving?
+- recurring
+- migrating
+
+must define delay and duration, can have multiple phases (i.e., migrating)
+ - hidden during authoring phase
+
+ UI and API
+ -----------------------
+tasks UI
+ - show directly assigned tasks (actions for which user is assigned)
+ - show all available tasks (actions user can accept)
+ - show tasks user has created (editable, for example to change content type or object)
+ - user can save changes without kicking workflow to next state (have separate option to pass on to...)
+ - allow editor or publisher to create new tasks 
+    - new workflow with target user for author
+    - ability to select existing page as object or new items
+ - on item publishing tab, allow for kicking back to production state
+    - how to allow senior staff to request edits? (simple task overview based on object permissions?)
+
+api integration
+ - when adding new content, kick off new case execute [initiate]
+   - allow content creation from workspace
+    -> drop down for content type 
+    -> populate second list for folders the type is registered to and writable
+   - new item api should accept workflow_id for when case has been initiated
+   - select widget - use which workflow? (if enabled... if not, then what?)
+ - when adding new task, kick off new case, executing [initiate]
+   - user will accept task and create new item or revision
+    -> api will update workflow with object_id once content is created
+ - when revising existing content, execute [initiate] on existing case
+   - manager can initiate update with target user (or default)
+
+ random notes
+ ------------------------
+develop rss feed for workflow ala (http://www.cmswatch.com/Trends/453-Workflow-via-RSS/Atom)?
+
+
+
+
+
 -- to drop old workflow from production:
+-- -------------------------------------
 drop function content_workflow__is_overdue (integer,varchar);
 drop function content_workflow__get_holding_user_name (integer);
 drop function content_workflow__get_first_place();

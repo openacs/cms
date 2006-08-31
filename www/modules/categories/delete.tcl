@@ -21,10 +21,10 @@ if { [string equal $is_empty "f"] } {
   }
 
   # Remove it from the clipboard, if it exists
-  set clip [clipboard::parse_cookie]
-  clipboard::remove_item $clip $mount_point $id
-  clipboard::set_cookie $clip
-  clipboard::free $clip 
+  set clip [cms::clipboard::parse_cookie]
+  cms::clipboard::remove_item $clip $mount_point $id
+  cms::clipboard::set_cookie $clip
+  cms::clipboard::free $clip 
 
   ad_returnredirect "index?id=$parent_id&mount_point=$mount_point"
 }

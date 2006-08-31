@@ -1,8 +1,12 @@
-#########################################
-# Procedures to manipulate clipped items
-#########################################
+ad_library {
 
-ad_proc -public clipboard::ui::form_create { form_name args } {
+    Procedures to manipulate clipboard UI
+
+}
+
+namespace eval cms::clipboard::ui {}
+
+ad_proc -public cms::clipboard::ui::form_create { form_name args } {
 
   Create a form for representing clipped items,
   also start a multirow datasource for the items
@@ -39,7 +43,7 @@ ad_proc -public clipboard::ui::form_create { form_name args } {
   set form_properties(row_elements) $elements
 }
 
-ad_proc -public clipboard::ui::add_row { form_name mount_point item_id title args} {
+ad_proc -public cms::clipboard::ui::add_row { form_name mount_point item_id title args} {
 
   Append a row to the multirow datasource
   If the -checked switch is specified, checks the box by default
@@ -84,7 +88,7 @@ ad_proc -public clipboard::ui::add_row { form_name mount_point item_id title arg
 
   uplevel "
     upvar 0 \"${form_name}_data:$rowcount\" row
-    clipboard::ui::element_create $form_name $element_code
+    cms::clipboard::ui::element_create $form_name $element_code
   "
 
   set row(checked) [template::util::nvl $row(checked) 0]
@@ -92,7 +96,7 @@ ad_proc -public clipboard::ui::add_row { form_name mount_point item_id title arg
   # Create the title inform widget
   set element_code [list title -datatype text -widget inform -label Title \
                       -value $title]
-  uplevel "clipboard::ui::element_create $form_name $element_code"
+  uplevel "cms::clipboard::ui::element_create $form_name $element_code"
 
   # Create the mount point, item_id hidden vars, remember their values
   # in the datasource. other hidden vars ?
@@ -100,12 +104,12 @@ ad_proc -public clipboard::ui::add_row { form_name mount_point item_id title arg
     set element_code [list $varname -datatype keyword -widget hidden \
                        -label $varname -value [set $varname]]
     set row($varname) [set $varname]
-    uplevel "clipboard::ui::element_create $form_name $element_code"
+    uplevel "cms::clipboard::ui::element_create $form_name $element_code"
   } 
 
 }
 
-ad_proc -public clipboard::ui::element_create { form_name element_name args } {
+ad_proc -public cms::clipboard::ui::element_create { form_name element_name args } {
 
   A wrapper for element create which maintains the naming convention
   for the element. Appends the element to the multirow datasource
@@ -141,7 +145,7 @@ ad_proc -public clipboard::ui::element_create { form_name element_name args } {
 }
 
 
-ad_proc -public clipboard::ui::process_row { form_name row_index row_dml } {
+ad_proc -public cms::clipboard::ui::process_row { form_name row_index row_dml } {
 
   Process a row of the table, executing whatever TCL code
   the user has passed in.
@@ -170,7 +174,7 @@ ad_proc -public clipboard::ui::process_row { form_name row_index row_dml } {
   uplevel $code
 }
  
-ad_proc -public clipboard::ui::generate_form { form_name clip mount_point } {
+ad_proc -public cms::clipboard::ui::generate_form { form_name clip mount_point } {
 
   Assemble the entire datasource based on all items under some mount point
 
@@ -184,23 +188,23 @@ ad_proc -public clipboard::ui::generate_form { form_name clip mount_point } {
   "
  
   uplevel {
-    set items [clipboard::get_items $__clip $__mount_point]
+    set items [cms::clipboard::get_items $__clip $__mount_point]
     cm::modules::${__mount_point}::getSortedPaths clip_rows $items
     for { set i 1 } { $i <= [template::multirow size clip_rows] } { incr i } {
       # Start the row
       template::multirow get clip_rows $i
-      clipboard::ui::add_row $__form_name $__mount_point \
+      cms::clipboard::ui::add_row $__form_name $__mount_point \
         $clip_rows(item_id) $clip_rows(item_path)
       # Append all elements
       upvar 0 ${__form_name}:$i row
       foreach element $form_properties(row_elements) {
-        eval clipboard::ui::element_create $__form_name $element
+        eval cms::clipboard::ui::element_create $__form_name $element
       }
     }
   }
 }
 
-ad_proc -public clipboard::ui::generate_form_header { form_name {row_index 1}} {
+ad_proc -public cms::clipboard::ui::generate_form_header { form_name {row_index 1}} {
 
   Generate the extra <th>...</th> tags based on the elements in some row
 
@@ -210,7 +214,7 @@ ad_proc -public clipboard::ui::generate_form_header { form_name {row_index 1}} {
   upvar "${form_name}_data:${row_index}" row
 
   if { ![info exists row] } {
-    ns_log notice "clipboard::ui::generate_form_header: No such row $row_index"
+    ns_log notice "cms::clipboard::ui::generate_form_header: No such row $row_index"
     return
   }
 
@@ -223,7 +227,7 @@ ad_proc -public clipboard::ui::generate_form_header { form_name {row_index 1}} {
   }
 }
 
-ad_proc -public clipboard::ui::process_form { form_name row_dml } {
+ad_proc -public cms::clipboard::ui::process_form { form_name row_dml } {
 
   Process the entire form, executing the same DML for each row
   If no DML is specified, uses the global dml
@@ -232,19 +236,20 @@ ad_proc -public clipboard::ui::process_form { form_name row_dml } {
   
   upvar "${form_name}_data:rowcount" rowcount
   for {set i 1} {$i <= $rowcount} {incr i} {
-    uplevel "clipboard::ui::process_row $form_name $i \{$row_dml\}"
+    uplevel "cms::clipboard::ui::process_row $form_name $i \{$row_dml\}"
   }
 }
   
-ad_proc -public clipboard::ui::render_bookmark { mount_point id package_url} {
+ad_proc -public cms::clipboard::ui::render_bookmark { mount_point id package_url} {
 
   Compile and eval a chunk of ADP for the bookmark
+  @author Michael Steigman
 
 } {
     set img_checked "${package_url}resources/checked.gif"
     set img_unchecked "${package_url}resources/unchecked.gif"
     
-    set clipboardfloats_p [clipboard::floats_p]
+    set clipboardfloats_p [cms::clipboard::ui::floats_p]
 
     set code "<a href=\"javascript:markx('@package_url@', '@mount_point@', '@id@',
     '@img_checked@', '@img_unchecked@', '@clipboardfloats_p@')\" title=\"Copy this item to the clipboard\">
@@ -252,4 +257,14 @@ ad_proc -public clipboard::ui::render_bookmark { mount_point id package_url} {
 
     set compiled_code [template::adp_compile -string $code]
     return [template::adp_eval compiled_code]
+}
+
+ad_proc -public cms::clipboard::ui::floats_p {} {
+
+  determines whether clipboard should float or not
+  currently incomplete, should be checking user prefs
+
+} {
+    return [ad_parameter ClipboardFloatsP]
+
 }

@@ -1,1 +1,0 @@
-# Add an object to the clipboard

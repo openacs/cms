@@ -2,7 +2,7 @@
 
 set heads [ad_conn headers]
 set package_url [ad_conn package_url]
-set clipboardfloats_p [clipboard::floats_p]
+set clipboardfloats_p [cms::clipboard::ui::floats_p]
 
 for { set i 0 } { $i < [ns_set size $heads] } { incr i } {
   ns_log notice "[ns_set key $heads $i] = [ns_set value $heads $i]"
@@ -34,14 +34,14 @@ if {$id == "" } {
 # The cookie for the clipboard looks like this:
 # mnt:id,id,id|mnt:id,id,id|mnt:id,id,id.
 
-set clip [clipboard::parse_cookie]
+set clip [cms::clipboard::parse_cookie]
 
-set total_items [clipboard::get_total_items $clip]
-set user_id [User::getID]
+set total_items [cms::clipboard::get_total_items $clip]
+set user_id [auth::require_login]
 
 if { ![util::is_nil id] } {
   
-  set item_id_list [clipboard::get_items $clip $id]
+  set item_id_list [cms::clipboard::get_items $clip $id]
   ns_log Notice "item_id_list = [join $item_id_list ","]"
 
   # First, attempt to ask the module for the list of item paths in sorted order

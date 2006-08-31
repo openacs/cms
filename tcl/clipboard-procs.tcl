@@ -1,21 +1,18 @@
-##########################
-#
-# Procedures to manipulate the clipboard
-#
-################
+ad_library {
 
-namespace eval clipboard {   
-  # See clipboard-ui-procs.tcl
-  namespace eval ui {}
+    Procedures to manipulate the clipboard data structure and cookies
+
 }
+
+namespace eval cms::clipboard {} 
   
-ad_proc -public clipboard::parse_cookie {} { 
+ad_proc -public cms::clipboard::parse_cookie {} { 
 
     Get the clipboard from a cookie and return it
 
 } {
     set clipboard_cookie [template::util::get_cookie content_marks]   
-    ns_log debug "clipboard::parse_cookie: cookie $clipboard_cookie"
+    ns_log debug "cms::clipboard::parse_cookie: cookie $clipboard_cookie"
     set clip [ns_set create]
     set mount_branches [split $clipboard_cookie "|"]
     set mount_points [list]
@@ -23,7 +20,7 @@ ad_proc -public clipboard::parse_cookie {} {
     
     foreach branch $mount_branches {
         if { [regexp {([a-zA-Z0-9]+):(.*)} $branch match mount_point items] } {
-            ns_log debug "clipboard::parse_cookie: branch: $branch"
+            ns_log debug "cms::clipboard::parse_cookie: branch: $branch, mount_point: $mount_point, items: $items"
             set items_list [split $items ","]  
             set items_size [llength $items_list]
             incr total_items $items_size
@@ -39,7 +36,26 @@ ad_proc -public clipboard::parse_cookie {} {
     return $clip
 }
 
-ad_proc -public clipboard::get_items { clip mount_point } {
+ad_proc -public cms::clipboard::reassemble_cookie { clip } { 
+
+    Reassemble the cookie from clip
+
+    @return A string suitable for use with ad_set_cookie
+
+} {
+
+    set cookie ""
+    set mount_point_names [ns_set get $clip __mount_points__] 
+    set pipe ""
+    foreach mount_point $mount_point_names {
+        append cookie "$pipe${mount_point}:[join [ns_set get $clip $mount_point] ,]"
+        set pipe "|"
+    }
+
+    return $cookie
+}
+
+ad_proc -public cms::clipboard::get_items { clip mount_point } {
 
   Retreive all marked items as a list
 
@@ -47,7 +63,7 @@ ad_proc -public clipboard::get_items { clip mount_point } {
     return [ns_set get $clip $mount_point]
 }
 
-ad_proc -public clipboard::get_total_items { clip } {
+ad_proc -public cms::clipboard::get_total_items { clip } {
 
   Get the number of total items on the clipboard
 
@@ -55,7 +71,7 @@ ad_proc -public clipboard::get_total_items { clip } {
     return [ns_set get $clip __total_items__]
 }
 
-ad_proc -public clipboard::map_code { clip mount_point code } {
+ad_proc -public cms::clipboard::map_code { clip mount_point code } {
 
   Execute a piece of code for each item under the
   specified mount point, creating an item_id
@@ -68,7 +84,7 @@ ad_proc -public clipboard::map_code { clip mount_point code } {
     }
 }
 
-ad_proc -public clipboard::is_marked { clip mount_point item_id } {
+ad_proc -public cms::clipboard::is_marked { clip mount_point item_id } {
 
   Determine if an item is marked
 
@@ -82,7 +98,7 @@ ad_proc -public clipboard::is_marked { clip mount_point item_id } {
     }
 }
 
-ad_proc -public clipboard::get_bookmark_icon { clip mount_point item_id {row_ref row} } {
+ad_proc -public cms::clipboard::get_bookmark_icon { clip mount_point item_id {row_ref row} } {
 
   Use this function as part of the multirow query to
   set up the bookmark icon
@@ -90,7 +106,7 @@ ad_proc -public clipboard::get_bookmark_icon { clip mount_point item_id {row_ref
 } {
     upvar $row_ref row
 
-    if { [clipboard::is_marked $clip $mount_point $item_id] } {
+    if { [cms::clipboard::is_marked $clip $mount_point $item_id] } {
         set row(bookmark) Bookmarked
     } else {
         set row(bookmark) Bookmarks
@@ -99,9 +115,10 @@ ad_proc -public clipboard::get_bookmark_icon { clip mount_point item_id {row_ref
     return $row(bookmark)
 }
 
-ad_proc -public clipboard::add_item { clip mount_point item_id } {
+ad_proc -public cms::clipboard::add_item { clip mount_point item_id } {
 
-  Add an item to the clipboard: BROKEN
+  Add an item to the clipboard
+  @return Updated clip
 
 } {
     set old_items [ns_set get $clip $mount_point]
@@ -122,71 +139,46 @@ ad_proc -public clipboard::add_item { clip mount_point item_id } {
             ns_set update $clip __mount_points__ $old_mount_points
         }
     }
+
+    return $clip
 }
 
-ad_proc -public clipboard::remove_item { clip mount_point item_id } {
+ad_proc -public cms::clipboard::remove_item { clip mount_point item } {
 
-  Remove an item from the clipboard: BROKEN
+  Remove an item from the clipboard
+  @return Updated clip
 
 } {
-    set old_items [ns_set get $clip $mount_point]
-    set index [lsearch $old_items $item_id]
+    set items [ns_set get $clip $mount_point]
+    set index [lsearch $items $item]
     if { $index !=  -1 } {
-
         # Remove the item
-        set old_items [lreplace $old_items $index $index ""]
-        ns_set update $clip $mount_point $old_items
-        ns_set update $clip ${mount_point}_size \
-            [expr [ns_set get $clip ${mount_point}_size] - 1]
-        ns_set update $clip __total_items__ \
-            [expr [ns_set get $clip __total_items__] - 1]
-    }
-}
-
-ad_proc -public clipboard::set_cookie { clip } {
-
-  Actually set the new cookie: BROKEN
-
-} {
-    set the_cookie ""
-    set mount_point_names [ns_set get $clip __mount_points__] 
-    set pipe ""
-    foreach mount_point $mount_point_names {
-        append the_cookie "$pipe${mount_point}:[join [ns_set get $clip $mount_point] ,]"
-        set pipe "|"
+	ns_log debug "cms::clipboard::remove_item: removing $item from $mount_point"
+        set items [lreplace $items $index $index]
+	if { [llength $items] > 0 } {
+	    ns_set update $clip $mount_point $items
+	    ns_set update $clip ${mount_point}_size \
+		[expr [ns_set get $clip ${mount_point}_size] - 1]
+	    ns_set update $clip __total_items__ \
+		[expr [ns_set get $clip __total_items__] - 1]
+	} else {
+	    set mount_points [ns_set get $clip __mount_points__]
+	    set mp_index [lsearch $mount_points $mount_point]
+	    set mount_points [lreplace $mount_points $mp_index $mp_index]
+            ns_set update $clip __mount_points__ $mount_points
+            ns_set delkey $clip ${mount_point}_size 
+	    ns_set update $clip __total_items__ \
+		[expr [ns_set get $clip __total_items__] - 1]
+	}
     }
 
-    template::util::set_cookie session content_marks $the_cookie
+    return $clip
 }
 
-ad_proc -public clipboard::clear_cookie {} {
-
-  Clear the clipboard: BROKEN
-
-} {
-    template::util::clear_cookie content_marks
-}
-
-ad_proc -public clipboard::free { clip } {
+ad_proc -public cms::clipboard::free { clip } {
 
   Release the resources associated with the clipboard
 
 } {
     ns_set free $clip
 }
-
-ad_proc -public clipboard::floats_p {} {
-
-  determines whether clipboard should float or not
-  currently incomplete, should be checking user prefs
-
-} {
-    return [ad_parameter ClipboardFloatsP]
-
-}
-
-
-
- 
-  
-   

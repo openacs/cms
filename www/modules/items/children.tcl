@@ -1,14 +1,7 @@
-# Display information about items for which the item is the context.
+# expects item_id and (optionally) mount_point
 
-# page variables
-request create -params {
-  item_id -datatype integer
-  mount_point -datatype keyword -optional -value sitemap
-}
-
-set user_id [auth::require_login]
-permission::require_permission -party_id $user_id \
-    -object_id $item_id -privilege read
+set user_id [ad_conn user_id]
+set return_url [ad_return_url]
 
 # create a form to add child items...
 set child_types [db_list_of_lists get_child_types ""]
@@ -20,6 +13,8 @@ if { [permission::permission_p -party_id $user_id -object_id $item_id -privilege
     form create add_child -method get -action create-1
     element create add_child parent_id -datatype integer \
 	-widget hidden -value $item_id
+    element create add_child return_url -datatype text \
+	-widget hidden -value $return_url
     element create add_child content_type -datatype keyword \
 	-options $child_types -widget select 
 }
@@ -36,15 +31,16 @@ template::list::create \
 		       "[export_vars -base unrelate-item?mount_point=sitemap { rel_id }]" \
 		       "Remove marked relations from this item"] \
     -elements {
-	content_type {
-	    label "Content Type"
-	}
-	title_url {
+	title {
 	    label "Title"
-	    display_template "<a href=\"@children.title_url@\" title=\"View content item\">@children.title@</a>"
+	    link_url_col title_url
+	    link_html { title "View child item" }
 	}
 	type_name {
 	    label "Relationship Type"
+	}
+	content_type {
+	    label "Content Type"
 	}
 	tag {
 	    label "Tag"
@@ -58,6 +54,6 @@ template::list::create \
 
 db_multirow -extend { title_url relation_view_url move_up_url move_down_url reorder } children get_children "" {
     set title_url "index?item_id=$item_id&mount_point=$mount_point"
-    set move_up_url "relate-order?rel_id=$rel_id&order=up&mount_point=$mount_point&item_props_tab=children&relation_type=relation"
-    set move_down_url "relate-order?rel_id=$rel_id&order=down&mount_point=$mount_point&item_props_tab=children&relation_type=relation"
+    set move_up_url "relate-order?rel_id=$rel_id&order=up&mount_point=$mount_point&tab=children&relation_type=relation"
+    set move_down_url "relate-order?rel_id=$rel_id&order=down&mount_point=$mount_point&tab=children&relation_type=relation"
 }

@@ -11,8 +11,6 @@ ad_library {
     @cvs-id $Id$
 }
  
-# Should be a CR parameter
+# Should be a CR parameter?
 set interval 120
-ad_schedule_proc -thread t $interval publish::track_publish_status
-
-
+ad_schedule_proc -thread t $interval cms::publish::track_publish_status

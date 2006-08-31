@@ -51,3 +51,11 @@ begin
   return v_module_id;
 
 end;' language 'plpgsql';
+
+select define_function_args('content_method__set_default_method','content_type,content_method');
+select define_function_args('content_method__unset_default_method','content_type');
+select define_function_args('content_method__remove_method','content_type,content_method');
+select define_function_args('content_method__add_all_methods','content_type');
+select define_function_args('content_method__add_method','content_type,content_method,is_default');
+select define_function_args('content_method__is_mapped','content_type,content_method');
+select define_function_args('content_method__get_method','content_type');

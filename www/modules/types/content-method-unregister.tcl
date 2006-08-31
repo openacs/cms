@@ -10,20 +10,11 @@ request set_param return_url     -datatype text -value ""
 
 # default return_url
 if { [template::util::is_nil return_url] } {
-    set return_url "index?content_type=$content_type"
+    set return_url [export_vars -base index content_type]
 }
-
 
 db_transaction {
-    db_exec_plsql content_method_unregister "
-  begin
-  content_method.remove_method (
-      content_type   => :content_type,
-      content_method => :content_method
-  );
-  end;
-"
+    db_exec_plsql content_method_unregister {}
 }
-
 
 template::forward $return_url

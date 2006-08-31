@@ -1,12 +1,9 @@
 <master src="../../master">
 <property name="title">@page_title@</property>
 
-<p/>
-
-<include src="../../bookmark" mount_point="@mount_point@" id="@original_folder_id@">
-
+<p>
+<include src="/packages/cms/lib/clip" mount_point="@mount_point@" id="@original_folder_id@">
 @page_title;noquote@ 
-
 <p/>
 
 &nbsp;&nbsp;&nbsp;
@@ -15,13 +12,13 @@
 
 <p/>
 
-<include src="ancestors" item_id=@original_folder_id@ 
+<include src="/packages/cms/lib/ancestors" item_id=@original_folder_id@ 
   index_page_id=@index_page_id@ 
   mount_point=@mount_point@ />
 
 <p/>
 
-<include src="../../../lib/folder-items" folder_id="@folder_id@"
+<include src="/packages/cms/lib/folder-items" folder_id="@folder_id@"
   parent_id="@parent_id@" actions="@actions;noquote@" 
   orderby="@orderby@" page="@page@" mount_point="@mount_point@" />
 

@@ -1,27 +1,27 @@
-request create -params {
-  revision_id -datatype integer
+ad_page_contract {
+
+    @author Michael Steigman
+    @creation-date October 2004
+} {
+    { revision_id:integer}
+    { return_url }
 }
 
-
-# query for the path and ID of the template
-db_1row get_info "" -column_array info
+set template_id [cms::item::get_id_from_revision -revision_id $revision_id]
 
 # write the template to the file system
-
 set text [content::get_content_value $revision_id]
+set template_root [cm::modules::templates::getRootFolderID [ad_conn subsite_id]]
+set path [content::template::get_path -template_id $template_id -root_folder_id $template_root]
 
-set path [content::get_template_path]/$info(path)
+if { [ catch {
+    util::write_file [acs_root_dir]/templates/$path.adp $text
+    content::item::set_live_revision -revision_id $revision_id } err ] } {
+    util_user_message -message "There was an error writing the file and/or setting the live revision: $err"
+} else {
+    util_user_message -message "[content::revision::revision_name -revision_id $revision_id] written to file system and marked \"live\""
+}
 
-util::write_file $path.adp $text
-
-# update the live revision
-
-set template_id $info(item_id)
-
-db_dml update_items "update cr_items set live_revision = :revision_id
-                where item_id = :template_id"
-
-
-set return_url [ns_set iget [ns_conn headers] Referer]
-template::forward $return_url
+ad_returnredirect $return_url
+ad_script_abort
 

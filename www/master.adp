@@ -94,8 +94,5 @@ div#section-header {
  </div>
 </div>
 
-<div id="subnavbar-body">
-
 <slave>
 
-</div>

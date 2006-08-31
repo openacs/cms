@@ -33,8 +33,8 @@ element create register_templates type_props_tab \
 
 # grab marked templates from the clipboard
 #set root_id [cm::modules::templates::getRootFolderID]
-set clip [clipboard::parse_cookie]
-set marked_templates [clipboard::get_items $clip templates]
+set clip [cms::clipboard::parse_cookie]
+set marked_templates [cms::clipboard::get_items $clip templates]
 set marked_templates_csv [join $marked_templates ","]
 
 if { [llength $marked_templates] == 0 } {

@@ -1,9 +1,9 @@
 <master src="../../master">
 <property name="title">Upload new template revision</property>
 
-<include src="template-header" mount_point=@mount_point@ item_id=@template_id@ template_props_tab=@template_props_tab@>
+<include src="template-header" mount_point=@mount_point@ item_id=@template_id@ tab=@tab@>
 
-<include src="template-tabs" mount_point=@mount_point@ item_id=@template_id@ template_props_tab=@template_props_tab@>
+<include src="template-tabs" mount_point=@mount_point@ item_id=@template_id@ tab=@tab@>
 
 <div id="subnavbar-body">
 

@@ -1,17 +1,13 @@
-# download.tcl
-#
-# see if this person is authorized to read the file in question
-# and if so, write it to the connection.
+ad_page_contract {
+    see if this person is authorized to read the file in question
 
-template::request create
-template::request set_param revision_id -datatype integer
+} {
+    { item_id:integer }
+    { revision_id:integer }
+}
 
-db_1row get_iteminfo ""
-
-# item_id, is_live
-
-# check cm permissions on file
-if { ![string equal $is_live t] } {
+# check permissions on file
+if { ![content::revision::is_live -revision_id $revision_id] } {
     permission::require_permission -party_id [auth::require_login] \
 	-object_id $item_id -privilege read
 }

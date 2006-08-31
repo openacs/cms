@@ -5,7 +5,7 @@ request set_param rel_id -datatype integer
 request set_param order         -datatype keyword 
 request set_param mount_point   -datatype keyword -value "sitemap"
 request set_param return_url    -datatype text    -value "index"
-request set_param item_props_tab -datatype text    -value "related"
+request set_param tab -datatype text    -value "related"
 request set_param relation_type -datatype keyword -value "relation" 
 
 # Use hardcoding instead of inheritance, since inheritance is not in the
@@ -39,9 +39,9 @@ db_transaction {
 
     # Sort the related/child items order to ensure unique order_n
     if { [string equal $relation_type child] } {
-        cms_rel::sort_child_item_order $item_id
+        cms::rel::sort_child_item_order $item_id
     } else {
-        cms_rel::sort_related_item_order $item_id
+        cms::rel::sort_related_item_order $item_id
     }
 
     # grab the (sorted) order of the original related/child item
@@ -65,19 +65,13 @@ db_transaction {
         set swap_id $swap_rel(rel_id)
         set swap_order $swap_rel(order_n)
 
-        db_dml relate_swap_1 "
-      update $rel_table 
-        set order_n = :swap_order 
-        where rel_id = :rel_id"
-
-        db_dml relate_swap_2 "
-      update $rel_table 
-        set order_n = :order_n 
-        where rel_id = :swap_id"
+        db_dml relate_swap_1 {}
+        db_dml relate_swap_2 {}
 
     } else {
         ns_log notice "relate-order.tcl: $relation_type cannot be moved further"
     }
 }
 
-template::forward "$return_url?item_props_tab=$item_props_tab[content::url_passthrough $passthrough]"
+ad_returnredirect [export_vars -base $return_url tab]
+ad_script_abort

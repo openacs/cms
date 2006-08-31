@@ -16,9 +16,11 @@ set template_exists t
 
 set tcl_stub "${url}.tcl"
 
-# In the future, we may have many roots !
-set template_root [publish::get_template_root]
-set tcl_file [ns_normalizepath "/$template_root/${url}.tcl"]
+# Get template path
+set path [content::template::get_path -template_id $template_id \
+	      -root_folder_id [cm::modules::templates::getRootFolderID [ad_conn subsite_id]]]
+set tcl_file [ns_normalizepath "[acs_root_dir]/templates/${path}.tcl"]
+ns_log debug "datasources.tcl: looking for template code in $tcl_file"
 
 # Load and process the file
 if { ![file exists $tcl_file] } {

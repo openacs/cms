@@ -15,7 +15,7 @@ if { [template::util::is_nil target_url] } {
 
 # get the list of associated content methods
 set content_methods \
-	[content_method::get_content_methods $content_type -get_labels]
+	[cms::type::get_content_methods $content_type -get_labels]
 set content_method_count [llength $content_methods]
 
 

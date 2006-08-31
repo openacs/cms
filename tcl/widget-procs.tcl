@@ -1,14 +1,11 @@
+ad_library {
+    Procedures for generating and processing metadata form widgets, editing
+    attribute widgets
+}
 
-# @namespace widget
+namespace eval cms::widget {}
 
-# Procedures for generating and processing metadata form widgets, editing
-# attribute widgets
-
-namespace eval widget {}
-
-
-
-ad_proc -public widget::param_element_create { form param order param_id \
+ad_proc -public cms::widget::param_element_create { form param order param_id \
 	{default ""} {is_required ""} {param_source ""}} {
 
   @public param_element_create
@@ -51,7 +48,7 @@ ad_proc -public widget::param_element_create { form param order param_id \
 
 
 
-ad_proc -private widget::create_param_type { form order } {
+ad_proc -private cms::widget::create_param_type { form order } {
 
   @private create_param_type
 
@@ -77,7 +74,7 @@ ad_proc -private widget::create_param_type { form order } {
 
 
 
-ad_proc -private widget::create_param_source { form order param_source } {
+ad_proc -private cms::widget::create_param_source { form order param_source } {
 
   @private create_param_source
 
@@ -101,7 +98,7 @@ ad_proc -private widget::create_param_source { form order param_source } {
 }
 
 
-ad_proc -private widget::create_param_value { form order default is_required } {
+ad_proc -private cms::widget::create_param_value { form order default is_required } {
 
   @private create_param_value
 
@@ -137,7 +134,7 @@ ad_proc -private widget::create_param_value { form order default is_required } {
 }
 
 
-ad_proc -private widget::create_text_param { form order default is_required param_source} {
+ad_proc -private cms::widget::create_text_param { form order default is_required param_source} {
 
   @private create_text_param
 
@@ -159,15 +156,15 @@ ad_proc -private widget::create_text_param { form order default is_required para
 	    -widget hidden \
 	    -value "onevalue"
 
-    widget::create_param_source $form $order $param_source
-    widget::create_param_value $form $order $default $is_required
+    cms::widget::create_param_source $form $order $param_source
+    cms::widget::create_param_value $form $order $default $is_required
 }
 
 
 
 
 
-ad_proc -private widget::create_options_param { form order default is_required \
+ad_proc -private cms::widget::create_options_param { form order default is_required \
 	param_source} {
 
   @private create_options_param
@@ -192,13 +189,13 @@ ad_proc -private widget::create_options_param { form order default is_required \
 	    -widget hidden \
 	    -value "multilist"
 
-    widget::create_param_source $form $order $param_source
-    widget::create_param_value $form $order $default $is_required
+    cms::widget::create_param_source $form $order $param_source
+    cms::widget::create_param_value $form $order $default $is_required
 }
 
 
 
-ad_proc -private widget::create_values_param { form order default is_required param_source} {
+ad_proc -private cms::widget::create_values_param { form order default is_required param_source} {
 
   @private create_values_param
 
@@ -222,15 +219,15 @@ ad_proc -private widget::create_values_param { form order default is_required pa
 	    -widget hidden \
 	    -value "onelist"
 
-    widget::create_param_source $form $order $param_source
-    widget::create_param_value $form $order $default $is_required
+    cms::widget::create_param_source $form $order $param_source
+    cms::widget::create_param_value $form $order $default $is_required
 }
 
 
 
 
 
-ad_proc -private widget::process_param { form order content_type attribute_name } {    
+ad_proc -private cms::widget::process_param { form order content_type attribute_name } {    
 
   @private process_param
 
@@ -250,17 +247,7 @@ ad_proc -private widget::process_param { form order content_type attribute_name 
 	    param_source_$order param_value_$order
  
 
-    db_exec_plsql pp_proces_param "
-      begin
-      cm_form_widget.set_attribute_param_value (
-          content_type   => :content_type,
-          attribute_name => :attribute_name,
-          param          => :param_$order,
-          param_type     => :param_type_$order,
-          param_source   => :param_source_$order,
-          value          => :param_value_$order
-      );
-      end;"
+    db_exec_plsql pp_proces_param {}
 }
 
 

@@ -1,101 +1,107 @@
-# Display a list of items on the clipboard
+ad_page_contract {
+    Display a list of items on the clipboard
 
-set heads [ad_conn headers]
-set package_url [ad_conn package_url]
-set clipboardfloats_p [clipboard::floats_p]
-
-for { set i 0 } { $i < [ns_set size $heads] } { incr i } {
-  ns_log notice "[ns_set key $heads $i] = [ns_set value $heads $i]"
+    @author Michael Steigman
+    @creation-date March 2006
+} {
+    { id ""}
+    { parent_id:integer ""}
+    { mount_point:optional "clipboard" }
+    { clip_tab "main"}
 }
 
-request create
-request set_param id -datatype keyword -optional
-request set_param parent_id -datatype keyword -optional
-request set_param state -datatype text -param -optional -value [list]
-request set_param mount_point -datatype keyword -optional -value clipboard
-request set_param clip_tab -datatype keyword -optional -value main
+set user_id [auth::require_login]
+set package_url [ad_conn package_url]
+set clipboardfloats_p [cms::clipboard::ui::floats_p]
+
+# set heads [ad_conn headers]
+# for { set i 0 } { $i < [ns_set size $heads] } { incr i } {
+#   ns_log debug "clipboard/index.tcl: [ns_set key $heads $i] = [ns_set value $heads $i]"
+# }
 
 # using the tabs to set the page id;
 # then making sure that the tabs display the correct page
-if {![template::util::is_nil clip_tab]} {
-    if {$clip_tab == "main" } {
-	set id ""
-    } else {
-	set id $clip_tab
-    }
-}
-
-if {$id == "" } {
-    set curr_tab main
+if { $clip_tab eq "main" } {
+    set id ""
 } else {
-    set curr_tab $id
+    set id $clip_tab
 }
 
 # The cookie for the clipboard looks like this:
 # mnt:id,id,id|mnt:id,id,id|mnt:id,id,id.
-
-set clip [clipboard::parse_cookie]
-
-set total_items [clipboard::get_total_items $clip]
-set user_id [auth::require_login]
-
-if { ![util::is_nil id] } {
-  
-  set item_id_list [clipboard::get_items $clip $id]
-  ns_log Notice "item_id_list = [join $item_id_list ","]"
-
-  # First, attempt to ask the module for the list of item paths in sorted order
-  # Could fail because of some SQL error or because the procedure does not exist
-
-  if { [catch { 
-      cm::modules::${id}::getSortedPaths items $item_id_list \
-          [cm::modules::${id}::getRootFolderID [ad_conn subsite_id]]
-
-      template::multirow extend items url
-      template::multirow foreach items { 
-          switch $item_type {
-              content_template { 
-                  set url "../templates/properties?id=$item_id"
-              }
-              party {
-                  set url "../$id/index?id="
-              }
-              user {
-                  set url "../$id/one-user?id=$item_id"
-              }
-              default {
-                  set url "../$id/index?id=$item_id"
-              }
-          }
-          # this is for all items in the sitemap that need to be listed under the
-          # item folder
-          if {$id == "sitemap" && $item_type != "content_folder"} {
-              set url "../items/index?item_id=$item_id"
-          }
-          append url "&mount_point=$id"
-      }
-  } errmsg ] } {
-      # Process the list manually. Path information will not be shown, but at least
-      # the names will be
-
-      ns_log Warning "CLIPBOARD ERROR: $errmsg"
-      template::multirow create items item_id item_path item_type url
-
-      foreach item_id $item_id_list {
-          if { [string equal $item_id "content_revision"] && [string equal $id "types"] } {
-              set link_id ""
-              set item_path "Basic Item"
-          } else {
-              set link_id $item_id
-              set item_path [folderAccess name [getFolder $user_id $id $link_id state]]
-          } 
-          set item_type ""
-          set url "../$id/index?id=$link_id"
-          
-          template::multirow append items $item_id $item_path $item_type $url
-      }
-  }
+# i.e., %22%22%7Csitemap%3A1254%7Ctemplates%3A1337%2C1441%7Ctypes%3Acontent_revision
+# where %3A = : and %7C = |
+set clip [cms::clipboard::parse_cookie]
+set total_items [cms::clipboard::get_total_items $clip]
+set total_items_string [ad_decode $total_items 1 "is a total of 1 item" \
+			    "are a total of $total_items items"]
+if { $id ne "" } {
+    
+    template::list::create \
+	-name marked_items \
+	-multirow marked_items \
+	-key item_id \
+	-no_data "No items of this type on the clipboard" \
+	-bulk_actions [list "Remove" \
+			   "remove-items" \
+			   "Remove checked types from the clipboard"] \
+	-bulk_action_export_vars {mount_point clip_tab} \
+	-elements {
+	    title {
+		label "Title"
+		link_url_col item_url
+	    }
+	    type {
+		label "Type"
+	    }
+	    path {
+		label "Path"
+	    }
+	}
+    
+    template::multirow create marked_items item_id title type path item_url
+    set item_list [cms::clipboard::get_items $clip $id]    
+    ns_log notice " ------------------> $item_list" 
+    foreach item $item_list {
+	switch $id {
+	    sitemap - templates {
+		set title [content::item::get_title -item_id $item]
+		set type [content::item::content_type -item_id $item]
+		set path [content::item::get_path -item_id $item]
+		switch $type {
+		    content_folder {
+			set base_url "../${id}/index"
+			set item_var folder_id
+		    }
+		    content_template {
+			set base_url "../templates/properties"
+			set item_var item_id
+		    }
+		    default {
+			set base_url "../items/index"
+			set item_var item_id
+		    }
+		}		
+	    }
+	    types {
+		set title [cms::type::pretty_name -content_type $item]
+		set type "$item"
+		set path "N/A"
+		set base_url "../types/index"
+		set item_var content_type
+	    }
+	    categories {
+		set title [content::keyword::get_heading -keyword_id $item]
+		set type "keyword"
+		set path "N/A"
+		set base_url "../categories/index"
+		set item_var id
+	    }
+	}
+	set $item_var $item
+	set item_url [export_vars -base $base_url $item_var ]
+	template::multirow append marked_items $item $title $type $path $item_url
+    }
 }
 
-set url [ad_conn url]
-append url "?mount_point=clipboard&id=$id&parent_id=$parent_id&refresh_tree=f"
+cms::clipboard::free $clip

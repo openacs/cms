@@ -7,17 +7,17 @@
     <initial-install-p>f</initial-install-p>
     <singleton-p>f</singleton-p>
     
-    <version name="5.1d" url="http://www.arsdigita.com/acs-repository/download/apm/cms-5.1d.apm">
-        <owner url="mailto:lutter@arsdigita.com">David Lutterkort</owner>
-        <owner url="mailto:karlg@arsdigita.com">Karl Goldstein</owner>
+    <version name="5.0d2" url="http://openacs.org/download/apm/cms-5.0d2.apm">
         <owner url="mailto:michael@steigman.net">Michael Steigman</owner>
+        <owner url="mailto:karlg@arsdigita.com">Karl Goldstein</owner>
+        <owner url="mailto:lutter@arsdigita.com">David Lutterkort</owner>
         <summary>A CMS implemented on top of the Content Repository</summary>
-        <release-date>2005-10-04</release-date>
+        <release-date>2006-08-31</release-date>
         <vendor url="http://www.openacs.org">OpenACS</vendor>
         <description format="text/html">CMS is a full featured content management system implemented on top of the content repository which supports composite objects, dynamicly created attributes, publishing to the filesystem and categorization. CMS remains the best place to look to find examples of how the content repository should be used.</description>
-        <maturity>0</maturity>
+        <maturity>1</maturity>
 
-        <provides url="cms" version="5.1d"/>
+        <provides url="cms" version="5.0d2"/>
         <requires url="acs-content-repository" version="5.1.5"/>
         <requires url="acs-kernel" version="5.1.5"/>
         <requires url="acs-mail" version="5.1.5"/>
@@ -27,6 +27,8 @@
         <callbacks>
             <callback type="after-instantiate"  proc="cms::install::package_instantiate"/>
             <callback type="before-uninstantiate"  proc="cms::install::package_uninstantiate"/>
+            <callback type="after-install"  proc="cms::install::package_install"/>
+            <callback type="before-uninstall"  proc="cms::install::package_uninstall"/>
         </callbacks>
         <parameters>
             <parameter datatype="number"  min_n_values="1"  max_n_values="1"  name="ClipboardFloatsP"  default="1" description="Determine whether the clipboard should be in its own floating window."/>

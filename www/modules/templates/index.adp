@@ -1,28 +1,31 @@
 <master src="../../master">
-<property name="title">@page_title@</property>
+<property name="title">Template Folder - @folder_info.label;noquote@</property>
 
 <p/>
 
-<include src="../../bookmark" mount_point="@mount_point@" id="@folder_id@">
+<include src="/packages/cms/lib/clip" mount_point="@mount_point@" id="@folder_id@">
 
-@page_title;noquote@ 
+Template Folder - @folder_info.label;noquote@
 
 <p/>
 
 &nbsp;&nbsp;&nbsp;
-<if @info.description@ not nil>@info.description@</if>
+<if @folder_info.description@ not nil>@folder_info.description;noquote@</if>
 <else>No description</else>
 
 <p/>
 
-<include src="../sitemap/ancestors" item_id="@folder_id@" mount_point="@mount_point@">
+<include src="/packages/cms/lib/ancestors" item_id="@folder_id@" mount_point="@mount_point@">
 
 <p/>
 
-<include src="../../../lib/folder-items" folder_id="@folder_id@"
-  parent_id="@parent_id@" actions="@actions;noquote@" 
-  orderby="@orderby@" page="@page@" mount_point="@mount_point@" />
-
+<include src="/packages/cms/lib/folder-items" 
+	folder_id="@folder_id@"
+	parent_id="@parent_id@" 
+	actions="@actions;noquote@" 
+	orderby="@orderby@" 
+	page="@page@" 
+	mount_point="@mount_point@" />
 
 <script language=JavaScript>
   set_marks('@mount_point@', '../../resources/checked');

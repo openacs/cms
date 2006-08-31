@@ -3,7 +3,7 @@
 #   what needs to be done before this item can be published.
 request create
 request set_param item_id -datatype integer
-request set_param item_props_tab -datatype text
+request set_param tab -datatype text
 
 set user_id [auth::require_login]
 permission::require_permission -party_id $user_id -object_id $item_id \

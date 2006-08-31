@@ -17,10 +17,10 @@ if { [template::util::is_nil id] } {
   set root_id $id
 }
 
-set clip [clipboard::parse_cookie]
+set clip [cms::clipboard::parse_cookie]
 
 db_transaction {
-    clipboard::map_code $clip categories {
+    cms::clipboard::map_code $clip categories {
         if { [catch { 
             db_exec_plsql item_assign {}
             lappend folder_list [list $mount_point $item_id]
@@ -30,7 +30,7 @@ db_transaction {
 
 }
 
-clipboard::free $clip
+cms::clipboard::free $clip
 
 # Specify a null id so that the entire branch will be refreshed
 template::forward "index?item_id=$id&mount_point=$mount_point"

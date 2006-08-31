@@ -18,8 +18,8 @@ permission::require_permission -party_id [auth::require_login] \
   set page_title "Relate Items to \"$item_title\""
 
   # get related items from the clipboard
-  set clip [clipboard::parse_cookie]
-  set items [clipboard::get_items $clip $mount_point]
+  set clip [cms::clipboard::parse_cookie]
+  set items [cms::clipboard::get_items $clip $mount_point]
 
   # If no items are clipped, abort
   if { [llength $items] < 1 } {
@@ -49,20 +49,20 @@ permission::require_permission -party_id [auth::require_login] \
   }
 
   # Process the query
-  clipboard::ui::form_create rel_form
+  cms::clipboard::ui::form_create rel_form
 
   # A short proc to add a row
   proc add_row { } {
     uplevel {
       upvar 0 "clip_items:[expr $j - 1]" prev_row
-      clipboard::ui::add_row rel_form $mount_point $prev_row(related_id) $prev_row(title) -checked
-      clipboard::ui::element_create rel_form path -datatype text -widget hidden \
+      cms::clipboard::ui::add_row rel_form $mount_point $prev_row(related_id) $prev_row(title) -checked
+      cms::clipboard::ui::element_create rel_form path -datatype text -widget hidden \
 	-value $prev_row(path)
-      clipboard::ui::element_create rel_form relation_type -datatype keyword -widget select \
+      cms::clipboard::ui::element_create rel_form relation_type -datatype keyword -widget select \
 	-options $type_options
-      clipboard::ui::element_create rel_form relation_tag -datatype text -widget select \
+      cms::clipboard::ui::element_create rel_form relation_tag -datatype text -widget select \
 	-options $item_tags
-      clipboard::ui::element_create rel_form order_n -datatype integer -widget text \
+      cms::clipboard::ui::element_create rel_form order_n -datatype integer -widget text \
 	-html { size 3 } -optional
     }
   }    
@@ -125,7 +125,7 @@ permission::require_permission -party_id [auth::require_login] \
     set source_id $item_id
 
       db_transaction {
-          clipboard::ui::process_form rel_form {
+          cms::clipboard::ui::process_form rel_form {
               if { $row(checked) } {
 
                   template::util::array_to_vars row

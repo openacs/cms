@@ -14,9 +14,9 @@ if { [template::util::is_nil item_id] } {
 
 # Preserve the item_id since the clipboard::parse_cookie wil overwrite it
 set saved_item_id $item_id
-set clip [clipboard::parse_cookie]
+set clip [cms::clipboard::parse_cookie]
 db_transaction {
-    clipboard::map_code $clip categories {
+    cms::clipboard::map_code $clip categories {
         if { [catch { 
             db_exec_plsql assign_keyword {
 
@@ -28,6 +28,6 @@ db_transaction {
     }
 }
 
-clipboard::free $clip
+cms::clipboard::free $clip
 
 template::forward "../items/index?item_id=$saved_item_id&mount_point=$mount_point"

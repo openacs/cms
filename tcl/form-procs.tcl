@@ -1,10 +1,14 @@
-namespace eval content {
+ad_library {
+    These procs manage building and processing the forms used in CMS. 
+}
+# MS: old namespace stuff - now converted to cms::form
+#namespace eval content {
     # namespace import seems to prevent content:: procs from being recognized
     # namespace import ::template::query ::template::form ::template::element
-}
+#}
+namespace eval cms::form {}
 
-
-ad_proc -private content::query_form_metadata { 
+ad_proc -private cms::form::query_form_metadata { 
     {datasource_name rows} 
     {datasource_type multirow}
     {extra_where {}} 
@@ -13,6 +17,7 @@ ad_proc -private content::query_form_metadata {
     Helper proc: query out all the information neccessary to create
     a custom form element based on stored metadata
     Requires the variable content_type to be set in the calling frame
+    @ www/modules/items/relate-items-2.tcl
 } {
     # query for all attribute widget param values associated with a content 
     #   the 3 nvl subqueries are necessary because we cannot outer join
@@ -41,8 +46,10 @@ ad_proc -private content::query_form_metadata {
 
 }
 
-ad_proc -private content::assemble_form_element { 
-    datasource_ref the_attribute_name start_row {db {}}
+ad_proc -private cms::form::assemble_form_element { 
+    datasource_ref 
+    the_attribute_name 
+    start_row {db {}}
 } {
 
     Process the query and assemble the "element create..." statement
@@ -70,7 +77,7 @@ ad_proc -private content::assemble_form_element {
 
         template::util::array_to_vars q_row
 
-        content::get_revision_create_element
+        get_revision_create_element
     }
     set last_row $i
 
@@ -97,202 +104,202 @@ ad_proc -private content::assemble_form_element {
 }
 
 
-ad_proc -public content::create_form_element {
-    form_name attribute_name args
-} {
+# ad_proc -public content::create_form_element {
+#     form_name attribute_name args
+# } {
 
-    Create a form widget based on the given attribute. Query parameters
-    out of the database, override them with the passed-in parameters
-    if they exist.
-    If the -revision_id flag exists, fills in the value of the attribute from 
-    the database, based on the given revision_id.
-    If the -content_type flag exists, uses the attribute for the given content
-    type (without inheritance). 
-    If the -item_id flag is present, the live revision for the item will be 
-    used.
-    If the -item_id and the -revision_id flags are missing, the -content_type
-    flag must be specified.
-    Example: 
-    content::create_form_element my_form width -revision_id $image_id -size 10
-    This call will create an element representing the width attribute
-    of the image type, with the textbox size set to 10 characters,
-    and query the current value of the attribute out of the database.
+#     Create a form widget based on the given attribute. Query parameters
+#     out of the database, override them with the passed-in parameters
+#     if they exist.
+#     If the -revision_id flag exists, fills in the value of the attribute from 
+#     the database, based on the given revision_id.
+#     If the -content_type flag exists, uses the attribute for the given content
+#     type (without inheritance). 
+#     If the -item_id flag is present, the live revision for the item will be 
+#     used.
+#     If the -item_id and the -revision_id flags are missing, the -content_type
+#     flag must be specified.
+#     Example: 
+#     content::create_form_element my_form width -revision_id $image_id -size 10
+#     This call will create an element representing the width attribute
+#     of the image type, with the textbox size set to 10 characters,
+#     and query the current value of the attribute out of the database.
 
-} {
-    template::util::get_opts $args
+# } {
+#     template::util::get_opts $args
 
-    # Get the revision id if the item id is specified, or if
-    # it is passed in directly
-    if { ![template::util::is_nil opts(revision_id)] } {
-        set revision_id $opts(revision_id)
+#     # Get the revision id if the item id is specified, or if
+#     # it is passed in directly
+#     if { ![template::util::is_nil opts(revision_id)] } {
+#         set revision_id $opts(revision_id)
         
-    } elseif { ![template::util::is_nil opts(item_id)] } {
+#     } elseif { ![template::util::is_nil opts(item_id)] } {
         
-        set item_id $opts(item_id)
-        set revision_id [db_string get_revision_id ""]
-    }
+#         set item_id $opts(item_id)
+#         set revision_id [db_string get_revision_id ""]
+#     }
 
-    if { [info exists opts(content_type)] } {
-        # The type is known: use it
-        set content_type $opts(content_type)
-    } else {
+#     if { [info exists opts(content_type)] } {
+#         # The type is known: use it
+#         set content_type $opts(content_type)
+#     } else {
         
-        # Figure out the type based on revision_id
-        if { ![info exists revision_id] } {
-            template::request error invalid_element_flags "
-         No revision_id, item_id or content_type specified in 
-         content::create_form_element for attribute ${form_name}:${attribute_name}"
-            return
-        }
+#         # Figure out the type based on revision_id
+#         if { ![info exists revision_id] } {
+#             template::request error invalid_element_flags "
+#          No revision_id, item_id or content_type specified in 
+#          content::create_form_element for attribute ${form_name}:${attribute_name}"
+#             return
+#         }
         
-        set content_type [db_string get_content_type ""]
-    }
+#         set content_type [db_string get_content_type ""]
+#     }
 
-    # Run the gigantic uber-query. This is somewhat wasteful; should
-    # be replaced by 2 smaller queries: one for the attribute_id, one
-    # for parameter types and values.
-    query_form_metadata params multirow "attribute_name = :attribute_name"
+#     # Run the gigantic uber-query. This is somewhat wasteful; should
+#     # be replaced by 2 smaller queries: one for the attribute_id, one
+#     # for parameter types and values.
+#     query_form_metadata params multirow "attribute_name = :attribute_name"
     
-    if { ${params:rowcount} < 1} {
-        error "No widgets are registered for ${content_type}.${attribute_name}"
-    }
+#     if { ${params:rowcount} < 1} {
+#         error "No widgets are registered for ${content_type}.${attribute_name}"
+#     }
 
-    template::util::array_to_vars "params:1"
-    assemble_form_element params $attribute_name 1
+#     template::util::array_to_vars "params:1"
+#     assemble_form_element params $attribute_name 1
 
-    # If the -revision_id switch exists, look up the existing value for the
-    # element
-    if { ![template::util::is_nil revision_id] && [lsearch $code_params "-value"] < 0 } {
+#     # If the -revision_id switch exists, look up the existing value for the
+#     # element
+#     if { ![template::util::is_nil revision_id] && [lsearch $code_params "-value"] < 0 } {
         
-        # Handle custom datatypes... Basically, this is done so that
-        # the date widget will work :-/
-        # In the future, upgrade the date widget and use acs_object.get_attribute
+#         # Handle custom datatypes... Basically, this is done so that
+#         # the date widget will work :-/
+#         # In the future, upgrade the date widget and use acs_object.get_attribute
 
-        switch $datatype {
-            date {
-                set what [db_map cfe_attribute_name_to_char]
-            }
+#         switch $datatype {
+#             date {
+#                 set what [db_map cfe_attribute_name_to_char]
+#             }
 
-            default {
-                set what [db_map cfe_attribute_name]
-            }
-        }
+#             default {
+#                 set what [db_map cfe_attribute_name]
+#             }
+#         }
         
-        set element [db_string get_element_value ""]
+#         set element [db_string get_element_value ""]
 
-        lappend code_params -value $element_value -values [list $element_value]
-    }
+#         lappend code_params -value $element_value -values [list $element_value]
+#     }
 
-    set form_element "template::element create $form_name $attribute_name $code_params"
-    if { ![string equal $is_required t] } {
-        append form_element " -optional"
-    }
+#     set form_element "template::element create $form_name $attribute_name $code_params"
+#     if { ![string equal $is_required t] } {
+#         append form_element " -optional"
+#     }
 
-    eval $form_element
-}  
+#     eval $form_element
+# }  
 
 
-ad_proc -public content::get_revision_form { 
-    content_type item_id form_name {show_sections t} {element_override {}}
-} {
+# ad_proc -public content::get_revision_form { 
+#     content_type item_id form_name {show_sections t} {element_override {}}
+# } {
 
-    generate a form based on metadata
+#     generate a form based on metadata
 
-} {
+# } {
 
-    # Convert overrides to an array
-    array set overrides $element_override
+#     # Convert overrides to an array
+#     array set overrides $element_override
 
-    set last_type ""
-    set last_attribute_name ""
-    set new_section_p 1
+#     set last_type ""
+#     set last_attribute_name ""
+#     set new_section_p 1
 
-    set code_params [list]
-    set html_params [list]
+#     set code_params [list]
+#     set html_params [list]
     
-    # Perform a gigantic query to retreive all metadata
-    query_form_metadata
+#     # Perform a gigantic query to retreive all metadata
+#     query_form_metadata
 
-    # Process the results and create the elements
-    for { set i 1 } { $i <= ${rows:rowcount} } { incr i } {
-        upvar 0 "rows:${i}" row 
-        template::util::array_to_vars row
+#     # Process the results and create the elements
+#     for { set i 1 } { $i <= ${rows:rowcount} } { incr i } {
+#         upvar 0 "rows:${i}" row 
+#         template::util::array_to_vars row
 
-        # make a new section in the form for each type in the content type hierarchy
-        if { $new_section_p == 1 && [string equal $show_sections t]} {
-            # put attributes for each supertype in their own section
-	    template::form section $form_name $last_type
-        }
+#         # make a new section in the form for each type in the content type hierarchy
+#         if { $new_section_p == 1 && [string equal $show_sections t]} {
+#             # put attributes for each supertype in their own section
+# 	    template::form section $form_name $last_type
+#         }
 
-        # check if attributes should be placed in a new content type section
-        if { ! [string equal $type_label $last_type] } {
-            set new_section_p 1
-        } else {
-            set new_section_p 0
-        }
+#         # check if attributes should be placed in a new content type section
+#         if { ! [string equal $type_label $last_type] } {
+#             set new_section_p 1
+#         } else {
+#             set new_section_p 0
+#         }
 
 
-        # if the attribute is new
-        if { ![string equal $last_attribute_name $attribute_name] } {
+#         # if the attribute is new
+#         if { ![string equal $last_attribute_name $attribute_name] } {
 
-            # if this is a new attribute and it isn't the first attribute ( $i != 1 ), 
-            #   then evaluate the current "element create" string, and reset the params lists
-            if { $i != 1 } {
+#             # if this is a new attribute and it isn't the first attribute ( $i != 1 ), 
+#             #   then evaluate the current "element create" string, and reset the params lists
+#             if { $i != 1 } {
 
-                if { [llength $html_params] } {
-                    # widget has html parameters
-                    lappend code_params -html $html_params
-                }
-                set form_element \
-                    "template::element create $form_name $last_attribute_name $code_params"
-                ns_log debug "content::get_revision_form: CREATING"
-		ns_log debug "content::get_revision_form:   attribute : $last_attribute_name"
-		ns_log debug "content::get_revision_form:   type_label: $last_type"
-                eval $form_element
+#                 if { [llength $html_params] } {
+#                     # widget has html parameters
+#                     lappend code_params -html $html_params
+#                 }
+#                 set form_element \
+#                     "template::element create $form_name $last_attribute_name $code_params"
+#                 ns_log debug "content::get_revision_form: CREATING"
+# 		ns_log debug "content::get_revision_form:   attribute : $last_attribute_name"
+# 		ns_log debug "content::get_revision_form:   type_label: $last_type"
+#                 eval $form_element
                 
-                set code_params [list]
-                set html_params [list]
-            }
+#                 set code_params [list]
+#                 set html_params [list]
+#             }
 
 
-            # start a new "element create" string
-            get_element_default_params
-        }
+#             # start a new "element create" string
+#             get_element_default_params
+#         }
 
-        # evaluate the param
-        get_revision_create_element
-        if { [info exists overrides($last_attribute_name)] } {
-            set code_params [concat $code_params $overrides($last_attribute_name)]
-	}
+#         # evaluate the param
+#         get_revision_create_element
+#         if { [info exists overrides($last_attribute_name)] } {
+#             set code_params [concat $code_params $overrides($last_attribute_name)]
+# 	}
 
-        set last_attribute_name $attribute_name
-	set last_type $type_label
-    }
+#         set last_attribute_name $attribute_name
+# 	set last_type $type_label
+#     }
     
 
-    # eval the last "element create" string
-    if { [llength $html_params] } {
-        # widget has html parameters
-        lappend code_params -html $html_params
-    }
+#     # eval the last "element create" string
+#     if { [llength $html_params] } {
+#         # widget has html parameters
+#         lappend code_params -html $html_params
+#     }
 
-    set form_element "template::element create $form_name $last_attribute_name $code_params"
-    ns_log debug "content::get_revision_form:   ELEMENT CREATE: $form_element"
-    eval $form_element
-
-
-    # add some default form elements
-    eval template::element create $form_name content_type \
-        -widget hidden -datatype keyword -value $content_type
-
-    if { ![string equal $item_id ""] } {
-        eval template::element create $form_name item_id \
-            -widget hidden -datatype integer -value $item_id
-    }
-}
+#     set form_element "template::element create $form_name $last_attribute_name $code_params"
+#     ns_log debug "content::get_revision_form:   ELEMENT CREATE: $form_element"
+#     eval $form_element
 
 
-ad_proc -public content::get_element_default_params {} {
+#     # add some default form elements
+#     eval template::element create $form_name content_type \
+#         -widget hidden -datatype keyword -value $content_type
+
+#     if { ![string equal $item_id ""] } {
+#         eval template::element create $form_name item_id \
+#             -widget hidden -datatype integer -value $item_id
+#     }
+# }
+
+
+ad_proc -public cms::form::get_element_default_params {} {
 
     PRE: requires datatype, widget, attribute_label, is_required code_params
     to be set in the calling frame
@@ -310,7 +317,7 @@ ad_proc -public content::get_element_default_params {} {
     }
 }
 
-ad_proc content::get_revision_create_element {} {
+ad_proc cms::form::get_revision_create_element {} {
 
     PRE:  requires the following variables to be set in the uplevel scope:
     db, code_params, html_params, 
@@ -369,90 +376,90 @@ ad_proc content::get_revision_create_element {} {
 }
 
 
-ad_proc -public content::process_revision_form { form_name content_type item_id {db{}} } {
+# ad_proc -public content::process_revision_form { form_name content_type item_id {db{}} } {
 
-    perform the appropriate DML based on metadata
+#     perform the appropriate DML based on metadata
 
-} {
+# } {
 
-    template::form get_values $form_name title description mime_type
+#     template::form get_values $form_name title description mime_type
 
-    # create the basic revision
-    set revision_id [db_exec_plsql new_content_revision {}]
+#     # create the basic revision
+#     set revision_id [db_exec_plsql new_content_revision {}]
 
-    # query for extended attribute tables
-    set last_table ""
-    set last_id_column ""
-    db_multirow rows get_extended_attributes ""
+#     # query for extended attribute tables
+#     set last_table ""
+#     set last_id_column ""
+#     db_multirow rows get_extended_attributes ""
 
-    for { set i 1 } { $i <= ${rows:rowcount} } { incr i } {
-        upvar 0 "rows:${i}" row
-        template::util::array_to_vars row
+#     for { set i 1 } { $i <= ${rows:rowcount} } { incr i } {
+#         upvar 0 "rows:${i}" row
+#         template::util::array_to_vars row
 
-        ns_log debug "content::process_revision_form: attribute_name $attribute_name"
-        ns_log debug "content::process_revision_form: table_name $table_name"
+#         ns_log debug "content::process_revision_form: attribute_name $attribute_name"
+#         ns_log debug "content::process_revision_form: table_name $table_name"
         
-        if { ![string equal $last_table $table_name] } {
-            if { $i != 1 } {                
-                content::process_revision_form_dml
-            }
-            set columns [list]
-            set values [list]
-        }
+#         if { ![string equal $last_table $table_name] } {
+#             if { $i != 1 } {                
+#                 content::process_revision_form_dml
+#             }
+#             set columns [list]
+#             set values [list]
+#         }
         
-        # fetch the value of the attribute from the form
-        if { ![template::util::is_nil attribute_name] } {
-            set $attribute_name [template::element::get_value \
-                                     $form_name $attribute_name]
+#         # fetch the value of the attribute from the form
+#         if { ![template::util::is_nil attribute_name] } {
+#             set $attribute_name [template::element::get_value \
+#                                      $form_name $attribute_name]
 
-            lappend columns $attribute_name
+#             lappend columns $attribute_name
 
-            # If the attribute is a date, get the date
-            if { [string equal $datatype date] } {
-                set $attribute_name \
-                    [template::util::date::get_property sql_date [set $attribute_name]]
-                # Can't use bind vars because this will be a to_date call
-                lappend values "[set $attribute_name]"
-            } else {
-                lappend values ":$attribute_name"
-            }
-        }
-        set last_table $table_name
-        set last_id_column $id_column
-    }
+#             # If the attribute is a date, get the date
+#             if { [string equal $datatype date] } {
+#                 set $attribute_name \
+#                     [template::util::date::get_property sql_date [set $attribute_name]]
+#                 # Can't use bind vars because this will be a to_date call
+#                 lappend values "[set $attribute_name]"
+#             } else {
+#                 lappend values ":$attribute_name"
+#             }
+#         }
+#         set last_table $table_name
+#         set last_id_column $id_column
+#     }
 
-    content::process_revision_form_dml
+#     content::process_revision_form_dml
 
-    return $revision_id
-}
+#     return $revision_id
+# }
 
-ad_proc -public content::process_revision_form_dml {} {
+# ad_proc -public content::process_revision_form_dml {} {
 
-    helper function for process_revision_form
-    PRE: the following variables must be set in the uplevel scope:
-    columns, values, last_table
+#     helper function for process_revision_form
+#     PRE: the following variables must be set in the uplevel scope:
+#     columns, values, last_table
 
-} {
+# } {
 
-    upvar last_table __last_table
-    upvar columns __columns
-    upvar values __values
-    upvar __sql sql
-    set sql [db_map insert_revision_form]
+#     upvar last_table __last_table
+#     upvar columns __columns
+#     upvar values __values
+#     upvar __sql sql
+#     set sql [db_map insert_revision_form]
     
-    uplevel {
+#     uplevel {
 
-        if { ! [string equal $last_table {}] } {
-            lappend columns $last_id_column
-            lappend values ":revision_id"
+#         if { ! [string equal $last_table {}] } {
+#             lappend columns $last_id_column
+#             lappend values ":revision_id"
 
-            db_dml insert_revision_form $__sql
-        }
-    }
-}
+#             db_dml insert_revision_form $__sql
+#         }
+#     }
+# }
 
 
-ad_proc -public content::insert_element_data { 
+ad_proc -public cms::form::insert_element_data { 
     form_name content_type exclusion_list id_value \
         {suffix ""} {extra_where ""}
 } {
@@ -462,6 +469,7 @@ ad_proc -public content::insert_element_data {
     exclusion_list is a list of all object types for which the elements
     are NOT to be inserted
     id_value is the revision_id
+    @see www/modules/items/relate-items-2
 
 } {
 
@@ -476,7 +484,7 @@ ad_proc -public content::insert_element_data {
 
     append query [db_map ied_get_objects_tree_order_by]
 
-    ns_log debug "content::insert_element_data: $query"
+    ns_log debug "cms::form::insert_element_data: $query"
     
     set last_table ""
     set last_id_column ""
@@ -486,12 +494,12 @@ ad_proc -public content::insert_element_data {
         upvar 0 "rows:${i}" row
         template::util::array_to_vars row
 
-        ns_log debug "content::insert_element_data: attribute_name $attribute_name"
-        ns_log debug "content::insert_element_data: table_name $table_name"
+        ns_log debug "cms::form::insert_element_data: attribute_name $attribute_name"
+        ns_log debug "cms::form::insert_element_data: table_name $table_name"
         
         if { ![string equal $last_table $table_name] } {
             if { $i != 1 } {                
-                content::process_insert_statement
+                process_insert_statement
             }
             set columns [list]
             set values [list]
@@ -519,16 +527,16 @@ ad_proc -public content::insert_element_data {
         set last_id_column $id_column
     }
 
-    content::process_insert_statement
+    process_insert_statement
 
 }
 
-ad_proc -public content::process_insert_statement {} {
+ad_proc -public cms::form::process_insert_statement {} {
 
     helper function for process_revision_form
     PRE: the following variables must be set in the uplevel scope:
     columns, values, last_table, id_value_ref
-
+    @see www/modules/items/relate-items-2
 } {
     upvar last_table __last_table
     upvar columns __columns
@@ -547,61 +555,17 @@ ad_proc -public content::process_insert_statement {} {
     }
 }
 
-ad_proc -public content::assemble_passthrough { args } {
-
-    Assemble a passthrough list out of variables
-
-} {
-    set result [list]
-    foreach varname $args {
-        upvar $varname var
-        lappend result [list $varname $var]
-    }
-    return $result
-}
-
-ad_proc -public content::url_passthrough { passthrough } {
-
-    Convert passthrough to a URL fragment
-
-} {
-
-    set extra_url ""
-    foreach pair $passthrough {
-        append extra_url "&[lindex $pair 0]=[lindex $pair 1]"
-    }    
-    return $extra_url
-}
-
-ad_proc -public content::assemble_url { base_url args } {
-
-    Assemble a URL out of component parts
-
-} {
-    set result $base_url
-    if { [string first $base_url "?"] == -1 } {
-        set joiner "?"
-    } else {
-        set joiner "&"
-    }
-    foreach fragment $args {
-        set fragment [string trimleft $fragment "&?"]
-        if { ![string equal $fragment {}] } {
-            append result $joiner $fragment
-            set joiner "&"
-        }
-    }
-    return $result
-}  
-
 #################################################################
-
-# @namespace content
 
 # Procedures for generating and processing content content creation
 # and editing forms..
 
-ad_proc -public content::new_item { form_name { storage_type text } { tmpfile "" } {prefix {StArT}} } {
+ad_proc -public cms::form::new_item { 
+    form_name 
+    { storage_type text } 
+    { tmpfile "" }
+    {prefix {StArT}} 
+} {
 
     Create a new item, including the initial revision, based on a valid
     form submission.
@@ -619,16 +583,16 @@ ad_proc -public content::new_item { form_name { storage_type text } { tmpfile ""
 
     @param prefix A prefix to remove from the form when looking up attributes
 
-    @see content::add_revision
+    @see cms::form::add_revision
 
 } {
     # Here we walk the item prefixes and create them all, unless the content_prefixes var 
     # does not exist or we are already handling the form
-    ns_log Warning "content::new_item: handling prefix $prefix"
+    ns_log Warning "cms::form::new_item: handling prefix $prefix"
     if {[string equal "StArT" $prefix]} { 
         if {[template::element exists $form_name content_prefixes]} { 
             foreach prefix [template::element get_value $form_name content_prefixes] { 
-                lappend item_id [content::new_item $form_name $storage_type $tmpfile $prefix]
+                lappend item_id [new_item $form_name $storage_type $tmpfile $prefix]
             }
             return $item_id
         } else { 
@@ -645,9 +609,9 @@ ad_proc -public content::new_item { form_name { storage_type text } { tmpfile ""
 
     # If the item does not already exist build the call to create it.
     if { !$exists } { 
-        array set defaults [list item_id "" locale "" parent_id "" content_type "content_revision"]
+        array set defaults [list item_id "" locale "" parent_id "" content_type "content_revision" creation_ip "" creation_user ""]
 
-        foreach param { item_id name locale parent_id content_type } {
+        foreach param { item_id name locale parent_id content_type creation_ip creation_user } {
             
             if { [template::element exists $form_name $prefix$param] } {
                 set $param [template::element get_value $form_name $prefix$param]
@@ -678,10 +642,10 @@ ad_proc -public content::new_item { form_name { storage_type text } { tmpfile ""
 
     db_transaction {
         if {!$exists} { 
-            set item_id [db_exec_plsql get_item_id  "
-                     begin 
-                       :1 := content_item.new( [join $params ","] );
-                     end;"]
+            set item_id [content::item::new -name $name -parent_id $parent_id \
+			     -locale $locale -item_id $item_id -storage_type $storage_type \
+			     -content_type $content_type -creation_ip $creation_ip \
+			     -creation_user $creation_user]
         }
         add_revision $form_name $tmpfile $prefix [expr !$exists]
     }
@@ -699,7 +663,12 @@ ad_proc -public content::new_item { form_name { storage_type text } { tmpfile ""
 }
 
 
-ad_proc -public content::add_revision { form_name { tmpfile "" } {prefix {}} {new_p 1}} {
+ad_proc -public cms::form::add_revision { 
+    form_name 
+    { tmpfile "" } 
+    { prefix "" } 
+    { new_p 1 }
+} {
 
     Create a new revision for an existing item based on a valid form
     submission.  Queries for attribute names and inserts a row into the
@@ -708,16 +677,19 @@ ad_proc -public content::add_revision { form_name { tmpfile "" } {prefix {}} {ne
     for the revision as well.  
 
     @param form_name Name of the form from which to obtain attribute
-    values.  The form should include an item_id and revision_id.
+    values.  The form should include an item_id, revision_id and 
+    creation_user/creation_ip.
 
     @param tmpfile Name of the temporary file containing the content to
     upload.
 
     @param prefix A prefix to prepend when looking up attributes in the form data
     
-    @param new_p Whether the revision is attached to a new cr_item or if previousrevision exist
+    @param new_p Whether the revision is attached to a new cr_item or if previous revision exist
+
+    @see called by revision-add-2 in the items module
 } {
-    ns_log Debug "content::add_revision: $form_name $tmpfile $prefix $new_p"
+    ns_log Debug "cms::form::add_revision: $form_name $tmpfile $prefix $new_p"
     # initialize an ns_set to hold bind values
     set bind_vars [ns_set create]
 
@@ -754,7 +726,7 @@ ad_proc -public content::add_revision { form_name { tmpfile "" } {prefix {}} {ne
 }
 
 
-ad_proc -private content::attribute_insert_statement { 
+ad_proc -private cms::form::attribute_insert_statement { 
     content_type table_name bind_vars form_name {prefix {}} {new_p 1}
 } {
 
@@ -775,14 +747,10 @@ ad_proc -private content::attribute_insert_statement {
                      submission.
 
 } {
-    # get creation_user and creation_ip
-    ns_set put $bind_vars creation_user null
-    ns_set put $bind_vars creation_ip null
-
 
     # initialize the column and value list 
-    set columns [list item_id revision_id creation_user creation_ip]
-    set values [list :item_id :revision_id null null]
+    set columns [list item_id revision_id]
+    set values [list :item_id :revision_id]
     set default_columns [list] 
     set default_values [list]
     set missing_columns [list]
@@ -807,7 +775,7 @@ ad_proc -private content::attribute_insert_statement {
                 }
             }
             
-            if { ! [string equal $value {} ] } {
+            if { ! [string equal $value {}] && ![expr { [string equal $ancestor "content_revision"] && [string equal $attribute_name "title"] }] } {
                 ns_set put $bind_vars $attribute_name $value
 
                 lappend columns $attribute_name
@@ -837,7 +805,7 @@ ad_proc -private content::attribute_insert_statement {
 }
 
 
-ad_proc -private content::add_revision_dml { statement bind_vars tmpfile filename } {
+ad_proc -private cms::form::add_revision_dml { statement bind_vars tmpfile filename } {
 
     Perform the DML to insert a revision into the appropriate input view.
 
@@ -869,7 +837,7 @@ ad_proc -private content::add_revision_dml { statement bind_vars tmpfile filenam
 }
 
 
-ad_proc -public content::upload_content { revision_id tmpfile filename } {
+ad_proc -public cms::form::upload_content { revision_id tmpfile filename } {
 
     @private upload_content
 
@@ -919,19 +887,11 @@ ad_proc -public content::upload_content { revision_id tmpfile filename } {
         db_dml upload_file_revision {}
     } elseif {[string equal $storage_type text]} {
         # upload the file into the revision content
-        db_dml upload_text_revision "update cr_revisions 
-             set content = empty_blob(), 
-             content_length = '[file size $tmpfile]' 
-             where revision_id = :revision_id
-             returning content into :1" -blob_files [list $tmpfile]
+        db_dml upload_text_revision {} -blob_files [list $tmpfile]
 
     } else {
         # upload the file into the revision content
-        db_dml upload_revision "update cr_revisions 
-             set content = empty_blob(), 
-             content_length = '[file size $tmpfile]' 
-             where revision_id = :revision_id
-             returning content into :1" -blob_files [list $tmpfile]
+        db_dml upload_revision {} -blob_files [list $tmpfile]
     }
 
     # this seems to abort the transaction even with the catch.
@@ -951,7 +911,7 @@ ad_proc -public content::upload_content { revision_id tmpfile filename } {
 }
 
 
-ad_proc -private content::get_sql_value { name datatype } {
+ad_proc -private cms::form::get_sql_value { name datatype } {
 
     Return the sql statement for a column value in an insert or update
     statement, using a bind variable for the actual value and wrapping it
@@ -974,7 +934,7 @@ ad_proc -private content::get_sql_value { name datatype } {
 }
 
 
-ad_proc -private content::prepare_content_file { form_name } {
+ad_proc -private cms::form::prepare_content_file { form_name } {
 
     Looks for an element named "content" in a form and prepares a
     temporarily file in UTF-8 for uploading to the content repository.
@@ -1022,7 +982,7 @@ ad_proc -private content::prepare_content_file { form_name } {
 }
 
 
-ad_proc -private content::string_to_file { s } {
+ad_proc -private cms::form::string_to_file { s } {
 
     Write a string in UTF-8 encoding to of temp file so it can be
     uploaded into a BLOB (which is blind to character encodings).
@@ -1047,7 +1007,7 @@ ad_proc -private content::string_to_file { s } {
 
 # Form preparation procs
 
-namespace eval content {
+namespace eval cms::form {
 
     variable columns
     set columns [list object_type sort_order attribute_name param_type \
@@ -1057,7 +1017,7 @@ namespace eval content {
 }
 
 
-ad_proc -public content::new_item_form { args } {
+ad_proc -public cms::form::new_item_form { args } {
 
     Adds elements to an ATS form object for creating an item and its
     initial revision.  If the form does not already exist, creates the
@@ -1128,7 +1088,7 @@ ad_proc -public content::new_item_form { args } {
         } 
     }
 
-    if { [string equal {} $opts(item_id)] } { 
+    if { $opts(item_id) eq "" } { 
         # Only add all this junk for 
         # new items.
 
@@ -1186,7 +1146,7 @@ ad_proc -public content::new_item_form { args } {
 
     if { [template::form is_request $opts(form_name)] } {
         if {[template::util::is_nil item_id]} { 
-            set item_id [get_object_id]
+            set item_id [new_object_id]
 
             template::element set_properties $opts(form_name) "$opts(prefix)item_id" -value $item_id
 
@@ -1206,7 +1166,7 @@ ad_proc -public content::new_item_form { args } {
 }
 
 
-ad_proc -public content::add_revision_form { args } {
+ad_proc -public cms::form::add_revision_form { args } {
 
     Adds elements to an ATS form object for adding a revision to an
     existing item.  If the item already exists, element values default a
@@ -1273,7 +1233,7 @@ ad_proc -public content::add_revision_form { args } {
 
     set attributes [add_attribute_elements $opts(form_name) $opts(content_type) {} $opts(prefix) $opts(section) $opts(exclude) $opts(hidden)]
 
-    ns_log debug "content::add_revision_form: content method $opts(content_method)"
+    ns_log debug "cms::form::add_revision_form: content method $opts(content_method); revision id $opts(revision_id)"
 
     add_content_element $opts(form_name) $opts(content_method) $opts(prefix)
 
@@ -1283,11 +1243,11 @@ ad_proc -public content::add_revision_form { args } {
 
         # template::element set_properties $opts(form_name) "$opts(prefix)revision_id" -value $revision_id
 
-        if { [string equal $opts(revision_id) {}] } {
-            set opts(revision_id) [get_latest_revision $opts(item_id)]
+        if { $opts(revision_id) eq "" } {
+            set opts(revision_id) [content::item::get_latest_revision -item_id $opts(item_id)]
         }
 
-        if { ! [string equal $opts(revision_id) {}] } {
+        if { $opts(revision_id) ne "" } {
             set_attribute_values $opts(form_name) $opts(content_type) \
                 $opts(revision_id) $attributes $opts(prefix)
         }
@@ -1313,7 +1273,7 @@ ad_proc -public content::add_revision_form { args } {
 }
 
 
-ad_proc -public content::add_attribute_elements { 
+ad_proc -public cms::form::add_attribute_elements { 
     form_name content_type { revision_id "" } {prefix {}} {section {}} {exclude {}} {hidden {}}
 } {
     
@@ -1389,7 +1349,7 @@ ad_proc -public content::add_attribute_elements {
 }
 
 
-ad_proc -public content::add_attribute_element { 
+ad_proc -public cms::form::add_attribute_element { 
     form_name content_type attribute { attribute_data "" } {prefix {}} {section {}} {hidden_p 0}
 } {
 
@@ -1413,8 +1373,8 @@ ad_proc -public content::add_attribute_element {
 
     set command [list "template::element" create $form_name "$prefix$attribute"]
 
-    if { [string equal $attribute_data {}] } {
-        set attribute_data [get_attribute_params $content_type $attribute]
+    if { $attribute_data eq "" } {
+        set attribute_data [cms::form::get_attribute_params $content_type $attribute]
     }
 
     array set is_html $attribute_data
@@ -1466,7 +1426,7 @@ ad_proc -public content::add_attribute_element {
         -datatype $param(datatype) -section $section
     
     # changed from widget_is_required to param_is_required (OpenACS - DanW)
-    if { [string equal $param(param_is_required) f] } {
+    if { $param(param_is_required) eq "f" } {
         lappend command -optional
     }
 
@@ -1476,7 +1436,7 @@ ad_proc -public content::add_attribute_element {
 }
 
 
-ad_proc -public content::add_content_element { 
+ad_proc -public cms::form::add_content_element { 
     form_name
     content_method 
     { prefix {}}
@@ -1537,7 +1497,7 @@ ad_proc -public content::add_content_element {
 }
 
 
-ad_proc content::add_child_relation_element { form_name args } {
+ad_proc cms::form::add_child_relation_element { form_name args } {
 
     Add a select box listing all valid child relation tags.
     The form must contain a parent_id element and a content_type element.
@@ -1579,7 +1539,7 @@ ad_proc content::add_child_relation_element { form_name args } {
     }
 
     # Get the parent type. If the parent is not an item, abort
-    set parent_type [db_string get_parent_type ""]
+    set parent_type [content::item::get_content_type -item_id $parent_id]
 
     if { [template::util::is_nil parent_type] } {
         return
@@ -1594,7 +1554,7 @@ ad_proc content::add_child_relation_element { form_name args } {
 
     # Create the section, if specified
     if { ![template::util::is_nil opts(section)] } {
-        set parent_title [db_string get_parent_title ""]
+        set parent_title [content::item::get_title -item_id $parent_id -is_live f]
 
         if { ![template::util::is_nil parent_title] } {
             template::form section $form_name "Relationship to $parent_title"
@@ -1609,7 +1569,7 @@ ad_proc content::add_child_relation_element { form_name args } {
 }
 
 
-ad_proc -private content::get_widget_param_value { 
+ad_proc -private cms::form::get_widget_param_value { 
     array_ref {content_type content_revision}
 } {
 
@@ -1672,7 +1632,7 @@ ad_proc -private content::get_widget_param_value {
 }
 
 
-ad_proc -private content::get_type_attribute_params { args } {
+ad_proc -private cms::form::get_type_attribute_params { args } {
 
     Query for attribute form metadata
 
@@ -1704,7 +1664,7 @@ ad_proc -private content::get_type_attribute_params { args } {
 }
 
 
-ad_proc -private content::get_attribute_params { content_type attribute_name } {
+ad_proc -private cms::form::get_attribute_params { content_type attribute_name } {
 
     Query for parameters associated with a particular attribute
 
@@ -1732,7 +1692,7 @@ ad_proc -private content::get_attribute_params { content_type attribute_name } {
 }
 
 
-ad_proc -private content::set_attribute_values {
+ad_proc -private cms::form::set_attribute_values {
     form_name content_type revision_id attributes 
     {prefix {}}
 } { 
@@ -1749,7 +1709,7 @@ ad_proc -private content::set_attribute_values {
 } {
 
     if { [llength $attributes] == 0 } {
-        set attributes [get_attributes $content_type]
+        set attributes [cms::form::get_attributes $content_type]
     }
 
     # Assemble the list of columns to query, handling dates
@@ -1798,7 +1758,7 @@ ad_proc -private content::set_attribute_values {
 }
 
 
-ad_proc -private content::set_content_value { form_name revision_id } {
+ad_proc -private cms::form::set_content_value { form_name revision_id } {
 
     Set the default value for the content text area in an ATS form object
     based on a previous revision
@@ -1808,14 +1768,14 @@ ad_proc -private content::set_content_value { form_name revision_id } {
     @param revision_id       The revision ID of the content to revise
 
 } {
-
-    set content [template::util::richtext::create [get_content_value $revision_id] {}]
+    
+    set content [template::util::richtext::create [content::get_content_value $revision_id] {}]
 
     template::element set_properties $form_name content -value $content
 }
 
 
-ad_proc -private content::get_default_content_method { content_type } {
+ad_proc -private cms::form::get_default_content_method { content_type } {
 
     Gets the content input method most appropriate for an content type,
     based on the MIME types that are registered for that content type.
@@ -1824,15 +1784,12 @@ ad_proc -private content::get_default_content_method { content_type } {
 
 } {
 
-    set is_text [db_string count_mime_type ""]
-
-    if { $is_text > 0 } {
-        set content_method text_entry
+    if { [cms::type::has_text_mime_types_p -content_type $content_type] } {
+        return text_entry
     } else {
-        set content_method file_upload
+        return file_upload
     }
 
-    return $content_method
 }
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -1840,7 +1797,7 @@ ad_proc -private content::get_default_content_method { content_type } {
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 
-ad_proc -private content::get_type_info { object_type ref args } {
+ad_proc -private cms::form::get_type_info { object_type ref args } {
 
     Return specified columns from the acs_object_types table.
 
@@ -1864,7 +1821,7 @@ ad_proc -private content::get_type_info { object_type ref args } {
 }
 
 
-ad_proc -public content::get_object_id {} {
+ad_proc -public cms::form::new_object_id {} {
 
     Grab an object ID for creating a new ACS object.
 
@@ -1874,7 +1831,7 @@ ad_proc -public content::get_object_id {} {
 }
 
 
-ad_proc -private content::get_attributes { content_type args } {
+ad_proc -private cms::form::get_attributes { content_type args } {
 
     Returns columns from the acs_attributes table for all attributes
     associated with a content type.
@@ -1909,7 +1866,7 @@ ad_proc -private content::get_attributes { content_type args } {
 }
 
 
-ad_proc -public content::get_attribute_enum_values { attribute_id } {
+ad_proc -public cms::form::get_attribute_enum_values { attribute_id } {
 
     Returns a list of { pretty_name enum_value } for an attribute of
     datatype enumeration.
@@ -1924,21 +1881,7 @@ ad_proc -public content::get_attribute_enum_values { attribute_id } {
     return $enum
 }
 
-ad_proc -public content::get_latest_revision { item_id } {
-
-    Get the ID of the latest revision for the specified content item.
-
-    @param item_id  The ID of the content item.
-
-} {
-
-    set latest_revision [db_string glr_get_latest_revision ""]
-
-    return $latest_revision
-}
-
-
-ad_proc -public content::add_basic_revision { item_id revision_id title args } {
+ad_proc -public cms::form::add_basic_revision { item_id revision_id title args } {
 
     Create a basic new revision using the content_revision PL/SQL API.
 
@@ -1979,7 +1922,7 @@ ad_proc -public content::add_basic_revision { item_id revision_id title args } {
 }
 
 
-ad_proc -private content::update_content_from_file { revision_id tmpfile } {
+ad_proc -private cms::form::update_content_from_file { revision_id tmpfile } {
 
     Update the BLOB column of a revision with the contents of a file
 
@@ -2001,26 +1944,14 @@ ad_proc -private content::update_content_from_file { revision_id tmpfile } {
                    where revision_id = :revision_id)}
 
     if {[string equal $storage_type file]} {
-        db_dml upload_file_revision "
-                             update cr_revisions 
-                             set filename = '[cr_create_content_file $item_id $revision_id $tmpfile]',
-                             content_length = [file size $tmpfile]
-                             where revision_id = :revision_id"
+        db_dml upload_file_revision {}
     } elseif {[string equal $storage_type text]} {
         # upload the file into the revision content
-        db_dml upload_text_revision "update cr_revisions 
-             set content = empty_blob(),
-             content_length = [file size $tmpfile] where 
-             revision_id = :revision_id
-             returning content into :1" -blob_files [list $tmpfile]
+        db_dml upload_text_revision {} -blob_files [list $tmpfile]
 
     } else {
         # upload the file into the revision content
-        db_dml upload_revision "update cr_revisions 
-             set content = empty_blob(),
-             content_length = [file size $tmpfile]
-             where revision_id = :revision_id
-             returning content into :1" -blob_files [list $tmpfile]
+        db_dml upload_revision {} -blob_files [list $tmpfile]
     }
 
     # delete the tempfile
@@ -2029,7 +1960,7 @@ ad_proc -private content::update_content_from_file { revision_id tmpfile } {
 
 
 
-ad_proc -public content::copy_content { revision_id_src revision_id_dest } {
+ad_proc -public cms::form::copy_content { revision_id_src revision_id_dest } {
 
     Update the BLOB column of one revision with the content of another revision
 
@@ -2039,19 +1970,13 @@ ad_proc -public content::copy_content { revision_id_src revision_id_dest } {
     @param revision_id_dest  The object ID of the revision to be updated.
     copied.
 
+    @see only used by attributes-edit in the items module
 } {
 
     db_transaction {
 
         # copy the content from the source to the target
-        db_exec_plsql cc_copy_content {
-            begin
-            content_revision.content_copy (
-                                           revision_id      => :revision_id_src,
-                                           revision_id_dest => :revision_id_dest
-                                           );
-            end;
-        }
+        db_exec_plsql cc_copy_content {}
         
         # fetch the mime_type of the source revision
         set mime_type [db_string cc_get_mime_type ""]
@@ -2063,7 +1988,7 @@ ad_proc -public content::copy_content { revision_id_src revision_id_dest } {
 }
 
 
-ad_proc -public content::add_content { form_name revision_id } {
+ad_proc -public cms::form::add_content { form_name revision_id } {
 
     Update the BLOB column of a revision with content submitted in a form
 
@@ -2087,7 +2012,7 @@ ad_proc -public content::add_content { form_name revision_id } {
     } 
 }
 
-ad_proc -public content::validate_name { form_name } {
+ad_proc -public cms::form::validate_name { form_name } {
 
     Make sure that name is unique for the folder
 

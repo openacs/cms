@@ -5,19 +5,19 @@ ad_page_contract {
 } {
     { item_id:naturalnum }
     { mount_point:optional "sitemap" }
-    { item_props_tab:optional "publishing" }
+    { tab:optional "templates" }
     { template_id:naturalnum,optional }
     { context:optional }
 }
 
 # get templates from the clipboard
-set clip [clipboard::parse_cookie]
-set templates [clipboard::get_items $clip templates]
+set clip [cms::clipboard::parse_cookie]
+set templates [cms::clipboard::get_items $clip templates]
 
 # if no templates are clipped, send user a message and abort
 if { [llength $templates] < 1 } {
     util_user_message -message "There are no templates on the clipboard"
-    ad_returnredirect [export_vars -base index {item_id item_props_tab mount_point}]
+    ad_returnredirect [export_vars -base index {item_id tab mount_point}]
 } 
 
 ad_form -name select_template -form {
@@ -66,6 +66,6 @@ ad_form -extend -name select_template -form {
 	util_user_message -message "There is already a template registered for $context context"
     }
 
-    ad_returnredirect [export_vars -base index { item_id mount_point item_props_tab }]
+    ad_returnredirect [export_vars -base index { item_id mount_point tab }]
 
 }

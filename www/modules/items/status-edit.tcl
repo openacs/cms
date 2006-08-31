@@ -7,7 +7,7 @@ ad_page_contract {
     { item_id:integer }
     { parent_id:integer,optional }
     { mount_point "sitemap" }
-    { item_props_tab ""}
+    { tab:optional "publishing"}
 }
 
 ## Create the form
@@ -105,7 +105,7 @@ if { [form is_valid publish_status] } {
 
   db_transaction {
       ns_log notice "setting publish status to $publish_status for item $item_id"
-      publish::set_publish_status $item_id $publish_status
+      cms::publish::set_publish_status $item_id $publish_status
 
       set start_when [template::util::date get_property sql_date $start_when]
       set end_when [template::util::date get_property sql_date $end_when]
@@ -113,8 +113,7 @@ if { [form is_valid publish_status] } {
       db_exec_plsql set_release_period {}
   }
  
-  set item_props_tab publishing
-  ad_returnredirect [export_vars -base index { item_id item_props_tab }]
+  ad_returnredirect [export_vars -base index { item_id tab }]
 }
 
 # If the item is in a production state, we may simply be marking

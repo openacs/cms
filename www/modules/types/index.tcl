@@ -28,14 +28,8 @@ set can_edit_widgets_p [permission::permission_p -party_id $user_id \
     -object_id $module_id -privilege write]
 
 # get the content type pretty name
-set object_type_pretty [db_string get_object_type ""]
+set object_type_pretty  [cms::type::pretty_name -content_type $content_type]
 set page_title "Content Type - $object_type_pretty"
-
-if { [string equal $object_type_pretty ""] } {
-    # error - invalid content_type
-    template::forward index
-}
-
 
 # get all the content types that this content type inherits from
 db_multirow content_type_tree get_content_type ""

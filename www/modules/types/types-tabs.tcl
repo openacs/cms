@@ -5,3 +5,4 @@ request set_param mount_point -datatype keyword -value types
 request set_param type_props_tab -datatype keyword -optional -value attributes
 
 set package_url [ad_conn package_url]
+set has_subtypes_p [cms::type::has_subtypes_p -content_type $content_type]

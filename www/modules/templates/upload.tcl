@@ -5,14 +5,16 @@ ad_page_contract {
 } {
     { template_id:integer }
     { mount_point "templates"}
-    { template_props_tab:optional "revision"}
+    { tab:optional "revision"}
+    { return_url }
 }
 
 if { ! [request is_valid] } { return }
 
-set path [db_string get_path ""]
+set template_root [cm::modules::templates::getRootFolderID [ad_conn subsite_id]]
+set path [content::template::get_path -template_id $template_id -root_folder_id $template_root]
 
-form create edit_template -html { enctype multipart/form-data }
+form create edit_template -html { enctype multipart/form-data } -cancel_url $return_url
 
 element create edit_template return_url -datatype url -widget hidden
 
@@ -27,15 +29,11 @@ element create edit_template content -widget file -label Local File \
 if { [form is_request edit_template] } {
   
   element set_properties edit_template revision_id \
-      -value [content::get_object_id]
+      -value [cms::form::new_object_id]
 
-  set return_url [ns_set iget [ns_conn headers] Referer]
   element set_properties edit_template return_url -value $return_url
 
-} else {
-
-  set return_url [element get_value edit_template return_url]
-}
+} 
 
 if { [string equal [ns_queryget action] "Cancel"] } {
   template::forward $return_url
@@ -45,9 +43,9 @@ if { [form is_valid edit_template] } {
 
   form get_values edit_template template_id revision_id
 
-  set tmpfile [content::prepare_content_file edit_template]
+  set tmpfile [cms::form::prepare_content_file edit_template]
 
-  content::add_basic_revision $template_id $revision_id "Template" \
+  cms::form::add_basic_revision $template_id $revision_id "Template" \
       -tmpfile $tmpfile
 
   template::forward $return_url

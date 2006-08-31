@@ -25,7 +25,7 @@
 	</querytext>
 </fullquery>
 
-<partialquery name="content::query_form_metadata.attributes_query_extra_where">
+<partialquery name="cms::form::query_form_metadata.attributes_query_extra_where">
 	<querytext>
 
 	 and $extra_where
@@ -43,7 +43,7 @@
 	</querytext>
 </fullquery>
 
-<partialquery name="content::insert_element_data.ied_get_objects_tree_extra_where">
+<partialquery name="cms::form::insert_element_data.ied_get_objects_tree_extra_where">
 	<querytext>
 
 	 and $extra_where
@@ -51,7 +51,7 @@
 	</querytext>
 </partialquery>
 
-<partialquery name="content::insert_element_data.ied_get_objects_tree_order_by">
+<partialquery name="cms::form::insert_element_data.ied_get_objects_tree_order_by">
 	<querytext>
 
           order by 
@@ -60,7 +60,7 @@
 	</querytext>
 </partialquery>
 
-<fullquery name="content::process_insert_statement.process_insert_statement">
+<fullquery name="cms::form::process_insert_statement.process_insert_statement">
 	<querytext>
               insert into $__last_table (
                 [join $__columns ", "]
@@ -70,7 +70,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="content::add_revision.addrev_get_content_type">
+<fullquery name="cms::form::add_revision.addrev_get_content_type">
 	<querytext>
     select object_type as content_type, table_name
     from acs_object_types
@@ -89,7 +89,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="content::add_content_element.get_text_mime_types">
+<fullquery name="cms::form::add_content_element.get_text_mime_types">
 	<querytext>
 
 	    select
@@ -108,16 +108,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="content::add_child_relation_element.get_parent_type">
-	<querytext>
-
-    select content_type from cr_items 
-    where item_id = :parent_id
-
-	</querytext>
-</fullquery>
-
-<fullquery name="content::get_widget_param_value.set_content_values">
+<fullquery name="cms::form::get_widget_param_value.set_content_values">
 	<querytext>
 
 	$param(value)
@@ -138,7 +129,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="content::get_attribute_params.gap_get_attribute_data">
+<fullquery name="cms::form::get_attribute_params.gap_get_attribute_data">
 	<querytext>
 
     select
@@ -153,7 +144,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="content::set_attribute_values.get_previous_version_values">
+<fullquery name="cms::form::set_attribute_values.get_previous_version_values">
 	<querytext>
 
     select 
@@ -166,16 +157,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="content::get_default_content_method.count_mime_type">
-	<querytext>
-
-	select count(*) from cr_content_mime_type_map
-	where content_type = :content_type and mime_type like 'text/%'
-
-	</querytext>
-</fullquery>
-
-<fullquery name="content::get_type_info.get_type_info_1">
+<fullquery name="cms::form::get_type_info.get_type_info_1">
 	<querytext>
 
       select 
@@ -220,7 +202,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="content::validate_name.vn_same_name_count1">
+<fullquery name="cms::form::validate_name.vn_same_name_count1">
 	<querytext>
 
 	  select count(1)
@@ -230,7 +212,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="content::validate_name.vn_same_name_count2">
+<fullquery name="cms::form::validate_name.vn_same_name_count2">
 	<querytext>
 
 	  select count(1)

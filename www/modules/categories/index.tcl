@@ -59,7 +59,7 @@ if { [string equal $info(is_leaf) t] } {
 }
 
 set page_title "$info(heading) $what"
-set clip [clipboard::parse_cookie]
+set clip [cms::clipboard::parse_cookie]
 
 template::list::create \
     -name items \
@@ -95,5 +95,5 @@ db_multirow -extend { copy keyword_url type } items get_items {} {
     }
     set id $keyword_id
     set keyword_url [export_vars -base index?mount_point=categories { id parent_id }]
-    set copy [clipboard::ui::render_bookmark categories $keyword_id [ad_conn package_url]]
+    set copy [cms::clipboard::ui::render_bookmark categories $keyword_id [ad_conn package_url]]
 }

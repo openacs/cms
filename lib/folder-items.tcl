@@ -62,10 +62,10 @@ db_multirow -extend { item_url copy file_size } folder_contents get_folder_conte
     }
 
     if { ![ template::util::is_nil content_length ] } {
-	set file_size [lc_numeric [expr $content_length / 1000.00] "%.2f"]
+	set file_size "[lc_numeric [expr $content_length / 1000.00] "%.2f"] Kb"
     } else {
 	set file_size "-"
     }
 
-    set copy [clipboard::ui::render_bookmark $mount_point $item_id [ad_conn package_url]]
+    set copy [cms::clipboard::ui::render_bookmark $mount_point $item_id [ad_conn package_url]]
 }

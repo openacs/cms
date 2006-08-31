@@ -6,6 +6,7 @@ request create -params {
   mount_point -datatype keyword -value sitemap -optional
   rel_list    -datatype text
   page_title  -datatype text -optional -value "Relate Items"
+  tab  -datatype text -optional -value related
 }
 
 # rel_list is a list of lists in form of
@@ -57,7 +58,7 @@ foreach rel $rel_list {
   # Get all elements, if any
   # FIXME: 
   set content_type $relation_type
-  content::query_form_metadata params multirow {
+  cms::form::query_form_metadata params multirow {
     object_type <> 'cr_item_rel'
   }  
 
@@ -84,7 +85,7 @@ foreach rel $rel_list {
       template::util::array_to_vars el_row
       lappend rel_row(elements) $attribute_name
 
-      set j [content::assemble_form_element params $attribute_name $j]
+      set j [cms::form::assemble_form_element params $attribute_name $j]
       ns_log notice "$j : $attribute_name, $code_params"
       eval "template::element create rel_form_2 ${attribute_name}_$index $code_params"
 
@@ -103,7 +104,7 @@ if { [form is_valid rel_form_2] || $form_complete } {
   
   # sort order_n for all related items for consistency
   form get_values rel_form_2 item_id
-  cms_rel::sort_related_item_order $item_id  
+  cms::rel::sort_related_item_order $item_id  
 
 
   db_transaction { 
@@ -122,28 +123,21 @@ if { [form is_valid rel_form_2] || $form_complete } {
           }
 
           # Perform the insertion
-          set rel_id [db_exec_plsql relate "begin 
-      :1 := content_item.relate (
-          item_id       => :item_id,
-          object_id     => :related_id,
-          relation_tag  => :relation_tag,
-          order_n       => :order_n,
-          relation_type => :relation_type
-      );
-    end;"]
+          set rel_id [db_exec_plsql relate {}]
 
           # Insert any extra attributes
           if { [llength $elements] > 0 } {
               set attr_list [template::util::tcl_to_sql_list $elements]
               ns_log notice "$i : $attr_list"
-              content::insert_element_data rel_form_2 $relation_type \
+              cms::form::insert_element_data rel_form_2 $relation_type \
                   [list acs_object cr_item_rel] $rel_id "_$i" \
                   " attribute_name in ($attr_list)"
           }
       }
   }
 
-  template::forward "index?item_id=$item_id&mount_point=$mount_point&item_props_tab=related"
+  ad_returnredirect [export_vars -index { item_id mount_point tab }]
+  ad_script_abort
 }
      
     

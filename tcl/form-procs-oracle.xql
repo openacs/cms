@@ -2,7 +2,7 @@
 <queryset>
 <rdbms><type>oracle</type><version>8.1.6</version></rdbms>
 
-<partialquery name="content::query_form_metadata.attributes_query_1">      
+<partialquery name="cms::form::query_form_metadata.attributes_query_1">      
 	<querytext>
 		
     select
@@ -237,14 +237,6 @@
       content_item.is_subclass(:content_type, c.child_type) = 't'
     and
       content_item.is_valid_child(:parent_id, c.child_type, relation_tag) = 't'
-
-	</querytext>
-</fullquery>
-
-<fullquery name="content::add_child_relation_element.get_parent_title">
-	<querytext>
-
-      select content_item.get_title(:parent_id) from dual
 
 	</querytext>
 </fullquery>

@@ -26,7 +26,7 @@ if { [form is_request widget_preview] } {
     set outstanding_params [llength $outstanding_params_list]
 
     db_1row get_name ""
-    content::add_attribute_element widget_preview $object_type $attribute_name
+    cms::form::add_attribute_element widget_preview $object_type $attribute_name
 }
 
 if { [form is_valid widget_preview] } {

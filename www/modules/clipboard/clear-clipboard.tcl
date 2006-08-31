@@ -6,5 +6,5 @@ ad_page_contract {
     {float_p "0"}
 }
 
-#clipboard::clear_cookie
-#ns_returnredirect "index"
+ad_set_cookie content_marks
+ad_returnredirect "index"

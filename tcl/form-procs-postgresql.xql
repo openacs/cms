@@ -2,7 +2,7 @@
 <queryset>
 <rdbms><type>postgresql</type><version>7.1</version></rdbms>
 
-<partialquery name="content::query_form_metadata.attributes_query_1">      
+<partialquery name="cms::form::query_form_metadata.attributes_query_1">      
 	<querytext>
 		
     select
@@ -160,7 +160,7 @@
 	</querytext>
 </partialquery>
 
-<fullquery name="content::new_item.get_item_id">      
+<fullquery name="cms::form::new_item.get_item_id">      
       <querytext>
 
         select content_item__new(varchar :name,
@@ -183,7 +183,7 @@
       </querytext>
 </fullquery>
 
-<fullquery name="content::upload_content.upload_file_revision">      
+<fullquery name="cms::form::upload_content.upload_file_revision">      
       <querytext>
 
 
@@ -194,7 +194,7 @@
       </querytext>
 </fullquery>
 
-<fullquery name="content::upload_content.upload_text_revision">      
+<fullquery name="cms::form::upload_content.upload_text_revision">      
       <querytext>
 
         update 
@@ -209,7 +209,7 @@
 </fullquery>
 
 
-<fullquery name="content::upload_content.upload_revision">      
+<fullquery name="cms::form::upload_content.upload_revision">      
       <querytext>
 
              update cr_revisions 
@@ -221,7 +221,7 @@
 </fullquery>
 
 
-<fullquery name="content::update_content_from_file.upload_file_revision">      
+<fullquery name="cms::form::update_content_from_file.upload_file_revision">      
       <querytext>
 
 
@@ -233,7 +233,7 @@
       </querytext>
 </fullquery>
 
-<fullquery name="content::update_content_from_file.upload_text_revision">      
+<fullquery name="cms::form::update_content_from_file.upload_text_revision">      
       <querytext>
 
         update 
@@ -248,7 +248,7 @@
 </fullquery>
 
 
-<fullquery name="content::update_content_from_file.upload_revision">      
+<fullquery name="cms::form::update_content_from_file.upload_revision">      
       <querytext>
 
              update cr_revisions 
@@ -270,7 +270,7 @@
 	</querytext>
 </partialquery>
 
-<fullquery name="content::add_child_relation_element.get_all_valid_relation_tags">
+<fullquery name="cms::form::add_child_relation_element.get_all_valid_relation_tags">
 	<querytext>
 
     select 
@@ -287,15 +287,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="content::add_child_relation_element.get_parent_title">
-	<querytext>
-
-      select content_item__get_title(:parent_id, 'f')
-
-	</querytext>
-</fullquery>
-
-<partialquery name="content::set_attribute_values.timestamp_to_string">
+<partialquery name="cms::form::set_attribute_values.timestamp_to_string">
 	<querytext>
 
 	to_char($attr, 'YYYY MM DD HH24 MI SS') as $attr
@@ -304,7 +296,7 @@
 </partialquery>
 
 
-<fullquery name="content::get_attributes.ga_get_attributes">
+<fullquery name="cms::form::get_attributes.ga_get_attributes">
 	<querytext>
 
     select
@@ -345,14 +337,6 @@
 	     attribute_id = :attribute_id
 	   order by
 	     sort_order
-
-	</querytext>
-</fullquery>
-
-<fullquery name="content::get_latest_revision.glr_get_latest_revision">
-	<querytext>
-
-    select content_item__get_latest_revision(:item_id)
 
 	</querytext>
 </fullquery>

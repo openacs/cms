@@ -13,6 +13,28 @@
    </div>
  </else>
 
+ <if @type_props_tab@ eq mime_types>
+   <div class="tab" id="subnavbar-here">
+     Mime Types
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/types/index?content_type=@content_type@&mount_point=types&parent_type=@parent_type@&type_props_tab=mime_types" title="" class="subnavbar-unselected">Mime Types</a>
+   </div>
+ </else>
+
+ <if @type_props_tab@ eq content_method>
+   <div class="tab" id="subnavbar-here">
+     Content Methods
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/types/index?content_type=@content_type@&mount_point=types&parent_type=@parent_type@&type_props_tab=content_method" title="" class="subnavbar-unselected">Content Methods</a>
+   </div>
+ </else>
+
  <if @type_props_tab@ eq relations>
    <div class="tab" id="subnavbar-here">
      Relations
@@ -52,9 +74,11 @@
    </div>
  </if>
  <else>
+  <if @has_subtypes_p@>
    <div class="tab">
      <a href="@package_url@modules/types/index?content_type=@content_type@&mount_point=types&parent_type=@parent_type@&type_props_tab=subtypes" title="" class="subnavbar-unselected">Subtypes</a>
    </div>
+  </if>
  </else>
 
   </div>

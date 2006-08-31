@@ -43,7 +43,7 @@ foreach wparam $widget_params {
     set param_source  [lindex $wparam 5]
 
     form section widget_register "Param - $param"
-    widget::param_element_create widget_register $param $i $param_id \
+    cms::widget::param_element_create widget_register $param $i $param_id \
 	    $default_value $is_required $param_source
     incr i
 }
@@ -64,7 +64,7 @@ if { [form is_valid widget_register] } {
     db_transaction {
 
         for { set i 0 } { $i < $param_count } { incr i } {
-            widget::process_param  \
+            cms::widget::process_param  \
 		widget_register $i $content_type $attribute_name
         }
     }

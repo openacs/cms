@@ -33,7 +33,7 @@ if { [template::util::is_nil name] } {
 
 # get the list of associated content methods
 set content_methods \
-	[content_method::get_content_methods $content_type -get_labels]
+	[cms::type::get_content_methods $content_type -get_labels]
 set first_method [lindex [lindex $content_methods 0] 1]
 
 # if only one valid content method exists, redirect to revision-add-2

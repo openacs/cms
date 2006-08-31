@@ -1,9 +1,11 @@
-# @namespace cms_rel
-# Procedures for managing relation items and child items
+ad_library {
+    Procedures for managing related/child items
+}
 
-namespace eval cms_rel {}
+# @namespace cms::rel
+namespace eval cms::rel {}
 
-ad_proc -public cms_rel::sort_related_item_order { item_id } {
+ad_proc -public cms::rel::sort_related_item_order { item_id } {
 
  @public sort_related_item_order
 
@@ -35,7 +37,7 @@ ad_proc -public cms_rel::sort_related_item_order { item_id } {
 }
 
 
-ad_proc -public cms_rel::sort_child_item_order { item_id } {
+ad_proc -public cms::rel::sort_child_item_order { item_id } {
 
  @public sort_child_item_order
 

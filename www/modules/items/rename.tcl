@@ -1,24 +1,48 @@
-# /items/rename.tcl
-# Change name of a content item
+ad_page_contract {
+    Change name of a content item
 
-request create
-request set_param item_id -datatype integer
-request set_param mount_point -datatype text -value sitemap
-request set_param item_props_tab -datatype text
+    @author Michael Steigman
+    @creation-date April 2006
+} {
+    { item_id:integer }
+    { mount_point:optional "sitemap" }
+    { return_url }
+    { tab:optional }
+}
 
 permission::require_permission -party_id [auth::require_login] \
     -object_id $item_id -privilege read
 
-set item_name [db_string get_item_name ""]
+set content_type [content::item::get_content_type -item_id $item_id]
+if { $content_type eq "content_template" } {
+    cms::template::get -template_id $item_id -array_name content_item
+} elseif { $content_type eq "image" } {
+    cms::image::get -image_id $item_id
+} else {
+    content::item::get -item_id $item_id
+}
+set name $content_item(name)
+    
+set page_title "Rename $name"
 
-set page_title "Rename $item_name"
-
-form create rename_item 
+form create rename_item -cancel_url $return_url
 
 element create rename_item mount_point \
     -datatype text \
     -widget hidden \
     -value $mount_point \
+    -optional
+
+element create rename_item content_type \
+    -datatype text \
+    -widget hidden \
+    -value $content_type \
+    -optional
+
+element create rename_item return_url \
+    -datatype text \
+    -widget hidden \
+    -value $return_url \
     -optional
 
 element create rename_item item_id \
@@ -27,35 +51,28 @@ element create rename_item item_id \
     -param
 
 element create rename_item name \
-    -label "Rename $item_name to" \
+    -label "Rename $name to" \
     -datatype keyword \
     -widget text \
     -html { size 20 } \
     -validate { { expr ![string match $value "/"] } \
 		    { Item name cannot contain slashes }} \
-    -value $item_name \
-    -help_text "Short name using no special characters"
+    -value $name \
+    -help_text "Short name using no special characters and without file extension"
 
 # Rename
 if { [form is_valid rename_item] } {
 
   form get_values rename_item \
-	  mount_point item_id name
+	  mount_point item_id name content_type
 
-  db_transaction {
-      db_exec_plsql rename_item "
-    begin 
-    content_item.edit_name (
-        item_id => :item_id, 
-        name    => :name 
-    ); 
-    end;"
+  # handle file system stuff for templates
+  if { $content_type eq "content_template" } {
+      cms::template::rename -template_id $template_id -name $name
+  }  
+  content::item::rename -item_id $item_id -name $name
 
-      set parent_id [db_string get_parent_id ""]
-  }
-
-  # flush cache
-  cms_folder::flush $mount_point $parent_id
-
-  template::forward "index?item_id=$item_id"
+  set base_url [ad_decode $content_type content_template "../templates/properties" "../items/index"]
+  ad_returnredirect [export_vars -base $base_url {item_id tab}]
+  ad_script_abort
 }

@@ -27,7 +27,7 @@ if { [template::util::is_nil name] } {
 
 # get associated content methods
 set content_methods \
-	[content_method::get_content_methods $content_type -get_labels]
+	[cms::type::get_content_methods $content_type -get_labels]
 
 # filter out xml_import and no_content
 set filtered_content_methods [list]

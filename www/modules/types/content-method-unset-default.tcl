@@ -9,21 +9,14 @@ request set_param return_url     -datatype text -value ""
 
 # default return_url
 if { [template::util::is_nil return_url] } {
-    set return_url "index?content_type=$content_type"
+    set return_url [export_vars -base index content_type]
 }
 
 
 db_transaction {
-    db_exec_plsql unset_content_method_default "
-  begin
-    content_method.unset_default_method (
-      content_type   => :content_type
-    );
-  end;
-"
+    db_exec_plsql unset_content_method_default {}
 }
 
-content_method::flush_content_methods_cache $content_type
+cms::type::flush_content_methods_cache $content_type
 
-
-template::forward $return_url
+ad_returnredirect $return_url

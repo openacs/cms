@@ -41,37 +41,49 @@ if { [template::util::is_nil page_title] } {
 
 
 # Create a form for the basic item, no revision info
-form create create_item -html { enctype "multipart/form-data" }
+form create create_item -html { enctype "multipart/form-data" } -cancel_url $return_url
 
 element create create_item item_path \
-	 -datatype text \
-  	 -widget inform \
-	 -label "Folder" \
-	 -value $item_path
+    -datatype text \
+    -widget inform \
+    -label "Folder" \
+    -value $item_path
 
 element create create_item content_type_name \
-	-datatype text \
-	-widget inform \
-	-label "Content Type" \
-	-value $content_type_name 
+    -datatype text \
+    -widget inform \
+    -label "Content Type" \
+    -value $content_type_name 
 
 element create create_item return_url \
-        -datatype text \
-	-widget hidden \
-        -optional \
-	-value $return_url
+    -datatype text \
+    -widget hidden \
+    -optional \
+    -value $return_url
 
 element create create_item relation_tag \
-        -datatype text \
-	-widget hidden \
-        -optional \
-	-param
+    -datatype text \
+    -widget hidden \
+    -optional \
+    -param
+
+element create create_item creation_ip \
+    -datatype text \
+    -widget hidden \
+    -optional \
+    -value [ad_conn peeraddr]
+
+element create create_item creation_user \
+    -datatype text \
+    -widget hidden \
+    -optional \
+    -value [ad_conn user_id]
 
 # auto-generated form
-content::new_item_form -form_name create_item \
-	-parent_id $parent_id \
-	-content_type $content_type \
-	-content_method $content_method
+cms::form::new_item_form -form_name create_item \
+    -parent_id $parent_id \
+    -content_type $content_type \
+    -content_method $content_method
 
 # added to support content storage selection (OpenACS - DanW)
 element create create_item storage_type \
@@ -91,7 +103,7 @@ if { [wizard exists] } {
 if { [form is_valid create_item] } {
 
     # check for duplicate name within same folder or parent item.
-    if { ![content::validate_name create_item] } {
+    if { ![cms::form::validate_name create_item] } {
 	set name [template::element get_value create_item name]
 	template::element::set_error create_item name \
 		"The name \"$name\" is already in use by an existing item<br> 
@@ -100,13 +112,12 @@ if { [form is_valid create_item] } {
     }
 
     form get_values create_item return_url item_id storage_type
-    ns_log notice "----------------- creating item $item_id $storage_type"
-    set item_id [content::new_item create_item $storage_type]
+    ns_log debug "create-2.tcl: creating item $item_id $storage_type"
+    set item_id [cms::form::new_item create_item $storage_type]
 
     # do wizard forward or forward to return_url
     if { ![wizard exists] } { 
-	template::forward \
-		[content::assemble_url $return_url "item_id=$item_id"]
+	ad_returnredirect [export_vars -base $return_url item_id]
     } else {
 	template::wizard forward
     }

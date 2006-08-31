@@ -1,7 +1,7 @@
 <nobr>
 <p>
-<include src="../../bookmark" mount_point="@mount_point@" id="@item_id@">
-@page_title;noquote@ (<a href="@path@" target="_new">preview</a>)
+<include src="/packages/cms/lib/clip" mount_point="@mount_point@" id="@item_id@">@page_title;noquote@
+<span style="font-size: 70%;">[<a href="@path@" target="_new">preview</a>]</span>
 </p>
 </nobr>
 <p/>
@@ -12,6 +12,6 @@
 
 <p/>
 
-<include src="../sitemap/ancestors" item_id=@item_id@>
+<include src="/packages/cms/lib/ancestors" item_id=@item_id@>
 
 <p/>

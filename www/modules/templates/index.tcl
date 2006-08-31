@@ -14,47 +14,31 @@ ad_page_contract {
 }
 
 set package_url [ad_conn package_url]
-set clipboardfloats_p [clipboard::floats_p]
 
-if { ! [string equal $path {}] } {
-
-    set item_id [db_string get_id ""]
-
-    if { [string equal $folder_id {}] } {
-
-        set msg "The requested folder <tt>$path</tt> does not exist."
-        request error invalid_path $msg
+# the ability to pass in a path is not currently utilized by any CMS pages
+if { $path ne "" } {
+    set folder_id [content::item::get_id -item_path $path]
+    if { $folder_id eq "" } {
+	ad_return_complaint 1 "The requested folder \"$path\" does not exist."
     }
 } else {
-
-  if { [string equal $folder_id {}] } {
+  if { $folder_id eq "" } {
       set folder_id [cm::modules::templates::getRootFolderID [ad_conn subsite_id]]  
   }
-
-  set path [db_string get_path ""]
 }
 
-# query for the content type and redirect if a folder
-set type [db_string get_type ""]
+permission::require_permission -party_id [auth::require_login] \
+    -object_id $folder_id -privilege read
 
-if { [string equal $type content_template] } {
-  template::forward properties?item_id=$item_id
-}
+cms::folder::get -folder_id $folder_id
+set return_url [ad_return_url]
 
-db_1row get_info "" -column_array info
-
-set page_title "Template Folder - $info(label)"
-
-#set folder_id $item_id
-#set parent_id $item_id
-
-set actions "Attributes [export_vars -base ../sitemap/attributes?mount_point=templates {folder_id}] \"Folder Attributes\"
-\"Delete Folder\" [export_vars -base ../sitemap/delete?mount_point=templates {folder_id parent_id}] \"Delete this folder\"
-\"Rename Folder\" [export_vars -base ../sitemap/rename?mount_point=templates {folder_id}] \"Rename this folder\"
-\"New Template\" [export_vars -base new-template?mount_point=templates {folder_id}] \"Create a new template within this folder\"
-\"New Folder\" [export_vars -base new-folder?mount_point=templates {parent_id}] \"Create a new folder within this folder\"
-\"Move Items\" [export_vars -base move?mount_point=templates {folder_id}] \"Move folder\"
-\"Copy Items\" [export_vars -base copy?mount_point=templates {folder_id}] \"Copy folder\"
-\"Delete Items\" [export_vars -base delete?mount_point=templates {folder_id}] \"Delete folder\"
+set actions "\"Folder Attributes\" [export_vars -base ../sitemap/folder-attributes?mount_point=templates {folder_id return_url}] \"Folder Attributes\"
+\"Delete Folder\" [export_vars -base ../sitemap/folder-delete {mount_point folder_id parent_id return_url}] \"Delete this folder\"
+\"Edit Folder Info\" [export_vars -base ../sitemap/folder-ae {mount_point folder_id return_url}] \"Rename this folder\"
+\"New Template\" [export_vars -base template-ae {mount_point folder_id return_url}] \"Create a new template within this folder\"
+\"New Folder\" [export_vars -base ../sitemap/folder-ae?parent_id=$folder_id {mount_point return_url}] \"Create a new folder within this folder\"
+\"Move Items\" [export_vars -base ../sitemap/manage-items?action=move {mount_point folder_id return_url}] \"Move marked items to this folder\"
+\"Copy Items\" [export_vars -base ../sitemap/manage-items?action=copy {mount_point folder_id return_url}] \"Copy marked items to this folder\"
+\"Delete Items\" [export_vars -base ../sitemap/manage-items?action=delete {mount_point folder_id return_url}] \"Delete marked items to this folder\"
 "
-

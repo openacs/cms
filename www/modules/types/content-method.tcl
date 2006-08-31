@@ -1,6 +1,6 @@
 request create
 request set_param content_type -datatype keyword -value content_revision
-request set_param return_url -datatype text -value ""
+request set_param type_props_tab -datatype text -value content_method
 
 # permissions check - user must have read on the types module
 permission::require_permission -party_id [auth::require_login] \
@@ -69,7 +69,7 @@ set unregistered_method_count [llength $unregistered_content_methods]
 
 
 # form to register unregistered content methods to this content type
-form create register
+form create register -action content-method
 
 element create register content_type \
 	-datatype keyword \
@@ -99,18 +99,11 @@ if { [form is_valid register] } {
     
     db_transaction {
 
-        db_exec_plsql add_method "
-      begin
-      content_method.add_method (
-          content_type   => :content_type,
-          content_method => :content_method,
-          is_default     => 'f'
-      );
-      end;
-    "
+        db_exec_plsql add_method {}
+
     }
 
-    content_method::flush_content_methods_cache $content_type
+    cms::type::flush_content_methods_cache $content_type
 
-    template::forward $return_url
+    ad_returnredirect [export_vars -base index { mount_point type_props_tab content_type }]
 }

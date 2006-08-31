@@ -6,11 +6,11 @@ ad_page_contract {
     { item_id:naturalnum }
     { revision_id:naturalnum }
     { mount_point "sitemap" }
-    { item_props_tab:optional "publishing" }
+    { tab:optional "revisions" }
 }
 
 content::item::set_live_revision -revision_id $revision_id
-ad_returnredirect [export_vars -base index {item_id item_props_tab mount_point}]
+ad_returnredirect [export_vars -base index {item_id tab mount_point}]
 
 # set root_path [ns_info pageroot]
 
@@ -20,7 +20,7 @@ ad_returnredirect [export_vars -base index {item_id item_props_tab mount_point}]
 
 #     if { [string equal $publish_p t] } {
 
-#         # publish::publish_revision $revision_id
+#         # cms::publish::publish_revision $revision_id
 
 #         db_exec_plsql set_live_revision {}
 #         publish::unpublish_item $item_id

@@ -1,19 +1,18 @@
-###############################################################
-#
-# @namespace publish
-# 
-# @author Stanislav Freidin
-#
-# The procs in this namespace are useful for publishing items,
-# including items inside other items, and writing items to the
-# filesystem. <p>
-# Specifically, the <tt>content</tt>, <tt>child</tt> and
-# <tt>relation</tt> tags are defined here.
-#
-# @see namespace item item.html
+ad_library {
 
-namespace eval publish {
+ The procs in this namespace are useful for publishing items,
+ including items inside other items, and writing items to the
+ filesystem. <p>
+ Specifically, the <tt>content</tt>, <tt>child</tt> and
+ <tt>relation</tt> tags are defined here.
 
+ @namespace publish
+ @author Stanislav Freidin
+ @see namespace item item.html
+
+}
+
+namespace eval cms::publish {
   variable item_id_stack  
   variable revision_html
 }  
@@ -93,32 +92,32 @@ namespace eval publish {
 
 
 
-ad_proc -public publish::get_template_root {} {
+# ad_proc -public publish::get_template_root {} {
 
-  @public get_template_root
+#   @public get_template_root
  
-  Get the template root. All templates are assumed to exist
-  in the filesystem with their URLs relative to this root.
-  The page root is controlled by the TemplateRoot parameter in CMS.
-  The default is /web/yourserver/templates
+#   Get the template root. All templates are assumed to exist
+#   in the filesystem with their URLs relative to this root.
+#   The page root is controlled by the TemplateRoot parameter in CMS.
+#   The default is /web/yourserver/templates
  
-  @return The template root
+#   @return The template root
  
-  @see content::get_template_root
-  @see publish::get_page_root
+#   @see content::get_template_root
+#   @see publish::get_page_root
 
-} {
-  return [content::get_template_root]
-}
+# } {
+#   return [content::get_template_root]
+# }
 
 
-ad_proc -public content::get_template_path {} {
+# ad_proc -public content::get_template_path {} {
 
-  Legacy compatibility
+#   Legacy compatibility
 
-} {
-  return [publish::get_template_root]
-}
+# } {
+#   return [publish::get_template_root]
+# }
 
 
 # ad_proc -public publish::mkdirs { path } {
@@ -141,7 +140,10 @@ ad_proc -public content::get_template_path {} {
 
 
 
-ad_proc -private publish::delete_multiple_files { url {root_path ""}} {
+ad_proc -private cms::publish::delete_multiple_files { 
+    url 
+    {root_path ""}
+} {
 
   @private delete_multiple_files
  
@@ -149,19 +151,22 @@ ad_proc -private publish::delete_multiple_files { url {root_path ""}} {
   
   @param url          Relative URL of the file to write
  
-  @see publish::get_publish_roots
-  @see publish::write_multiple_files
-  @see publish::write_multiple_blobs
+  @see cms::publish::get_publish_roots
+  @see cms::publish::write_multiple_files
+  @see cms::publish::write_multiple_blobs
 
 } {
   foreach_publish_path $url {
     ns_unlink -nocomplain $filename 
-    ns_log debug "publish::delete_multiple_files: Delete file $filename"
+    ns_log debug "cms::cms::publish::delete_multiple_files: Delete file $filename"
   } $root_path
 }
 
 
-ad_proc -public publish::publish_revision { revision_id args} {
+ad_proc -public cms::publish::publish_revision { 
+    revision_id 
+    args
+} {
 
   @public publish_revision
  
@@ -175,8 +180,8 @@ ad_proc -public publish::publish_revision { revision_id args} {
     Write the content to this path only.
  
   @see item::get_extended_url
-  @see publish::get_publish_roots
-  @see publish::handle_item
+  @see cms::publish::get_publish_roots
+  @see cms::publish::handle_item
 
 } {
 
@@ -187,9 +192,9 @@ ad_proc -public publish::publish_revision { revision_id args} {
   } else {
     set root_path $opts(root_path)
   }
-  ns_log debug "publish::publish_revision: root_path = $root_path"
+  ns_log debug "cms::publish::publish_revision: root_path = $root_path"
   # Get tem id
-  set item_id [item::get_item_from_revision $revision_id]
+  set item_id [cms::item::get_id_from_revision $revision_id]
   # Render the item
   set item_content [handle_item $item_id -revision_id $revision_id -embed]
 
@@ -203,7 +208,7 @@ ad_proc -public publish::publish_revision { revision_id args} {
 }
 
 
-ad_proc -public publish::unpublish_item { item_id args } {
+ad_proc -public cms::publish::unpublish_item { item_id args } {
 
   @public unpublish_item
  
@@ -217,7 +222,7 @@ ad_proc -public publish::unpublish_item { item_id args } {
   @option root_path {default All paths in the PublishPaths parameter}
     Write the content to this path only.
  
-  @see publish::publish_revision
+  @see cms::publish::publish_revision
 
 } {
   
@@ -231,7 +236,7 @@ ad_proc -public publish::unpublish_item { item_id args } {
 
   # Get revision id
   if { [template::util::is_nil opts(revision_id)] } {
-    set revision_id [item::get_live_revision $item_id]
+    set revision_id [content::item::get_live_revision -item_id $item_id]
   } else {
     set revision_id $opts(revision_id)
   }
@@ -277,7 +282,7 @@ ad_proc -public publish::unpublish_item { item_id args } {
 # Scheduled proc stuff
 
 
-ad_proc -public publish::set_publish_status { item_id new_status {revision_id ""} } {
+ad_proc -public cms::publish::set_publish_status { item_id new_status {revision_id ""} } {
 
   @public set_publish_status
  
@@ -292,17 +297,17 @@ ad_proc -public publish::set_publish_status { item_id new_status {revision_id ""
   @param revision_id {default The live revision}
     The revision id to be used when publishing the item to the filesystem.
   
-  @see publish::publish_revision
-  @see publish::unpublish_item
+  @see cms::publish::publish_revision
+  @see cms::publish::unpublish_item
 
 } {
     
-    ns_log debug "publish::set_publish_status: Setting publish status for item_id $item_id to $new_status"
+    ns_log debug "cms::publish::set_publish_status: Setting publish status for item_id $item_id to $new_status"
   switch $new_status {
 
     production - expired {
       # Delete the published files
-      publish::unpublish_item $item_id
+      cms::publish::unpublish_item $item_id
     }
 
     ready {
@@ -318,7 +323,7 @@ ad_proc -public publish::set_publish_status { item_id new_status {revision_id ""
 	  set new_status [list [list publish_status production]]
 	  content::item::update -item_id $item_id -attributes $new_status
 	  # Delete the published files
-	  #publish::unpublish_item $item_id
+	  #cms::publish::unpublish_item $item_id
       } else {
 	  set new_status [list [list publish_status ready]]
 	  content::item::update -item_id $item_id -attributes $new_status
@@ -339,13 +344,13 @@ ad_proc -public publish::set_publish_status { item_id new_status {revision_id ""
 	  set new_status [list [list publish_status live]]
 	  ns_log notice "MS: got a revision, setting status to $new_status"
 	  content::item::update -item_id $item_id -attributes $new_status
-          #publish_revision $revision_id -root_path [publish::get_publish_roots]
+          #publish_revision $revision_id -root_path [cms::publish::get_publish_roots]
       } else {
         # Delete the published files
 	  set new_status [list [list publish_status production]]
 	  ns_log notice "MS: no revision, setting status to $new_status"
 	  content::item::update -item_id $item_id -attributes $new_status
-	  #publish::unpublish_item $item_id
+	  #cms::publish::unpublish_item $item_id
 	  #set new_status "production"
       }
     }
@@ -357,17 +362,17 @@ ad_proc -public publish::set_publish_status { item_id new_status {revision_id ""
 }
      
  
-ad_proc -private publish::track_publish_status {} {
+ad_proc -private cms::publish::track_publish_status {} {
 
   @private track_publish_status
  
   Scheduled proc which keeps the publish status updated
  
-  @see publish::schedule_status_sweep
+  @see cms::publish::schedule_status_sweep
 
 } {
   
-  ns_log debug "publish::track_publish_status: Tracking publish status"
+  ns_log debug "cms::publish::track_publish_status: Tracking publish status"
   db_transaction {
 
 #      if { [catch {
@@ -380,7 +385,7 @@ ad_proc -private publish::track_publish_status {} {
 	  foreach pair $items {
 	      set item_id [lindex $pair 0]
 	      set live_revision [lindex $pair 1]
-	      publish::set_publish_status $item_id live $live_revision
+	      cms::publish::set_publish_status $item_id live $live_revision
 	  }
     
 
@@ -388,18 +393,19 @@ ad_proc -private publish::track_publish_status {} {
           set items [db_list tps_get_items_onelist ""]
    
 	  foreach item_id $items {
-	      publish::set_publish_status $item_id expired 
+	      cms::publish::set_publish_status $item_id expired 
+	      # MS: update workflow state here
 	  }
     
 
 #       } errmsg] } {
-# 	  ns_log Warning "publish::track_publish_status: error: $errmsg"
+# 	  ns_log Warning "cms::publish::track_publish_status: error: $errmsg"
 #       }
   }
 }
 
 
-# ad_proc -public publish::schedule_status_sweep { {interval ""} } {
+# ad_proc -public cms::publish::schedule_status_sweep { {interval ""} } {
 
 #   @public schedule_status_sweep
  
@@ -417,9 +423,9 @@ ad_proc -private publish::track_publish_status {} {
 #     StatusSweepInterval parameter in the server's INI file is used 
 #     (if it exists).
     
-#   @see publish::set_publish_status
-#   @see publish::unschedule_status_sweep
-#   @see publish::track_publish_status
+#   @see cms::publish::set_publish_status
+#   @see cms::publish::unschedule_status_sweep
+#   @see cms::publish::track_publish_status
 
 # } {
 
@@ -431,11 +437,11 @@ ad_proc -private publish::track_publish_status {} {
 # 	    # if cms is installed but not mounted, return reasonable default
 # 	    if { $interval == "" } {
 # 		set interval 3600
-# 		ns_log Warning "publish::schedule_status_sweep: unable to lookup package_id for cms defaulting to interval 3600"
+# 		ns_log Warning "cms::publish::schedule_status_sweep: unable to lookup package_id for cms defaulting to interval 3600"
 # 	    }
 
-# 	    ns_log notice "publish::schedule_status_sweep: Scheduling status sweep every $interval seconds for package_id $package_id"
-# 	    set proc_id ns_schedule_proc -thread $interval publish::track_publish_status
+# 	    ns_log notice "cms::publish::schedule_status_sweep: Scheduling status sweep every $interval seconds for package_id $package_id"
+# 	    set proc_id ns_schedule_proc -thread $interval cms::publish::track_publish_status
 # 	    cache set status_sweep_proc_id_${package_id} $proc_id
    
 # 	}
@@ -443,13 +449,13 @@ ad_proc -private publish::track_publish_status {} {
 #     }
 # }
 
-ad_proc -public publish::unschedule_status_sweep {} {
+ad_proc -public cms::publish::unschedule_status_sweep {} {
 
   @public unschedule_status_sweep
  
   Unschedule the proc which keeps track of the publish status. 
  
-  @see publish::schedule_status_sweep
+  @see cms::publish::schedule_status_sweep
 
 } {
   
@@ -459,8 +465,3 @@ ad_proc -public publish::unschedule_status_sweep {} {
   }
 }
   
-
-# Actually schedule the status sweep
-
-#publish::schedule_status_sweep
-

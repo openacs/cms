@@ -15,11 +15,11 @@ if { [template::util::is_nil target_id] } {
   set update_value "$target_id"
 }
 
-set clip [clipboard::parse_cookie]
+set clip [cms::clipboard::parse_cookie]
 
 db_transaction {
 
-    clipboard::map_code $clip $mount_point {
+    cms::clipboard::map_code $clip $mount_point {
         if { [catch { 
             db_dml move_keyword_item {}
             db_dml move_keyword_keyword {}
@@ -29,7 +29,7 @@ db_transaction {
     }
 }
 
-clipboard::free $clip
+cms::clipboard::free $clip
 
 set id $target_id
 ad_returnredirect [export_vars -base index {id mount_point}]

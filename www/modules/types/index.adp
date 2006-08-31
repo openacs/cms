@@ -12,12 +12,18 @@
     <div id=section>
     <include src="attributes" can_edit_widgets_p="@can_edit_widgets_p@" content_type="@content_type@">
     </div>
-    <p/>
+
+ </if>
+
+ <if @type_props_tab@ eq mime_types>
 
     <div id=section>
     <include src="mime-types" content_type="@content_type@">
     </div>
-    <p/>
+
+ </if>
+
+ <if @type_props_tab@ eq content_method>
 
     <div id=section>
     <include src="content-method" content_type="@content_type@">

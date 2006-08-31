@@ -105,21 +105,19 @@ set index_page_id [db_string get_index_page_id ""]
 # symlinks to this folder/item
 db_multirow symlinks get_symlinks ""
 
-# build folder contents list
-
+set return_url [ad_return_url]
 set page_title "Content Folder - $info(label)"
 
-set actions "Attributes [export_vars -base attributes?mount_point=sitemap {folder_id}] \"Folder Attributes\""
-if { [permission::permission_p -party_id $user_id \
-	  -object_id $folder_id -privilege write] } {
+set actions "\"Folder Attributes\" [export_vars -base folder-attributes {mount_point folder_id return_url}] \"Folder Attributes\""
+if { [permission::permission_p -party_id $user_id -object_id $folder_id -privilege write] } {
     append actions "
-\"Delete Folder\" [export_vars -base delete?mount_point=sitemap {folder_id parent_id}] \"Delete this folder\"
-\"Rename Folder\" [export_vars -base rename?mount_point=sitemap {folder_id}] \"Rename this folder\"
-\"New Folder\" [export_vars -base create?mount_point=sitemap {folder_id}] \"Create a new folder within this folder\"
-\"Move Items\" [export_vars -base move?mount_point=sitemap {folder_id}] \"Move marked items to this folder\"
-\"Copy Items\" [export_vars -base copy?mount_point=sitemap {folder_id}] \"Copy marked items to this folder\"
-\"Link Items\" [export_vars -base symlink?mount_point=sitemap {folder_id}] \"Link marked items to this folder\"
-\"Delete Items\" [export_vars -base delete-items?mount_point=sitemap {folder_id}] \"Delete marked items\"
+\"Delete Folder\" [export_vars -base folder-delete {mount_point folder_id parent_id}] \"Delete this folder\"
+\"Edit Folder Info\" [export_vars -base folder-ae?mount_point=sitemap {folder_id return_url}] \"Edit folder information\"
+\"New Folder\" [export_vars -base folder-ae?parent_id=$folder_id {mount_point return_url}] \"Create a new folder within this folder\"
+\"Move Items\" [export_vars -base manage-items?action=move {mount_point folder_id return_url}] \"Move marked items to this folder\"
+\"Copy Items\" [export_vars -base manage-items?action=copy {mount_point folder_id return_url}] \"Copy marked items to this folder\"
+\"Link Items\" [export_vars -base manage-items?action=link {mount_point folder_id return_url}] \"Link marked items to this folder\"
+\"Delete Items\" [export_vars -base manage-items?action=delete {mount_point folder_id return_url}] \"Delete marked items\"
 "
 } 
 
@@ -139,7 +137,7 @@ element create add_item mount_point \
 
 set revision_types [list [list "----------------" ""]]
 append revision_types " "
-append revision_types [cms_folder::get_registered_types $the_id]
+append revision_types [cms::folder::get_registered_types $the_id]
 set num_revision_types [llength $revision_types]
 
 element create add_item content_type \
@@ -149,8 +147,13 @@ element create add_item content_type \
     -options $revision_types \
     -html { onchange "javascript:this.form.submit();" }
 
+element create add_item return_url \
+    -datatype url \
+    -widget hidden \
+    -value $return_url
+
 if { [form is_valid add_item] } {
-    form get_values add_item folder_id mount_point content_type
+    form get_values add_item folder_id mount_point content_type return_url
 
     # if the folder_id is empty, then it must be the root folder
     if { [template::util::is_nil folder_id] } {
@@ -162,7 +165,9 @@ if { [form is_valid add_item] } {
     if { [string equal $mount_point "templates"] } {
 	forward "../items/template?parent_id=$folder_id&mount_point=$mount_point"
     } else {
- 	forward "../items/create-1?parent_id=$folder_id&mount_point=$mount_point&content_type=$content_type"
+	set parent_id $folder_id
+ 	ad_returnredirect [export_vars -base ../items/create-1 {parent_id mount_point content_type return_url}]
+	ad_script_abort
     }
 }
 

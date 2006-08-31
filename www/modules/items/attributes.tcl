@@ -1,10 +1,4 @@
 # display the attributes of an item
-
-request create -params {
-  revision_id -datatype integer
-  mount_point -datatype keyword -optional -value sitemap
-}
-
 # query the content type and table so we know which view to examine
 
 db_0or1row get_type_info "" -column_array type_info
@@ -39,21 +33,19 @@ set content_type $type_info(object_type)
 template::list::create \
     -name attributes \
     -multirow attributes \
-    -actions [list "Edit item attributes" \
-		  "attributes-edit?item_id=$info(item_id)" \
-		  "Edit item attributes"] \
     -elements {
 	attribute_label {
 	    label "Attribute"
+	    html { width 20% }
+	}
+	object_label {
+	    label "From Content Type"
+	    html { width 20% }
 	}
 	attribute_value {
 	    label "Value"
 	    display_template "@attributes.attribute_value;noquote@"
-	    html { width 50% }
-	}
-	object_label {
-	    label "Origin"
-	    html { width 10% }
+	    html { width 60% }
 	}
     }
 

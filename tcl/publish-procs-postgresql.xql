@@ -5,7 +5,7 @@
 
 
  
-<fullquery name="publish::track_publish_status.tps_get_items_multilist">      
+<fullquery name="cms::publish::track_publish_status.tps_get_items_multilist">      
       <querytext>
       
             select 
@@ -25,7 +25,7 @@
 </fullquery>
 
  
-<fullquery name="publish::track_publish_status.tps_get_items_onelist">      
+<fullquery name="cms::publish::track_publish_status.tps_get_items_onelist">      
       <querytext>
       
             select 
