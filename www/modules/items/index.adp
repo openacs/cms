@@ -112,6 +112,7 @@
      Delete Item</a>
 </if>
 
+<a href="@preview_url@" target="_new" class="button">Preview Item</a>
 </div>
 
 <p>

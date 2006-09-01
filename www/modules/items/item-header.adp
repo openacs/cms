@@ -1,7 +1,7 @@
 <nobr>
 <p>
 <include src="/packages/cms/lib/clip" mount_point="@mount_point@" id="@item_id@">@page_title;noquote@
-<span style="font-size: 70%;">[<a href="@path@" target="_new">preview</a>]</span>
+
 </p>
 </nobr>
 <p/>

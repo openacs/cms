@@ -67,6 +67,8 @@ if { [cms::item::storage_type -revision_id $revision_id] eq "text" } {
 set return_url [ad_return_url]
 set revise_url [export_vars -base revision-add-2 {item_id revision_id mount_point tab content_method return_url}]
 set rename_url [export_vars -base rename {item_id mount_point tab return_url}]
+set content_root [cm::modules::sitemap::getRootFolderID [ad_conn subsite_id]]
+set preview_url "[subsite::get_element -subsite_id [ad_conn subsite_id] -element url -notrailing]/[content::item::get_path -root_folder_id $content_root -item_id $item_id]"
 
 # send over to manage-items-2 to delete
 set action delete

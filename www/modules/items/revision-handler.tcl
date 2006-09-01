@@ -36,7 +36,7 @@ if { $action eq "view" } {
 	    continue
 	}
 	set revision_name [content::revision::revision_name -revision_id $rev]
-	content::revision::delete -revision_id $revision_id
+	content::revision::delete -revision_id $rev
 	util_user_message -message "$revision_name deleted"
     }
 
