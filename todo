@@ -9,17 +9,16 @@ finish moving the content_method stuff to tcl api (then delete many of the xql f
 make content_method stuff make sense (ok for now, if developer sets up the type information [content_method, mime_type] correctly?)
 when you view a symlink in CMS should the path show up as the path of the linked item or the symlink (latter methinks)?
 show symlinks to an item (extra tab, if they exist) or folder (where in UI?)
-junk move/copy/symlink stuff in sitemap, revisions in items/templates
 continue cleanup/removal of xql files
 add interface to allow admin to map subsite to cms instance
  - should copy index.vuh to /www/subsite and add entry to subsite_package_map
-printer friendly template (steal from xcms-ui? add ad_page_contract to index.vuh with preview/printer-friendly option?)
+printer friendly template (steal from xcms-ui? add ad_page_contract to index.vuh with preview/printer-friendly option? pass in use_context?)
 new icon for "clipping" items - competing with new listbuilder checkboxes, confuses UI a bit
 go through various listbuilder lists and remove "un-xxx" links in favor of bulk actions
  unregister item templates - types/content methods & templates
 redo tab files - just cycle through list of tabs to create the tab html?
 floating clipboard working?
-hide data model for users creating/editing items:
+(done, except for storage type) hide data model for users creating/editing items:
  - for new items, if:
    -> if has_text_mime_types_p, forward to create-2 with content_method=text_entry
    -> if !has_text_mime_types_p & has_mime_types, forward with cm=file_upload
@@ -29,12 +28,13 @@ hide data model for users creating/editing items:
    -> if storage_type is text and content ne "", forward to revision-add-2 with content_method=text_entry "Author new revision"
    -> if storage_type is files, use content_method=file_upload "Upload new revision"
 
+
 plumbing
 --------
 dav for templates root
 internationalization
 integrate categories and workflow packages
-fix search module (will try when i have tsearch2, ie upgrade to rhel4)
+fix search module
 
 questions/ideas
 ---------

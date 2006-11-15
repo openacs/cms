@@ -104,15 +104,18 @@
 
 <p>
 
-<if @write_p@>
-  <a href="@revise_url@" class="button">@revise_button@</a>
-  <a href="@rename_url@" class="button">Rename Item</a> 
-  <a href="@delete_url@" class="button" 
-     onClick="return confirm('Warning! You are about to delete this @content_item.content_type@: @content_item.title@.');">
-     Delete Item</a>
+<if @preview_p@>
+  <a href="@preview_url@" target="_new" class="button">Preview</a>
 </if>
 
-<a href="@preview_url@" target="_new" class="button">Preview Item</a>
+<if @write_p@>
+  <a href="@revise_url@" class="button">@revise_button@</a>
+  <a href="@rename_url@" class="button">Rename</a> 
+  <a href="@delete_url@" class="button" 
+     onClick="return confirm('Warning! You are about to delete this @content_item.content_type@: @content_item.title@.');">
+     Delete</a>
+</if>
+
 </div>
 
 <p>
