@@ -49,6 +49,7 @@ if { $id ne "" } {
 	-elements {
 	    title {
 		label "Title"
+		display_template { @marked_items.title;noquote@ }
 		link_url_col item_url
 	    }
 	    type {
