@@ -50,8 +50,7 @@ switch $mime_info(mime_type) {
 	if { [template::util::is_nil template_id] } {
 	    cr_write_content -revision_id $revision_id
 	}
-	set path "/templates/"
-	append path [content::template::get_path -template_id $template_id]
+	set path [content::template::get_path -template_id $template_id -root_folder_id $template_root]
 
 	# put item_id into form so template can get it out ...
 	# and then redirect to template

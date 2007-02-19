@@ -21,7 +21,7 @@
 
   select 
     template_id, 
-    content_item__get_path( template_id, content_template__get_root_folder() ) 
+    '/' || content_item__get_path( template_id, :template_root ) 
       as name
   from 
     cr_templates t, cr_items i

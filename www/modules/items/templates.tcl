@@ -21,10 +21,11 @@ set can_set_default_template \
 db_1row get_iteminfo "" -column_array iteminfo
 
 set content_type $iteminfo(object_type)
+set template_root [cm::modules::templates::getRootFolderID [ad_conn subsite_id]]
 
 template::list::create \
-    -name registered_templates \
-    -multirow registered_templates \
+    -name item_templates \
+    -multirow item_templates \
     -actions [list "Assign marked templates to this item" \
 		  [export_vars -base template-register {item_id}] \
 		  "Assign marked templates to this item"] \
@@ -38,15 +39,14 @@ template::list::create \
 	    label "Use Context"
 	}
 	action {
-	    label "Action"
 	    display_template {
-		<if @registered_templates.unreg_url@ not nil><a href=@registered_templates.unreg_url@>unregister</a></if>
+		<if @item_templates.unreg_url@ not nil><a href=@item_templates.unreg_url@ class=button>Unregister</a></if>
 	    }
 	}
     }
 
 # templates registered to this item
-db_multirow -extend {unreg_url context} registered_templates get_reg_templates {} {
+db_multirow -extend {unreg_url context} item_templates get_reg_templates {} {
     if { [permission::permission_p -party_id $user_id -object_id $item_id -privilege write] } {
 	set context $use_context
 	set unreg_url [export_vars -base template-unregister {item_id template_id context}]
@@ -90,9 +90,9 @@ template::list::create \
 # templates registered to this content type
 db_multirow -extend { set_default_url register_template_url} type_templates get_type_templates {} {
     set context $use_context
-    if {$can_read_template && $can_set_default_template} {
+    if {!$is_default && $can_read_template && $can_set_default_template} {
 	set set_default_url [export_vars -base ../types/set-default-template {template_id context content_type return_url}]
-	if {[string match $already_registered_p f] && {$registered_templates:rowcount == 0}} {
+	if {[string match $already_registered_p f] && {$item_templates:rowcount == 0}} {
 	    set register_template_url [export_vars -base template-register {item_id template_id context return_url}]
 	} else {
 	    set register_template_url ""

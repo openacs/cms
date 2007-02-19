@@ -40,20 +40,28 @@
   <div id=section>
    <div id=section-header>Related Items</div>
    <p/>
-    <include src="related-items" item_id="@item_id;noquote@">
+    <include src="related-items" item_id="@item_id;noquote@" mount_point="@mount_point;noquote@">
   </div>
   <p>
 
   <div id=section>
    <div id=section-header>Child Items</div>
    <p/>
-    <include src="children" item_id="@item_id;noquote@">
+    <include src="children" item_id="@item_id;noquote@" mount_point="@mount_point;noquote@">
   </div>
   <p>
 
 </if>
 
 <if @tab@ eq categories>
+
+  <div id=section>
+   <include src="categories" item_id="@item_id;noquote@" mount_point="@mount_point;noquote@">  
+  </div>
+
+</if>
+
+<if @tab@ eq keywords>
 
   <div id=section>
    <include src="keywords" item_id="@item_id;noquote@" mount_point="@mount_point;noquote@">  

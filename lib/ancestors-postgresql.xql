@@ -27,12 +27,12 @@
       from 
         (select * from cr_items where item_id = :item_id) i1, cr_items i2
       where
-        i2.parent_id != 0
+        i2.parent_id != '0'
       and
         i1.tree_sortkey between i2.tree_sortkey and tree_right(i2.tree_sortkey)
     ) t
   where
-    i.item_id = t.parent_id and t.tree_level > 1
+    i.item_id = t.parent_id and t.tree_level > 3
   order by
     tree_level asc
 

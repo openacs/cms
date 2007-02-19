@@ -7,7 +7,7 @@
       <querytext>
       
   select 
-    coalesce(content_item__get_path(:parent_id,null), '/') as item_path,
+    coalesce('/' || content_item__get_path(:parent_id, :content_root), '/') as item_path,
     pretty_name as content_type_name
   from
     acs_object_types

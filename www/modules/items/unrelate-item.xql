@@ -1,17 +1,10 @@
 <?xml version="1.0"?>
 <queryset>
 
-<fullquery name="abort">      
-      <querytext>
-      abort transaction
-      </querytext>
-</fullquery>
-
- 
-<fullquery name="get_item_id">      
+<fullquery name="rel_exists_p">      
       <querytext>
       
-  select item_id from cr_item_rels where rel_id = :rel
+  select 1 from $rel_table where rel_id = :rel
       </querytext>
 </fullquery>
 

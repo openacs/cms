@@ -19,7 +19,7 @@ if { $content_type eq "content_template" } {
 } elseif { $content_type eq "image" } {
     cms::image::get -image_id $item_id
 } else {
-    content::item::get -item_id $item_id
+    content::item::get -item_id $item_id -revision latest
 }
 set name $content_item(name)
     
@@ -52,7 +52,7 @@ element create rename_item item_id \
 
 element create rename_item name \
     -label "Rename $name to" \
-    -datatype keyword \
+    -datatype text \
     -widget text \
     -html { size 20 } \
     -validate { { expr ![string match $value "/"] } \
@@ -68,7 +68,7 @@ if { [form is_valid rename_item] } {
 
   # handle file system stuff for templates
   if { $content_type eq "content_template" } {
-      cms::template::rename -template_id $template_id -name $name
+      #cms::template::rename -template_id $item_id -name $name
   }  
   content::item::rename -item_id $item_id -name $name
 

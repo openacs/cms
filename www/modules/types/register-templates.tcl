@@ -4,7 +4,7 @@
 request create
 request set_param content_type -datatype keyword
 request set_param type_props_tab -datatype text -optional -value attributes
-
+set template_root [cm::modules::templates::getRootFolderID [ad_conn subsite_id]]
 
 # get the content type pretty name
 set object_type_pretty [db_string get_pretty_type "" -default ""]
@@ -81,7 +81,7 @@ foreach temp $only_marked_templates {
 	    -datatype text \
 	    -widget inform \
 	    -label "Template" \
-	    -value "/$t_name"
+	    -value "$t_name"
 
     element create register_templates $id_name \
 	    -datatype integer \

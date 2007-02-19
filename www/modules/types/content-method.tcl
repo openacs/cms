@@ -1,15 +1,14 @@
+
 request create
-request set_param content_type -datatype keyword -value content_revision
+request set_param content_type -datatype text -value content_revision
 request set_param type_props_tab -datatype text -value content_method
+request set_param mount_point -datatype text -value types
 
 # permissions check - user must have read on the types module
 permission::require_permission -party_id [auth::require_login] \
     -object_id [cm::modules::get_module_id -module_name types -subsite_id [ad_conn subsite_id]] -privilege read
 
-# default return_url
-if { [template::util::is_nil return_url] } {
-    set return_url "index?content_type=$content_type"
-}
+set return_url [export_vars -base index {content_type content_method type_props_tab}]
 
 template::list::create \
     -name content_methods \
@@ -26,28 +25,28 @@ template::list::create \
 	pretty_is_default {
 	    label "Is default?"
 	}
-	unreg_default_links {
-	    display_template "<center>@content_methods.unreg_default_links;noquote@</center>"
+	action_links {
+	    display_template "@content_methods.action_links;noquote@"
 	}
 	
     }
 
 # fetch the content methods registered to this content type
-db_multirow -extend {pretty_is_default unreg_default_links} content_methods get_methods "" {
-    set content_method_unset_default_url [export_vars -base content-method-unset-default {content_type}]
-    set content_method_set_default_url [export_vars -base content-method-set-default {content_type content_method}]
-    set content_method_unregister_url [export_vars -base content-method-unregister {content_type content_method}]
+db_multirow -extend {pretty_is_default action_links} content_methods get_methods "" {
+    set content_method_unset_default_url [export_vars -base content-method-unset-default {content_type return_url}]
+    set content_method_set_default_url [export_vars -base content-method-set-default {content_type content_method return_url}]
+    set content_method_unregister_url [export_vars -base content-method-unregister {content_type content_method return_url}]
 
-    set unreg_default_links "\[ "
+    set action_links ""
     if {[string match $is_default "t"]} {
 	set pretty_is_default "Yes"
-	append unreg_default_links "<a href=\"$content_method_unset_default_url\">unset default</a>"
+	append action_links "<a href=\"$content_method_unset_default_url\" class=\"button\">Unset default</a> "
     } else {
     	set pretty_is_default "No"
-	append unreg_default_links "<a href=\"$content_method_set_default_url\">set as default</a>"
+	append action_links "<a href=\"$content_method_set_default_url\" class=\"button\">Set as default</a> "
     }
 
-    append unreg_default_links " | <a href=\"$content_method_unregister_url\">unregister</a> ]"
+    append action_links " <a href=\"$content_method_unregister_url\" class=\"button\">Unregister</a>"
 
 }
 
@@ -67,43 +66,31 @@ set unregistered_content_methods [db_list_of_lists get_unregistered_methods ""]
 
 set unregistered_method_count [llength $unregistered_content_methods]
 
-
 # form to register unregistered content methods to this content type
-form create register -action content-method
-
-element create register content_type \
-	-datatype keyword \
-	-widget hidden \
-	-value $content_type
-
-element create register return_url \
-	-datatype text \
-	-widget hidden \
-	-value $return_url
-
-element create register content_method \
-	-datatype keyword \
-	-widget select \
-	-options $unregistered_content_methods
+if { [llength $unregistered_content_methods] > 0 } {
+    set form_p 1
+    ad_form -name register -action content-method -form {
 	
-element create register submit \
-	-datatype keyword \
-	-widget submit \
-	-label "Register"
-
-
-
-if { [form is_valid register] } {
-
-    form get_values register content_type content_method
-    
-    db_transaction {
-
-        db_exec_plsql add_method {}
-
+	{content_type:text(hidden)
+	    {value $content_type}
+	}
+	{return_url:text(hidden)
+	    {value $return_url}
+	}
+	{content_method:text(select)
+	    {label "Register Content Method"}
+	    {options $unregistered_content_methods}
+	}
+	
+    } -on_submit {
+	
+	cms::type::add_content_method -content_type $content_type \
+	    -content_method $content_method
+	cms::type::flush_content_methods_cache $content_type
+	ad_returnredirect [export_vars -base index { mount_point type_props_tab content_type return_url}]
+	ad_script_abort
+	
     }
-
-    cms::type::flush_content_methods_cache $content_type
-
-    ad_returnredirect [export_vars -base index { mount_point type_props_tab content_type }]
+} else {
+    set form_p 0
 }

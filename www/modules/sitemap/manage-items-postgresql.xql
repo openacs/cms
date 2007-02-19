@@ -7,7 +7,7 @@
       <querytext>
       
 	select content_item__get_title(item_id, 'f') as title, 
-	       content_item__get_path(item_id,:root_id) as path, 
+	       '/' || content_item__get_path(item_id,:root_id) as path, 
 	       item_id, parent_id
 	  from cr_items
 	 where item_id in ([join $clip_items ","])

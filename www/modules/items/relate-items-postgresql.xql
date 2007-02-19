@@ -3,30 +3,14 @@
 <queryset>
    <rdbms><type>postgresql</type><version>7.1</version></rdbms>
 
-<fullquery name="get_item_info">      
-      <querytext>
-      
-    select 
-      content_item__get_title(i.item_id,'f') as title,
-      i.content_type
-    from 
-      cr_items i
-    where
-      i.item_id = :item_id
-
-      </querytext>
-</fullquery>
-
- 
-<fullquery name="get_options">      
+<fullquery name="get_relation_type_options">      
       <querytext>
 
     select 
-      lpad(' ', tree_level(ot1.tree_sortkey), '-') || ot1.pretty_name as pretty_name, 
-      ot1.object_type
+      ot1.pretty_name, ot1.object_type
     from
       acs_object_types ot1, acs_object_types ot2
-    where ot2.object_type = 'cr_item_rel'
+    where ot2.object_type = :relation
       and ot1.tree_sortkey between ot2.tree_sortkey and tree_right(ot2.tree_sortkey)
 
       </querytext>

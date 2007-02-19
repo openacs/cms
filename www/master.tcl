@@ -4,6 +4,7 @@ request create -params {
 
 set url [ad_conn url]
 set package_url [ad_conn package_url]
+set package_id [ad_conn package_id]
 
 if {[template::util::is_nil mount_point]} {
     
@@ -24,8 +25,12 @@ if {[template::util::is_nil mount_point]} {
 	set section workspace
     } elseif {[string match *clipboard* $url]} {
 	set section clipboard
+    } elseif {[string match *keywords* $url]} {
+	set section keywords
+    } elseif {[string match *sw-categories* $url]} {
+	set section sw-categories
     } elseif {[string match *categories* $url]} {
-	set section categories
+	set section keywords
     } elseif {[string match *users* $url]} {
 	set section users
     }

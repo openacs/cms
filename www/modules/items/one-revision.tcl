@@ -1,4 +1,4 @@
-
+set content_p 1
 switch $content_method {
     text_entry {
 	set content [content::get_content_value $revision_id]
@@ -11,5 +11,8 @@ switch $content_method {
 	} else {
 	    set file_type file
 	}
+    }
+    no_content {
+	set content_p 0
     }
 }

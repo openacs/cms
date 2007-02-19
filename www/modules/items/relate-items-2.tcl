@@ -1,145 +1,60 @@
-# Step 2 in the relate item wizard - presents a custom form
-# for each relation
+ad_page_contract {
 
-request create -params {
-  item_id     -datatype integer
-  mount_point -datatype keyword -value sitemap -optional
-  rel_list    -datatype text
-  page_title  -datatype text -optional -value "Relate Items"
-  tab  -datatype text -optional -value related
+    Relate target items to item_id
+
+    @author Michael Steigman
+    @creation-date February 2007
+} {
+    { target_items:integer,multiple ""}
+    { item_id:integer }
+    { target_item_id:integer,array,optional }    
+    { relate_p:array "" }
+    { relation_type:array "" }
+    { relation_tag:array "" } 
+    { order_n:array "" }    
+    { tab:optional "related" }
 }
 
-# rel_list is a list of lists in form of
-# {item_id relation_tag order_n relation_type}
+set item_title [content::item::get_title -item_id $item_id]
 
-permission::require_permission -party_id [auth::require_login] \
-    -object_id $item_id -privilege write
-
-# Create the basic form
-form create rel_form_2
-
-element create rel_form_2 item_id -label "Item Id" \
-  -widget hidden -datatype integer -value $item_id
-element create rel_form_2 mount_point -label "Mount Point" \
-  -widget hidden -datatype keyword -value $mount_point -optional
-element create rel_form_2 rel_list -label "Rel List" \
-  -widget hidden -datatype text -value $rel_list
-element create rel_form_2 page_title -label "Page Title" \
-  -widget hidden -datatype text -value $page_title
-
-# Create extra widgets; one widget for each relationship, and a
-# multirow datasource that encompasses them all
-upvar 0 "rel_attrs:rowcount" index
-set index 0
-
-set item_title [db_string get_title ""]
-
-# Create the main multirow datasource
-
-set form_complete 1
-
-foreach rel $rel_list {
-  incr index
-  upvar 0 "rel_attrs:$index" rel_row
-  set rel_row(rownum) $index
-
-  set related_id [lindex $rel 0]
-  set relation_tag [lindex $rel 1]
-  set order_n [lindex $rel 2]
-  set relation_type [lindex $rel 3]
-
-  set rel_row(related_id) $related_id
-  set rel_row(relation_tag) $relation_tag
-  set rel_row(order_n) $order_n
-  set rel_row(relation_type) $relation_type
-  set rel_row(elements) [list] 
-  set row(dmls) [list]
-
-  # Get all elements, if any
-  # FIXME: 
-  set content_type $relation_type
-  cms::form::query_form_metadata params multirow {
-    object_type <> 'cr_item_rel'
-  }  
-
-  if { ${params:rowcount} > 0 } {
-
-    set form_complete 0
-
-    # Get the header
-    db_1row get_rel_info "" -column_array rel_info
-
-    # Create the form section
-    form section rel_form_2 \
-      "$rel_info(pretty_name) : $rel_info(item_title) relates to $rel_info(related_title)"
-
-    element create rel_form_2 tag_info_$index -label "Relation Tag" \
-      -datatype text -widget inform -value $rel_row(relation_tag)
-
-    # Create all the custom elements
-    set j 1
-    set last_table {}
-    set element_list [list]
-    while { 1 } {
-      upvar 0 "params:$j" el_row
-      template::util::array_to_vars el_row
-      lappend rel_row(elements) $attribute_name
-
-      set j [cms::form::assemble_form_element params $attribute_name $j]
-      ns_log notice "$j : $attribute_name, $code_params"
-      eval "template::element create rel_form_2 ${attribute_name}_$index $code_params"
-
-      if { $j > ${params:rowcount} } {
-        break
-      }
-
+set num_related 0
+# loop through target items, check if they can be related
+#  - if possible, do so. tell the user in either case.
+foreach target_item_num $target_items {
+    if { [info exists relate_p($target_item_num)] } {
+	set target_title [content::item::get_title -item_id $target_item_id($target_item_num)]
+	set relation [lindex [array get relation_type $target_item_num] 1]
+	set proc "valid_${relation}_relation_p"
+	if { [cms::rel::${proc} -item_id $item_id -object_id $target_item_id($target_item_num)] } {
+	    switch $relation {
+		cr_item_rel {
+		    cms::rel::sort_related_item_order $item_id
+		    content::item::relate -item_id $item_id \
+			-object_id $target_item_id($target_item_num) \
+			-relation_tag $relation_tag($target_item_num) \
+			-relation_type $relation_type($target_item_num) \
+			-order_n $order_n($target_item_num)
+		}
+		cr_item_child_rel {
+		    cms::rel::sort_child_item_order $item_id
+		    cms::rel::add_child -item_id $item_id \
+			-object_id $target_item_id($target_item_num) \
+			-relation_tag $relation_tag($target_item_num) \
+			-relation_type $relation_type($target_item_num) \
+			-order_n $order_n($target_item_num)
+		}
+	    }
+	    util_user_message -message "Related $target_title to $item_title"
+	    incr num_related
+	} else {
+	    util_user_message -message "Could not relate $target_title to $item_title"
+	}
     }
-  }
 }
 
-
-
-# Process the form
-if { [form is_valid rel_form_2] || $form_complete } {
-  
-  # sort order_n for all related items for consistency
-  form get_values rel_form_2 item_id
-  cms::rel::sort_related_item_order $item_id  
-
-
-  db_transaction { 
-
-      unset row
-
-      for { set i 1 } { $i <= ${rel_attrs:rowcount} } {incr i} {
-          upvar 0 "rel_attrs:$i" row
-          template::util::array_to_vars row
-
-          # Insert the basic data
-          
-          # Insert at the end if no order
-          if { [template::util::is_nil order_n] } {
-              set order_n [db_string get_order ""]
-          }
-
-          # Perform the insertion
-          set rel_id [db_exec_plsql relate {}]
-
-          # Insert any extra attributes
-          if { [llength $elements] > 0 } {
-              set attr_list [template::util::tcl_to_sql_list $elements]
-              ns_log notice "$i : $attr_list"
-              cms::form::insert_element_data rel_form_2 $relation_type \
-                  [list acs_object cr_item_rel] $rel_id "_$i" \
-                  " attribute_name in ($attr_list)"
-          }
-      }
-  }
-
-  ad_returnredirect [export_vars -index { item_id mount_point tab }]
-  ad_script_abort
+if { $num_related == 0 } {
+    util_user_message -message "Unable to relate any items"
 }
-     
-    
 
+ad_returnredirect [export_vars -base index {item_id tab}]
 

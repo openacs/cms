@@ -8,13 +8,13 @@ ad_page_contract {
     @creation-date March 2006
 } {
     { folder_id:integer }
-    { action }
+    { list_action }
     { mount_point:optional "sitemap" }
     { return_url }
 }
 
 cms::folder::get -folder_id $folder_id
-switch $action {
+switch $list_action {
     move {
 	set action_title "Move Items"
 	set title "Move Items to $folder_info(label)"
@@ -53,12 +53,12 @@ template::list::create \
     -multirow marked_items \
     -key item_id \
     -bulk_actions [list	"$action_title" \
-		       "[export_vars -base manage-items-2 {mount_point action folder_id}]" \
+		       "[export_vars -base manage-items-2 {mount_point list_action folder_id}]" \
 		       "$title" \
 		       "Cancel" \
 		       "$return_url" \
 		       "Cancel action and return to previous page"] \
-    -bulk_action_export_vars { folder_id action mount_point return_url } \
+    -bulk_action_export_vars { folder_id list_action mount_point return_url } \
     -elements {
 	title {
 	    label "Title"
@@ -68,7 +68,7 @@ template::list::create \
 	    label "Content Type"
 	}
 	path {
-	    label "Path"
+	    label "URL"
 	}
     }
 

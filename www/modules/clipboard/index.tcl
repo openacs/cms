@@ -55,31 +55,35 @@ if { $id ne "" } {
 		label "Type"
 	    }
 	    path {
-		label "Path"
+		label "URL"
 	    }
 	}
     
     template::multirow create marked_items item_id title type path item_url
+    set content_root [cm::modules::sitemap::getRootFolderID [ad_conn subsite_id]]
+    set template_root [cm::modules::templates::getRootFolderID [ad_conn subsite_id]]
     set item_list [cms::clipboard::get_items $clip $id]    
-    ns_log notice " ------------------> $item_list" 
+
     foreach item $item_list {
 	switch $id {
 	    sitemap - templates {
 		set title [content::item::get_title -item_id $item]
 		set type [content::item::content_type -item_id $item]
-		set path [content::item::get_path -item_id $item]
 		switch $type {
 		    content_folder {
 			set base_url "../${id}/index"
 			set item_var folder_id
+			set path "/[content::item::get_path -item_id $item -root_folder_id $content_root]"
 		    }
 		    content_template {
 			set base_url "../templates/properties"
 			set item_var item_id
+			set path "/[content::item::get_path -item_id $item -root_folder_id $template_root]"
 		    }
 		    default {
 			set base_url "../items/index"
 			set item_var item_id
+			set path "/[content::item::get_path -item_id $item -root_folder_id $content_root]"
 		    }
 		}		
 	    }

@@ -4,7 +4,7 @@
   <div id="subnavbar-container">
     <div id="subnavbar">
 
- <if @tab@ eq template>
+<!-- <if @tab@ eq template>
    <div class="tab" id="subnavbar-here">
      Template
    </div>
@@ -14,7 +14,7 @@
      <a href="@package_url@modules/templates/properties?item_id=@item_id@&mount_point=@mount_point@&tab=template" title="" class="subnavbar-unselected">Template</a>
    </div>
  </else>
-
+-->
  <if @tab@ eq revisions>
    <div class="tab" id="subnavbar-here">
      Revisions

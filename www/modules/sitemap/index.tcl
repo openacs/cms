@@ -114,10 +114,10 @@ if { [permission::permission_p -party_id $user_id -object_id $folder_id -privile
 \"Delete Folder\" [export_vars -base folder-delete {mount_point folder_id parent_id}] \"Delete this folder\"
 \"Edit Folder Info\" [export_vars -base folder-ae?mount_point=sitemap {folder_id return_url}] \"Edit folder information\"
 \"New Folder\" [export_vars -base folder-ae?parent_id=$folder_id {mount_point return_url}] \"Create a new folder within this folder\"
-\"Move Items\" [export_vars -base manage-items?action=move {mount_point folder_id return_url}] \"Move marked items to this folder\"
-\"Copy Items\" [export_vars -base manage-items?action=copy {mount_point folder_id return_url}] \"Copy marked items to this folder\"
-\"Link Items\" [export_vars -base manage-items?action=link {mount_point folder_id return_url}] \"Link marked items to this folder\"
-\"Delete Items\" [export_vars -base manage-items?action=delete {mount_point folder_id return_url}] \"Delete marked items\"
+\"Move Items\" [export_vars -base manage-items?list_action=move {mount_point folder_id return_url}] \"Move marked items to this folder\"
+\"Copy Items\" [export_vars -base manage-items?list_action=copy {mount_point folder_id return_url}] \"Copy marked items to this folder\"
+\"Link Items\" [export_vars -base manage-items?list_action=link {mount_point folder_id return_url}] \"Link marked items to this folder\"
+\"Delete Items\" [export_vars -base manage-items?list_action=delete {mount_point folder_id return_url}] \"Delete marked items\"
 "
 } 
 

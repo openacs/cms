@@ -332,17 +332,16 @@ ad_proc -private cm::modules::install::create_modules {
 } {
     set instance_name [apm_instance_name_from_id $package_id]
     set subsite_id [ad_conn subsite_id]
-    set modules [list Sitemap Templates Types Categories Search]
-    set sort_key 0
+    set modules [list Sitemap Templates Types Keywords Search]
+    set sort_key 1
     set root_key ""
     foreach module $modules {
-	incr sort_key
 	set module_name "$instance_name $module"
 	switch $module { 
 	    "Sitemap" {
 		set root_key [content::folder::new -name pkg_${package_id}_content \
 				  -context_id $package_id \
-				  -parent_id "0" \
+				  -package_id $package_id \
 				  -label "$instance_name $module" ]
 		# register content_revision and subtypes to main folder
 		content::folder::register_content_type -folder_id $root_key \
@@ -353,7 +352,7 @@ ad_proc -private cm::modules::install::create_modules {
 	    "Templates" {
 		set root_key [content::folder::new -name pkg_${package_id}_templates \
 				  -context_id $package_id \
-				  -parent_id "0" \
+				  -package_id $package_id \
 				  -label "$instance_name $module" ]
 		content::folder::register_content_type -folder_id $root_key \
 		    -content_type content_template -include_subtypes t
@@ -372,6 +371,7 @@ ad_proc -private cm::modules::install::create_modules {
 	
 	# assign context_id of package_id
 	db_dml update_module_context {}
+	incr sort_key
     }
 }
 

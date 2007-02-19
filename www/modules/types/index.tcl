@@ -41,7 +41,7 @@ template::list::create \
     -no_data "There are no templates registered to this content type." \
     -actions [list "Register marked templates to this content type" [export_vars -base register-templates {content_type type_props_tab}] "Register marked templates to this content type"] \
     -elements {
-        name {
+        title {
 	    label "Template Name"
 	}
 	path {
@@ -55,10 +55,13 @@ template::list::create \
 	}
 	is_default {
 	    label "Default?"
-	    display_template "<if @type_templates.is_default@ eq t>Yes</if><else><a href=\"@type_templates.set_default_url@\">set as default</a></else>"
+	    display_template {
+		<if @type_templates.is_default@ eq t>Yes</if>
+		<else><a href=\"@type_templates.set_default_url@\" class=\"button\">Set as default</a></else>
+	    }
 	}
 	unreg_link {
-	    display_template "<center><a href=\"@type_templates.unreg_link_url;noquote@\">unregister</a></center>"
+	    display_template "<a href=\"@type_templates.unreg_link_url;noquote@\" class=\"button\">Unregister</a>"
 	}
 	
     }

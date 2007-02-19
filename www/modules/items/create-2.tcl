@@ -22,6 +22,7 @@ request set_param return_url -datatype text -value "index"
 request set_param page_title -datatype text -optional
 request set_param is_wizard -datatype keyword -value f
 
+set content_root [cm::modules::sitemap::getRootFolderID [ad_conn subsite_id]]
 permission::require_permission -party_id [auth::require_login] \
     -object_id $parent_id -privilege write
 

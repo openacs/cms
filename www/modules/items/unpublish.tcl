@@ -5,7 +5,7 @@ ad_page_contract {
 } {
     { item_id:naturalnum }
     { mount_point "sitemap" }
-    { tab:optional "item" }
+    { tab:optional "revisions" }
 }
 
 content::item::unset_live_revision -item_id $item_id

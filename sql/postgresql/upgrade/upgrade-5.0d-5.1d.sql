@@ -6,7 +6,13 @@
 -- @cvs-id $Id$
 --
 
+update apm_package_types set singleton_p = 'f' where package_key = 'cms';
+
+insert into acs_rel_roles (role,pretty_name,pretty_plural) values ('author','Author','Authors');
+insert into acs_rel_roles (role,pretty_name,pretty_plural) values ('editor','Editor','Editors');
+insert into acs_rel_roles (role,pretty_name,pretty_plural) values ('publisher','Publisher','Publishers');
 -- adds package_id to call to content_item__new
+select define_function_args('content_module__new','name,key,root_key,sort_key,parent_id,package_id,object_id,creation_date,creation_user,creation_ip,object_type');
 create or replace function content_module__new (varchar,varchar,varchar,integer,integer,integer,integer,timestamptz,integer,varchar,varchar)
 returns integer as '
 declare
@@ -14,7 +20,7 @@ declare
   p_key                         alias for $2;  
   p_root_key                    alias for $3;  
   p_sort_key                    alias for $4;  
-  p_parent_id                   alias for $5;  -- null  
+  p_parent_id                   alias for $5;  
   p_package_id                  alias for $6;
   p_object_id                   alias for $7;  -- null
   p_creation_date               alias for $8;  -- now()

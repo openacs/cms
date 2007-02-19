@@ -40,6 +40,7 @@
 			  nvl(v.title, i.name))),
       '-') title,
     o.object_type, t.pretty_name as pretty_content_type, last_modified, 
+    '/' || content_item__get_path(r.item_id,:root_id) as path,
     v.content_length
   from 
     cr_resolved_items r, cr_items i, cr_folders f, cr_revisions v, 

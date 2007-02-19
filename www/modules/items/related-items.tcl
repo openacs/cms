@@ -19,13 +19,15 @@ if { [permission::permission_p -party_id $user_id -object_id $item_id -privilege
 	-options $related_types -widget select 
 }
 
+set relation cr_item_rel
 template::list::create \
     -name related \
     -key rel_id \
+    -bulk_action_export_vars {item_id relation}\
     -no_data "No related items" \
     -multirow related \
     -actions [list "Relate marked items to this item" \
-		  [export_vars -base relate-items {item_id tab mount_point}] \
+		  [export_vars -base relate-items {item_id tab mount_point relation}] \
 		  "Relate marks items to this item"] \
     -bulk_actions [list "Remove marked relations" \
 		       [export_vars -base unrelate-item { rel_id mount_point}] \
@@ -33,6 +35,7 @@ template::list::create \
     -elements {
 	title {
 	    label "Title"
+	    display_template { @related.title;noquote@ }
 	    link_url_col title_url
 	    link_html { title "View related item" }
 	}
@@ -46,9 +49,10 @@ template::list::create \
 	    label "Tag"
 	}
 	reorder {
-	    label "Move"
-	    display_template "<nobr><a href=\"@related.move_up_url@\" title=\"Move item up\">up</a> &nbsp;|&nbsp; \
-                                    <a href=\"@related.move_down_url@\" title=\"Move item down\">down</a></nobr>"
+	    display_template { 
+		<nobr><a href=\"@related.move_up_url@\" title=\"Move item up\" class=\"button\">Move up</a>
+		<a href=\"@related.move_down_url@\" title=\"Move item down\" class=\"button\">Move down</a></nobr>
+	    }
 	}
     }    
 

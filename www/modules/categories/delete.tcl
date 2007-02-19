@@ -11,7 +11,7 @@ set is_empty [db_string get_empty_status ""]
 # If nonempty, show error
 if { [string equal $is_empty "f"] } {
 
-  ad_complain "This category contains subcategories and cannot be deleted."
+    util_user_message -message "This category contains subcategories and cannot be deleted."
 
 } else {
 
@@ -21,10 +21,9 @@ if { [string equal $is_empty "f"] } {
   }
 
   # Remove it from the clipboard, if it exists
-  set clip [cms::clipboard::parse_cookie]
-  cms::clipboard::remove_item $clip $mount_point $id
-  cms::clipboard::set_cookie $clip
-  cms::clipboard::free $clip 
+  set new_clip [cms::clipboard::remove_item [cms::clipboard::parse_cookie] $mount_point $id]
+  ad_set_cookie content_marks [cms::clipboard::reassemble_cookie $new_clip]
+  cms::clipboard::free $new_clip 
 
   ad_returnredirect "index?id=$parent_id&mount_point=$mount_point"
 }

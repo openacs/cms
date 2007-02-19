@@ -32,9 +32,9 @@ db_multirow -extend { widget_links } attribute_types get_attr_types "" {
     if {$can_edit_widgets_p} {
 	if {[string match $object_type $content_type] && [expr ! [string match $object_type "content_revision"]]} {
 	    if {[template::util::is_nil widget]} {
-		set widget_links "<a href=\"$edit_widget_url\">Register Widget</a>"
+		set widget_links "<a href=\"$edit_widget_url\" class=\"button\">Register Widget</a>"
 	    } else {
-		set widget_links "\[ <a href=\"$edit_widget_url\">Edit Widget</a> | <a href=\"$unregister_widget_url\">Unregister Widget</a> \]"
+		set widget_links "<a href=\"$edit_widget_url\" class=\"button\">Edit Widget</a> <a href=\"$unregister_widget_url\" class=\"button\">Unregister Widget</a>"
 	    }
 	}
     }

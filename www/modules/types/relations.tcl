@@ -29,7 +29,7 @@ template::list::create \
 	    label "Max Relations"
 	}
 	item_unreg_link {
-	    display_template "<center><a href=\"@rel_types.item_unreg_link;noquote@\">unregister</a></center>"
+	    display_template "<a href=\"@rel_types.item_unreg_link;noquote@\" class=\"button\">Unregister</a>"
 	}
 	
     }
@@ -59,7 +59,7 @@ template::list::create \
 	    label "Max Relations"
 	}
 	child_unreg_link {
-	    display_template "<center><a href=\"@child_types.child_unreg_link;noquote@\">unregister</a></center>"
+	    display_template "<a href=\"@child_types.child_unreg_link;noquote@\" class=\"button\">Unregister</a></center>"
 	}
 	
     }

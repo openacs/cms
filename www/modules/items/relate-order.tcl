@@ -73,5 +73,5 @@ db_transaction {
     }
 }
 
-ad_returnredirect [export_vars -base $return_url tab]
+ad_returnredirect [export_vars -base $return_url {tab item_id}]
 ad_script_abort

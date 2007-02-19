@@ -2,7 +2,7 @@
   <div id="subnavbar-container">
     <div id="subnavbar">
 
- <if @tab@ eq item>
+<!-- <if @tab@ eq item>
    <div class="tab" id="subnavbar-here">
      Item
    </div>
@@ -12,7 +12,7 @@
      <a href="@package_url@modules/items/index?item_id=@item_id@&mount_point=sitemap&tab=item" title="" class="subnavbar-unselected">Item</a>
    </div>
  </else>
-
+-->
  <if @tab@ eq revisions>
    <div class="tab" id="subnavbar-here">
      Revisions
@@ -43,6 +43,17 @@
  <else>
    <div class="tab">
      <a href="@package_url@modules/items/index?item_id=@item_id@&mount_point=sitemap&tab=categories" title="" class="subnavbar-unselected">Categories</a>
+   </div>
+ </else>
+
+ <if @tab@ eq keywords>
+   <div class="tab" id="subnavbar-here">
+     Keywords
+   </div>
+ </if>
+ <else>
+   <div class="tab">
+     <a href="@package_url@modules/items/index?item_id=@item_id@&mount_point=sitemap&tab=keywords" title="" class="subnavbar-unselected">Keywords</a>
    </div>
  </else>
 

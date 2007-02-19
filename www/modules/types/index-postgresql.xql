@@ -58,16 +58,18 @@
       <querytext>
       
   select 
-    template_id, ttmap.content_type, use_context, is_default, name, 
-    content_item__get_path(
+    template_id, ttmap.content_type, use_context, is_default, title, 
+    '/' || content_item__get_path(
       template_id,:root_id) as path,
     (select pretty_name 
        from acs_object_types 
        where object_type = :content_type) as pretty_name
   from 
-    cr_type_template_map ttmap, cr_items i 
+    cr_type_template_map ttmap, cr_items i, cr_revisions r
   where 
     i.item_id = ttmap.template_id
+  and 
+    r.revision_id = content_item__get_best_revision(i.item_id)
   and 
     ttmap.content_type = :content_type
   order by 

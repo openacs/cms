@@ -8,7 +8,7 @@ div#section {
 }
 
 div#section-header {
-  background-color: grey;
+  background-color: #888888;
   color: white;
   font: bold;
   padding-left: 10px;
@@ -56,7 +56,18 @@ div#section-header {
   </div>
  </else>
 
- <if @section@ eq "categories">
+ <if @section@ eq "sw-categories">
+  <div class="tab" id="subnavbar-here">
+    Categories
+  </div>
+ </if>
+ <else>
+  <div class="tab">
+    <a href="@package_url@modules/sw-categories/index" title="">Categories</a>
+  </div>
+ </else>
+
+ <if @section@ eq "keywords">
   <div class="tab" id="subnavbar-here">
     Keywords
   </div>
@@ -87,6 +98,17 @@ div#section-header {
   <div class="tab">
     <a href="@package_url@modules/clipboard/index" title="">Clipboard</a>
     <!--[<a href="javascript: void(openrefreshClipboard('@package_url@modules/clipboard/floating?mount_point=clipboard','clipboard','toolbar=no,innerWidth=500,innerHeight=300,scrollbars=yes'))" title="Open floating clipboard">float</a>]-->
+  </div>
+ </else>
+
+ <if @section@ eq "admin">
+  <div class="tab" id="subnavbar-here">
+    Admin
+  </div>
+ </if>
+ <else>
+  <div class="tab">
+    <a href="@package_url@modules/admin/index" title="">Admin</a>
   </div>
  </else>
 

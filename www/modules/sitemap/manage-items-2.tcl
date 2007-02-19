@@ -6,7 +6,7 @@ ad_page_contract {
 } {
     { folder_id:integer }
     { item_id:multiple }
-    { action }
+    { list_action }
     { mount_point }
     { return_url }
 }
@@ -17,13 +17,13 @@ set errors [list]
 set actions_completed 0
 foreach item_id $item_id_list {
     set content_type [content::item::content_type -item_id $item_id]
-    switch $action {
+    switch $list_action {
 	move - copy {
 	    if { [lsearch [cms::folder::get_registered_types $folder_id list] $content_type] > -1 } {
 		if { [ catch {
 		    switch $content_type {
 			content_symlink {
-			    if { $action eq "copy" } {
+			    if { $list_action eq "copy" } {
 				content::symlink::copy -target_folder_id $folder_id -symlink_id $item_id
 			    } else {
 				lappend errors "Content symlinks cannot be moved."
@@ -31,7 +31,7 @@ foreach item_id $item_id_list {
 			    }
 			}
 			content_template {
-			    if { $action eq "move" } {
+			    if { $list_action eq "move" } {
 				cms::template::move -target_folder_id $folder_id -template_id $item_id
 				content::item::move -target_folder_id $folder_id -item_id $item_id
 			    } else {
@@ -39,7 +39,7 @@ foreach item_id $item_id_list {
 			    }
 			}
 			default {
-			    content::item::${action} -target_folder_id $folder_id -item_id $item_id
+			    content::item::${list_action} -target_folder_id $folder_id -item_id $item_id
 			} 
 		    }
 		} err ] } {

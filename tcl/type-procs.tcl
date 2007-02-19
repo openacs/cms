@@ -248,7 +248,7 @@ ad_proc -public cms::type::add_content_method {
   @return integer
 } {
 
-    return [package_exec_plsql -var_list [list [list content_type $content_type] [list content_method $content_method] \
+    return [package_exec_plsql -var_list [list [list content_type $content_type] [list content_method $content_method]] \
 		content_method add_method]
 }
 

@@ -3,32 +3,18 @@
 <queryset>
    <rdbms><type>oracle</type><version>8.1.6</version></rdbms>
 
-<fullquery name="get_item_info">      
+<fullquery name="get_relation_type_options">      
       <querytext>
       
     select 
-      content_item.get_title(i.item_id) as title,
-      i.content_type
-    from 
-      cr_items i
-    where
-      i.item_id = :item_id
-      </querytext>
-</fullquery>
-
- 
-<fullquery name="get_options">      
-      <querytext>
-      
-    select 
-      lpad(' ', level, '-') || pretty_name as pretty_name, 
+      pretty_name, 
       object_type
     from
       acs_object_types
     connect by
       prior object_type = supertype
     start with
-      object_type = 'cr_item_rel'
+      object_type = :relation
       </querytext>
 </fullquery>
 

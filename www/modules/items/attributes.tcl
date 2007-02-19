@@ -28,7 +28,7 @@ permission::require_permission -party_id [auth::require_login] \
 
 # query the attributes for this content type
 
-set content_type $type_info(object_type)
+set content_type [content::item::get_content_type -item_id $info(item_id)]
 
 template::list::create \
     -name attributes \

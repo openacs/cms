@@ -38,27 +38,33 @@ ad_proc -public cms::install::package_uninstall {} {
     cms::install::unregister_implementations
 }
 
+ad_proc -public cms::install::before_instantiate {} {
+    Check to be sure there isn't already a CMS instance under this subsite.
+    not a callback but we need to check this somewhere below and bomb if nec.
+} {
+
+}
+
 ad_proc -public cms::install::package_instantiate { -package_id } {
     Procedures to run on package instantiation
 } {
     # create modules and clone workflow for new instance
     cm::modules::install::create_modules -package_id $package_id
-    cms::workflow::instance_workflow_create -package_id $package_id    
+#     cms::workflow::instance_workflow_create -package_id $package_id    
 
-    array set package_info [site_node::get_from_object_id -object_id $package_id]
-    set subsite_package [site_node::closest_ancestor_package -url $package_info(url) -element package_id]
-    array set subsite_info [site_node::get_from_object_id -object_id $subsite_package]
-
+    # assumes we are mounting from the subsite
+    array set subsite_info [site_node::get -node_id [ad_conn subsite_node_id]]
+    set subsite_package $subsite_info(package_id)
     db_dml map_subsite {}
 
     set subsite_dir "[acs_root_dir]/www/$subsite_info(url)"
     # check that directory exists and...
-    if { ![file exists $subsite_dir] } {
-	file mkdir $subsite_dir
-    }
+#     if { ![file exists $subsite_dir] } {
+# 	file mkdir $subsite_dir
+#     }
 
     # copy content delivery .vuh file to subsite root
-    file copy -force [acs_root_dir]/packages/cms/www/index.vuh $subsite_dir
+#    file copy -force [acs_root_dir]/packages/cms/www/index.vuh $subsite_dir
 
     # set up subsite segments for for workflow
     set app_group [application_group::group_id_from_package_id -package_id $subsite_package]
@@ -70,7 +76,8 @@ ad_proc -public cms::install::package_instantiate { -package_id } {
     set template_root [cm::modules::templates::getRootFolderID $subsite_package]
 
     foreach { role pn pp } $roles {
-	set rel [rel_types::new -supertype membership_rel -role_one "" -role_two $role ${role}_rel_${subsite_package} \
+	# boy, this is really convoluted; we've (i??) gotta do better
+	set rel [rel_types::new -supertype membership_rel -role_one "" -role_two $role ${role}_rel_${subsite_info(package_id)} \
 		     "$subsite_info(instance_name) $pn" "$subsite_info(instance_name) $pp" group 0 0 person 0 0]
 	rel_types::add_permissible application_group $rel
 	# MS: move to tcl API with 5.2
@@ -93,9 +100,9 @@ ad_proc -public cms::install::package_instantiate { -package_id } {
     }
 
     # register template folder with dav module
-    #set subsite_node [site_node::get_node_id_from_object_id -object_id [ad_conn subsite_id]]
-    #set templates_node [site_node::new -name templates -parent_id $subsite_node]
-    #oacs_dav::register_folder $templates_folder $templates_node    
+    #set subsite_node site_node::get_node_id_from_object_id -object_id [ad_conn subsite_id]
+    #set templates_node site_node::new -name templates -parent_id $subsite_node
+    #oacs_dav::register_folder $templates_root $templates_node    
 }
 
 ad_proc -public cms::install::package_uninstantiate { -package_id:required } {

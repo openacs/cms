@@ -9,7 +9,7 @@ ad_page_contract {
     { revision_id:integer,optional }
     { path:optional "" }
     { mount_point "templates"}
-    { tab:optional "template"}
+    { tab:optional "revisions"}
 }
 set template_id $item_id
 set user_id [auth::require_login]
@@ -43,7 +43,7 @@ set write_p [permission::permission_p -party_id $user_id \
 set return_url [ad_return_url]
 set revise_url [export_vars -base template-ae {template_id revision_id mount_point tab return_url}]
 set rename_url [export_vars -base ../items/rename {item_id mount_point tab return_url}]
-set upload_url [export_vars -base upload {template_id tab return_url}]
+set upload_url [export_vars -base upload {template_id revision_id tab return_url}]
 set download_url [export_vars -base download {template_id tab return_url}]
 
 # send over to manage-items-2 to delete

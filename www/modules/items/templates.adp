@@ -1,7 +1,7 @@
 
 Templates Registered to content item "@iteminfo.name@":
 
-<listtemplate name="registered_templates"></listtemplate>
+<listtemplate name="item_templates"></listtemplate>
 
 <p>&nbsp;</p>
 

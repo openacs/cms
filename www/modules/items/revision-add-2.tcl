@@ -59,7 +59,6 @@ cms::form::add_revision_form \
     
 if { [form is_valid add_revision] } {
     form get_values add_revision item_id
-    ns_log notice "WHAT THE FUCK ????"
     # autoprocess the revision form
     cms::form::add_revision add_revision
 

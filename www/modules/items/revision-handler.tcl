@@ -5,13 +5,13 @@ ad_page_contract {
 } {
     { item_id:integer }
     { revision_id:integer,multiple }
-    { action:optional "view" }
+    { list_action:optional "view" }
     { mount_point:optional "sitemap" }
     { tab:optional "revisions" }
     { return_url }
 }
 
-if { $action eq "view" } {
+if { $list_action eq "view" } {
     set revision_name [content::revision::revision_name -revision_id $revision_id]
     util_user_message -message "$revision_name. Select \"Author Revision\" to base a new revision on this revision."
     if { $mount_point eq "templates" } {

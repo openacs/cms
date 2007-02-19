@@ -25,7 +25,7 @@ if { [string match [content::folder::is_empty -folder_id $folder_id] "f" ] } {
     # Remove it from the clipboard, if it exists
     set clip [cms::clipboard::parse_cookie]
     cms::clipboard::remove_item $clip $mount_point $folder_id
-    cms::clipboard::set_cookie $clip
+    ad_set_cookie content_marks [cms::clipboard::reassemble_cookie $clip]
     cms::clipboard::free $clip 
 
     # Redirect to parent folder

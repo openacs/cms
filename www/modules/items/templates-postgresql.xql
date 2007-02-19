@@ -24,7 +24,7 @@
       
   select 
     template_id, use_context, 
-    content_item__get_path( template_id, null ) as path,
+    '/' || content_item__get_path( template_id, :template_root ) as path,
     acs_permission__permission_p( template_id, :user_id, 'read')
       as can_read_template
   from 
@@ -43,7 +43,7 @@
       
   select 
     template_id, use_context, is_default,
-    content_item__get_path( template_id, null ) as path,
+    '/' || content_item__get_path( template_id, :template_root ) as path,
     acs_permission__permission_p( template_id, :user_id, 'read') 
       as can_read_template,
     (select 1 

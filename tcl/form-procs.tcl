@@ -1,11 +1,7 @@
 ad_library {
     These procs manage building and processing the forms used in CMS. 
 }
-# MS: old namespace stuff - now converted to cms::form
-#namespace eval content {
-    # namespace import seems to prevent content:: procs from being recognized
-    # namespace import ::template::query ::template::form ::template::element
-#}
+
 namespace eval cms::form {}
 
 ad_proc -private cms::form::query_form_metadata { 
@@ -650,15 +646,6 @@ ad_proc -public cms::form::new_item {
         add_revision $form_name $tmpfile $prefix [expr !$exists]
     }
 
-    # flush the sitemap folder listing cache
-    #if { [template::element exists $form_name parent_id] } {
-    #    set parent_id [template::element get_value $form_name parent_id]
-    #    if { $parent_id == [cm::modules::sitemap::getRootFolderID] } {
-    #      set parent_id ""
-    #    }
-    #    cms_folder::flush sitemap $parent_id
-    #}
-
     return $item_id
 }
 
@@ -693,10 +680,33 @@ ad_proc -public cms::form::add_revision {
     # initialize an ns_set to hold bind values
     set bind_vars [ns_set create]
 
-    # get the item_id and revision_id and content_method
+    # get the item_id and revision_id, content_method and category_id
     foreach var {item_id revision_id content_method} {
         set $var [template::element get_values $form_name ${prefix}$var]
     } 
+
+    # manually pull out category ids
+    set form [ns_getform]
+    set form_size [ns_set size $form]
+    set form_counter_i 0
+    set category_ids ""
+    while {$form_counter_i < $form_size} {
+	ns_log notice "[ns_set key $form $form_counter_i]: [ns_set value $form $form_counter_i]\n" 
+	if { [string match "__category__ad_form__category_id_*" [ns_set key $form $form_counter_i]] } {
+	    ns_log notice "[ns_set key $form $form_counter_i]: [ns_set value $form $form_counter_i]\n" 
+	    append category_ids "[ns_set value $form $form_counter_i] "
+	}
+	incr form_counter_i
+    }
+
+    
+    foreach tree [category_tree::get_mapped_trees [ad_conn package_id]] {
+	ns_log notice "==================== looking for categories for tree [lindex $tree 0] " 
+	append category_ids "[category::ad_form::get_categories -container_object_id [lindex $tree 0]] "
+    }
+
+    ns_log debug "cms::form::add_revision: form:$form_name category_ids = $category_ids"
+    category::map_object -remove_old -object_id $item_id $category_ids
 
     # MS: new items were bombing with a null revision_id
     if {[empty_string_p $revision_id]} {
@@ -764,6 +774,7 @@ ad_proc -private cms::form::attribute_insert_statement {
         if { [template::element exists $form_name $prefix$attribute_name] } {
 
             set value [template::element get_value $form_name $prefix$attribute_name]
+	    ns_log debug "cms::form::attribute_insert_statement: fetching attribute values: $attribute ($datatype) $value"
 
             # Convert dates to linear "YYYY MM DD HH24 MI SS" format
             if { [string equal $datatype date] } {
@@ -777,7 +788,6 @@ ad_proc -private cms::form::attribute_insert_statement {
             
             if { ! [string equal $value {}] && ![expr { [string equal $ancestor "content_revision"] && [string equal $attribute_name "title"] }] } {
                 ns_set put $bind_vars $attribute_name $value
-
                 lappend columns $attribute_name
                 lappend values [get_sql_value $attribute_name $datatype]
             }
@@ -801,6 +811,7 @@ ad_proc -private cms::form::attribute_insert_statement {
         set insert_statement "insert into ${table_name}i ( [join [concat $columns $missing_columns] ", "] )\nselect [join [concat $values $missing_columns] ", "]\nfrom ${table_name}i\nwhere revision_id = content_item.get_latest_revision(:item_id)"
     }
 
+    ns_log debug "cms::form::attribute_insert_statement: returning $insert_statement"
     return $insert_statement
 }
 
@@ -860,7 +871,7 @@ ad_proc -public cms::form::upload_content { revision_id tmpfile filename } {
 
     # if it is HTML then strip out the body
     set mime_type [ns_guesstype $filename]
-    ns_log debug "content::upload_content: guessed mime_type: $mime_type, filename = $filename"
+    ns_log debug "cms::form::upload_content: guessed mime_type: $mime_type, filename = $filename"
     if { [string equal $mime_type text/html] } {
         set text [template::util::read_file $tmpfile]
         if { [regexp {<body[^>]*>(.*?)</body>} $text x body] } {
@@ -1058,7 +1069,8 @@ ad_proc -public cms::form::new_item_form { args } {
     template::util::get_opts $args
 
     if { ! [template::form exists $opts(form_name)] } {
-        template::form create $opts(form_name) \
+	ad_form -name $opts(form_name) -html { enctype multipart/form-data }
+#        template::form create $opts(form_name) \
             -html { enctype multipart/form-data }
     }
 
@@ -1094,31 +1106,51 @@ ad_proc -public cms::form::new_item_form { args } {
 
         if {[lsearch $opts(exclude) name] == -1} { 
             if {[lsearch $opts(hidden) name] == -1} { 
-                template::element create $opts(form_name) "$opts(prefix)name" \
+#                template::element create $opts(form_name) "$opts(prefix)name" \
                     -datatype filename \
                     -html { maxlength 400 } \
                     -widget text \
-                    -label Name
+                    -label "Name"
+		    ad_form -extend -name $form_name -form {
+			{$opts(prefix)name:filename(text)
+			    {label "Name"}
+			    {html {maxlength 400}}
+			}
+		    }
             } else { 
-                template::element create $opts(form_name) "$opts(prefix)name" \
+#                template::element create $opts(form_name) "$opts(prefix)name" \
                     -datatype filename \
                     -widget hidden \
                     -sign
+		    ad_form -extend -name $form_name -form {
+			{$opts(prefix)name:filename(hidden)}
+		    }
             }
         }
 
         if {[lsearch $opts(exclude) parent_id] == -1} { 
-            template::element create $opts(form_name) "$opts(prefix)parent_id" \
+	    ad_form -extend -name $form_name -form {
+		{$opts(prefix)parent_id:integer(hidden),optional
+		    {value $opts(parent_id)}
+		}
+	    }
+#            template::element create $opts(form_name) "$opts(prefix)parent_id" \
                 -datatype integer \
                 -widget hidden \
                 -optional \
                 -sign
+
             # ATS doesn't like "-value -100" so use set_value to get around it
-            template::element set_value $opts(form_name)  "$opts(prefix)parent_id" $opts(parent_id)
+#            template::element set_value $opts(form_name)  "$opts(prefix)parent_id" $opts(parent_id)
         }
 
         if {[lsearch $opts(exclude) relation_tag] == -1 && ![string equal {} $opts(relation)]}  { 
-            template::element create $opts(form_name) "$opts(prefix)relation_tag" \
+	    ad_form -extend -name $form_name -form {
+		{$opts(prefix)relation_tag:text(hidden),optional
+		    {value $opts(relation)}
+		}
+	    }
+#            template::element create $opts(form_name) "$opts(prefix)relation_tag" \
                 -datatype text \
                 -widget hidden \
                 -optional \
@@ -1126,7 +1158,12 @@ ad_proc -public cms::form::new_item_form { args } {
         }
 
         if {[lsearch $opts(exclude) parent_id] == -1} { 
-            template::element create $opts(form_name) "$opts(prefix)content_type" \
+	    ad_form -extend -name $form_name -form {
+		{$opts(prefix)content_type:text(hidden),optional
+		    {value $opts(content_type)}
+		}
+	    }
+#            template::element create $opts(form_name) "$opts(prefix)content_type" \
                 -datatype keyword \
                 -widget hidden \
                 -value $opts(content_type) \
@@ -1146,7 +1183,7 @@ ad_proc -public cms::form::new_item_form { args } {
 
     if { [template::form is_request $opts(form_name)] } {
         if {[template::util::is_nil item_id]} { 
-            set item_id [new_object_id]
+            set item_id [db_nextval "acs_object_id_seq"]
 
             template::element set_properties $opts(form_name) "$opts(prefix)item_id" -value $item_id
 
@@ -1208,7 +1245,8 @@ ad_proc -public cms::form::add_revision_form { args } {
     }
 
     if { ! [template::form exists $opts(form_name)] } {
-        template::form create $opts(form_name) \
+	ad_form -name $opts(form_name) -html { enctype multipart/form-data }
+#        template::form create $opts(form_name) \
             -html { enctype multipart/form-data }
     }
 
@@ -1231,7 +1269,7 @@ ad_proc -public cms::form::add_revision_form { args } {
             -sign
     }
 
-    set attributes [add_attribute_elements $opts(form_name) $opts(content_type) {} $opts(prefix) $opts(section) $opts(exclude) $opts(hidden)]
+    set attributes [add_attribute_elements $opts(form_name) $opts(content_type)  $opts(item_id) {} $opts(prefix) $opts(section) $opts(exclude) $opts(hidden)]
 
     ns_log debug "cms::form::add_revision_form: content method $opts(content_method); revision id $opts(revision_id)"
 
@@ -1274,7 +1312,7 @@ ad_proc -public cms::form::add_revision_form { args } {
 
 
 ad_proc -public cms::form::add_attribute_elements { 
-    form_name content_type { revision_id "" } {prefix {}} {section {}} {exclude {}} {hidden {}}
+    form_name content_type item_id { revision_id "" } {prefix {}} {section {}} {exclude {}} {hidden {}}
 } {
     
     Add form elements to an ATS form object for all attributes of a
@@ -1284,13 +1322,14 @@ ad_proc -public cms::form::add_attribute_elements {
                          should be added.
     @param content_type	 The content type keyword for which attribute
                          widgets should be added.
+    @option item_id      
     @param revision_id   The revision from which default values should be
                          queried
     @param prefix        a prefix for the form variables.
     @param section       a section name
    
-    @option exclude              a list of object attributes to exclude from the form
-    @option hidden               a list of attributes to hide but leave in form
+    @option exclude      a list of object attributes to exclude from the form
+    @option hidden       a list of attributes to hide but leave in form
 
     @return The list of attributes that were added.
 } {
@@ -1336,6 +1375,14 @@ ad_proc -public cms::form::add_attribute_elements {
         }
     }
 
+    # add category widget if there is at least one mapped tree
+    if { [expr [llength [category_tree::get_mapped_trees [ad_conn package_id]]] > 0] } {
+	category::ad_form::add_widgets \
+	    -container_object_id [ad_conn package_id] \
+	    -categorized_object_id $item_id \
+	    -form_name $form_name
+    }
+	
     if { ![template::util::is_nil revision_id] } {
         if { [template::form is_request $form_name] } {
 
@@ -1430,7 +1477,7 @@ ad_proc -public cms::form::add_attribute_element {
         lappend command -optional
     }
 
-    # ns_log debug "content::add_attribute_element: command = $command"
+    ns_log debug "cms::form::add_attribute_element: command = $command"
 
     eval $command
 }
@@ -1451,7 +1498,7 @@ ad_proc -public cms::form::add_content_element {
     @param section        A section name for the added elements
     @param prefix         A prefix for the form element name
 } {
-    ns_log debug "content::add_content_element: content method $content_method"
+    ns_log debug "cms::form::add_content_element: content method $content_method"
 
     template::element create $form_name "${prefix}content_method" \
         -datatype keyword \
@@ -1466,9 +1513,18 @@ ad_proc -public cms::form::add_content_element {
                 -widget richtext \
                 -label {} \
                 -datatype text \
-                -html { cols 80 rows 20 wrap physical } 
+                -html { cols 80 rows 20 wrap physical } \
+		-options {editor xinha plugins {Stylist} height 350px javascript { 
+		    xinha_config.toolbar = [ 
+					    ['popupeditor','createlink','insertimage'], 
+					    ['separator','insertorderedlist','insertunorderedlist'],
+					    ['separator','bold','italic'],
+					    ['separator','undo','redo','cut','copy','paste'],
+					    ['separator','htmlmode','killword','removeformat']
+					   ]; 
+		    xinha_config.stylistLoadStylesheet('/definitions.css'); }}
 
-            if { [template::element exists $form_name "${prefix}mime_type"]
+	    if { [template::element exists $form_name "${prefix}mime_type"]
                  && [template::element exists $form_name "${prefix}content_type"] } {
                 
                 set content_type \
@@ -1821,16 +1877,6 @@ ad_proc -private cms::form::get_type_info { object_type ref args } {
 }
 
 
-ad_proc -public cms::form::new_object_id {} {
-
-    Grab an object ID for creating a new ACS object.
-
-} {
-
-    return [db_string nextval "select acs_object_id_seq.nextval from dual"]
-}
-
-
 ad_proc -private cms::form::get_attributes { content_type args } {
 
     Returns columns from the acs_attributes table for all attributes
@@ -1912,8 +1958,7 @@ ad_proc -public cms::form::add_basic_revision { item_id revision_id title args }
 
     db_transaction {
 
-        set revision_id [db_exec_plsql basic_get_revision_id {}]
-
+        #set revision_id [db_exec_plsql basic_get_revision_id {}]
         if { [info exists opts(tmpfile)] } {
 
             update_content_from_file $revision_id $opts(tmpfile)

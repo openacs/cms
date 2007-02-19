@@ -1,9 +1,10 @@
-tasks
+tasks (as of 02/07)
 =====
 
-can rename template folders? how?
-root template/content folder procs returning correct info?
-clean up www/modules/items/relate-items (convert old table/grid format to listbuilder ala perm-include from acs-subsite)
+display tabs based on rel seg membership (i.e., designer, editor, publisher, author)
+go through various listbuilder lists and remove "un-xxx" links in favor of bulk actions
+handle rename/deletion of templates/template folders?
+clean up www/modules/items/relate-items 
 finish moving the content_method stuff to tcl api (then delete many of the xql files under types)
  - [content::revision::delete], content method stuff using package_plsql broken?
 make content_method stuff make sense (ok for now, if developer sets up the type information [content_method, mime_type] correctly?)
@@ -12,11 +13,10 @@ show symlinks to an item (extra tab, if they exist) or folder (where in UI?)
 continue cleanup/removal of xql files
 add interface to allow admin to map subsite to cms instance
  - should copy index.vuh to /www/subsite and add entry to subsite_package_map
-printer friendly template (steal from xcms-ui? add ad_page_contract to index.vuh with preview/printer-friendly option? pass in use_context?)
+printer friendly templates/alternate templates -
+  steal from x|bcms-ui? add ad_page_contract to index.vuh with preview/printer-friendly option? use_context cookie?
 new icon for "clipping" items - competing with new listbuilder checkboxes, confuses UI a bit
-go through various listbuilder lists and remove "un-xxx" links in favor of bulk actions
  unregister item templates - types/content methods & templates
-redo tab files - just cycle through list of tabs to create the tab html?
 floating clipboard working?
 (done, except for storage type) hide data model for users creating/editing items:
  - for new items, if:
@@ -33,7 +33,7 @@ plumbing
 --------
 dav for templates root
 internationalization
-integrate categories and workflow packages
+integrate workflow packages
 fix search module
 
 questions/ideas

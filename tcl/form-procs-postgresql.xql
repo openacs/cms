@@ -262,7 +262,7 @@
 
 
 
-<partialquery name="content::get_sql_value.string_to_timestamp">
+<partialquery name="cms::form::get_sql_value.string_to_timestamp">
 	<querytext>
 
 	to_date(:$name, 'YYYY MM DD HH24 MI SS')
@@ -325,7 +325,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="content::get_attribute_enum_values.gaev_get_enum_values">
+<fullquery name="cms::form::get_attribute_enum_values.gaev_get_enum_values">
 	<querytext>
 
            select
@@ -341,7 +341,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="content::add_basic_revision.basic_get_revision_id">      
+<fullquery name="cms::form::add_basic_revision.basic_get_revision_id">      
       <querytext>
 
         select content_revision__new(
@@ -361,7 +361,7 @@
 </fullquery>
 
 
-<fullquery name="content::update_content_from_file.upcff_update_cr_revisions">
+<fullquery name="cms::form::update_content_from_file.upcff_update_cr_revisions">
 	<querytext>
 
     update cr_revisions 
@@ -371,7 +371,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="content::copy_content.cc_copy_content">
+<fullquery name="cms::form::copy_content.cc_copy_content">
 	<querytext>
 
           select content_revision__content_copy (:revision_id_src, :revision_id_dest)

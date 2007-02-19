@@ -200,6 +200,7 @@ begin
 end;' language 'plpgsql';
 
 -- function new
+select define_function_args('content_module__new','name,key,root_key,sort_key,parent_id,package_id,object_id,creation_date,creation_user,creation_ip,object_type');
 create or replace function content_module__new (varchar,varchar,varchar,integer,integer,integer,integer,timestamptz,integer,varchar,varchar)
 returns integer as '
 declare

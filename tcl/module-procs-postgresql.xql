@@ -177,12 +177,17 @@
 <fullquery name="cm::modules::install::create_modules.create_module">      
       <querytext>
 	select content_module__new (
-	:module_name, --name
+	:module_name,        -- name
 	lower(:module),
 	:root_key,
 	:sort_key,
-	:package_id, -- parent_id
-	:package_id -- subsite_id
+	:package_id,         -- package_id
+	:package_id,         -- subsite_id
+	null,                -- object_id
+	current_timestamp,   -- creation_date
+	null,                -- creation_user
+	null,                -- creation_ip
+	null                 -- object_type	
 	)
       </querytext>
 </fullquery>

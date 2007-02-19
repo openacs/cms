@@ -11,11 +11,11 @@ set template_id [cms::item::get_id_from_revision -revision_id $revision_id]
 
 # write the template to the file system
 set text [content::get_content_value $revision_id]
-set template_root [cm::modules::templates::getRootFolderID [ad_conn subsite_id]]
-set path [content::template::get_path -template_id $template_id -root_folder_id $template_root]
+set path "/templates/"
+append path [content::template::get_path -template_id $template_id -root_folder_id "-100"]
 
 if { [ catch {
-    util::write_file [acs_root_dir]/templates/$path.adp $text
+    util::write_file [acs_root_dir]$path.adp $text
     content::item::set_live_revision -revision_id $revision_id } err ] } {
     util_user_message -message "There was an error writing the file and/or setting the live revision: $err"
 } else {

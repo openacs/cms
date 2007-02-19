@@ -14,6 +14,8 @@ ad_page_contract {
 set clip [cms::clipboard::parse_cookie]
 set templates [cms::clipboard::get_items $clip templates]
 
+set template_root [cm::modules::templates::getRootFolderID [ad_conn subsite_id]]
+
 # if no templates are clipped, send user a message and abort
 if { [llength $templates] < 1 } {
     util_user_message -message "There are no templates on the clipboard"
@@ -29,7 +31,7 @@ ad_form -name select_template -form {
 if { [llength $templates] > 1 } {
     set options [list]
     foreach template_id $templates {
-	set path [content::template::get_path -template_id $template_id]
+	set path "/[content::template::get_path -template_id $template_id -root_folder_id $template_root]"
 	lappend options [list $path $template_id]
     }
     ad_form -extend -name select_template -form {
@@ -39,7 +41,7 @@ if { [llength $templates] > 1 } {
     }
 
 } else {
-    set path [content::template::get_path -template_id $templates]
+    set path "/[content::template::get_path -template_id $templates -root_folder_id $template_root]"
     ad_form -extend -name select_template -form {
 	{path:text(inform)
 	    {label "Template"}

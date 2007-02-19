@@ -63,7 +63,7 @@
 	</querytext>
 </partialquery>
 
-<partialquery name="content::create_form_element.cfe_attribute_name_to_char">
+<partialquery name="cms::form::create_form_element.cfe_attribute_name_to_char">
 	<querytext>
 
 	to_char($attribute_name, 'YYYY MM DD HH24 MI SS') 
@@ -73,13 +73,13 @@
 </partialquery>
 
 
-<fullquery name="content::create_form_element.get_revision_id">
+<fullquery name="cms::form::create_form_element.get_revision_id">
 	<querytext>
 	select content_item.get_latest_revision(:item_id) from dual
 	</querytext>
 </fullquery>
 
-<partialquery name="content::get_revision_create_element.get_enum_1">
+<partialquery name="cms::form::get_revision_create_element.get_enum_1">
 	<querytext>
 	select nvl(pretty_name,enum_value), enum_value
 	from acs_enum_values
@@ -88,7 +88,7 @@
 	</querytext>
 </partialquery>
 
-<fullquery name="content::process_revision_form.new_content_revision">
+<fullquery name="cms::form::process_revision_form.new_content_revision">
 	<querytext>
              begin
 	     :revision_id := content_revision.new(
@@ -104,7 +104,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="content::process_revision_form.get_extended_attributes">
+<fullquery name="cms::form::process_revision_form.get_extended_attributes">
 	<querytext>
 
 	  select 
@@ -132,7 +132,7 @@
 	</querytext>
 </fullquery>
 
-<partialquery name="content::insert_element_data.ied_get_objects_tree">
+<partialquery name="cms::form::insert_element_data.ied_get_objects_tree">
 	<querytext>
 
           select 
@@ -156,7 +156,7 @@
 	</querytext>
 </partialquery>
 
-<fullquery name="content::new_item.get_item_id">
+<fullquery name="cms::form::new_item.get_item_id">
 	<querytext>
         begin 
           :1 := content_item.new( [join $params ","] );
@@ -164,7 +164,7 @@
         </querytext>
 </fullquery>
 
-<fullquery name="content::upload_content.get_storage_type">
+<fullquery name="cms::form::upload_content.get_storage_type">
 	<querytext>
 
                 select 
@@ -182,7 +182,7 @@
 </fullquery>
 
 
-<fullquery name="content::upload_content.upload_file_revision">      
+<fullquery name="cms::form::upload_content.upload_file_revision">      
       <querytext>
 
       update cr_revisions 
@@ -192,7 +192,7 @@
       </querytext>
 </fullquery>
 
-<fullquery name="content::upload_content.upload_text_revision">      
+<fullquery name="cms::form::upload_content.upload_text_revision">      
       <querytext>
 
              update cr_revisions 
@@ -204,7 +204,7 @@
       </querytext>
 </fullquery>
 
-<fullquery name="content::upload_content.upload_revision">      
+<fullquery name="cms::form::upload_content.upload_revision">      
       <querytext>
 
              update cr_revisions 
@@ -216,7 +216,7 @@
       </querytext>
 </fullquery>
  
-<partialquery name="content::get_sql_value.string_to_timestamp">
+<partialquery name="cms::form::get_sql_value.string_to_timestamp">
 	<querytext>
 
 	to_date(:$name, 'YYYY MM DD HH24 MI SS')
@@ -224,7 +224,7 @@
 	</querytext>
 </partialquery>
 
-<fullquery name="content::add_child_relation_element.get_all_valid_relation_tags">
+<fullquery name="cms::form::add_child_relation_element.get_all_valid_relation_tags">
 	<querytext>
 
     select 
@@ -241,7 +241,7 @@
 	</querytext>
 </fullquery>
 
-<partialquery name="content::set_attribute_values.timestamp_to_string">
+<partialquery name="cms::form::set_attribute_values.timestamp_to_string">
 	<querytext>
 
 	to_char($attr, 'YYYY MM DD HH24 MI SS') as $attr
@@ -249,7 +249,7 @@
 	</querytext>
 </partialquery>
 
-<fullquery name="content::get_attributes.ga_get_attributes">
+<fullquery name="cms::form::get_attributes.ga_get_attributes">
 	<querytext>
 
     select
@@ -273,7 +273,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="content::get_latest_revision.glr_get_latest_revision">
+<fullquery name="cms::form::get_latest_revision.glr_get_latest_revision">
 	<querytext>
 
     select content_item.get_latest_revision(:item_id) from dual
@@ -281,7 +281,7 @@
 	</querytext>
 </fullquery>
 
-<fullquery name="content::get_attribute_enum_values.gaev_get_enum_values">
+<fullquery name="cms::form::get_attribute_enum_values.gaev_get_enum_values">
 	<querytext>
 
            select
@@ -298,7 +298,7 @@
 </fullquery>
 
 
-<fullquery name="content::add_basic_revision.basic_get_revision_id">      
+<fullquery name="cms::form::add_basic_revision.basic_get_revision_id">      
       <querytext>
       begin :1 := content_revision.new(
                item_id       => content_symlink.resolve(:item_id),
@@ -309,7 +309,7 @@
       </querytext>
 </fullquery>
 
-<fullquery name="content::update_content_from_file.get_storage_type">
+<fullquery name="cms::form::update_content_from_file.get_storage_type">
 	<querytext>
 
                 select 
@@ -327,7 +327,7 @@
 </fullquery>
 
 
-<fullquery name="content::update_content_from_file.upload_file_revision">      
+<fullquery name="cms::form::update_content_from_file.upload_file_revision">      
       <querytext>
 
       update cr_revisions 
@@ -338,7 +338,7 @@
       </querytext>
 </fullquery>
 
-<fullquery name="content::update_content_from_file.upload_text_revision">      
+<fullquery name="cms::form::update_content_from_file.upload_text_revision">      
       <querytext>
 
              update cr_revisions 
@@ -350,7 +350,7 @@
       </querytext>
 </fullquery>
 
-<fullquery name="content::update_content_from_file.upload_revision">      
+<fullquery name="cms::form::update_content_from_file.upload_revision">      
       <querytext>
 
              update cr_revisions 
@@ -363,7 +363,7 @@
 </fullquery>
 
 
-<fullquery name="content::copy_content.cc_copy_content">
+<fullquery name="cms::form::copy_content.cc_copy_content">
 	<querytext>
 
            begin
