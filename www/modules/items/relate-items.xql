@@ -5,8 +5,8 @@
       <querytext>
         select relation_tag 
           from cr_type_relations 
-         where content_type = :content_type 
-           and target_type = :target_type  
+         where content_type = :item_type 
+           and target_type = :object_type
       </querytext>
 </fullquery>
 
@@ -14,8 +14,8 @@
       <querytext>
         select relation_tag 
           from cr_type_children
-         where parent_type = :content_type 
-           and child_type = :child_type  
+         where parent_type = :item_type 
+           and child_type = :object_type
       </querytext>
 </fullquery>
 
