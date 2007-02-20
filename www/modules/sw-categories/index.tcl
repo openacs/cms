@@ -33,7 +33,7 @@ template::list::create \
     -key item_id \
     -page_size 25 \
     -page_query {
-	select i.item_id, content_item__get_title(i.item_id,'f') as title, category__name(com.category_id) as category
+	select i.item_id, content_item__get_title(i.item_id,'f') as title, category__name(com.category_id,'en_US') as category
           from cr_items i join category_object_map com on (i.item_id = com.object_id) 
                join acs_object_types t on (i.content_type = t.object_type)
                [list::filter_where_clauses -and -name categorized_items]
@@ -69,7 +69,7 @@ template::list::create \
 db_multirow -extend { item_url copy full_title } categorized_items get_categorized_items "
     select i.item_id, content_item__get_title(i.item_id,'f') as title, 
            r.revision_id, i.parent_id, t.pretty_name,
-           category__name(com.category_id) as category, i.content_type
+           category__name(com.category_id,'en_US') as category, i.content_type
       from cr_items i join category_object_map com on (i.item_id = com.object_id) 
            join cr_revisions r on (r.revision_id = content_item__get_best_revision(i.item_id))
            join acs_object_types t on (i.content_type = t.object_type)
