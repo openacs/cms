@@ -1,10 +1,11 @@
 tasks (as of 02/07)
 =====
 
+auto sitemap building feature? for google sitemaps and css type main navigation
+ - add table to store folder ids that should be "hidden" 
 display tabs based on rel seg membership (i.e., designer, editor, publisher, author)
 go through various listbuilder lists and remove "un-xxx" links in favor of bulk actions
 handle rename/deletion of templates/template folders?
-clean up www/modules/items/relate-items 
 finish moving the content_method stuff to tcl api (then delete many of the xql files under types)
  - [content::revision::delete], content method stuff using package_plsql broken?
 make content_method stuff make sense (ok for now, if developer sets up the type information [content_method, mime_type] correctly?)

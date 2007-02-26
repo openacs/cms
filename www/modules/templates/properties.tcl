@@ -47,6 +47,6 @@ set upload_url [export_vars -base upload {template_id revision_id tab return_url
 set download_url [export_vars -base download {template_id tab return_url}]
 
 # send over to manage-items-2 to delete
-set action delete
+set list_action delete
 set folder_id $template_info(parent_id)
-set delete_url [export_vars -base ../sitemap/manage-items-2 {item_id mount_point folder_id action return_url}]
+set delete_url [export_vars -base ../sitemap/manage-items-2 {item_id mount_point folder_id list_action return_url}]
