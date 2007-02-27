@@ -87,12 +87,30 @@ cms::form::new_item_form -form_name create_item \
     -content_method $content_method
 
 # added to support content storage selection (OpenACS - DanW)
-element create create_item storage_type \
-	-datatype keyword \
-	-widget radio \
-	-label "Content Storage Type" \
-        -options { {{Lob Storage} lob } {{File Storage} file} {{Text Storage} text}} \
-	-values [list "text"]
+switch $content_method {
+    file_upload {
+	element create create_item storage_type \
+	    -datatype text \
+	    -widget hidden \
+	    -value file
+    }
+    no_content {
+	element create create_item storage_type \
+	    -datatype text \
+	    -widget hidden \
+	    -optional \
+	    -value text
+    }
+    default {
+	element create create_item storage_type \
+	    -datatype keyword \
+	    -widget radio \
+	    -label "Content Storage Type" \
+	    -options { {{Lob Storage} lob } {{Text Storage} text}} \
+	    -values [list "text"]
+    }
+}
+
 
 if { [wizard exists] } {
   set is_wizard t
