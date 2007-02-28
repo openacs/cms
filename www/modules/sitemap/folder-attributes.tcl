@@ -52,7 +52,9 @@ set page_title "Folder Attributes - $folder_info(label)"
 set return_url [ad_return_url]
 
 # Determine registered types
-db_1row get_options "" -column_array folder_options
+set type_list [cms::folder::get_registered_types $folder_id list]
+set subfolders_p [ad_decode [lsearch $type_list content_folder] -1 f t]
+set symlinks_p [ad_decode [lsearch $type_list content_symlink] -1 f t]
 
 # Create the form for registering special types to the folder
 ad_form -name special_types \
@@ -60,38 +62,42 @@ ad_form -name special_types \
 	{allow_subfolders:boolean(radio)
 	    {label "Allow Subfolders?"}
 	    {options {{Yes t} {No f}}}
-	    {values $folder_options(allow_subfolders)}
+	    {value $subfolders_p}
 	}
 	{allow_symlinks:boolean(radio)
 	    {label "Allow Symlinks?"}
 	    {options {{Yes t} {No f}}}
-	    {values $folder_options(allow_symlinks)}
+	    {value $symlinks_p}
 	}
 	{folder_resolved_id:integer(hidden),optional}
 	{mount_point:text(hidden)}
 	{folder_id:integer(hidden)}
+	{folder_props_tab:text(hidden)}
     } \
-    -on_request {}\
+    -on_request {} \
     -on_submit {
 
 	permission::require_permission -party_id [auth::require_login] \
 	    -object_id $folder_id -privilege write
 
-        if { $allow_subfolders eq "t"] } {
-            set subfolder_method "register_content_type"
+        if { $allow_subfolders eq "t" } {
+	    content::folder::register_content_type -folder_id $folder_id \
+		-content_type content_folder
         } else {
-            set subfolder_method "unregister_content_type"
+	    content::folder::unregister_content_type -folder_id $folder_id \
+		-content_type content_folder
         }
 	
-        if { $allow_symlinks eq "t"] } {
-            set symlink_method "register_content_type"
+        if { $allow_symlinks eq "t" } {
+	    content::folder::register_content_type -folder_id $folder_id \
+		-content_type content_symlink
         } else {
-            set symlink_method "unregister_content_type"
+	    content::folder::unregister_content_type -folder_id $folder_id \
+		-content_type content_symlink
         }
 	
-        db_exec_plsql content ""
     } \
     -after_submit {
-	ad_returnredirect [export_vars -base folder-attributes {folder_id mount_point}]
+	ad_returnredirect [export_vars -base folder-attributes {folder_id mount_point folder_props_tab}]
 	ad_script_abort
     }
