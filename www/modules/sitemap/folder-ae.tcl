@@ -52,13 +52,18 @@ ad_form -name folder -cancel_url $return_url -export { parent_id mount_point ret
 } -new_data {
 
 
-    if { [catch {
-	set folder_id [content::folder::new -name $name -parent_id $parent_id \
+    if { [catch { set folder_id [content::folder::new -name $name -parent_id $parent_id \
 			   -label $label -description $description ] } error ] } {
 	# couldn't create the folder
 	set folder_id $parent_id
-	ad_returnredirect -message "Could not create the folder. The error we received was: $error" \
-	    [export_vars -base ../${mount_point}/index folder_id]
+	# give a friendlier message for the most common cause
+	if { [regexp "cr_items_unique_name" $error] } {
+	    set message "Could not create folder because an item with the same name already exists in this folder."
+	} else {
+	    set message "Could not create the folder. The error was: $error"
+	}
+	ad_returnredirect -message $message [export_vars -base ../${mount_point}/index folder_id]
+	ad_script_abort
     }
     content::folder::register_content_type -folder_id $folder_id \
 	-content_type [ad_decode $mount_point "templates" content_template content_revision] \
@@ -74,5 +79,5 @@ ad_form -name folder -cancel_url $return_url -export { parent_id mount_point ret
 } -after_submit {
 
     ad_returnredirect [export_vars -base ../${mount_point}/index { mount_point folder_id }]
-
+    ad_script_abort
 }
