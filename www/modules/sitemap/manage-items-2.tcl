@@ -17,6 +17,7 @@ set errors [list]
 set actions_completed 0
 foreach item_id $item_id_list {
     set content_type [content::item::content_type -item_id $item_id]
+    set title [content::item::get_title -item_id $item_id]
     switch $list_action {
 	move - copy {
 	    if { [lsearch [cms::folder::get_registered_types $folder_id list] $content_type] > -1 } {
@@ -25,6 +26,7 @@ foreach item_id $item_id_list {
 			content_symlink {
 			    if { $list_action eq "copy" } {
 				content::symlink::copy -target_folder_id $folder_id -symlink_id $item_id
+				util_user_message -message "Copied link $title"
 			    } else {
 				lappend errors "Content symlinks cannot be moved."
 				continue
@@ -34,12 +36,15 @@ foreach item_id $item_id_list {
 			    if { $list_action eq "move" } {
 				cms::template::move -target_folder_id $folder_id -template_id $item_id
 				content::item::move -target_folder_id $folder_id -item_id $item_id
+				util_user_message -message "Moved template $title"
 			    } else {
 				content::item::copy -target_folder_id $folder_id -item_id $item_id
+				util_user_message -message "Copied template $title"
 			    }
 			}
 			default {
 			    content::item::${list_action} -target_folder_id $folder_id -item_id $item_id
+			    util_user_message -message "Copied item $title"
 			} 
 		    }
 		} err ] } {
@@ -57,6 +62,7 @@ foreach item_id $item_id_list {
 		    lappend errors $err
 		} else {
 		    incr actions_completed
+		    util_user_message -message "Symlinked $title created"
 		}
 	    } else {
 		lappend errors "Content symlinks are not allowed in this folder."
@@ -67,14 +73,17 @@ foreach item_id $item_id_list {
 		switch $content_type {
 		    content_symlink {
 			content::symlink::delete -symlink_id $item_id
+			util_user_message -message "Symlinked $title deleted"
 		    }
 		    content_template {
 			cms::template::delete -template_id $item_id
 			content::template::delete -template_id $item_id
+			util_user_message -message "Template $title deleted"
 		    }
 		    content_folder {
 			if { [content::folder::is_empty -folder_id $item_id] } {
 			    content::folder::delete -folder_id $item_id
+			    util_user_message -message "Folder $title deleted"
 			} else {
 			    lappend errors "Folders must be empty before they can be deleted."
 			    continue
@@ -82,6 +91,7 @@ foreach item_id $item_id_list {
 		    }
 		    default {
 			content::item::delete -item_id $item_id
+			util_user_message -message "Item $title deleted"
 		    }  
 		} 
 	    } err ] } {
