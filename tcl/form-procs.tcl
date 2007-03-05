@@ -691,9 +691,7 @@ ad_proc -public cms::form::add_revision {
     set form_counter_i 0
     set category_ids ""
     while {$form_counter_i < $form_size} {
-	ns_log notice "[ns_set key $form $form_counter_i]: [ns_set value $form $form_counter_i]\n" 
 	if { [string match "__category__ad_form__category_id_*" [ns_set key $form $form_counter_i]] } {
-	    ns_log notice "[ns_set key $form $form_counter_i]: [ns_set value $form $form_counter_i]\n" 
 	    append category_ids "[ns_set value $form $form_counter_i] "
 	}
 	incr form_counter_i
@@ -701,7 +699,6 @@ ad_proc -public cms::form::add_revision {
 
     
     foreach tree [category_tree::get_mapped_trees [ad_conn package_id]] {
-	ns_log notice "==================== looking for categories for tree [lindex $tree 0] " 
 	append category_ids "[category::ad_form::get_categories -container_object_id [lindex $tree 0]] "
     }
 
@@ -1458,7 +1455,6 @@ ad_proc -public cms::form::add_attribute_element {
         template::util::list_to_array $values param $columns
     }
 
-
     # special case - the search widget
     #if { [string equal $param(widget) search] } {
     #    set param(datatype) search
@@ -1471,6 +1467,20 @@ ad_proc -public cms::form::add_attribute_element {
     # use any set of values for label and optional flag
     lappend command -label $param(pretty_name) -widget $param(widget) \
         -datatype $param(datatype) -section $section
+
+    # initialize richtext widget for non "content" area attributes
+    if { $param(widget) eq "richtext" } {
+	lappend command -options {editor xinha plugins {Stylist} height 350px javascript { 
+		xinha_config.toolbar = [ 
+					['popupeditor','createlink','insertimage'], 
+					['separator','insertorderedlist','insertunorderedlist'],
+					['separator','bold','italic'],
+					['separator','undo','redo','cut','copy','paste'],
+					['separator','htmlmode','killword','removeformat']
+				       ]; 
+	    xinha_config.stylistLoadStylesheet('/definitions.css'); }
+	}
+    }
     
     # changed from widget_is_required to param_is_required (OpenACS - DanW)
     if { $param(param_is_required) eq "f" } {
