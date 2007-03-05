@@ -44,7 +44,7 @@ foreach item_id $item_id_list {
 			}
 			default {
 			    content::item::${list_action} -target_folder_id $folder_id -item_id $item_id
-			    util_user_message -message "Copied item $title"
+			    util_user_message -message "[ad_decode $list_action move Moved Copied] item $title"
 			} 
 		    }
 		} err ] } {

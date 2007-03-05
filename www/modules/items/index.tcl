@@ -77,4 +77,4 @@ if { [content::item::get_template -item_id $item_id -use_context public] ne "" }
 # send over to manage-items-2 to delete
 set list_action delete
 set folder_id $content_item(parent_id)
-set delete_url [export_vars -base ../sitemap/manage-items-2 {item_id mount_point folder_id action return_url}]
+set delete_url [export_vars -base ../sitemap/manage-items-2 {item_id mount_point folder_id list_action return_url}]
