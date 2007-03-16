@@ -87,7 +87,7 @@ ad_proc -public cm::modules::templates::getRootFolderID { subsite_id } {
 
 } {
     if { ![nsv_exists browser_state template_root_$subsite_id] } {
-        set root_id [db_string template_get_root_id ""]
+        set root_id [db_string template_get_root_id {} -default "-100"]
         nsv_set browser_state template_root_$subsite_id $root_id
         return $root_id
     } else {
@@ -132,7 +132,7 @@ ad_proc -public cm::modules::sitemap::getRootFolderID { subsite_id } {
 
 } {
     if { ![nsv_exists browser_state sitemap_root_$subsite_id] } {
-        set root_id [db_string sitemap_get_root_id ""]
+        set root_id [db_string sitemap_get_root_id {} -default "-100"]
         nsv_set browser_state sitemap_root_$subsite_id $root_id
         return $root_id
     } else {

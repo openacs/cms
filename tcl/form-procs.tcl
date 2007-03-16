@@ -584,7 +584,7 @@ ad_proc -public cms::form::new_item {
 } {
     # Here we walk the item prefixes and create them all, unless the content_prefixes var 
     # does not exist or we are already handling the form
-    ns_log Warning "cms::form::new_item: handling prefix $prefix"
+    ns_log debug "cms::form::new_item: handling prefix $prefix"
     if {[string equal "StArT" $prefix]} { 
         if {[template::element exists $form_name content_prefixes]} { 
             foreach prefix [template::element get_value $form_name content_prefixes] { 
@@ -676,7 +676,7 @@ ad_proc -public cms::form::add_revision {
 
     @see called by revision-add-2 in the items module
 } {
-    ns_log Debug "cms::form::add_revision: $form_name $tmpfile $prefix $new_p"
+    ns_log debug "cms::form::add_revision: $form_name $tmpfile $prefix $new_p"
     # initialize an ns_set to hold bind values
     set bind_vars [ns_set create]
 
