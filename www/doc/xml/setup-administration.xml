@@ -467,7 +467,7 @@ procedure register_child_type (
 </programlisting>
 
       <para>The parameters for <computeroutput>content_type.register_child_type</computeroutput>
-      are largely analagous to those for <computeroutput>content_type.register_relation_type
+      are largely analogous to those for <computeroutput>content_type.register_relation_type
       </computeroutput>, except <computeroutput>parent_type</computeroutput> and 
       <computeroutput>child_type</computeroutput> must both be content types (<computeroutput>
       content_revision</computeroutput> or a sub-class of it).  <computeroutput>
