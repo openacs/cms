@@ -150,7 +150,7 @@ ad_proc -private widget::create_text_param { form order default is_required para
   @param default The default value for the form widget param value
   @param is_required A flag indicating whether the value of the form widget
          param is mandatory
-  @param param_source The deafult param source for the form widget param 
+  @param param_source The default param source for the form widget param 
           value (literal, query, eval)
 
 } {
