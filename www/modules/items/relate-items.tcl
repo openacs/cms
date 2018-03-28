@@ -77,7 +77,7 @@ permission::require_permission -party_id [auth::require_login] \
 
     } elseif { $prev_item != $clip_row(related_id) && [llength $item_tags] > 0 } {
 
-      # Apppend another row
+      # Append another row
       add_row
 
       set item_tags [list [list $clip_row(relation_tag) $clip_row(relation_tag)]]
