@@ -333,7 +333,7 @@ ad_proc content::get_revision_create_element {} {
                 # build the option list
                 if { [string equal $datatype "enumeration"] } {
 
-                    set options [db_list_of_list get_enum_values $__sql]
+                    set options [db_list_of_lists get_enum_values $__sql]
                     lappend code_params -options $options
                 }
                 
