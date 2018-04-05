@@ -10,7 +10,7 @@ ad_proc -private content::query_form_metadata {
     {extra_where {}} 
     {extra_orderby {}}
 } {
-    Helper proc: query out all the information neccessary to create
+    Helper proc: query out all the information necessary to create
     a custom form element based on stored metadata
     Requires the variable content_type to be set in the calling frame
 } {
@@ -74,7 +74,7 @@ ad_proc -private content::assemble_form_element {
     }
     set last_row $i
 
-    # All the neccessary variables should still be set
+    # All the necessary variables should still be set
     get_element_default_params
 
     # eval the last "element create" string
@@ -210,7 +210,7 @@ ad_proc -public content::get_revision_form {
     set code_params [list]
     set html_params [list]
     
-    # Perform a gigantic query to retreive all metadata
+    # Perform a gigantic query to retrieve all metadata
     query_form_metadata
 
     # Process the results and create the elements
@@ -297,7 +297,7 @@ ad_proc -public content::get_element_default_params {} {
     PRE: requires datatype, widget, attribute_label, is_required code_params
     to be set in the calling frame
     
-    POST: appends the list of params neccessary to create a new element to code_params
+    POST: appends the list of params necessary to create a new element to code_params
 
 } {
 

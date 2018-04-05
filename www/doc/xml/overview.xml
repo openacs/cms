@@ -117,7 +117,7 @@
     <title>Deployment</title>
 
     <para>CMS can coexist with your public server infrastructure in a
-      variety of ways, ranging from total indepedence to tight
+      variety of ways, ranging from total independence to tight
       integration.</para>
 
     <sect3 id="overview-static-content" xreflabel="Static Content">

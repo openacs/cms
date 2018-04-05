@@ -12,7 +12,7 @@
 #
 # In order to build the tree, the state is traversed in the depth-first order,
 # and each folder id is mapped to the appropriate folder in the cache, which contains
-# all the presentation information neccessary to display it on the tree.
+# all the presentation information necessary to display it on the tree.
 #
 #################################################
 
@@ -49,8 +49,8 @@ ad_proc -public updateTreeStateChildren {
 
   foreach child $children {
 
-    # If we are at the top level, retreive the mount point. 
-    # Otherwise, retreive the folder id and use the passed in mount point
+    # If we are at the top level, retrieve the mount point. 
+    # Otherwise, retrieve the folder id and use the passed in mount point
     if { $level == 0 } {
       set child_id ""
       set mount_point [stateNodeAccess id $child]
@@ -74,7 +74,7 @@ ad_proc -public updateTreeStateChildren {
     set the_folder [getFolder $user_id $mount_point $child_id state]
     set folder_children [folderAccess children $the_folder]
 
-    # If the folder in the db is newer than the update, retreive it from the db
+    # If the folder in the db is newer than the update, retrieve it from the db
     if { [folderAccess update_time $the_folder] > $update_time } {
       set folder_exists 0
       set use_new_children 1
@@ -103,7 +103,7 @@ ad_proc -public updateTreeStateChildren {
 
             ns_log debug "updateTreeStateChildren: EXPANDING: [folderPath $user_id $mount_point $target_id]"
 
-            # If the list is empty, retreive children from the database and recache the folder later
+            # If the list is empty, retrieve children from the database and recache the folder later
             if { [llength [folderAccess children $the_folder]] == 0 } {
               set folder_exists 0
             }
@@ -162,7 +162,7 @@ ad_proc -public updateTreeStateChildren {
     } 
  
     # Merge the children in the state with the children in the folder, if
-    # neccessary. This ensures that, if a folder was already expanded, along
+    # necessary. This ensures that, if a folder was already expanded, along
     # with its subfloders, their expanded status is preserved
     if { $use_new_children } {
 
@@ -285,7 +285,7 @@ ad_proc -public fetchStateChildFolders { user_id mount_point children folderList
 
 ad_proc -public folderPath { user_id mount_point folder_id } {
 
- Retreive a "path" to the particular folder - in fact, this is a unique hash 
+ Retrieve a "path" to the particular folder - in fact, this is a unique hash 
  key used to reference the folder in the AOLServer cache
 
 } {
@@ -294,7 +294,7 @@ ad_proc -public folderPath { user_id mount_point folder_id } {
 
 ad_proc -public folderChildrenDB { mount_point folder_id } {
 
- Hit the database to retreive the list of children for the folder
+ Hit the database to retrieve the list of children for the folder
  Recache the child folders if specified
 
 } {
@@ -386,7 +386,7 @@ ad_proc -public stateNodeCreate { id children {selected ""}} {
   
   set ret [list $id $children]
 
-  # Only append the "selected" field if neccessary
+  # Only append the "selected" field if necessary
   if { [string equal $selected "t"] } {
     lappend ret "t"
   }
@@ -410,8 +410,8 @@ ad_proc -public stateNodeAccess { op node } {
 
 ad_proc -public getFolder { user_id mount_point folder_id stateRef } {
 
- Retreive folder information for a particular id. If that id does not exist 
- in the cache, cache it. if id is the empty string, retreives the top-level 
+ Retrieve folder information for a particular id. If that id does not exist 
+ in the cache, cache it. if id is the empty string, retrieves the top-level 
  mount point
 
 } {
@@ -567,7 +567,7 @@ ad_proc -public cacheStateFolders { user_id target_mount_point target_folder_id 
         # Cache child folders of the current folder
         set mount_point_id [stateNodeAccess id $mount_point]
         foreach child_folder [folderChildrenDB $mount_point_id $id] {
-          # Retreive the children of this folder from the db in case another
+          # Retrieve the children of this folder from the db in case another
           # user has added some chilren
           set new_children [folderChildIDs [folderChildrenDB $mount_point_id \
                                                 [folderAccess id $child_folder]]]

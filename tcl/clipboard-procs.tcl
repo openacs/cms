@@ -41,7 +41,7 @@ ad_proc -public clipboard::parse_cookie {} {
 
 ad_proc -public clipboard::get_items { clip mount_point } {
 
-  Retreive all marked items as a list
+  Retrieve all marked items as a list
 
 } {
     return [ns_set get $clip $mount_point]

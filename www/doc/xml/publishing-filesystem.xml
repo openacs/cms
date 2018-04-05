@@ -367,7 +367,7 @@ I am a child
 		<entry>
 		  <computeroutput>-revision_id <replaceable>id</replaceable></computeroutput></entry>
 		<entry>Specifies the id of the revision which should be used when
-		  rendering the item. If this option is ommitted, the handler is free
+		  rendering the item. If this option is omitted, the handler is free
 		  to use any revision; the live revision is probably the logical
 		  choice.</entry>
 	      </row>
@@ -635,7 +635,7 @@ proc publish::handle::image { item_id args } {
 		      URL.</para></listitem>
 
 		  <listitem><para><computeroutput>error_msg</computeroutput> - An error message. If this variable
-		      contains the empty string, then no error has ocurred.</para></listitem>
+		      contains the empty string, then no error has occurred.</para></listitem>
 		</itemizedlist>
 	      </entry>
 	    </row>

@@ -90,8 +90,8 @@ limit 1;
 --   function has_grant_authority (
 --     --/** Determine if the user may grant a certain permission to another
 --     --    user. The permission may only be granted if the user has 
---     --    the permission himself and posesses the cm_perm access, or if the
---     --    user posesses the cm_perm_admin access.
+--     --    the permission himself and possesses the cm_perm access, or if the
+--     --    user possesses the cm_perm_admin access.
 --     --    @author Stanislav Freidin
 --     --    @param item_id     The item whose permissions are to be changed
 --     --    @param holder_id   The person who is attempting to grant the permissions
@@ -131,8 +131,8 @@ limit 1;
 --   function has_revoke_authority (
 --     --/** Determine if the user may take a certain permission away from another
 --     --    user. The permission may only be revoked if the user has 
---     --    the permission himself and posesses the cm_perm access, while the
---     --    other user does not, or if the user posesses the cm_perm_admin access.
+--     --    the permission himself and possesses the cm_perm access, while the
+--     --    other user does not, or if the user possesses the cm_perm_admin access.
 --     --    @author Stanislav Freidin
 --     --    @param item_id     The item whose permissions are to be changed
 --     --    @param holder_id   The person who is attempting to revoke the permissions

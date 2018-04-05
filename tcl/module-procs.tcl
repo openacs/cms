@@ -82,7 +82,7 @@ ad_proc -public cm::modules::workspace::getChildFolders { id } {
 
 ad_proc -public cm::modules::templates::getRootFolderID { package_id } {
 
-  Retreive the id of the root folder
+  Retrieve the id of the root folder
 
 } {
     if { ![nsv_exists browser_state template_root_$package_id] } {
@@ -127,7 +127,7 @@ ad_proc -public cm::modules::workflow::getChildFolders { id } {
 
 ad_proc -public cm::modules::sitemap::getRootFolderID { package_id } {
 
-  Retreive the id of the root folder
+  Retrieve the id of the root folder
 
 } {
     if { ![nsv_exists browser_state sitemap_root_$package_id] } {

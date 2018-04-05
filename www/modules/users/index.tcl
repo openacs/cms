@@ -20,7 +20,7 @@ if { [string equal $admin_p t] } {
 
 set perm_p [db_string check_perm ""]
 
-# Create all the neccessary URL params for passthrough
+# Create all the necessary URL params for passthrough
 set passthrough "mount_point=$mount_point&parent_id=$parent_id"
 set root_id [cm::modules::${mount_point}::getRootFolderID]
 
