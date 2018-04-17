@@ -96,14 +96,14 @@ namespace eval publish {
 ad_proc -public publish::get_template_root {} {
 
   @public get_template_root
- 
+
   Get the template root. All templates are assumed to exist
   in the filesystem with their URLs relative to this root.
   The page root is controlled by the TemplateRoot parameter in CMS.
   The default is /web/yourserver/templates
- 
+
   @return The template root
- 
+
   @see content::get_template_root
   @see publish::get_page_root
 
@@ -124,19 +124,19 @@ ad_proc -public content::get_template_path {} {
 # ad_proc -public publish::mkdirs { path } {
 
 #   @public mkdirs
- 
-#   Create all the directories neccessary to save the specified file
- 
-#   @param path 
+
+#   Create all the directories necessary to save the specified file
+
+#   @param path
 #      The path to the file that is about to be saved
- 
+
 
 # } {
 
 #   set index [string last "/" $path]
 #   if { $index != -1 } {
 #     file mkdir [string range $path 0 [expr $index - 1]]
-#   } 
+#   }
 # }
 
 
@@ -144,11 +144,11 @@ ad_proc -public content::get_template_path {} {
 ad_proc -private publish::delete_multiple_files { url {root_path ""}} {
 
   @private delete_multiple_files
- 
+
   Delete the specified URL from the filesystem, for all revisions
-  
+
   @param url          Relative URL of the file to write
- 
+
   @see publish::get_publish_roots
   @see publish::write_multiple_files
   @see publish::write_multiple_blobs
