@@ -57,8 +57,8 @@ ad_proc -private content::assemble_form_element {
     upvar content_type content_type
     upvar opts opts
 
-    set code_params   [list]
-    set html_params   [list]
+    set code_params   {}
+    set html_params   {}
 
     # Process the results of the query. 
     for { set i $start_row } { $i <= $rowcount  } { incr i } {
@@ -207,8 +207,8 @@ ad_proc -public content::get_revision_form {
     set last_attribute_name ""
     set new_section_p 1
 
-    set code_params [list]
-    set html_params [list]
+    set code_params {}
+    set html_params {}
     
     # Perform a gigantic query to retrieve all metadata
     query_form_metadata
@@ -250,8 +250,8 @@ ad_proc -public content::get_revision_form {
 		ns_log debug "content::get_revision_form:   type_label: $last_type"
                 eval $form_element
                 
-                set code_params [list]
-                set html_params [list]
+                set code_params {}
+                set html_params {}
             }
 
 
@@ -396,8 +396,8 @@ ad_proc -public content::process_revision_form { form_name content_type item_id 
             if { $i != 1 } {                
                 content::process_revision_form_dml
             }
-            set columns [list]
-            set values [list]
+            set columns {}
+            set values {}
         }
         
         # fetch the value of the attribute from the form
@@ -493,8 +493,8 @@ ad_proc -public content::insert_element_data {
             if { $i != 1 } {                
                 content::process_insert_statement
             }
-            set columns [list]
-            set values [list]
+            set columns {}
+            set values {}
         }
         
         # fetch the value of the attribute from the form
@@ -552,7 +552,7 @@ ad_proc -public content::assemble_passthrough { args } {
     Assemble a passthrough list out of variables
 
 } {
-    set result [list]
+    set result {}
     foreach varname $args {
         upvar $varname var
         lappend result [list $varname $var]
@@ -783,9 +783,9 @@ ad_proc -private content::attribute_insert_statement {
     # initialize the column and value list 
     set columns [list item_id revision_id creation_user creation_ip]
     set values [list :item_id :revision_id null null]
-    set default_columns [list] 
-    set default_values [list]
-    set missing_columns [list]
+    set default_columns {} 
+    set default_values {}
+    set missing_columns {}
 
     # query for attribute names and datatypes
     foreach attribute [get_attributes $content_type attribute_name datatype default_value ancestor] { 
@@ -1344,7 +1344,7 @@ ad_proc -public content::add_attribute_elements {
 
     set attribute_data [eval get_type_attribute_params [array names type_lookup]]
 
-    set attribute_names [list]
+    set attribute_names {}
     array set attributes_by_type $attribute_data
 
     foreach row $attribute_list { 
@@ -1754,8 +1754,8 @@ ad_proc -private content::set_attribute_values {
     # Assemble the list of columns to query, handling dates
     # correctly 
 
-    set columns [list]
-    set attr_types [list]  
+    set columns {}
+    set attr_types {}  
     foreach attr $attributes {
         if { [template::element exists $form_name "$prefix$attr"] } {
             set datatype [template::element get_property $form_name "$prefix$attr" datatype]

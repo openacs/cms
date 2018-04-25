@@ -24,7 +24,7 @@ ad_proc -public initFolderTree { user_id } {
 
 } {
 
-  set state [list]
+  set state {}
   foreach mount_point [buildMountPoints $user_id] {
     lappend state [stateNodeCreate [folderAccess mount_point $mount_point] [list]]
   }
@@ -44,7 +44,7 @@ ad_proc -public updateTreeStateChildren {
 
 } {
  
-  set new_children [list]
+  set new_children {}
   upvar $stateRef state
 
   foreach child $children {
@@ -89,7 +89,7 @@ ad_proc -public updateTreeStateChildren {
         collapse {
           # Collapse: empty the children list
           ns_log debug "updateTreeStateChildren: COLLAPSING: [folderPath $user_id $mount_point $target_id]"
-          set child_children [list]   
+          set child_children {}   
         }
 
         expand {
@@ -172,7 +172,7 @@ ad_proc -public updateTreeStateChildren {
       } 
 
       # Merge the new children, preserving the sorted order
-      set child_children [list]
+      set child_children {}
       foreach new_child $folder_children {
         set old_child_id [stateNodeAccess id $new_child]
         # If the old child exists, use it instead of the new one
@@ -222,7 +222,7 @@ ad_proc -public fetchStateFolders { user_id stateRef } {
   # Reference the state
   upvar $stateRef state
 
-  set folderList [list]
+  set folderList {}
 
   foreach node $state {
 
@@ -366,7 +366,7 @@ ad_proc -public folderChildIDs { subfolder_list { user_id {}}} {
  the folders in the process
 
 } {
-  set child_ids [list]
+  set child_ids {}
   foreach subfolder $subfolder_list {
     if { ![template::util::is_nil user_id] } {
       cacheOneFolder $user_id $subfolder 1
