@@ -69,7 +69,7 @@ if { [form is_valid delete] } {
 
     db_transaction {
 
-        set parents {}
+        set parents [list]
         foreach del_item_id $deleted_items {
             set is_symlink [element get_values delete "is_symlink_$del_item_id"]
             set is_folder [element get_values delete "is_folder_$del_item_id"]

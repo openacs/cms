@@ -192,7 +192,7 @@ ad_proc -public cm::modules::types::getChildFolders { id } {
 
 } {
 
-    set children {}
+    set children [list]
 
     if { [string equal $id {}] } {
         set id [getRootFolderID [ad_conn package_id]]
@@ -222,7 +222,7 @@ ad_proc -public cm::modules::categories::getChildFolders { id } {
 
 } {
 
-    set children {}
+    set children [list]
 
     if { [string equal $id {}] } {
         set where_clause "k.parent_id is null"
@@ -307,7 +307,7 @@ ad_proc -public cm::modules::clipboard::getChildFolders { id } {
         return [list]
     }
 
-    set children {}
+    set children [list]
     
     set module_name [namespace tail [namespace current]] 
 

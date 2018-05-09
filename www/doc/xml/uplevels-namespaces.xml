@@ -964,7 +964,7 @@ proc list_map { the_list code } {
 1 2 3 4
 % set factor 3
 3
-% set b {}
+% set b [list]
 % list_map $a {lappend b [expr $list_item * $factor]}
 % set b
 3 6 9 12

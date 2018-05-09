@@ -24,7 +24,7 @@ ad_proc -public clipboard::ui::form_create { form_name args } {
     set elements $opts(elements)
     unset opts(elements)
   } else {
-    set elements {}
+    set elements [list]
   }
   set v_args [template::util::list_opts]
 
@@ -72,7 +72,7 @@ ad_proc -public clipboard::ui::add_row { form_name mount_point item_id title arg
   # Set defaults
   set row(html) ""
   set row(hidden) ""
-  set row(elements) {}
+  set row(elements) [list]
 
   # Create the checkbox
   set element_code [list check -datatype text -widget checkbox \
@@ -214,7 +214,7 @@ ad_proc -public clipboard::ui::generate_form_header { form_name {row_index 1}} {
     return
   }
 
-  set header {}
+  set header [list]
   foreach element_name $row(elements) {
     upvar "${form_name}:${element_name}_${row_index}" element
     if { ![string equal $element(widget) hidden] } {

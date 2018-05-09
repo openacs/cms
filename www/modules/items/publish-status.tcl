@@ -20,7 +20,7 @@ db_1row get_info "" -column_array info
 
 # Build a sentence describing the publishing status
 
-set actions {}
+set actions [list]
 
 switch $info(publish_status) {
 

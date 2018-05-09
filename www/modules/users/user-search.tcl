@@ -54,7 +54,7 @@ if { [form is_valid user_search] } {
 
   set extra_url [content::url_passthrough $passthrough]
 
-  set clauses {}
+  set clauses [list]
   set search_in [element get_values user_search search_in]
   set keyword [string tolower "%$keyword%"]
 
