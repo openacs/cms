@@ -364,7 +364,7 @@ create table v_items (
 );
 insert into v_items (value) values ('{0}');
 
-create or replace function v_items_tr () returns opaque as '
+create or replace function v_items_tr () returns trigger as '
 begin
         raise EXCEPTION ''Only updates are allowed on this table'';
         return null;
@@ -379,7 +379,7 @@ create table v_perms (
 );
 insert into v_perms (value) values ('{''}');
 
-create or replace function v_perms_tr () returns opaque as '
+create or replace function v_perms_tr () returns trigger as '
 begin
         raise EXCEPTION ''Only updates are allowed on this table'';
         return null;
@@ -685,7 +685,7 @@ end;' language 'plpgsql';
 -- A trigger to automatically grant item creators the cm_write and cm_perm
 -- permissions
 
-create or replace function cr_items_permission_tr () returns opaque as '
+create or replace function cr_items_permission_tr () returns trigger as '
 declare
   v_user_id parties.party_id%TYPE;
 begin
