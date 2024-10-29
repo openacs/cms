@@ -29,7 +29,7 @@ set user_id [auth::require_login]
 #content::check_access $id "cm_perm" -db $db -user_id $user_id \
 #  -parent_id $parent_id -mount_point $mount_point
 
-# Determine if the user is the site wide admin, and if he has the rights to \
+# Determine if the user is the site-wide admin, and if he has the rights to \
 # modify permissions at all
 content::check_access $object_id "cm_examine" \
   -user_id $user_id -mount_point $mount_point -parent_id $parent_id
