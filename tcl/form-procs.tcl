@@ -946,7 +946,7 @@ ad_proc -public content::upload_content { revision_id tmpfile filename } {
     #     }
 
     # delete the tempfile
-    ns_unlink $tmpfile
+    file delete $tmpfile
 }
 
 
@@ -1031,7 +1031,7 @@ ad_proc -private content::string_to_file { s } {
 
 } {
 
-    set tmp_file [ns_tmpnam]
+    set tmp_file [ns_mktemp]
 
     set fd [open $tmp_file w]
 
@@ -2023,7 +2023,7 @@ ad_proc -private content::update_content_from_file { revision_id tmpfile } {
     }
 
     # delete the tempfile
-    ns_unlink $tmpfile
+    file delete $tmpfile
 }
 
 

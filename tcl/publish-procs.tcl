@@ -31,8 +31,8 @@ namespace eval publish {
 #   Get the page root. All items will be published to the 
 #   filesystem with their URLs relative to this root.
 #   The page root is controlled by the PageRoot parameter in CMS.
-#   A relative path is relative to [ns_info pageroot]
-#   The default is [ns_info pageroot]
+#   A relative path is relative to [ns_server pagedir]
+#   The default is [ns_server pagedir]
  
 #   @return The page root
  
@@ -46,7 +46,7 @@ namespace eval publish {
 
 #   if { [string index $root_path 0] != "/" } {
 #     # Relative path, prepend server_root
-#     set root_path "[ns_info pageroot]/$root_path"
+#     set root_path "[ns_server pagedir]/$root_path"
 #   }
 
 #   return [ns_normalizepath $root_path]
@@ -155,7 +155,7 @@ ad_proc -private publish::delete_multiple_files { url {root_path ""}} {
 
 } {
   foreach_publish_path $url {
-    ns_unlink -nocomplain $filename 
+    file delete -nocomplain $filename 
     ns_log debug "publish::delete_multiple_files: Delete file $filename"
   } $root_path
 }

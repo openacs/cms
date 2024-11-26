@@ -4,7 +4,7 @@
 request create
 request set_param revision_id -datatype integer
 
-set root_path [ns_info pageroot]
+set root_path [ns_server pagedir]
 
 db_transaction {
 
